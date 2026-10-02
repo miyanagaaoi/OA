@@ -2,7 +2,6 @@
 uid: "426e6923"
 id: oa.authz.rbac.user-role
 parent: oa.authz.rbac
-state: planned
 name: {zh: "用户角色分配", en: "User-role Assignment"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Grants roles to users, optionally bounded by the org scope where the role takes effect (scope_org_id, falling back to the role default); branch process admins may assign only inside their own company and cannot delegate further.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.693Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.653Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/data-model.md"
     line: 188

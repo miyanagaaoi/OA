@@ -11,8 +11,8 @@ description:
   en: >
       Any single rejection on a countersign node rejects the node immediately and returns the document to the initiator; every other pending task of that node becomes auto-closed instead of waiting for the remaining signers. Approvals already recorded stay in the trail while the node verdict is rejection.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.803Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.771Z"
 fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"

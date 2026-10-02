@@ -11,8 +11,8 @@ description:
   en: >
       The document form inside the overlay: every field is read-only after submission (changes require an approver to reject and the initiator to resubmit) and read-only values use a canvas-subtle block; amounts are tnum right-aligned with two decimals and a ten-thousand-yuan conversion above one million; the header carries title, status badge and document number, with print / route / more as secondary actions on the right.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.769Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.736Z"
 fingerprint: 28e8829672cee9b922026028eb18feb80adbb9de4b7fc02f0910f372f46c48c2
 source:
   - path: "DESIGN.md"

@@ -11,8 +11,8 @@ description:
   en: >
       The mobile H5 shell: a white 48px top bar over a white content area above a white bottom action bar in a single-column flow; dark navigation is forbidden on H5; the layout applies at 480px and below and shares one token set with the desktop, changing only density and control size.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.774Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.742Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -11,8 +11,8 @@ description:
   en: >
       Graphical process designer: add/remove nodes, reorder, pick approver resolution rules, configure decision mode and thresholds, signature requirement, timeout length, add-sign and jump permissions; validates the chain before publishing.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.801Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.770Z"
 fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"

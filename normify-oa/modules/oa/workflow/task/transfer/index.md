@@ -11,8 +11,8 @@ description:
   en: >
       Two ways to change a task owner: transfer, raised by the approver with a mandatory reason and only to people inside the same data scope who can see the document; and reassignment, restricted to system administrators for departed or unavailable snapshot approvers, also with a mandatory audited reason.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.822Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.792Z"
 fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"

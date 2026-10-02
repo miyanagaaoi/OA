@@ -2,7 +2,6 @@
 uid: 4a093e50
 id: oa.authz.rbac.grant.org-node
 parent: oa.authz.rbac.grant
-state: planned
 name: {zh: "组织节点授权范围", en: "Org-node Grant Scope"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Ticks the subset of org nodes a role may access (a company or department); together with the data scope it fixes the visible range and may never exceed the granter's own org boundary.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.691Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.652Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/prd-0.1.md"
     line: 159

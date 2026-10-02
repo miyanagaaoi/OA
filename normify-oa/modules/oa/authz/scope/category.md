@@ -2,7 +2,6 @@
 uid: 73a02658
 id: oa.authz.scope.category
 parent: oa.authz.scope
-state: planned
 name: {zh: "归口类别数据域", en: "Category Scope"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Category scope: category values come from the data dictionary (no release needed, downstream consumer of REQ-ADMIN-004) and a role's category range lives in the role-category table; after centralizing on Finance it only applies to business-line roles such as group executives.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.693Z"
-fingerprint: affe2755b0ec3d7b6adffe3259b4864634f794b5be85e144d9ec84d32aeba3d7
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.654Z"
+fingerprint: 7241121ccd161ffddfd3e9166a1a5bc6bd672932d1333daa0959b62334d40745
 source:
   - path: "doc/data-model.md"
     line: 205

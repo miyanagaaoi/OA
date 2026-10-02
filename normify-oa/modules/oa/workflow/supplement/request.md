@@ -11,9 +11,9 @@ description:
   en: >
       An approval node raises a supplement request: the reason stating what is missing is mandatory, a flow_supplement row is written (node_instance_id points to the requesting node, supplement_round increments, deadline defaults to three working days) and the instance enters the pending-supplement sub-status. At most once per node and three times per document.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.816Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.787Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/prd-0.1.md"
     line: 325

@@ -11,8 +11,8 @@ description:
   en: >
       The contract sheet's core feature, up to three segments: each holds receiving unit / receiver / receipt time (a three-cell inline table with vertical rules only), a multi-line handling opinion and a right-aligned sign-off with date; each segment corresponds to one group-level routing.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.723Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.689Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

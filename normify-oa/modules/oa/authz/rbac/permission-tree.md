@@ -2,7 +2,6 @@
 uid: 4518af9f
 id: oa.authz.rbac.permission-tree
 parent: oa.authz.rbac
-state: planned
 name: {zh: "权限树维护", en: "Permission Tree"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Defines and maintains the permission tree: menu/button/api nodes, each with a unique permission code (e.g. flow:task:approve) and front-end route, assignable level by level.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.692Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.653Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/data-model.md"
     line: 219

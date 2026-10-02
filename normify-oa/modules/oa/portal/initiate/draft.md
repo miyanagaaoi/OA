@@ -11,8 +11,8 @@ description:
   en: >
       Top-bar entries for Save draft and Draft box (N); when an unsubmitted earlier edit is detected, an info bar appears with resume and delete actions on a semantic-info-surface fill; drafts keep the template version number and are re-resolved against the latest template on resubmission.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.777Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.745Z"
 fingerprint: 28e8829672cee9b922026028eb18feb80adbb9de4b7fc02f0910f372f46c48c2
 source:
   - path: "DESIGN.md"

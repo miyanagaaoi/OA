@@ -11,9 +11,9 @@ description:
   en: >
       Resolves the document type (matter/fund/contract/seal) from flow_template.code/form_type and maintains the template name, node_count and the form_schema_json field definitions that drive form rendering and the field dictionary (see doc/forms.md).
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.800Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.769Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/data-model.md"
     line: 278

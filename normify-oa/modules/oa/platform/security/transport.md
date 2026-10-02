@@ -11,8 +11,8 @@ description:
   en: >
       Site-wide HTTPS with modern cipher suites, HSTS and security response headers, and private storage that refuses direct attachment links without authentication.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.768Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.735Z"
 fingerprint: 0af6565d61634a342e4b0a32164bffdd5bdb0d2843067bb40450b183df60b428
 source:
   - path: "doc/prd-0.1.md"

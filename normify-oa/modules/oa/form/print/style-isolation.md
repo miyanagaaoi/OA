@@ -11,8 +11,8 @@ description:
   en: >
       Sheets share data with the screen UI but never its styles: square corners everywhere, 1pt solid table rules (outer border to .6mm), no shadows or gradients, no theme colour (all black), statuses expressed as text, fixed 9.5pt/8.5pt/16pt sizes, no .btn/.card/.pill reuse, millimetre and point units for paper and margins, and nothing lost in black-and-white copying.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.723Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.690Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

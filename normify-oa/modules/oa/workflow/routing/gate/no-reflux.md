@@ -11,8 +11,8 @@ description:
   en: >
       A department already handled cannot be designated as a routing target again (A-B-A is refused); returning to the own department is the only exception and is limited to two consecutive times. The judgement uses the set of receiving departments already present in the routing chain, and a hit is refused with a concrete reason and no state change.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.808Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.778Z"
 fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"

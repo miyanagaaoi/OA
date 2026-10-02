@@ -11,8 +11,8 @@ description:
   en: >
       Add-sign before inserts the added signer ahead of the current approver; the signer decides first and, once finished, the task returns to the original approver. The node decision mode and threshold are unchanged and the signer owns their opinion.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.819Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.789Z"
 fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"

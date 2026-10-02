@@ -2,7 +2,6 @@
 uid: 1c2e4d33
 id: oa.authz.rbac
 parent: oa.authz
-state: planned
 name: {zh: "角色与权限树", en: "Roles & Permission Tree"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Roles and the permission tree (menu/feature nodes) plus role-permission assignment; IT assigns permissions node by node, and branch process admins may maintain their own company but cannot re-delegate permissions.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.691Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.652Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/prd-0.1.md"
     line: 159

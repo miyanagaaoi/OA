@@ -10,8 +10,8 @@ description:
   en: >
       Four-level org cascader with per-level search (240px panels); nodes outside the caller's data scope are not rendered at all (invisible rather than disabled) so the picker cannot be used to probe the org tree.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.732Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.701Z"
 fingerprint: 28e8829672cee9b922026028eb18feb80adbb9de4b7fc02f0910f372f46c48c2
 source:
   - path: "DESIGN.md"

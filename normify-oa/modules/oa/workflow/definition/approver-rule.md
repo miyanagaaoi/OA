@@ -11,9 +11,9 @@ description:
   en: >
       Declares and validates the node's approver_rule and approver_param: dept_leader/department_leader/finance_leader/company_exec/gm/group_dept_leader/group_dept/group_exec/chairman/designated/initiator_pick; designated requires user_ids or role_code. Only the rule code is declared here — resolution runs at submission in the approver module (REQ-FLOW-011).
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.796Z"
-fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.766Z"
+fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/data-model.md"
     line: 307

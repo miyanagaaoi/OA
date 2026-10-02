@@ -11,8 +11,8 @@ description:
   en: >
       The five semantic colours with their surfaces: success #1f7a4d on #e6f4ec, warning #9a6200 on #fdf1dd (a deliberately darker amber to reach 4.6:1 on white), error #c02b25 on #fbeaea, info #1f5ae0 on #eef3fe (identical to primary because blue means exactly one thing in this system) and neutral #5b6472 on #eef0f4.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.706Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.669Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -11,8 +11,8 @@ description:
   en: >
       The four flow node states plus parallel grouping: done (white with a primary-border outline, ink text and a tick), current (solid corporate blue with white text), not reached (white with grey text and border) and overdue (white with red text and border); connectors are 2px with completed segments in primary and unfinished in hairline, and a parallel group shows Collaboration with the department count and 3/4 progress.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.700Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.662Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

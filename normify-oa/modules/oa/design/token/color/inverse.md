@@ -11,8 +11,8 @@ description:
   en: >
       Inverse tokens are used inside the left navigation only: inverse-canvas #151a22, inverse-surface-1 #1e242e for the selected item, inverse-surface-2 #28303c for hover and second-level expansion, inverse-ink #f4f6f9 at 14.6:1 and inverse-ink-muted #9aa4b2 at 6.4:1; dark cards or dark table headers in the content area are forbidden, and H5 never uses inverse surfaces.
       
-revision: c3342bbdedcde68c9955e4600fa972afa9b10579
-updated_at: "2026-10-02T10:35:01.706Z"
+revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
+updated_at: "2026-10-02T10:53:53.669Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"
