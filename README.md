@@ -25,6 +25,7 @@
 | [`doc/dev-plan-v0.3.md`](doc/dev-plan-v0.3.md) | **开发步骤与排期**：阶段 0 + 5 阶段 23 周，工作包、决策闸门、验收门、关键路径 | 基线 |
 | [`doc/tech-design.md`](doc/tech-design.md) | **技术方案**：总体架构、选型、模块划分、关键设计、部署运维、决策记录 D1–D10 | V1.0 已评审 |
 | [`doc/import-spec.md`](doc/import-spec.md) | **批量导入规格**：组织/人员/负责人/一人多岗/角色分配五个模板、校验规则与错误码、幂等与回滚、补偿控制 | V1.1 |
+| [`doc/dependencies.md`](doc/dependencies.md) | **依赖清单**：环境依赖（JDK/Maven/Node/MySQL/Redis/Nginx）、后端与前端构件实测版本、工具脚本零依赖说明、**DSH 插件依赖**（DSH 2.0.17-beta.1 / dsh 0.2.0-rc.2 / Normify 0.5.4 / 浏览器桥 0.1.4） | 2026-10-02 实测 |
 | [`DESIGN.md`](DESIGN.md) | **设计语言**：设计令牌、组件规范、A4 打印规格（Stitch DESIGN.md 格式） | V0.4 |
 | [`DESIGN.preview.html`](DESIGN.preview.html) | 全页面预览：登录 / 审批中心 / 四类表单 / 打印预览 / H5 / 审计日志 | 可打开 |
 | [`DESIGN.print-a4.html`](DESIGN.print-a4.html) | 四类单据 A4 实尺打印稿 | 可打开 |
