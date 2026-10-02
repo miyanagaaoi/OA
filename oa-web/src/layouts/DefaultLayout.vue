@@ -38,6 +38,17 @@ const navItems = [
 ] as const
 
 /**
+ * 管理后台分组（阶段 1 · 1.1）：组织架构与人员管理。
+ * 口径：`admin.org.manage` / `admin.user.manage` / `admin.console`（见 `utils/admin.ts`），
+ * 系统管理员兜底可见（PRD 6.10 REQ-ADMIN-006）。
+ */
+const adminNavItems = [
+  { key: 'admin-console', label: '管理后台', path: '/admin', permission: 'admin.console' },
+  { key: 'admin-orgs', label: '组织架构', path: '/admin/orgs', permission: 'admin.org.manage' },
+  { key: 'admin-users', label: '人员管理', path: '/admin/users', permission: 'admin.user.manage' },
+] as const
+
+/**
  * 权限不可见优于不可用：无权限的入口不渲染（DESIGN.md Agent Usage Rules 第 6 条）。
  * 权限数据尚未取回时（阶段 1 骨架）不做隐藏，避免整栏空白。
  */
@@ -47,8 +58,21 @@ const visibleNavItems = computed(() => {
   return navItems.filter((item) => userStore.isSuperAdmin || userStore.hasPermission(item.permission))
 })
 
+/**
+ * 管理入口的判定更严格：权限数据未取回时**一律不渲染**。
+ * 审批中心入口空着只是体验问题，管理入口误闪会给无权限用户泄露后台结构。
+ */
+const visibleAdminNavItems = computed(() => {
+  if (userStore.isSuperAdmin) return adminNavItems
+  if (userStore.permissions.length === 0) return []
+  return adminNavItems.filter((item) => userStore.hasPermission(item.permission))
+})
+
 const activeKey = computed(() => {
   if (route.path.startsWith('/archive')) return 'archive'
+  if (route.path.startsWith('/admin/orgs')) return 'admin-orgs'
+  if (route.path.startsWith('/admin/users')) return 'admin-users'
+  if (route.path.startsWith('/admin')) return 'admin-console'
   const tab = route.meta.tab as string | undefined
   if (tab) return tab
   if (route.name === 'task-detail' || route.name === 'print-preview') return 'pending'
@@ -56,6 +80,11 @@ const activeKey = computed(() => {
 })
 
 const breadcrumb = computed(() => {
+  if (route.path.startsWith('/admin')) {
+    const title = (route.meta.title as string | undefined) || '管理后台'
+    // 总览页不再重复「管理后台 / 管理后台」
+    return title === '管理后台' ? ['管理后台'] : ['管理后台', title]
+  }
   const parts = ['审批中心']
   if (route.path.startsWith('/archive')) {
     parts.push('历史库')
@@ -63,8 +92,6 @@ const breadcrumb = computed(() => {
     parts.push('待我审批', '单据详情')
   } else if (route.name === 'print-preview') {
     parts.push('单据详情', '打印预览')
-  } else if (route.name === 'admin') {
-    parts.push('管理后台')
   } else {
     parts.push(route.meta.title || '待我审批')
   }
@@ -173,6 +200,23 @@ function toggleWatermark(enabled: boolean): void {
         <p class="nav-placeholder">
           未来模块（合同管理、计划管理、经营决策、人力资源）按同一分组样式追加，不改抽屉机制。
         </p>
+
+        <!-- 管理后台分组：仅管理员可见（权限不可见优于不可用） -->
+        <template v-if="visibleAdminNavItems.length">
+          <p class="nav-caption">管理后台</p>
+          <button
+            v-for="item in visibleAdminNavItems"
+            :key="item.key"
+            class="nav-item"
+            :class="{ 'is-active': activeKey === item.key }"
+            type="button"
+            :data-tip="item.label"
+            @click="goto(item.path)"
+          >
+            <span class="nav-glyph" aria-hidden="true">{{ item.label.slice(0, 1) }}</span>
+            <span class="nav-label">{{ item.label }}</span>
+          </button>
+        </template>
       </nav>
 
       <!-- 用户区：头像 + 姓名 + 工号 + 退出 -->

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  组织架构 Mapper（sys_org）—— 数据域 WHERE 片段集中在本文件
+  ============================================================================
+  约定（doc/tech-design.md §4.1 第 ③ 条、§5.3；与 SysUserMapper.xml 同风格）：
+    1) 任一查询受控表的语句，必须在 WHERE 处写标记注释：
+         /* @dataScope(table=sys_org, alias=o) */
+       该标记会被 com.oa.common.scope.DataScopeInterceptor 替换为
+       com.oa.common.scope.DataScopeSqlBuilder 的产物。sys_org 以 DataScopeKind.NONE 登记
+       （见 SysOrg 类注释）：标记的作用是「禁止裸查询」，替换结果为 1=1；
+    2) 标记位置必须是一个**完整布尔表达式**的位置（`WHERE 1=1 AND <标记>`）。
+       若拦截器未生效，SQL 会因悬空的 AND 直接报错（fail-closed），而不是静默返回全表；
+    3) **每条语句至多一个标记**：拦截器只替换第一个标记（replaceFirst）。
+       若一次查询涉及两张受控表（如 join sys_user），只标注**承担过滤语义**的那张表；
+    4) 写操作（insert/update）不受拦截器约束，无需标记。
+  ============================================================================
+-->
+<mapper namespace="com.oa.identity.infra.SysOrgMapper">
+
+  <resultMap id="SysOrgResultMap" type="com.oa.identity.domain.SysOrg">
+    <id property="id" column="id"/>
+    <result property="parentId" column="parent_id"/>
+    <result property="orgType" column="org_type"/>
+    <result property="name" column="name"/>
+    <result property="path" column="path"/>
+    <result property="depth" column="depth"/>
+    <result property="leaderId" column="leader_id"/>
+    <result property="sortNo" column="sort_no"/>
+    <result property="status" column="status"/>
+    <result property="remark" column="remark"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="createdBy" column="created_by"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="updatedBy" column="updated_by"/>
+    <result property="deletedAt" column="deleted_at"/>
+  </resultMap>
+
+  <sql id="OrgColumns">
+    o.id, o.parent_id, o.org_type, o.name, o.path, o.depth, o.leader_id, o.sort_no,
+    o.status, o.remark, o.created_at, o.created_by, o.updated_at, o.updated_by, o.deleted_at
+  </sql>
+
+  <!-- 全量节点：用于导出与可见性推导。排序按 path（父先于子）→ 前端可直接顺序渲染 -->
+  <select id="selectAll" resultMap="SysOrgResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+    <if test="!includeDisabled">
+      AND o.status = 'active'
+    </if>
+    ORDER BY o.path ASC, o.sort_no ASC, o.id ASC
+  </select>
+
+  <select id="selectById" resultMap="SysOrgResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectByIds" resultMap="SysOrgResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.id IN
+      <foreach collection="ids" item="item" open="(" separator="," close=")">#{item}</foreach>
+    ORDER BY o.path ASC
+  </select>
+
+  <select id="selectRoots" resultMap="SysOrgResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.parent_id IS NULL
+    <if test="!includeDisabled">
+      AND o.status = 'active'
+    </if>
+    ORDER BY o.sort_no ASC, o.id ASC
+  </select>
+
+  <!-- 子树（含自身）：path 前缀匹配，path 形如 /1/12/135/ -->
+  <select id="selectSubtree" resultMap="SysOrgResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.path LIKE CONCAT(#{pathPrefix}, '%')
+    <if test="!includeDisabled">
+      AND o.status = 'active'
+    </if>
+    ORDER BY o.depth ASC, o.sort_no ASC, o.id ASC
+  </select>
+
+  <select id="search" resultMap="SysOrgResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND (o.name LIKE CONCAT('%', #{keyword}, '%') OR o.path LIKE CONCAT('%', #{keyword}, '%'))
+    <if test="!includeDisabled">
+      AND o.status = 'active'
+    </if>
+    ORDER BY o.depth ASC, o.path ASC, o.sort_no ASC
+  </select>
+
+  <select id="countByType" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.org_type = #{orgType}
+    <if test="excludeId != null">
+      AND o.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
+  <select id="countChildren" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.parent_id = #{parentId}
+  </select>
+
+  <select id="countSiblingName" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.deleted_at IS NULL
+      AND o.name = #{name}
+      AND ((#{parentId} IS NULL AND o.parent_id IS NULL) OR o.parent_id = #{parentId})
+    <if test="excludeId != null">
+      AND o.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insertOrg" parameterType="com.oa.identity.domain.SysOrg"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO sys_org (parent_id, org_type, name, path, depth, leader_id, sort_no, status, remark, created_by, updated_by)
+    VALUES (#{parentId}, #{orgType}, #{name}, #{path}, #{depth}, #{leaderId},
+            IFNULL(#{sortNo}, 0), IFNULL(#{status}, 'active'), #{remark}, #{createdBy}, #{createdBy})
+  </insert>
+
+  <update id="updateOrg" parameterType="com.oa.identity.domain.SysOrg">
+    UPDATE sys_org
+    <set>
+      <if test="name != null">name = #{name},</if>
+      <if test="sortNo != null">sort_no = #{sortNo},</if>
+      <if test="remark != null">remark = #{remark},</if>
+      <if test="leaderId != null">leader_id = #{leaderId},</if>
+      <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+      updated_at = NOW()
+    </set>
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <update id="updateStatus">
+    UPDATE sys_org
+    SET status = #{status}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <update id="updatePathAndDepth">
+    UPDATE sys_org
+    SET path = #{path}, depth = #{depth}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <update id="updateParent">
+    UPDATE sys_org
+    SET parent_id = #{parentId}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <update id="updateLeaderId">
+    UPDATE sys_org
+    SET leader_id = #{leaderId}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+</mapper>

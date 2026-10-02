@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
  *
  * <p>安全约定：{@code phone} 加密存储、展示按角色脱敏（{@link #maskedPhone()}）；
  * {@code password_hash} 只允许通过 {@code PasswordService} 读写，永不进响应体。
+ *
+ * <p><b>本实体不再经 BaseMapper 读写</b>：{@code sys_user} 是受控表，其 Mapper
+ * （{@code com.oa.identity.infra.SysUserMapper}）**不继承 {@code BaseMapper}**，
+ * 读写一律走该接口在 XML 中显式声明的语句（写入含 {@code useGeneratedKeys} 回填 id）。
+ * 下面的 {@code @TableName}/{@code @TableId}/{@code @TableLogic} 注解**保留**：
+ * 它们仍表达列名/主键/逻辑删除语义，且对 XML 中的 {@code useGeneratedKeys} 无影响。
  */
 @TableName("sys_user")
 @DataScopeTable(table = "sys_user", alias = "u", kind = DataScopeKind.USER)

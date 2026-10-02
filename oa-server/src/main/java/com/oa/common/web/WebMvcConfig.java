@@ -2,13 +2,10 @@ package com.oa.common.web;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.oa.common.config.OaProperties;
 import com.oa.common.security.AuthInterceptor;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
@@ -60,13 +57,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Jackson 配置：
+     * Jackson 配置（时间与解析特性）：
      * <ul>
-     *   <li>{@link BigDecimal}（金额 {@code DECIMAL(18,2)}）一律序列化为**字符串**，禁止浮点（doc/data-model.md §1）；</li>
-     *   <li>{@link Long} 序列化为字符串，避免 JS 53 位精度丢失（主键为 {@code BIGINT UNSIGNED}），可用
-     *       {@code oa.jackson.serialize-long-as-string=false} 关闭；</li>
-     *   <li>时间统一 {@code yyyy-MM-dd HH:mm:ss}（库内存 UTC、展示 Asia/Shanghai）。</li>
+     *   <li>时间统一 {@code yyyy-MM-dd HH:mm:ss}（库内存 UTC、展示 Asia/Shanghai）；</li>
+     *   <li>反序列化忽略未知字段（前端多传字段不得导致 400）。</li>
      * </ul>
+     *
+     * <p><b>数字精度</b>（{@code Long}/{@code long} → 字符串、{@code BigDecimal} → 字符串）
+     * 已收敛到 {@code com.oa.common.config.JacksonConfig#oaNumberAsStringCustomizer}——
+     * 序列化口径集中在 {@code common/config} 一处，避免两个 customizer 各写一半。
      */
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer oaJacksonCustomizer(OaProperties properties) {
@@ -78,14 +77,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(jackson.getDateFormat());
             builder.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
             builder.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
-            if (jackson.isSerializeBigDecimalAsString()) {
-                builder.serializerByType(BigDecimal.class, ToStringSerializer.instance);
-            }
-            if (jackson.isSerializeLongAsString()) {
-                builder.serializerByType(Long.class, ToStringSerializer.instance);
-                builder.serializerByType(Long.TYPE, ToStringSerializer.instance);
-                builder.serializerByType(BigInteger.class, ToStringSerializer.instance);
-            }
         };
     }
 }

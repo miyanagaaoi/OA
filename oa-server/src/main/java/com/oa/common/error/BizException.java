@@ -31,7 +31,11 @@ public class BizException extends RuntimeException {
     private BizException(ErrorCode errorCode, String message, Throwable cause, Map<String, Object> details) {
         super(message, cause);
         this.errorCode = errorCode == null ? ErrorCode.INTERNAL_ERROR : errorCode;
-        this.details = details == null ? Collections.emptyMap() : details;
+        // 必须拷贝为**可变** Map：{@link #withDetail} 会在构造后追加排查上下文。
+        // （原实现直接持有 Collections.emptyMap()，导致 withDetail 抛 UnsupportedOperationException。）
+        this.details = details == null || details.isEmpty()
+                ? new LinkedHashMap<>()
+                : new LinkedHashMap<>(details);
     }
 
     public static BizException of(ErrorCode errorCode, String message) {

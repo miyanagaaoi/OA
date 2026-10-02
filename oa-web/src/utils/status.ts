@@ -8,6 +8,7 @@
  * 状态色只出现在状态徽标、流程节点与风险提示上。
  */
 import type { DocumentStatus, FormType, TrailNodeState } from '@/types/api'
+import type { LeaderType, OrgStatus, UserStatus } from '@/types/identity'
 
 export interface StatusStyle {
   /** 全局状态徽标类名（styles/index.scss 的 .oa-pill） */
@@ -85,4 +86,56 @@ export function trailStateLabel(state: TrailNodeState): string {
     default:
       return '未到达'
   }
+}
+
+// ---------------------------------------------------------------------------
+// 身份域状态徽标（组织 / 人员 / 岗位 / 负责人）
+// ----------------------------------------------------------------------------
+//  口径与单据状态完全一致：**只从 `.oa-pill` 已有的五个类里选**，不新造配色
+//  （DESIGN.md 附录 B「状态与颜色映射表（全局唯一，实现时不得扩展）」）。
+//  语义落位：
+//    · 启用 / 在职 / 主岗  → 正常可用 → success（is-approved）
+//    · 停用 / 离职         → 中性、非风险 → neutral（is-closed）
+//    · 正职负责人          → 当前责任人，需与副职区分 → info（is-processing）
+//  中文标签与 `doc/import-spec.md` §3 的枚举中文逐字一致，改动即契约变更。
+// ---------------------------------------------------------------------------
+export interface IdentityPillStyle {
+  pillClass: StatusStyle['pillClass']
+  label: string
+}
+
+const ORG_STATUS_MAP: Record<OrgStatus, IdentityPillStyle> = {
+  active: { pillClass: 'is-approved', label: '启用' },
+  disabled: { pillClass: 'is-closed', label: '停用' },
+}
+
+const USER_STATUS_MAP: Record<UserStatus, IdentityPillStyle> = {
+  active: { pillClass: 'is-approved', label: '在职' },
+  // 离职与停用都是「不可用且非风险」，颜色不再细分（避免为不同对象发明新配色）
+  resigned: { pillClass: 'is-closed', label: '离职' },
+  disabled: { pillClass: 'is-closed', label: '停用' },
+}
+
+const LEADER_TYPE_MAP: Record<LeaderType, IdentityPillStyle> = {
+  primary: { pillClass: 'is-processing', label: '正职' },
+  deputy: { pillClass: 'is-closed', label: '副职' },
+}
+
+export function orgStatusStyle(status: OrgStatus): IdentityPillStyle {
+  return ORG_STATUS_MAP[status] ?? ORG_STATUS_MAP.disabled
+}
+
+export function userStatusStyle(status: UserStatus): IdentityPillStyle {
+  return USER_STATUS_MAP[status] ?? USER_STATUS_MAP.disabled
+}
+
+export function leaderTypeStyle(type: LeaderType): IdentityPillStyle {
+  return LEADER_TYPE_MAP[type] ?? LEADER_TYPE_MAP.deputy
+}
+
+/** 岗位主岗标记（E-POS-005：每人最多一个主岗） */
+export function primaryPillStyle(isPrimary: boolean): IdentityPillStyle {
+  return isPrimary
+    ? { pillClass: 'is-approved', label: '主岗' }
+    : { pillClass: 'is-closed', label: '兼岗' }
 }

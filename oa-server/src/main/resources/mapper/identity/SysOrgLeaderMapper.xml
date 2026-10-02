@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  组织负责人 Mapper（sys_org_leader）—— 数据域 WHERE 片段集中在本文件
+  ============================================================================
+  约定同 SysOrgMapper.xml：受控表 SELECT 必须带标记；每条语句至多一个标记。
+    - sys_org_leader 以 DataScopeKind.NONE 登记 → 标记替换为 1=1（禁止裸查询）；
+    - selectCandidates 的过滤主体是 sys_user（成员范围按用户类口径收敛），
+      故该语句标记指向 table=sys_user —— **同一语句内只标注承担过滤语义的那张表**。
+  ============================================================================
+-->
+<mapper namespace="com.oa.identity.infra.SysOrgLeaderMapper">
+
+  <resultMap id="SysOrgLeaderResultMap" type="com.oa.identity.domain.SysOrgLeader">
+    <id property="id" column="id"/>
+    <result property="orgId" column="org_id"/>
+    <result property="userId" column="user_id"/>
+    <result property="leaderType" column="leader_type"/>
+    <result property="dutyTitle" column="duty_title"/>
+    <result property="category" column="category"/>
+    <result property="sortNo" column="sort_no"/>
+    <result property="effectiveFrom" column="effective_from"/>
+    <result property="effectiveTo" column="effective_to"/>
+    <result property="remark" column="remark"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="createdBy" column="created_by"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="updatedBy" column="updated_by"/>
+  </resultMap>
+
+  <resultMap id="LeaderRowResultMap" type="com.oa.identity.infra.row.LeaderRow">
+    <id property="id" column="id"/>
+    <result property="orgId" column="org_id"/>
+    <result property="orgPath" column="org_path"/>
+    <result property="orgName" column="org_name"/>
+    <result property="orgType" column="org_type"/>
+    <result property="userId" column="user_id"/>
+    <result property="userName" column="user_name"/>
+    <result property="account" column="account"/>
+    <result property="employeeNo" column="employee_no"/>
+    <result property="leaderType" column="leader_type"/>
+    <result property="dutyTitle" column="duty_title"/>
+    <result property="category" column="category"/>
+    <result property="sortNo" column="sort_no"/>
+    <result property="remark" column="remark"/>
+    <result property="effectiveFrom" column="effective_from"/>
+    <result property="effectiveTo" column="effective_to"/>
+    <result property="userStatus" column="user_status"/>
+  </resultMap>
+
+  <resultMap id="LeaderCandidateRowResultMap" type="com.oa.identity.infra.row.LeaderCandidateRow">
+    <id property="userId" column="user_id"/>
+    <result property="name" column="name"/>
+    <result property="account" column="account"/>
+    <result property="employeeNo" column="employee_no"/>
+    <result property="userStatus" column="user_status"/>
+    <result property="orgId" column="org_id"/>
+    <result property="position" column="position"/>
+    <result property="isPrimary" column="is_primary"/>
+    <result property="leaderId" column="leader_id"/>
+    <result property="leaderType" column="leader_type"/>
+    <result property="category" column="category"/>
+    <result property="dutyTitle" column="duty_title"/>
+  </resultMap>
+
+  <sql id="LeaderRowColumns">
+    l.id, l.org_id, o.path AS org_path, o.name AS org_name, o.org_type,
+    l.user_id, u.name AS user_name, u.account, u.employee_no, u.status AS user_status,
+    l.leader_type, l.duty_title, l.category, l.sort_no, l.remark,
+    l.effective_from, l.effective_to
+  </sql>
+
+  <select id="selectByOrgId" resultMap="LeaderRowResultMap">
+    SELECT <include refid="LeaderRowColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_org o ON o.id = l.org_id AND o.deleted_at IS NULL
+    LEFT JOIN sys_user u ON u.id = l.user_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.org_id = #{orgId}
+    ORDER BY (l.leader_type = 'primary') DESC, l.sort_no ASC, l.id ASC
+  </select>
+
+  <select id="selectRowById" resultMap="LeaderRowResultMap">
+    SELECT <include refid="LeaderRowColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_org o ON o.id = l.org_id AND o.deleted_at IS NULL
+    LEFT JOIN sys_user u ON u.id = l.user_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectEntityById" resultMap="SysOrgLeaderResultMap">
+    SELECT l.id, l.org_id, l.user_id, l.leader_type, l.duty_title, l.category, l.sort_no,
+           l.effective_from, l.effective_to, l.remark, l.created_at, l.created_by, l.updated_at, l.updated_by
+    FROM sys_org_leader l
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectByUserId" resultMap="LeaderRowResultMap">
+    SELECT <include refid="LeaderRowColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_org o ON o.id = l.org_id AND o.deleted_at IS NULL
+    LEFT JOIN sys_user u ON u.id = l.user_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.user_id = #{userId}
+    ORDER BY o.path ASC, l.category ASC, l.id ASC
+  </select>
+
+  <!-- 集团层按业务线绑定的分管领导：category 非空 + 组织为 group -->
+  <select id="selectGroupLines" resultMap="LeaderRowResultMap">
+    SELECT <include refid="LeaderRowColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_org o ON o.id = l.org_id AND o.deleted_at IS NULL
+    LEFT JOIN sys_user u ON u.id = l.user_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.category IS NOT NULL
+      AND o.org_type = 'group'
+    ORDER BY l.category ASC, (l.leader_type = 'primary') DESC, l.sort_no ASC, l.id ASC
+  </select>
+
+  <!-- category 为 null 时取「普通负责人」组；非 null 时取该业务线（NULL 安全比较用 <=>） -->
+  <select id="selectBindings" resultMap="SysOrgLeaderResultMap">
+    SELECT l.id, l.org_id, l.user_id, l.leader_type, l.duty_title, l.category, l.sort_no,
+           l.effective_from, l.effective_to, l.remark, l.created_at, l.created_by, l.updated_at, l.updated_by
+    FROM sys_org_leader l
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.org_id = #{orgId}
+      AND l.category &lt;=&gt; #{category}
+    ORDER BY (l.leader_type = 'primary') DESC, l.sort_no ASC, l.id ASC
+  </select>
+
+  <select id="selectBinding" resultMap="SysOrgLeaderResultMap">
+    SELECT l.id, l.org_id, l.user_id, l.leader_type, l.duty_title, l.category, l.sort_no,
+           l.effective_from, l.effective_to, l.remark, l.created_at, l.created_by, l.updated_at, l.updated_by
+    FROM sys_org_leader l
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.org_id = #{orgId}
+      AND l.user_id = #{userId}
+      AND l.leader_type = #{leaderType}
+      AND l.category &lt;=&gt; #{category}
+    LIMIT 1
+  </select>
+
+  <!-- 候选人：过滤主体是 sys_user（用户类数据域），其余两表只做标注；keyword 为空即不过滤 -->
+  <select id="selectCandidates" resultMap="LeaderCandidateRowResultMap">
+    SELECT u.id AS user_id, u.name, u.account, u.employee_no, u.status AS user_status,
+           up.org_id, up.position, up.is_primary,
+           l.id AS leader_id, l.leader_type, l.category, l.duty_title
+    FROM sys_user u
+    LEFT JOIN sys_user_position up ON up.user_id = u.id AND up.org_id = #{orgId}
+    LEFT JOIN sys_org_leader l ON l.org_id = #{orgId} AND l.user_id = u.id
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.status &lt;&gt; 'resigned'
+      AND (u.org_id = #{orgId} OR up.id IS NOT NULL)
+    <if test="keyword != null and keyword != ''">
+      AND (u.name LIKE CONCAT('%', #{keyword}, '%')
+           OR u.account LIKE CONCAT('%', #{keyword}, '%')
+           OR u.employee_no LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY u.name ASC, u.id ASC
+  </select>
+
+  <!--
+    AC-11「未设正职」标示：一次性取回全部已设正职的组织 id（避免树接口逐节点 N+1）。
+    正职口径 = leader_type='primary' AND category IS NULL（业务线分管领导不算正职）。
+  -->
+  <select id="selectPrimaryOrgIds" resultType="java.lang.Long">
+    SELECT DISTINCT l.org_id
+    FROM sys_org_leader l
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.leader_type = 'primary'
+      AND l.category IS NULL
+  </select>
+
+  <select id="countByUserId" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_org_leader l
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.user_id = #{userId}
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insertLeader" parameterType="com.oa.identity.domain.SysOrgLeader"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO sys_org_leader (org_id, user_id, leader_type, duty_title, category, sort_no,
+                                effective_from, effective_to, remark, created_by, updated_by)
+    VALUES (#{orgId}, #{userId}, IFNULL(#{leaderType}, 'primary'), #{dutyTitle}, #{category},
+            IFNULL(#{sortNo}, 0), #{effectiveFrom}, #{effectiveTo}, #{remark}, #{createdBy}, #{createdBy})
+  </insert>
+
+  <!--
+    全字段覆盖式更新（PUT 语义）：leader_type / category / effective_* / remark 均按入参写入，
+    传 null 即清除（例如「解除业务线绑定」）。sort_no 用 IFNULL 兜 0（列 NOT NULL）。
+  -->
+  <update id="updateLeader" parameterType="com.oa.identity.domain.SysOrgLeader">
+    UPDATE sys_org_leader
+    SET leader_type = #{leaderType},
+        duty_title = #{dutyTitle},
+        category = #{category},
+        sort_no = IFNULL(#{sortNo}, 0),
+        effective_from = #{effectiveFrom},
+        effective_to = #{effectiveTo},
+        remark = #{remark},
+        updated_by = #{updatedBy},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM sys_org_leader WHERE id = #{id}
+  </delete>
+
+</mapper>

@@ -102,10 +102,8 @@ public class AuthService {
         SessionStore.IssuedSession issued = sessionStore.create(
                 user.getId(), fingerprint, ip, userAgent, request.rememberMe());
 
-        SysUser touch = new SysUser();
-        touch.setId(user.getId());
-        touch.setLastLoginAt(LocalDateTime.now());
-        userMapper.updateById(touch);
+        // 受控表写入口一律走 XML 显式语句（SysUserMapper 不继承 BaseMapper，避免误用无标记的注入语句）
+        userMapper.touchLastLoginAt(user.getId());
 
         writeLoginLog(user.getId(), account, SysLoginLog.RESULT_SUCCESS, null, ip, userAgent, fingerprint);
         auditLogWriter.append(new AuditLogWriter.AuditRecord(user.getId(), user.getName(), "login", "user", user.getId(),
@@ -152,7 +150,8 @@ public class AuthService {
         }
         passwordService.assertStrong(request.newPassword());
 
-        SysUser user = userMapper.selectById(principal.id());
+        // 读自己：必须走带 @dataScope 标记的 XML 语句（BaseMapper 的 selectById 会被拦截器 fail-closed 拒绝）
+        SysUser user = userMapper.selectUserById(principal.id());
         if (user == null) {
             throw new BizException(ErrorCode.UNAUTHORIZED);
         }
@@ -163,10 +162,7 @@ public class AuthService {
             throw new BizException(ErrorCode.PASSWORD_SAME_AS_OLD);
         }
 
-        SysUser update = new SysUser();
-        update.setId(user.getId());
-        update.setPasswordHash(passwordService.encode(request.newPassword()));
-        userMapper.updateById(update);
+        userMapper.updatePasswordHash(user.getId(), passwordService.encode(request.newPassword()), principal.id());
 
         int revoked = sessionStore.revokeAll(user.getId(), com.oa.identity.domain.SysUserSession.REASON_PASSWORD_CHANGED);
         auditLogWriter.append(new AuditLogWriter.AuditRecord(user.getId(), user.getName(), "update", "user", user.getId(),

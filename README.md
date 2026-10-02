@@ -21,7 +21,7 @@
 | [`doc/enums.md`](doc/enums.md) | **枚举权威源**：节点码、状态机、决议模式、消息类型、轨迹动作、类别五值 | V0.4 |
 | [`doc/dict-seed.md`](doc/dict-seed.md) | **数据字典种子**：8 个 dict_type / 37 行，含幂等 `INSERT` | V0.4 |
 | [`doc/templates.md`](doc/templates.md) | **模板契约**：四类单据 × 7 节点配置、`form_schema_json` 结构、打印版式映射 | V0.4 |
-| [`doc/test-cases.md`](doc/test-cases.md) | **可执行验收用例**：206 条，AC-01~AC-61 全覆盖，含越权/会签/补件/闸门/打印/非功能专项 | V0.4 |
+| [`doc/test-cases.md`](doc/test-cases.md) | **可执行验收用例**：210 条，AC-01~AC-61 全覆盖，含越权/会签/补件/闸门/打印/非功能专项 | V0.4 |
 | [`doc/dev-plan-v0.3.md`](doc/dev-plan-v0.3.md) | **开发步骤与排期**：阶段 0 + 5 阶段 23 周，工作包、决策闸门、验收门、关键路径 | 基线 |
 | [`doc/tech-design.md`](doc/tech-design.md) | **技术方案**：总体架构、选型、模块划分、关键设计、部署运维、决策记录 D1–D10 | V1.0 已评审 |
 | [`doc/import-spec.md`](doc/import-spec.md) | **批量导入规格**：组织/人员/负责人/一人多岗/角色分配五个模板、校验规则与错误码、幂等与回滚、补偿控制 | V1.1 |

@@ -51,7 +51,7 @@
 | 0.4 | 四类单据**表单模板与流程模板初稿**（**7 节点**主干，逐节点配决议模式/签名策略/超时） | [`templates.md`](templates.md) ✅（模板 JSON + 节点配置） | 产品 + 后端 |
 | 0.5 | 数据字典初值（事项类别五值、合同类型、用印类型、证照类型、付款方式、其他会审部门、归还状态） | [`dict-seed.md`](dict-seed.md) ✅（37 行种子 + 幂等 SQL）；**待生成落库脚本** | 产品 |
 | 0.6 | Excel 批量导入模板 + 校验规则说明（组织、人员、负责人、一人多岗、角色分配） | [`import-spec.md`](import-spec.md) ✅（600 行规格 + 5 份 CSV 模板 + `tools/check-import-csv.js`，T-01~T-16 全部定稿） | 产品 + 后端 |
-| 0.7 | `test-cases.md`：由 **AC-01~AC-61** 派生可执行用例（含越权、会签阈值、补件边界、非功能与后台） | [`test-cases.md`](test-cases.md) ✅（206 条，AC 全覆盖） | 测试 |
+| 0.7 | `test-cases.md`：由 **AC-01~AC-61** 派生可执行用例（含越权、会签阈值、补件边界、非功能与后台） | [`test-cases.md`](test-cases.md) ✅（**210 条**，AC 全覆盖） | 测试 |
 | 0.8 | 打印稿终稿确认（集团单两版 + 子公司内部审批单 + 印鉴证照单，对照 `doc/参考文档/` 实单） | 打印稿确认单 | 产品 + 设计 |
 | 0.9 | **PRD 一致性修订**（见 [`prd-v0.3-review.md`](prd-v0.3-review.md) 第 7 节的 6 件事：财务部数据域口径、Q11/Q12 回扫、DDL 硬错误、ORG/AUTH 编号补定义、非功能验收、决策闸门时点） | `prd-0.1.md` → V0.4 修订稿 | 产品（后端会签） |
 | 0.10 | `enums.md`：枚举权威源（节点码、事项类别、消息类型、动作类型、状态） | `doc/enums.md` | 后端 |
@@ -88,12 +88,17 @@
 
 **出口（DoD）**：AC-01、AC-02、AC-17 全部通过；越权专项测试（含手改 URL、直连接口）零放行；权限与数据域变更写入审计日志（REQ-LOG-004 的产生侧）。
 
-> **开工状态（2026-10-02）：工程骨架已落地并本地验证通过**
-> - 后端 [`oa-server/`](../oa-server)：Spring Boot 3.2.12 + Java 21 + MyBatis-Plus（Boot 3 专属 starter）+ Flyway + Redis；**`mvn test` 30 个单测全绿**（数据域 SQL 纯函数 12 条、三态白名单 9 条、会话与锁定 8 条、Mapper XML 解析 1 条）
-> - 前端 [`oa-web/`](../oa-web)：Vue 3.4 + TS + Vite 5 + Element Plus + Pinia；**`vue-tsc` 与 `vite build` 均通过**
-> - 部署：[`oa-deploy/docker-compose.yml`](../oa-deploy/docker-compose.yml) + [`nginx/oa.conf`](../oa-deploy/nginx/oa.conf) + [`oa-server/Dockerfile`](../oa-server/Dockerfile) + [`env-checklist.md`](../oa-deploy/env-checklist.md)（＝工作项 0.3）
-> - 已具备骨架：**1.3 登录与会话**（login/logout/me、失败锁定、多设备会话）、**1.5 数据域引擎**（`DataScopeSqlBuilder` 纯函数 + `DataScopeInterceptor` 唯一入口 + 标记缺失时 fail-closed）、**1.6 字段级限制**（三态白名单 `FormWritePolicy`）、**1.7 安全基座**（HTTPS/CSP/不可篡改触发器/BCrypt）、**1.9 设计基座**（`tokens.scss` 对齐 `DESIGN.md`、水印与三态组件、登录/待办/详情/打印四视图）
-> - 尚未开始：**1.1/1.2**（组织树、岗位与负责人）、**1.4**（角色与权限树）、**1.8**（组织人员维护与批量导入落地）
+> **进度（截至 2026-10-02，本地全部验证通过）**
+> - **1.1 组织树与人员** ✅：组织树/检索/选择器、四级层级约束（集团→公司→部门→科室）、**move 级联重算整棵子树 path/depth**、启停（停用前在途检查）、路径与祖先/后代、人员分页与档案维护、一人多岗、离职/调岗/交接（含影响清单）、通讯录（数据域 + 手机号脱敏）、组织导出（CSV+BOM、仅系统管理员）
+> - **1.2 岗位与负责人** ✅：负责人增删改查、候选人（keyword 服务端过滤）、**正职唯一按 `(org_id, category)` 分组**、集团层业务线分管领导（事项类别五值）、`leader-of` 反查、水印策略与「姓名+工号」载荷（AC-44）
+> - **1.3 登录与会话** ✅ 骨架：login/logout/me、失败 5 次锁 15 分钟、多设备上限与踢最早、记住我 7 天、登录日志
+> - **1.5 数据域引擎** ✅ 核心：`DataScopeSqlBuilder`（实例/用户两类口径，含**财务部五路并集**）+ `DataScopeInterceptor`（唯一入口，缺标记 **fail-closed**）+ **自读不变式**（本人可见不依赖数据域解析）+ `DataScopeMapperGuardTest`（受控表 Mapper 不得继承 `BaseMapper`、豁免清单不得含宽读方法）
+> - **1.6 字段级限制** ⏳ 部分：三态白名单 `FormWritePolicy` 已就绪；金额只读/导出与手机号脱敏的**接口级**落地待 1.4 权限树
+> - **1.7 安全基座** ✅ 部分：HTTPS/CSP/不可篡改触发器初始化/BCrypt/口令强度；手机号 AES-256-GCM 加密**未接入**（待 4 阶段密钥管理）
+> - **1.8 组织人员维护** ⏳ 部分：组织与人员的**管理界面已就绪**、组织导出已就绪；Excel 批量导入（五张模板）与其余导出待做
+> - **1.9 设计基座** ✅：`tokens.scss` 逐项对齐 `DESIGN.md`、Element Plus 主题覆写、A4 打印样式、水印/三态/状态徽标组件、管理后台版式（`DESIGN.md` 已补 `admin-org-console` 受控例外）
+> - **验证口径**：后端 `mvn -B clean test` **148 个单测全绿**（数据域 SQL、守卫、自读不变式、在途/强制继续、层级与 path 级联、主岗唯一、正职唯一、契约与审计、Jackson 序列化、CSV 导出等）；前端 `vue-tsc` ×2 + `vite build` 通过
+> - **尚未开始**：**1.4 角色与权限树**（`oa.authz.rbac.*`，含角色分配写入口 `sys_user_role`——**它是新建用户可见数据的前提**：无角色 ⇒ 数据域为空 ⇒ fail-closed 看不到任何数据）
 
 **风险**：数据域是最容易"上线后才发现漏过滤"的地方 → 建议在第 1 阶段末做一次**逐接口矩阵测试**（角色 × 数据范围 × 入口）。
 

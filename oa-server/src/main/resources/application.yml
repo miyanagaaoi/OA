@@ -142,7 +142,6 @@ oa:
     enforce-unmarked-select: true
     exempt-statement-ids:
       - com.oa.identity.infra.SysUserMapper.selectByAccount
-      - com.oa.identity.infra.SysUserMapper.selectOne
       - com.oa.identity.infra.SysUserSessionMapper
       - com.oa.identity.infra.SysLoginLogMapper
       - com.oa.authz.infra.DataScopeMapper
@@ -162,6 +161,11 @@ oa:
       - table: sys_user
         alias: u
         kind: USER
+  identity:
+    # 组织与人员（阶段 1.1/1.2）：在途/待办命中时是否「拒绝」操作
+    # 默认 true = 阻断（AC-11/AC-12、PRD 5.5、import-spec §8.1/§8.2 强制要求）
+    # 置 false = 仅告警放行，但仍返回影响清单（过渡期用法，验收前必须恢复 true）
+    block-on-inflight: true
   security:
     password-min-length: 8      # ≥8 位且含字母与数字（REQ-NFR-005）
     bcrypt-strength: 12         # 文档要求 ≥10

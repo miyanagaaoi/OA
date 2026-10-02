@@ -1,14 +1,39 @@
 <script setup lang="ts">
 /**
- * oa-web · 管理后台占位页
+ * oa-web · 管理后台总览
  * ----------------------------------------------------------------------------
- * 来源：`DESIGN.md` › Layout（主导航"一期只预留审批中心一个模块入口"）
+ * 来源：`doc/prd-0.1.md` 6.10（管理后台：用户与组织管理 / 流程配置 / 权限配置 /
+ *       数据字典 / 报表 / 系统管理员兜底权限边界）
  *       + `doc/tech-design.md` §5.3（管理后台承接数据字典、权限树、流程与表单配置）
  *
- * 一期只保留入口与占位说明，不实现功能；无权限时不渲染入口（权限不可见优于不可用）。
+ * 阶段 1 · 1.1 已落地两项：**组织架构**（组织树 + 负责人 + 岗位）与**人员管理**
+ * （人员列表、一人多岗、离职/调岗/交接）；其余模块仍为占位。
+ * 入口一律「无权限不渲染」（DESIGN.md Agent Usage Rules 第 6 条）。
  */
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { canManageOrg, canManageUser } from '@/utils/admin'
+
+const userStore = useUserStore()
+
+const ready = computed(() =>
+  [
+    {
+      name: '组织架构',
+      note: '组织树（四级）、改名/移动/启停、负责人正副职、集团层业务线绑定、停用在途检查',
+      path: '/admin/orgs',
+      visible: canManageOrg(userStore),
+    },
+    {
+      name: '人员管理',
+      note: '人员列表与筛选、一人多岗（主岗唯一）、离职/调岗/交接与影响清单、通讯录',
+      path: '/admin/users',
+      visible: canManageUser(userStore),
+    },
+  ].filter((item) => item.visible),
+)
+
 const modules = [
-  { name: '组织与人员', note: '组织树、负责人绑定、人员与岗位、Excel 批量导入与影响面预览' },
   { name: '角色与权限树', note: '角色、权限树勾选、数据域（self / dept / company / group_all / group_category）' },
   { name: '流程模板与节点', note: '7 节点定义、决议模式、超时、加签与流转策略、版本发布' },
   { name: '表单模板', note: '四类单据字段字典、三态白名单、校验规则、打印标签映射' },
@@ -23,13 +48,25 @@ const modules = [
   <div class="oa-admin">
     <header class="head">
       <h1>管理后台</h1>
-      <span class="oa-tag is-info">一期占位</span>
+      <span class="oa-tag is-info">阶段 1 · 1.1 已落地组织与人员</span>
     </header>
 
     <p class="lead">
-      本页在一期只保留路由入口。管理后台的完整能力（REQ-ADMIN-001 ~ REQ-ADMIN-005）排在后续阶段，
-      承接方式见 <code>doc/tech-design.md</code> §5.3 与 <code>normify-oa/modules/oa/admin/**</code>。
+      组织架构与人员管理已按 <code>doc/prd-0.1.md</code> 5.1 / 5.5 与
+      <code>doc/import-spec.md</code> 的中文↔code 口径实现；其余管理能力（REQ-ADMIN-002 ~ 005）
+      排在后续阶段，承接方式见 <code>doc/tech-design.md</code> §5.3 与
+      <code>normify-oa/modules/oa/admin/**</code>。
     </p>
+
+    <ul v-if="ready.length" class="grid">
+      <li v-for="item in ready" :key="item.name" class="oa-card is-ready">
+        <b>{{ item.name }}</b>
+        <span>{{ item.note }}</span>
+        <RouterLink class="enter" :to="item.path">进入 →</RouterLink>
+      </li>
+    </ul>
+
+    <h2 class="section">后续阶段</h2>
 
     <ul class="grid">
       <li v-for="item in modules" :key="item.name" class="oa-card">
@@ -59,6 +96,12 @@ h1 {
   color: var(--oa-color-ink);
 }
 
+.section {
+  margin-top: var(--oa-space-xs);
+  font: var(--oa-font-title-section);
+  color: var(--oa-color-ink);
+}
+
 .lead {
   max-width: 860px;
   font: var(--oa-font-body);
@@ -85,6 +128,11 @@ code {
   gap: 4px;
 }
 
+/* 已落地模块用主色描边区分（不新增色值，仅复用 primary-border） */
+.grid li.is-ready {
+  border-color: var(--oa-color-primary-border);
+}
+
 .grid b {
   font: var(--oa-font-title-section);
   color: var(--oa-color-ink);
@@ -93,5 +141,11 @@ code {
 .grid span {
   font: var(--oa-font-body-sm);
   color: var(--oa-color-ink-muted);
+}
+
+.enter {
+  margin-top: var(--oa-space-xs);
+  font: var(--oa-font-label);
+  color: var(--oa-color-primary);
 }
 </style>

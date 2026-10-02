@@ -19,5 +19,9 @@ declare module 'vue-router' {
     archiveOnly?: boolean
     /** 需要的权限码，缺失则不渲染入口（权限不可见优于不可用） */
     requiredPermission?: string
+    /** 命中其中任意一个权限码即可放行（管理后台总览：多种管理权限任一即可） */
+    requiredAnyPermission?: string[]
+    /** 管理后台子导航分组标识，供侧栏高亮与面包屑使用 */
+    adminSection?: 'console' | 'org' | 'user'
   }
 }

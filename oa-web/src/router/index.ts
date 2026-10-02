@@ -15,7 +15,9 @@
  *     /archive                历史库（满 3 年归档，只读、可按单号检索）
  *     /task/:id               单据详情（表单 + 轨迹 + 操作区 + 水印）
  *     /print/:id              A4 打印预览（正式打印签名栏空栏）
- *   /admin                    管理后台占位（一期只留入口，不实现）
+ *   /admin                    管理后台总览（其余模块占位）
+ *     /admin/orgs             组织架构（阶段 1 · 1.1：组织树 + 负责人 + 岗位）
+ *     /admin/users            人员管理（阶段 1 · 1.1：人员列表 + 岗位 + 离职/调岗/交接）
  *   /:pathMatch(.*)*          404
  */
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
@@ -79,10 +81,38 @@ const routes: RouteRecordRaw[] = [
         props: true,
       },
       {
+        // 管理后台总览（其余模块仍为占位，见 AdminPlaceholderView）
         path: 'admin',
         name: 'admin',
         component: () => import('@/views/AdminPlaceholderView.vue'),
-        meta: { title: '管理后台', requiredPermission: 'admin.console' },
+        meta: {
+          title: '管理后台',
+          adminSection: 'console',
+          // 任一身管理权限即可进入总览；无权限时不渲染入口（权限不可见优于不可用）
+          requiredAnyPermission: ['admin.org.manage', 'admin.user.manage', 'admin.console'],
+        },
+      },
+      {
+        // 阶段 1 · 1.1 组织树与人员：组织架构（左树右详情 + 负责人面板）
+        path: 'admin/orgs',
+        name: 'admin-orgs',
+        component: () => import('@/views/admin/OrgTreeView.vue'),
+        meta: {
+          title: '组织架构',
+          adminSection: 'org',
+          requiredPermission: 'admin.org.manage',
+        },
+      },
+      {
+        // 阶段 1 · 1.1 组织树与人员：人员管理（一人多岗、离职/调岗/交接）
+        path: 'admin/users',
+        name: 'admin-users',
+        component: () => import('@/views/admin/UserListView.vue'),
+        meta: {
+          title: '人员管理',
+          adminSection: 'user',
+          requiredPermission: 'admin.user.manage',
+        },
       },
     ],
   },
@@ -125,6 +155,16 @@ router.beforeEach(async (to) => {
   const required = to.meta.requiredPermission as string | undefined
   if (required && !userStore.hasPermission(required) && !userStore.isSuperAdmin) {
     // 权限不可见优于不可用：无权限直接回落到默认列表，不渲染入口
+    return { path: '/task/pending' }
+  }
+
+  // 「任一权限即可」场景（管理后台总览）：一个都不命中则回落
+  const requiredAny = to.meta.requiredAnyPermission
+  if (
+    requiredAny?.length &&
+    !userStore.isSuperAdmin &&
+    !requiredAny.some((code) => userStore.hasPermission(code))
+  ) {
     return { path: '/task/pending' }
   }
 

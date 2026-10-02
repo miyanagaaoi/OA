@@ -19,6 +19,7 @@ public class OaProperties {
     private final Security security = new Security();
     private final Db db = new Db();
     private final Jackson jackson = new Jackson();
+    private final Identity identity = new Identity();
 
     public Web getWeb() {
         return web;
@@ -42,6 +43,36 @@ public class OaProperties {
 
     public Jackson getJackson() {
         return jackson;
+    }
+
+    public Identity getIdentity() {
+        return identity;
+    }
+
+    /**
+     * 组织与人员（阶段 1.1 / 1.2，{@code oa.identity.*}）。
+     *
+     * <p>注意：PRD §9.1 的「运行期可配置项」（阈值、闸门次数、补件上限）由管理后台维护，
+     * 不进本类；这里只放**环境级**开关。
+     */
+    public static class Identity {
+
+        /**
+         * 在途/待办命中时是否**拒绝**操作（默认 {@code true}）。
+         *
+         * <p>依据 AC-11/AC-12、PRD §5.5、import-spec §8.1/§8.2：「离职前必须清空名下待办」
+         * 「组织停用前必须清空在途单据」必须**阻断**；置为 {@code false} 时仅告警放行
+         * （返回影响清单，由前端提示二次确认），用于上线初期的过渡期。
+         */
+        private boolean blockOnInflight = true;
+
+        public boolean isBlockOnInflight() {
+            return blockOnInflight;
+        }
+
+        public void setBlockOnInflight(boolean blockOnInflight) {
+            this.blockOnInflight = blockOnInflight;
+        }
     }
 
     /** Web 层配置。 */
@@ -206,10 +237,17 @@ public class OaProperties {
         /** 是否拦截「未织入数据域过滤的裸查询」（评审阻断项）。 */
         private boolean enforceUnmarkedSelect = true;
 
-        /** 免拦截的 MappedStatement id 前缀（身份/会话/字典等天然自限的查询）。 */
+        /**
+         * 免拦截的 MappedStatement id 前缀（身份/会话/字典等天然自限的查询）。
+         *
+         * <p>口径（评审阻断项）：只允许「认证前查询」与「非业务数据表」整体豁免；
+         * **禁止**豁免 {@code selectOne/selectList/selectById/selectPage/selectCount} 这类通用读方法
+         * —— 它们等价于给受控表开后门。受控表 Mapper（{@code SysUserMapper}/{@code SysOrgMapper}/
+         * {@code SysOrgLeaderMapper}/{@code SysUserPositionMapper}）一律不继承 {@code BaseMapper}，
+         * 因此这些注入语句本就不存在，见 {@code SysUserMapper} 类注释。
+         */
         private List<String> exemptStatementIds = new ArrayList<>(List.of(
                 "com.oa.identity.infra.SysUserMapper.selectByAccount",
-                "com.oa.identity.infra.SysUserMapper.selectOne",
                 "com.oa.identity.infra.SysUserSessionMapper",
                 "com.oa.identity.infra.SysLoginLogMapper",
                 "com.oa.authz.infra.DataScopeMapper"

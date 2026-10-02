@@ -890,7 +890,8 @@ components:
 
 - **`sidebar`** — 左侧导航，宽 224px，`{colors.inverse-canvas}` 底。顶部为**组织切换器**（`sidebar-org-switcher`，48px，显示当前公司/组织 + 下拉切换），中部为功能菜单，底部为用户区（头像 + 姓名 + 工号 + 退出）。折叠状态宽 64px，只留图标 + 悬停文字提示。
 - **`sidebar-item-active`** — 选中项 `{colors.inverse-surface-1}` 底 + `{colors.inverse-ink}` 文字 + 左侧 2px `{colors.primary}` 指示条。悬停态 `{colors.inverse-surface-2}`。
-- **`sidebar-tree-node`** — 组织树节点（四级），缩进 12px/级，高 32px，展开箭头 16px。**组织树只出现在侧栏或选择器内，不做独立页面**。
+- **`sidebar-tree-node`** — 组织树节点（四级），缩进 12px/级，高 32px，展开箭头 16px。**在端用户门户（审批中心 / H5）中，组织树只出现在侧栏或选择器内，不做独立页面**（门户的主任务是办单，不是维护组织）。
+- **`admin-org-console`**（**管理后台专用，门户不适用**）— 组织架构维护页：左侧**组织树面板**（宽 280px，`{colors.surface-1}` 底 + 右侧 1px `{colors.hairline}`，顶部检索框，节点含类型徽标与「未设正职」警示点）+ 右侧详情区（基本信息 / 负责人面板 / 在途影响清单）。人员管理页同理为「列表 + 抽屉」。**这是设计系统对门户规则的受控例外**：维护类操作需要全量检索、移动与批量操作，选择器形态无法承载。
 - **`topbar`** — 高 56px，白底，底部 1px `{colors.hairline}`。左为面包屑，右为「消息通知（未读数）」+「用户菜单」。**不做全局搜索框**（审批系统按单据类型与状态检索，检索器在列表页内）。
 - **`breadcrumb`** — `{typography.body-sm}` + `{colors.ink-subtle}`，最后一级用 `{colors.ink}`，分隔符用 `/`。层级示例：`审批中心 / 待我审批 / 资金审批单`。
 - **`h5-bottom-action-bar`** — H5 底部操作栏，高 60px，白底 + 上边框 1px。**同意**为主按钮（占满剩余宽度），**拒绝**为次按钮（96px），"更多"（转办/加签）为文本按钮。安全区适配 `env(safe-area-inset-bottom)`。

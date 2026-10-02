@@ -52,4 +52,190 @@
     ORDER BY u.org_id ASC, u.id ASC
   </select>
 
+  <!--
+    人员列表分页（GET /api/v1/identity/users）。
+    组织过滤：orgPathPrefix（子树，形如 /1/12/%）优先；orgId（精确节点，含其子节点由前缀覆盖）。
+    受控表标记只有一个（sys_user）；子查询 sys_org 仅用于归属过滤，不改变过滤主体。
+  -->
+  <select id="selectUserPage" resultMap="SysUserResultMap">
+    SELECT u.id, u.account, u.name, u.employee_no, u.password_hash, u.phone, u.email,
+           u.org_id, u.company_id, u.position, u.status, u.remark,
+           u.last_login_at, u.created_at, u.created_by, u.updated_at, u.updated_by, u.deleted_at
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+    <if test="status != null and status != ''">
+      AND u.status = #{status}
+    </if>
+    <if test="companyId != null">
+      AND u.company_id = #{companyId}
+    </if>
+    <if test="orgPathPrefix != null and orgPathPrefix != ''">
+      AND u.org_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE #{orgPathPrefix})
+    </if>
+    <if test="(orgPathPrefix == null or orgPathPrefix == '') and orgId != null">
+      AND u.org_id = #{orgId}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (u.name LIKE CONCAT('%', #{keyword}, '%')
+           OR u.account LIKE CONCAT('%', #{keyword}, '%')
+           OR u.employee_no LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY u.org_id ASC, u.id ASC
+  </select>
+
+  <select id="selectUserById" resultMap="SysUserResultMap">
+    SELECT u.id, u.account, u.name, u.employee_no, u.password_hash, u.phone, u.email,
+           u.org_id, u.company_id, u.position, u.status, u.remark,
+           u.last_login_at, u.created_at, u.created_by, u.updated_at, u.updated_by, u.deleted_at
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.id = #{id}
+    LIMIT 1
+  </select>
+
+  <!-- 通讯录：按数据域取可见人员（不返回 password_hash 以便最小化敏感字段） -->
+  <select id="selectDirectoryUsers" resultMap="SysUserResultMap">
+    SELECT u.id, u.account, u.name, u.employee_no, u.phone, u.email,
+           u.org_id, u.company_id, u.position, u.status, u.remark,
+           u.created_at, u.updated_at, u.deleted_at
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.status = 'active'
+    <if test="orgPathPrefix != null and orgPathPrefix != ''">
+      AND u.org_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE #{orgPathPrefix})
+    </if>
+    <if test="(orgPathPrefix == null or orgPathPrefix == '') and orgId != null">
+      AND u.org_id = #{orgId}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (u.name LIKE CONCAT('%', #{keyword}, '%')
+           OR u.account LIKE CONCAT('%', #{keyword}, '%')
+           OR u.employee_no LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY u.org_id ASC, u.name ASC, u.id ASC
+    LIMIT #{limit}
+  </select>
+
+  <!-- 组织子树下的在职人数（W-ORG-017 的子树口径；path 前缀由服务层拼好，含 %） -->
+  <select id="countActiveByOrgPath" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.status = 'active'
+      AND u.org_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE #{orgPathPrefix})
+  </select>
+
+  <!--
+    人员主数据导出（仅系统管理员，import-spec §9.2）：与列表同筛选口径，**不分页**。
+    受控表标记仍然必须有：导出同样只能取数据域内的人（系统管理员为全量口径）。
+  -->
+  <select id="selectForExport" resultMap="SysUserResultMap">
+    SELECT u.id, u.account, u.name, u.employee_no, u.phone, u.email,
+           u.org_id, u.company_id, u.position, u.status, u.remark,
+           u.last_login_at, u.created_at, u.updated_at, u.deleted_at
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+    <if test="status != null and status != ''">
+      AND u.status = #{status}
+    </if>
+    <if test="companyId != null">
+      AND u.company_id = #{companyId}
+    </if>
+    <if test="orgPathPrefix != null and orgPathPrefix != ''">
+      AND u.org_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE #{orgPathPrefix})
+    </if>
+    <if test="(orgPathPrefix == null or orgPathPrefix == '') and orgId != null">
+      AND u.org_id = #{orgId}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (u.name LIKE CONCAT('%', #{keyword}, '%')
+           OR u.account LIKE CONCAT('%', #{keyword}, '%')
+           OR u.employee_no LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY u.org_id ASC, u.id ASC
+  </select>
+
+  <select id="countByEmployeeNo" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.employee_no = #{employeeNo}
+    <if test="excludeId != null">
+      AND u.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
+  <select id="countByAccount" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.account = #{account}
+    <if test="excludeId != null">
+      AND u.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <update id="updateUserProfile" parameterType="com.oa.identity.domain.SysUser">
+    UPDATE sys_user
+    <set>
+      <if test="name != null">name = #{name},</if>
+      <if test="employeeNo != null">employee_no = #{employeeNo},</if>
+      <if test="phone != null">phone = #{phone},</if>
+      <if test="email != null">email = #{email},</if>
+      <if test="orgId != null">org_id = #{orgId},</if>
+      <if test="companyId != null">company_id = #{companyId},</if>
+      <if test="position != null">position = #{position},</if>
+      <if test="remark != null">remark = #{remark},</if>
+      <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+      updated_at = NOW()
+    </set>
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <update id="updateUserStatus">
+    UPDATE sys_user
+    SET status = #{status}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <!--
+    新增人员：替代 MyBatis-Plus 注入的 insert（受控表 Mapper 不继承 BaseMapper）。
+    useGeneratedKeys 把自增主键回填到 user.id，调用方（UserService#create）依赖它做日志与响应。
+    写语句**不需要** @dataScope 标记（拦截器只约束 SELECT），也不要加：标记会被替换成数据域片段而破坏 SQL。
+  -->
+  <insert id="insertUser" parameterType="com.oa.identity.domain.SysUser" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO sys_user (account, employee_no, name, password_hash, phone, email, org_id, company_id,
+                          position, status, remark, created_by, updated_by, created_at, updated_at)
+    VALUES (#{account}, #{employeeNo}, #{name}, #{passwordHash}, #{phone}, #{email}, #{orgId}, #{companyId},
+            #{position}, #{status}, #{remark}, #{createdBy}, #{updatedBy}, NOW(), NOW())
+  </insert>
+
+  <!-- 登录成功：只更新 last_login_at（首登强制改密的判定依据，见 SysUser#mustChangePasswordOnFirstLogin）。 -->
+  <update id="touchLastLoginAt">
+    UPDATE sys_user SET last_login_at = NOW() WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <!-- 改密：只更新口令哈希与更新人；成功后由 AuthService 撤销该用户全部会话。 -->
+  <update id="updatePasswordHash">
+    UPDATE sys_user
+    SET password_hash = #{passwordHash}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
 </mapper>

@@ -30,6 +30,7 @@ import type {
   WorkbenchItem,
   WorkbenchSummary,
 } from '@/types/api'
+import type { WireInFlightCheck, WireInFlightItem, WireUserInFlightCheck } from '@/types/identity-wire'
 
 // ---------------------------------------------------------------------------
 // 当前用户
@@ -63,6 +64,15 @@ export const demoCurrentUser: CurrentUser = {
     'portal.detail.actions.reject',
     'portal.detail.actions.route',
     'audit.logs.read',
+    // 阶段 1 · 1.1：管理后台（组织架构 / 人员管理）演示入口。
+    // 演示账号被授予身份域管理权限，便于在无后端时打开 /admin/orgs 与 /admin/users；
+    // 但**不**授予 `admin.user.export` —— import-spec §9.2（T-11 定稿）规定
+    // 主数据导出**仅系统管理员**，导出入口应保持不可见；如需验证导出，
+    // 请把本对象的 isSuperAdmin 置为 true（或由后端给系统管理员角色）。
+    'admin.console',
+    'admin.org.manage',
+    'admin.user.manage',
+    'admin.identity.force',
   ],
   signaturePresetReady: true,
   watermarkEnabled: true,
@@ -835,6 +845,72 @@ export const demoSealReturnInfo: SealReturnInfo = {
   editable: false,
   editableReason: '仅发起人与节点⑦（登记归档）可修改归还状态与归还日期',
 }
+
+// ---------------------------------------------------------------------------
+// 身份域管理后台：在途/待办影响清单与主数据导出（阶段 1 骨架演示）
+// ---------------------------------------------------------------------------
+/**
+ * 影响清单明细行（人员侧与组织侧共用结构）。
+ * 只回服务端**真实会下发**的列（单据类型 / 发起人 / 节点名 / 状态）；
+ * 「影响程度 / 受影响原因」不在后端出参里，界面显示「—」，演示数据也不造。
+ */
+const demoInFlightItems: WireInFlightItem[] = [
+  {
+    instanceId: '9001',
+    bizNo: 'OA-2026-000118',
+    formType: 'matter',
+    initiatorName: '李海涛',
+    nodeName: '部门负责人',
+    currentNodeName: '部门负责人',
+    status: 'approving',
+  },
+  {
+    instanceId: '9002',
+    bizNo: 'OA-2026-000121',
+    formType: 'fund',
+    initiatorName: '王晓敏',
+    nodeName: '财务部审核',
+    currentNodeName: '财务部审核',
+    status: 'approving',
+  },
+]
+
+/** 组织侧在途检查：`GET /orgs/{id}/in-flight-check` 的演示回落（`VITE_USE_MOCK=true` 时） */
+export const demoOrgInFlightCheck: WireInFlightCheck = {
+  blocked: true,
+  rejected: true,
+  blockOnInflight: true,
+  // 旧字段名与规范名同值（服务端两个都下发）
+  inFlightInstances: 2,
+  pendingTasks: 1,
+  total: 3,
+  bizNos: ['OA-2026-000118', 'OA-2026-000121'],
+  message:
+    '组织停用前必须清空在途单据：集团本部/财务部 及其子树下仍有 2 张在途单据（另有 1 条待处理待办），请先办结或流转处理；涉及单号：OA-2026-000118、OA-2026-000121',
+  inFlightInstanceCount: 2,
+  pendingTaskCount: 1,
+  activeStaffCount: 6,
+  items: demoInFlightItems,
+}
+
+/** 人员侧在途检查：`GET /users/{id}/in-flight-check` 的演示回落（`VITE_USE_MOCK=true` 时） */
+export const demoUserInFlightCheck: WireUserInFlightCheck = {
+  pendingTaskCount: 2,
+  inFlightInstanceCount: 2,
+  items: demoInFlightItems,
+}
+
+/**
+ * 人员主数据导出 CSV（import-spec §9.1 九列 + UTF-8 BOM）。
+ * 仅在开发态（`VITE_USE_MOCK=true`）接口不可用时回落，用于查看导出交互；
+ * 生产（`VITE_USE_MOCK=false`）必须严格抛出，不允许静默给出假数据。
+ */
+export const demoUserExportCsv =
+  '\ufeffaccount,employee_no,name,phone,email,company_path,dept_path,status,remark\n' +
+  'jiangzeyu,10086,降泽宇,13800008888,jiangzeyu@example.com,集团有限公司,集团有限公司/集团本部/财务部,在职,演示数据\n'
+
+/** 服务端导出的缺省文件名（`Content-Disposition` 缺失时的回落值） */
+export const demoUserExportFilename = 'user.csv'
 
 // ---------------------------------------------------------------------------
 // 打印（A4）：正式打印稿签名栏一律空栏

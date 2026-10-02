@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  岗位任职 Mapper（sys_user_position）—— 数据域 WHERE 片段集中在本文件
+  ============================================================================
+  约定同 SysOrgMapper.xml：受控表 SELECT 必须带标记；每条语句至多一个标记。
+  sys_user_position 以 DataScopeKind.NONE 登记（见 SysUserPosition 类注释）：
+  标记用于「禁止裸查询」，替换结果为 1=1；岗位行的可见性随其 user_id 收敛
+  （用户类查询在 sys_user 一侧织入 USER 口径，join 条件即 user_id）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.identity.infra.SysUserPositionMapper">
+
+  <resultMap id="SysUserPositionResultMap" type="com.oa.identity.domain.SysUserPosition">
+    <id property="id" column="id"/>
+    <result property="userId" column="user_id"/>
+    <result property="orgId" column="org_id"/>
+    <result property="isPrimary" column="is_primary"/>
+    <result property="position" column="position"/>
+    <result property="remark" column="remark"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <resultMap id="PositionRowResultMap" type="com.oa.identity.infra.row.PositionRow">
+    <id property="id" column="id"/>
+    <result property="userId" column="user_id"/>
+    <result property="orgId" column="org_id"/>
+    <result property="orgName" column="org_name"/>
+    <result property="orgPath" column="org_path"/>
+    <result property="orgType" column="org_type"/>
+    <result property="position" column="position"/>
+    <result property="isPrimary" column="is_primary"/>
+    <result property="remark" column="remark"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <!-- 列表投影：join sys_org 只为展示组织名/路径（过滤语义在 up 一侧，标记见文件头注释） -->
+  <select id="selectRowsByUserId" resultMap="PositionRowResultMap">
+    SELECT up.id, up.user_id, up.org_id, up.is_primary, up.position, up.remark,
+           up.created_at, up.updated_at,
+           o.name AS org_name, o.path AS org_path, o.org_type
+    FROM sys_user_position up
+    JOIN sys_org o ON o.id = up.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user_position, alias=up) */
+      AND up.user_id = #{userId}
+    ORDER BY up.is_primary DESC, o.path ASC, up.id ASC
+  </select>
+
+  <select id="selectByUserId" resultMap="SysUserPositionResultMap">
+    SELECT up.id, up.user_id, up.org_id, up.is_primary, up.position, up.remark, up.created_at, up.updated_at
+    FROM sys_user_position up
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user_position, alias=up) */
+      AND up.user_id = #{userId}
+    ORDER BY up.is_primary DESC, up.id ASC
+  </select>
+
+  <select id="selectById" resultMap="SysUserPositionResultMap">
+    SELECT up.id, up.user_id, up.org_id, up.is_primary, up.position, up.remark, up.created_at, up.updated_at
+    FROM sys_user_position up
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user_position, alias=up) */
+      AND up.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectByUserAndOrg" resultMap="SysUserPositionResultMap">
+    SELECT up.id, up.user_id, up.org_id, up.is_primary, up.position, up.remark, up.created_at, up.updated_at
+    FROM sys_user_position up
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user_position, alias=up) */
+      AND up.user_id = #{userId}
+      AND up.org_id = #{orgId}
+    LIMIT 1
+  </select>
+
+  <select id="countByOrgId" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user_position up
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user_position, alias=up) */
+      AND up.org_id = #{orgId}
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insertPosition" parameterType="com.oa.identity.domain.SysUserPosition"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO sys_user_position (user_id, org_id, is_primary, position, remark)
+    VALUES (#{userId}, #{orgId}, IFNULL(#{isPrimary}, 0), #{position}, #{remark})
+  </insert>
+
+  <update id="updatePrimary">
+    UPDATE sys_user_position
+    SET is_primary = #{isPrimary}, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="updatePosition">
+    UPDATE sys_user_position
+    <set>
+      <if test="position != null">position = #{position},</if>
+      <if test="remark != null">remark = #{remark},</if>
+      <if test="isPrimary != null">is_primary = #{isPrimary},</if>
+      updated_at = NOW()
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM sys_user_position WHERE id = #{id}
+  </delete>
+
+</mapper>

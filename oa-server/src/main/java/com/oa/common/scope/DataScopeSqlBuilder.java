@@ -192,21 +192,26 @@ public final class DataScopeSqlBuilder {
         String a = normalizeAlias(alias, DEFAULT_USER_ALIAS);
         List<String> parts = new ArrayList<>();
         Map<String, Object> params = new LinkedHashMap<>();
+
+        // 自读不变式（安全不变量）：任何登录用户都必须能看到「自己」这一行，且**不依赖角色数据域能否解析**。
+        // 反例：角色 data_scope='company' 而 sys_user.company_id 为 NULL（DDL 允许）时，只按数据域拼装会退化为
+        // deny(1=0)，导致 /auth/me、改密、水印等「读自己」的路径整体 401（对应 AC-44 水印与首登强制改密）。
+        parts.add(userSelfBranch(a));
+        params.put(P_UID, context.requireUserId());
+
         for (DataScopeType type : DataScopeType.values()) {
             if (!context.getScopes().contains(type)) {
                 continue;
             }
             if (type == DataScopeType.SELF) {
-                parts.add(userSelfBranch(a));
-                params.put(P_UID, context.requireUserId());
+                // 已在循环外无条件加入（自读不变式）
+                continue;
             } else if (type == DataScopeType.DEPT) {
                 String like = context.deptPathLike();
                 if (like == null) {
                     continue;
                 }
-                parts.add(userSelfBranch(a));
                 parts.add(userDeptBranch(a));
-                params.put(P_UID, context.requireUserId());
                 params.put(P_DEPT_PATH, like);
             } else if (type == DataScopeType.COMPANY) {
                 if (context.getCompanyId() == null) {
@@ -217,9 +222,7 @@ public final class DataScopeSqlBuilder {
             } else if (type == DataScopeType.GROUP_CATEGORY) {
                 String like = context.financeDeptPathLike();
                 if (like != null) {
-                    parts.add(userSelfBranch(a));
                     parts.add(userFinanceDeptBranch(a));
-                    params.put(P_UID, context.requireUserId());
                     params.put(P_FINANCE_DEPT_PATH, like);
                 } else if (context.getCompanyId() != null) {
                     // 归口部门路径未知时退化为本公司，避免通讯录整页空白
