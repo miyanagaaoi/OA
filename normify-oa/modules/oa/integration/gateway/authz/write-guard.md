@@ -11,9 +11,9 @@ description:
   en: >
       Rejects every external write attempt in phase one, keeping the gateway read-only until the permission model is mature.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:00:16.149Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.696Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 516
@@ -25,6 +25,8 @@ apis:
     description:
       zh: >
           一期拒绝来自系统外部的非 GET 请求。
+          
       en: >
           Rejects non-GET methods coming from outside the system in phase one.
+          
 ---

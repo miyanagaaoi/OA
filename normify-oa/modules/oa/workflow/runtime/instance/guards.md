@@ -7,11 +7,13 @@ name: {zh: "迁移守卫与终态规则", en: "Transition Guards & Terminal Rule
 description:
   zh: >
       迁移前置守卫：终态（approved/rejected/withdrawn/terminated）不可再提交；撤回仅限发起人且在节点②通过前；驳回后重提须重新解析快照与最新模板版本、已审节点不保留；终止仅系统管理员与集团分管领导且必填原因（REQ-FLOW-009/010/014/017、AC-15）。
+      
   en: >
       Pre-transition guards: terminal states (approved/rejected/withdrawn/terminated) can never be resubmitted; withdrawal belongs to the initiator only and only before node ② passes; resubmission after rejection re-resolves the snapshot against the latest template version and drops already-approved nodes; termination is limited to the system admin and group line leader with a mandatory reason (REQ-FLOW-009/010/014/017, AC-15).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.766Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 353
@@ -32,23 +34,29 @@ apis:
     description:
       zh: >
           校验动作是否允许并返回拒绝原因。
+          
       en: >
           Validates whether the requested action is allowed and returns the reason.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow-instances/{instance_id}/transition-guard/matrix"
     description:
       zh: >
           返回各状态允许的迁移矩阵供前端禁用按钮。
+          
       en: >
           Returns the allowed transitions per status for the UI.
+          
   - protocol: kafka
     path: "oa.workflow.instance.guard-rejected"
     description:
       zh: >
           迁移被拒事件，写入审计。
+          
       en: >
           Rejected transition event recorded for audit.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime.counters

@@ -7,11 +7,13 @@ name: {zh: "详情页水印", en: "Detail Watermark"}
 description:
   zh: >
       详情页水印层：typography.caption + 墨色 5%–8% 透明度，旋转 -24°，内容为「姓名 + 工号」，间距 240×160px；pointer-events: none 且 user-select: none，不得遮挡按钮与表单值（REQ-USER-004）。
+      
   en: >
       The detail-page watermark layer: typography.caption in ink at 5%–8% opacity, rotated -24°, tiled every 240×160px with the user's name and employee number; pointer-events and user-select are both none, and it must never cover buttons or form values (REQ-USER-004).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.723Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 900
@@ -26,8 +28,10 @@ apis:
     description:
       zh: >
           当前用户的水印文本（姓名 + 工号）与透明度区间。
+          
       en: >
           Watermark text (name plus employee number) and opacity range for the current user.
+          
 deps:
   - kind: call
     to: oa.identity.user

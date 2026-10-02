@@ -7,11 +7,13 @@ name: {zh: "兜底权限与改派", en: "Super-Admin Fallback"}
 description:
   zh: >
       定义系统管理员的兜底能力集，预校验某操作是否落入禁区，并提供快照审批人无法处理时的兜底改派能力（必须留痕）。
+      
   en: >
       Defines the super-admin fallback capability set, pre-checks whether a requested operation is forbidden, and provides the audited fallback reassignment used when snapshot approvers cannot act.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.589Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 440
@@ -29,24 +31,30 @@ apis:
     description:
       zh: >
           查询兜底能力清单（可配置一切但不可删除/不可改判）。
+          
       en: >
           List what the super-admin may and may not do.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/super-admin/fallback-check"
     description:
       zh: >
           校验某操作是否落入禁区。
+          
       en: >
           Check whether an operation falls into a forbidden zone.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/tasks/{task_id}/fallback-reassign"
     description:
       zh: >
           快照审批人均无法处理时的兜底改派。
+          
       en: >
           Fallback reassign when no snapshot approver can act.
+          
 deps:
   - kind: call
     to: oa.workflow.task

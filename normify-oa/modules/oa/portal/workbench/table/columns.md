@@ -11,9 +11,9 @@ description:
   en: >
       Column definitions for the full-width table: type icon + title + status badge, document number, initiator, department, current node, submitted time, amount; the amount column uses typography.amount (tnum), right-aligned with two decimals and a ten-thousand-yuan conversion at 1,000,000 and above; timestamps and numbers use the monospace face.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:37.558Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.734Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 875
@@ -28,8 +28,10 @@ apis:
     description:
       zh: >
           按单据类型与用户偏好返回列表列定义。
+          
       en: >
           Returns column definitions for the list by document type and user preference.
+          
 deps:
   - kind: dataflow
     to: oa.workflow.task.record

@@ -11,9 +11,9 @@ description:
   en: >
       The four trail node states: done (white fill, primary-border outline, ink text with a tick icon), current (solid corporate-blue with white text), not reached (white fill, grey text and border) and overdue (white fill, red text and border); connectors are 2px, with completed segments in primary and unfinished segments in hairline.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:46.293Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.722Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 879
@@ -28,8 +28,10 @@ apis:
     description:
       zh: >
           按时间排序的轨迹条目（审批人、意见、签名、时间）。
+          
       en: >
           Time-ordered trail entries with approver, opinion, signature and time.
+          
 deps:
   - kind: call
     to: oa.audit.trace

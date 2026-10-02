@@ -11,9 +11,9 @@ description:
   en: >
       Aggregates process volume by period, company and matter category, using the company, category and status columns deliberately kept on the instance table for reporting.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:40.407Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.611Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 439

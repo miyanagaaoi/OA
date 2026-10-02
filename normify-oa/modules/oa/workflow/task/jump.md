@@ -7,11 +7,13 @@ name: {zh: "自由跳转", en: "Free Jump"}
 description:
   zh: >
       仅有明确授权的节点可跳转（默认关闭，需管理员在流程模板中逐节点开启）；跳转必须填写原因，并记入审计日志与审批轨迹；未授权节点调用一律拒绝。跳转不改变已完成的审批事实。
+      
   en: >
       Only explicitly authorized nodes may jump (off by default, enabled per node in the template); a reason is mandatory and every jump is written to the audit log and approval trail. Unauthorized calls are rejected and completed approvals are never altered.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.777Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 347
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           跳转到指定节点（须授权 + 原因必填）。
+          
       en: >
           Jump to a target node with authorization and a mandatory reason.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow/instances/{instance_id}/jump-targets"
     description:
       zh: >
           当前操作人可跳转的目标节点清单（按模板授权）。
+          
       en: >
           Jump targets authorized for the current actor.
+          
 deps:
   - kind: call
     to: oa.workflow.definition

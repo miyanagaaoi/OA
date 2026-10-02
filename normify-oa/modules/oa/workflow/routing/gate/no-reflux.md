@@ -7,11 +7,13 @@ name: {zh: "禁止回流闸门", en: "No-reflux Gate"}
 description:
   zh: >
       已处理过的部门不可再次被指定为流转目标（A→B→A 拒绝）：「回到本部门」是唯一例外且限连续 2 次；判定依据是 flow_routing 流转链中已出现过的承接部门集合；命中即拒绝操作并返回具体原因。
+      
   en: >
       A department already handled cannot be designated as a routing target again (A-B-A is refused); returning to the own department is the only exception and is limited to two consecutive times. The judgement uses the set of receiving departments already present in the routing chain, and a hit is refused with a concrete reason and no state change.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.763Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 338
@@ -29,16 +31,20 @@ apis:
     description:
       zh: >
           校验目标部门是否已处理过（命中则拒绝流转）。
+          
       en: >
           Check whether the target department was already handled and refuse routing.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow/instances/{instance_id}/handled-departments"
     description:
       zh: >
           已处理部门集合（由流转链推导）。
+          
       en: >
           Departments already handled, derived from the routing chain.
+          
 deps:
   - kind: reference
     to: oa.workflow.routing.forward.designate

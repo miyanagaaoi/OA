@@ -7,11 +7,13 @@ name: {zh: "批量操作", en: "Batch Operations"}
 description:
   zh: >
       勾选多行后的批量动作：批量同意（逐条校验意见与签名要求）、批量转办、勾选导出（仅系统管理员）；破坏性批量动作二次确认并列出将被处理的对象清单；逐条回执，单条失败不回滚其余。
+      
   en: >
       Batch actions after selecting rows: batch approve (per-row opinion and signature checks), batch transfer, and export of the selection (system administrator only); destructive batches require a second confirmation listing the affected objects; results come back row by row and one failure does not roll back the rest.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.731Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 910
@@ -29,23 +31,29 @@ apis:
     description:
       zh: >
           批量同意勾选任务。
+          
       en: >
           Batch approve the selected tasks.
+          
   - protocol: http
     method: POST
     path: "/api/v1/portal/workbench/tasks/batch-transfer"
     description:
       zh: >
           批量转办勾选任务。
+          
       en: >
           Batch transfer the selected tasks.
+          
   - protocol: file
     path: "export/workbench-selected.csv"
     description:
       zh: >
           勾选单据导出（仅系统管理员）。
+          
       en: >
           Export of the selected documents (system administrator only).
+          
 deps:
   - kind: call
     to: oa.workflow.task

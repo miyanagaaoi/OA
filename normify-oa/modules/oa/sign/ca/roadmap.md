@@ -7,11 +7,13 @@ name: {zh: "CA 接入演进预留", en: "CA Integration Roadmap"}
 description:
   zh: >
       二期引入第三方 CA 所需的交互协议位与能力开关：一期仅新增「CA 签署/验签」交互，不改动数据模型、哈希范围与审计链路；能力开关默认关闭，避免一期误触发。
+      
   en: >
       Capability switches and protocol slots for introducing a third-party CA in phase two: only the sign/verify interaction is added, leaving the data model, hash scope and audit chain untouched.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.737Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 369
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           CA 能力开关，一期全部关闭。
+          
       en: >
           CA capability switches, all off in phase one.
+          
   - protocol: http
     method: GET
     path: "/api/v1/sign/ca/protocol"
     description:
       zh: >
           二期 CA 签署/验签交互协议位说明。
+          
       en: >
           Protocol slots for phase-two CA signing and verification.
+          
 deps:
   - kind: reference
     to: oa.integration.gateway

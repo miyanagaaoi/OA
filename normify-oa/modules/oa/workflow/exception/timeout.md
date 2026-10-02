@@ -7,11 +7,13 @@ name: {zh: "超时仅催办", en: "Timeout Reminder Only"}
 description:
   zh: >
       每个节点可配置超时时长（须显式配置且 ≥24h）；超时后向审批人发送站内信与邮件催办，并可配置抄送其上级；一期明确不做超时自动跳过或自动升级，避免误判。
+      
   en: >
       Each node may declare a timeout, which must be explicit and at least 24 hours. Once overdue the approver receives in-app and email reminders and the supervisor may optionally be cc'ed; the first phase explicitly performs no automatic skip and no automatic escalation, to avoid misjudged approvals.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.759Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 394
@@ -29,23 +31,29 @@ apis:
     description:
       zh: >
           配置节点超时时长（≥24h，未配置则不启用）。
+          
       en: >
           Configure the node timeout, at least 24 hours, disabled when unset.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow/node-instances/{node_instance_id}/timeout-remind"
     description:
       zh: >
           超时催办（站内信 + 邮件，可抄送上级；不跳过不升级）。
+          
       en: >
           Send overdue reminders in-app and by email, optionally cc the supervisor.
+          
   - protocol: kafka
     path: "oa.workflow.task.overdue"
     description:
       zh: >
           节点超时事件（触发催办通知）。
+          
       en: >
           Event emitted when a node passes its configured timeout.
+          
 deps:
   - kind: call
     to: oa.notify.reminder

@@ -7,11 +7,13 @@ name: {zh: "行内操作", en: "Row Actions"}
 description:
   zh: >
       表格行的行内操作：最多 3 个 ghost 按钮（查看 / 同意 / 转办），超出收进「更多」下拉；选中行用 primary-subtle 底 + 左侧 2px primary 指示条；驳回等破坏性动作用白底红字，二次确认文案须写明动作与对象（如「确认驳回《XX合同审批单》」）。
+      
   en: >
       Row-level actions: at most three ghost buttons (view / approve / transfer), the rest folded into a More dropdown; the selected row uses a primary-subtle fill with a 2px primary indicator bar on the left; destructive actions such as reject use red text on white and a confirmation that names both the action and the object.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.734Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 839
@@ -29,24 +31,30 @@ apis:
     description:
       zh: >
           行内快速同意（提交审批意见）。
+          
       en: >
           Inline quick approve with an opinion.
+          
   - protocol: http
     method: POST
     path: "/api/v1/portal/workbench/tasks/{task_id}/reject"
     description:
       zh: >
           行内驳回，意见必填且不少于 5 字。
+          
       en: >
           Inline reject; the opinion is mandatory and at least five characters.
+          
   - protocol: http
     method: POST
     path: "/api/v1/portal/workbench/tasks/{task_id}/transfer"
     description:
       zh: >
           行内转办给同一数据域内可见该单据的人。
+          
       en: >
           Inline transfer to a user who can see the document in the same data scope.
+          
 deps:
   - kind: call
     to: oa.workflow.task

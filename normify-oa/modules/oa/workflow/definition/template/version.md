@@ -7,11 +7,13 @@ name: {zh: "模板版本与发布状态", en: "Template Versioning & Publish Sta
 description:
   zh: >
       模板版本累积与状态机（draft 草稿 / published 已发布 / archived 已归档）：基于已发布版本开新草稿、发布时递增 version 并记 published_at，历史版本只累积不覆盖；已发起实例锁定发起时版本，停用不影响在途（REQ-FLOW-006、AC-09）。
+      
   en: >
       Version accumulation and lifecycle (draft/published/archived): open a new draft from a published version, bump version and record published_at on publish, never overwrite history; in-flight instances stay on the version captured at submission (REQ-FLOW-006, AC-09).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.755Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 349
@@ -29,32 +31,40 @@ apis:
     description:
       zh: >
           基于已发布版本开新草稿版本（version+1）。
+          
       en: >
           Opens a new draft version (version+1) from a published version.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow-templates/{template_id}/publish"
     description:
       zh: >
           发布模板版本并写入 published_at。
+          
       en: >
           Publishes the template version and records published_at.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow-templates/{template_id}/archive"
     description:
       zh: >
           归档模板版本（不影响在途实例）。
+          
       en: >
           Archives a template version without affecting in-flight instances.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow-templates/{template_id}/versions"
     description:
       zh: >
           列出历史版本与各自状态。
+          
       en: >
           Lists historical versions with their statuses.
+          
 deps:
   - kind: call
     to: oa.workflow.definition.template.registry

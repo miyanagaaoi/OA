@@ -7,11 +7,13 @@ name: {zh: "集团单结构", en: "Group Sheet Structure"}
 description:
   zh: >
       集团单共有结构要件：单据抬头（居中加粗 16pt、字距 2px）、三栏表头行（提报单位 / 责任部门 / 报送时间）、公文接收及处理重复块（最多 3 段）、多轮签名栏、合并栏（集团领导意见）、收尾行（公文回传 / 系统关联）、文字复选框与写值区；对应集团合同类文件流转审批单、资金审批单与印鉴证照使用审批单。
+      
   en: >
       Structure shared by the group-level sheets: a centred bold 16pt heading with 2px tracking, a three-column header row (submitting unit, responsible department, submission time), the repeated document receipt and handling block (up to three), multi-round signature bands, the merged leader-opinion cell, a closing row (document return or system linkage), text checkboxes and fillable value cells; these cover the group contract routing sheet, the fund approval sheet and the seal-and-licence sheet.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.645Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 1003

@@ -7,11 +7,13 @@ name: {zh: "操作日志写入", en: "Operation Log Writer"}
 description:
   zh: >
       操作日志统一采集入口：记录操作人、时间、来源 IP 与 User-Agent、目标对象类型与 ID、动作编码，以只追加方式写入 sys_log，不做更新与删除。
+      
   en: >
       Single ingestion entry for the operation log: records actor, timestamp, source IP and user agent, target type and ID, and action code, appending only to sys_log with no update or delete.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.622Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 426
@@ -25,16 +27,20 @@ apis:
     description:
       zh: >
           审计日志表（只追加）。
+          
       en: >
           Audit log table (append-only).
+          
   - protocol: http
     method: POST
     path: "/api/v1/audit/logs"
     description:
       zh: >
           写入一条操作日志。
+          
       en: >
           Appends one operation log entry.
+          
 deps:
   - kind: call
     to: oa.identity.session

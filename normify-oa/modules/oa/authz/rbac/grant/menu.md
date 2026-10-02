@@ -7,11 +7,13 @@ name: {zh: "功能菜单授权", en: "Menu Permission Grant"}
 description:
   zh: >
       按权限树逐级勾选角色的菜单/按钮/接口权限码（父节点连带子节点），可批量授予与回收；变更写入权限变更日志。
+      
   en: >
       Ticks a role's menu/button/api permission codes level by level in the permission tree (parents drag children) with bulk grant and revoke; every change is written to the permission change log.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.630Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 238
@@ -26,23 +28,29 @@ apis:
     description:
       zh: >
           读取角色已勾选的权限码。
+          
       en: >
           Lists granted permission codes of a role.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/authz/roles/{id}/permissions"
     description:
       zh: >
           保存角色的权限码勾选。
+          
       en: >
           Saves the role's permission ticks.
+          
   - protocol: mysql
     path: "sys_role_permission"
     description:
       zh: >
           角色权限表。
+          
       en: >
           Role-permission table.
+          
 deps:
   - kind: call
     to: oa.authz.rbac.permission-tree

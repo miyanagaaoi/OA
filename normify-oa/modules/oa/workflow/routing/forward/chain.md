@@ -7,11 +7,13 @@ name: {zh: "连续流转链", en: "Continuous Routing Chain"}
 description:
   zh: >
       支持连续流转 A→B→C：每次流转递增 flow_routing.seq 与实例 routing_seq/routing_count，更新 current_dept_id，将当前节点实例置为已通过，并由新承接部门的负责人产生新任务；流转链历史对审批人可见。
+      
   en: >
       Supports continuous routing A-B-C: each hop increments flow_routing.seq and the instance routing counters, updates the current receiving department, marks the current node instance approved and creates tasks for the leader of the new department. The chain remains visible to approvers.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.761Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 322
@@ -32,15 +34,19 @@ apis:
     description:
       zh: >
           流转链历史（序号、来源/承接部门、动作、原因、状态）。
+          
       en: >
           Routing chain history: seq, departments, action, reason, status.
+          
   - protocol: kafka
     path: "oa.workflow.routing.forwarded"
     description:
       zh: >
           流转完成事件（生成承接部门任务并推进节点）。
+          
       en: >
           Event emitted when a routing action completes.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

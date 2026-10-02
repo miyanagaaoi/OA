@@ -11,9 +11,9 @@ description:
   en: >
       Phase two: the contract system joins as a standalone module reusing OA identity and the approval engine, syncing the contract ledger and approval flow both ways over APIs.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.695Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 523
@@ -25,13 +25,17 @@ apis:
     description:
       zh: >
           二期：与合同系统同步台账与审批状态。
+          
       en: >
           Phase two: sync ledgers and approval status with the contract system.
+          
   - protocol: kafka
     path: "oa.contract.approved"
     description:
       zh: >
           合同审批通过后对外发布的事件。
+          
       en: >
           Event published when a contract is approved.
+          
 ---

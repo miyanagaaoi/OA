@@ -7,11 +7,13 @@ name: {zh: "补件轮次标记", en: "Supplement Round Marking"}
 description:
   zh: >
       补件附件带 `round` 标记：0 = 原始附件，1..3 = 第 N 次补件；同一节点 ≤1 次、全单 ≤3 次；打印附件清单按轮次标注。
+      
   en: >
       Supplement attachments carry a `round` marker: 0 for originals, 1..3 for the Nth supplement; at most one supplement per node and three per document; the printed attachment list labels each round.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.677Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 59
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           设置附件的补件轮次。
+          
       en: >
           Sets an attachment's supplement round.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/instances/{instance_id}/attachments"
     description:
       zh: >
           按轮次列出单据附件。
+          
       en: >
           Lists a document's attachments grouped by round.
+          
 deps:
   - kind: reference
     to: oa.workflow.supplement

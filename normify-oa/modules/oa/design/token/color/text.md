@@ -7,11 +7,13 @@ name: {zh: "文字与禁用态令牌", en: "Text & Disabled Tokens"}
 description:
   zh: >
       文字四级：ink #14181f（16.8:1）、ink-muted #4a5563（7.8:1）、ink-subtle #5f6b7a（5.2:1）、ink-disabled #aeb7c4（约 2.0:1）；disabled 只表示「当前不可用」，禁止承载需要阅读的内容，次要但需阅读的文案一律用 ink-subtle。
+      
   en: >
       Four ink levels: ink #14181f at 16.8:1, ink-muted #4a5563 at 7.8:1, ink-subtle #5f6b7a at 5.2:1 and ink-disabled #aeb7c4 at roughly 2.0:1; disabled means currently unavailable only and must never carry content that has to be read, so secondary text that still needs reading always uses ink-subtle.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.651Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 649
@@ -25,8 +27,10 @@ apis:
     description:
       zh: >
           文字层级 CSS 变量（含禁用态）。
+          
       en: >
           Ink ladder CSS custom properties including the disabled level.
+          
 deps:
   - kind: reference
     to: oa.design.a11y

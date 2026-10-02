@@ -7,11 +7,13 @@ name: {zh: "本页导航吸附目录", en: "In-page Section Index"}
 description:
   zh: >
       ≥1440px 时表单右侧出现的吸附目录（宽 140px）：列出全部分区标题，当前分区用 primary 文字色高亮，点击滚动定位；窄屏隐藏该目录，导航职责交回分区标题带。
+      
   en: >
       A 140px sticky in-page index on the right of the form from 1440px up: it lists all section titles, highlights the current section in primary text colour and scrolls to a section on click; on narrower screens it disappears and the section header bands take over navigation.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.730Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 863
@@ -26,8 +28,10 @@ apis:
     description:
       zh: >
           表单分区目录页（吸附目录的数据来源）。
+          
       en: >
           Form outline route that feeds the in-page index.
+          
 deps:
   - kind: reference
     to: oa.design.token

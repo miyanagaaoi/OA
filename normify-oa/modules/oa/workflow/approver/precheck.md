@@ -11,9 +11,9 @@ description:
   en: >
       Blocks submission when any node's candidate set is empty (department without a leader, GM vacancy), reporting "no valid approver for node XX" instead of silently skipping, and also blocks missing required fields and unauthorized org nodes (REQ-FLOW-012, AC-11).
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:18.687Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.748Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 230

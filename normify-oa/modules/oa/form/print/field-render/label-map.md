@@ -7,11 +7,13 @@ name: {zh: "打印标签映射", en: "Print Label Mapping"}
 description:
   zh: >
       打印稿使用与纸质单一致的中文标签，每个字段带 printLabel，缺省沿用界面标签。一期固定对照：category→事项分类、amount→申请金额/合同金额、return_status→证件归还状态、period_start/period_end→履约期限（合并一个单元格）、counterparty→合同签订主体（乙方）、our_company→甲方/审批单位/用印单位（由发起人所属公司带出，不新增数据库列）、attachments→附送材料 + 附件清单。
+      
   en: >
       Sheets use the paper form's Chinese labels; each field carries a printLabel defaulting to the screen label. Phase-one mapping: category→事项分类, amount→申请金额/合同金额, return_status→证件归还状态, period_start/period_end→履约期限 (one merged cell), counterparty→合同签订主体（乙方）, our_company→甲方/审批单位/用印单位 (derived from the initiator's company with no new column), attachments→附送材料 plus the attachment list.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.669Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 366
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           返回单据字段的打印标签。
+          
       en: >
           Returns print labels for a document's fields.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/forms/templates/{form_type}/schema/fields/{field_id}/print-label"
     description:
       zh: >
           配置字段的 printLabel。
+          
       en: >
           Configures a field's printLabel.
+          
 deps:
   - kind: reference
     to: oa.form.template.schema.field-def

@@ -11,9 +11,9 @@ description:
   en: >
       The four surfaces: canvas #ffffff for pages and cards (about 90% of the area), canvas-subtle #f7f8fa for table headers, read-only blocks, opinion blocks, the upload area and row hover, surface-1 #f2f4f7 for grouping containers, disabled control fills, skeletons and avatar backgrounds, and surface-2 #e6e9ef for heavier separations and the off track of a switch; used in order, never skipped.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:07:07.121Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.651Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 642

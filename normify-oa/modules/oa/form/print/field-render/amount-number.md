@@ -7,11 +7,13 @@ name: {zh: "金额与编号等宽格式", en: "Monospaced Amounts & Numbers"}
 description:
   zh: >
       打印稿统一等宽字体（Consolas / Courier New）便于归档核对：金额带千分位与两位小数，≥100 万时同时显示万元换算（如 `1,250,000.00 ¥ / 125.00 万`）；单号、合同编号、申请编号均等宽；黑白复印后信息不得丢失。
+      
   en: >
       Sheets use a monospaced face (Consolas / Courier New) for archival checking: amounts carry thousands separators and two decimals, and from 1,000,000 they also show the ten-thousand conversion (e.g. `1,250,000.00 ¥ / 125.00 万`); document, contract and application numbers are monospaced too, and no information may be lost in black-and-white copying.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.668Z"
+fingerprint: ad88e328b04de7a8d2ba605f8fc806c579bcb555ef8cadc76b8edcedbd0695f5
 source:
   - path: "DESIGN.md"
     line: 999
@@ -29,15 +31,19 @@ apis:
     description:
       zh: >
           返回打印用金额与编号格式化结果。
+          
       en: >
           Returns print-ready amount and number formatting.
+          
   - protocol: file
     path: "templates/print/partials/mono-number.css"
     description:
       zh: >
           等宽数字与编号样式片段。
+          
       en: >
           Stylesheet partial for monospaced amounts and numbers.
+          
 deps:
   - kind: reference
     to: oa.form.template.validate.amount

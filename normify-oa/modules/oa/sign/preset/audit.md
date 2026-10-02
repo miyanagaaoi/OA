@@ -7,11 +7,13 @@ name: {zh: "预存签名修改留痕", en: "Preset Signature Audit Trail"}
 description:
   zh: >
       预存签名的上传、替换与删除全部留痕（REQ-SIGN-002）：发布变更事件并保留变更历史，供个人中心与审计查询，防止事后否认预存签名内容。
+      
   en: >
       Every upload, replacement and deletion of a preset signature is traced (REQ-SIGN-002) through change events and history, queryable from the personal center and by audit.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.740Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 366
@@ -25,16 +27,20 @@ apis:
     description:
       zh: >
           预存签名新增/修改/删除事件（含变更前后）。
+          
       en: >
           Preset signature created/changed/deleted event with before and after values.
+          
   - protocol: http
     method: GET
     path: "/api/v1/sign/presets/{id}/history"
     description:
       zh: >
           查询某张预存签名的变更历史。
+          
       en: >
           Reads the change history of one preset signature.
+          
 deps:
   - kind: dataflow
     to: oa.audit.oplog

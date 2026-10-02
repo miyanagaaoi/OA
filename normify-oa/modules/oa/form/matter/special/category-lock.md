@@ -7,11 +7,13 @@ name: {zh: "事项类别不可改判", en: "Category Lock"}
 description:
   zh: >
       事项类别由发起人选择后，任何审批节点都不能修改；分类错误的唯一处理路径是驳回给发起人重新提交。类别取值来自后台数据字典配置项，不再决定归口部门，仅作分类标签与统计维度。
+      
   en: >
       Once the initiator picks the category, no approval node may change it; the only remedy for a wrong classification is rejecting back to the initiator. Category values come from admin-configured dictionary items, no longer determine central ownership, and serve only as a label and reporting dimension.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.665Z"
+fingerprint: be29667d4e39e20604635d25a37b43052c385d937b656fcaabc6dba1e57dfca8
 source:
   - path: "doc/forms.md"
     line: 80
@@ -29,16 +31,20 @@ apis:
     description:
       zh: >
           提交后锁定事项类别。
+          
       en: >
           Locks the category after submission.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/matter/instances/{instance_id}/category-change-check"
     description:
       zh: >
           校验事项类别是否被越权修改。
+          
       en: >
           Checks whether the category was changed without permission.
+          
 deps:
   - kind: call
     to: oa.form.dict.category

@@ -11,9 +11,9 @@ description:
   en: >
       Retention and cleanup rules for backup sets: thirty days of daily fulls, older sets pruned on schedule, and audit-relevant exports kept according to the ten-year retention rule.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.712Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 538
@@ -28,13 +28,17 @@ apis:
     description:
       zh: >
           查询备份任务历史与保留状态。
+          
       en: >
           Reads backup job history and retention status.
+          
   - protocol: file
     path: "backup/retention-policy.yml"
     description:
       zh: >
           备份保留与清理策略。
+          
       en: >
           Backup retention and cleanup policy.
+          
 ---

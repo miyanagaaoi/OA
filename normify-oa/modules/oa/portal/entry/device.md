@@ -11,9 +11,9 @@ description:
   en: >
       Multi-device sign-in (REQ-USER-003): the number of concurrently online devices per account is configurable with a default of three; exceeding it kicks out the device that signed in earliest with an explanation, the kicked session dies at once and every kick is written to the login log.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:46.293Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.723Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 417
@@ -25,16 +25,20 @@ apis:
     description:
       zh: >
           列出账号同时在线设备及其登录时间与地址。
+          
       en: >
           List a user's concurrently signed-in devices with login time and address.
+          
   - protocol: http
     method: DELETE
     path: "/api/v1/portal/entry/devices/{device_id}"
     description:
       zh: >
           踢出指定设备，其会话立即失效。
+          
       en: >
           Kick one device; its session dies immediately.
+          
 deps:
   - kind: call
     to: oa.identity.session

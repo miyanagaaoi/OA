@@ -7,11 +7,13 @@ name: {zh: "组件规范", en: "Component Specs"}
 description:
   zh: >
       组件规范：按钮、输入与表单、单据发起与填写（贴合集团现行表单习惯）、数据展示（密集表格与等宽数字）、导航、反馈与浮层，以及组件使用的硬约束。
+      
   en: >
       Component specs: buttons, inputs and forms, document initiation habits mirroring the group's paper forms, data display (dense tables, monospaced numerals), navigation, feedback overlays, and the hard usage rules for agents.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:00:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.644Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 835

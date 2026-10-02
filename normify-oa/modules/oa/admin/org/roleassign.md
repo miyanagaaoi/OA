@@ -11,9 +11,9 @@ description:
   en: >
       Assign roles to users together with the org scope the role applies to (scope_org_id), allowing multiple roles per user; every assignment is written to the permission-change log and branch admins cannot assign across companies.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:21.642Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.605Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 435
@@ -31,24 +31,30 @@ apis:
     description:
       zh: >
           查询人员的角色与生效组织范围。
+          
       en: >
           List the user's roles and their effective org scopes.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/users/{user_id}/roles"
     description:
       zh: >
           分配角色并指定生效组织范围。
+          
       en: >
           Assign a role with an effective org scope.
+          
   - protocol: http
     method: DELETE
     path: "/api/v1/admin/user-roles/{user_role_id}"
     description:
       zh: >
           解除角色分配（留痕）。
+          
       en: >
           Revoke a role assignment with audit trail.
+          
 deps:
   - kind: call
     to: oa.authz.rbac

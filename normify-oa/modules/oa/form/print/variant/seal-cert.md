@@ -7,11 +7,13 @@ name: {zh: "印鉴证照使用审批单", en: "Seal & Certificate Sheet"}
 description:
   zh: >
       实单无对应参考件，沿用集团单版式推导；实测高度 205mm，单页余量充足；须体现用印类型、证照名称与证件归还状态。
+      
   en: >
       No paper counterpart exists, so the layout derives from the group sheets; measured height 205mm leaves ample single-page room; it must show seal type, certificate name and certificate return status.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.674Z"
+fingerprint: ad88e328b04de7a8d2ba605f8fc806c579bcb555ef8cadc76b8edcedbd0695f5
 source:
   - path: "DESIGN.md"
     line: 973
@@ -28,14 +30,18 @@ apis:
     description:
       zh: >
           印鉴证照使用审批单打印模板。
+          
       en: >
           Print template for the seal & certificate sheet.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/print/seal/{instance_id}"
     description:
       zh: >
           渲染印鉴证照单打印稿。
+          
       en: >
           Renders a seal & certificate document.
+          
 ---

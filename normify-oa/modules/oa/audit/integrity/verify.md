@@ -7,11 +7,13 @@ name: {zh: "完整性校验", en: "Integrity Verification"}
 description:
   zh: >
       对签名哈希与日志记录做可校验性核对，输出校验作业与结果，作为不可篡改约束的验收证据；发现被改写痕迹时告警。
+      
   en: >
       Verifies signature hashes and log records, producing verification jobs and results as acceptance evidence for the immutability constraint, and alerts when tampering traces are found.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.621Z"
+fingerprint: a5c8c53b676315cbf9ccdfb80d068b584cf8e89cdb8f4dda5c25769eecec1871
 source:
   - path: "doc/data-model.md"
     line: 546
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           对日志与签名发起完整性校验。
+          
       en: >
           Starts an integrity verification over logs and signatures.
+          
   - protocol: http
     method: GET
     path: "/api/v1/audit/integrity/verify/{job_id}"
     description:
       zh: >
           查询完整性校验结果。
+          
       en: >
           Returns the integrity verification result.
+          
 deps:
   - kind: call
     to: oa.sign.record

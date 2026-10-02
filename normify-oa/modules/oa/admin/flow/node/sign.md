@@ -7,11 +7,13 @@ name: {zh: "签名要求", en: "Signature Policy"}
 description:
   zh: >
       配置节点是强制签名、可选签名还是不签名；默认集团分管领导与集团董事长节点强制签名，其余节点可选。
+      
   en: >
       Sets whether a node requires a signature, allows an optional one or forbids it, with the group executive and chairman nodes defaulting to a mandatory signature.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.599Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 367
@@ -29,16 +31,20 @@ apis:
     description:
       zh: >
           查询节点的签名要求。
+          
       en: >
           Read the signature policy of a node.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/admin/flow-nodes/{node_id}/sign-policy"
     description:
       zh: >
           设置节点强制签名/可选签名/不签名。
+          
       en: >
           Set required, optional or no signature for a node.
+          
 deps:
   - kind: call
     to: oa.sign.capture

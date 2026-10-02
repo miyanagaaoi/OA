@@ -7,11 +7,13 @@ name: {zh: "合同基础字段组", en: "Contract Basic Field Group"}
 description:
   zh: >
       合同基础信息字段：合同名称 title（text ≤80，必填）、事项类别 category（固定为经营 business，默认且置灰）、合同类型 contract_type（select，见 forms.md 6.3）与其他类型说明 contract_type_other（text ≤40，类型为「其他」时必填）。
+      
   en: >
       Contract basics: contract name `title` (text ≤80, required), category `category` (fixed to business, defaulted and greyed out), contract type `contract_type` (select per section 6.3) and other-type note `contract_type_other` (text ≤40, required when the type is other).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:36:43.524Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.656Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 130

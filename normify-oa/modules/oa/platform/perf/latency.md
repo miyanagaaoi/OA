@@ -11,9 +11,9 @@ description:
   en: >
       Latency budget for list and detail pages and for approval submission, measured at the ninety-fifth percentile and reported periodically.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.714Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 534
@@ -25,13 +25,17 @@ apis:
     description:
       zh: >
           查询页面与提交响应分位数据。
+          
       en: >
           Reads page and submit latency percentiles.
+          
   - protocol: file
     path: "reports/perf/latency-{date}.csv"
     description:
       zh: >
           按日导出的性能报告。
+          
       en: >
           Daily latency report export.
+          
 ---

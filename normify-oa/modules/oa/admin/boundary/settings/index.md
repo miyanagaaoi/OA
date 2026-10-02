@@ -7,11 +7,13 @@ name: {zh: "系统参数与保留期", en: "System Settings & Retention"}
 description:
   zh: >
       系统管理员可调的系统级参数：会话与登录策略、审计与日志保留期；参数均带不可越过的硬下限（审计与轨迹保留不得短于 10 年）。
+      
   en: >
       System-wide parameters the super-admin may tune: session and login policy plus audit and log retention, with hard floors that cannot be crossed (audit and trace retention never shorter than ten years).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.592Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 544

@@ -11,9 +11,9 @@ description:
   en: >
       Capacity baseline derived from the agreed figures (300+ total users, 80 peak online, 30 approval operations per second) with load-test scenarios that hold under those numbers.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.714Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 533
@@ -27,14 +27,18 @@ apis:
     description:
       zh: >
           并发审批压测场景脚本。
+          
       en: >
           Load-test scenario for concurrent approvals.
+          
   - protocol: http
     method: GET
     path: "/api/v1/admin/perf/baseline"
     description:
       zh: >
           查询容量基线与压测结论。
+          
       en: >
           Reads the capacity baseline and load-test conclusions.
+          
 ---

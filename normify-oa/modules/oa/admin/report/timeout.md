@@ -7,11 +7,13 @@ name: {zh: "超时率统计", en: "Timeout Rate"}
 description:
   zh: >
       统计超出配置超时时长的节点占比并列出超时节点明细，即一期口径的超时率报表。
+      
   en: >
       Computes the share of nodes that exceeded their configured timeout and lists the offending nodes, which is the phase-one timeout-rate report.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.611Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 439
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           按节点/公司/时间的超时率。
+          
       en: >
           Timeout rate by node, company and period.
+          
   - protocol: http
     method: GET
     path: "/api/v1/admin/reports/timeout-nodes"
     description:
       zh: >
           超时节点明细。
+          
       en: >
           Detail of the nodes that timed out.
+          
 deps:
   - kind: reference
     to: oa.notify.reminder

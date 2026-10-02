@@ -11,9 +11,9 @@ description:
   en: >
       Rate limiting per client and window plus idempotency keys so retried approval submissions cannot create duplicate documents.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.697Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 533
@@ -25,21 +25,27 @@ apis:
     description:
       zh: >
           限流判定，超限返回 429。
+          
       en: >
           Rate-limit check returning 429 when exceeded.
+          
   - protocol: redis
     path: "gateway:rate:{client}:{window}"
     description:
       zh: >
           限流计数键。
+          
       en: >
           Rate-limit counter key.
+          
   - protocol: http
     method: POST
     path: "/api/v1/gateway/idempotency"
     description:
       zh: >
           提交类接口的幂等键校验。
+          
       en: >
           Idempotency-key guard for submit endpoints.
+          
 ---

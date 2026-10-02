@@ -7,11 +7,13 @@ name: {zh: "清理与评审留痕", en: "Purge Control"}
 description:
   zh: >
       一期不做物理删除；如需清理须提交清理申请、单独评审并写入审计记录，系统按申请单约束执行范围。
+      
   en: >
       No physical deletion in phase one; any cleanup must go through a purge request, a separate review and an audit record, and the system enforces the approved scope.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.615Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 827
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           提交物理清理申请并附评审依据。
+          
       en: >
           Submits a physical purge request for review.
+          
   - protocol: http
     method: GET
     path: "/api/v1/archive/purge-requests"
     description:
       zh: >
           查看清理申请与评审状态。
+          
       en: >
           Lists purge requests and their review status.
+          
 deps:
   - kind: reference
     to: oa.admin.boundary

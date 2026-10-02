@@ -7,11 +7,13 @@ name: {zh: "整单搬迁执行", en: "Archive Migration Run"}
 description:
   zh: >
       以整单为单位把实例、节点、任务、轨迹、签名、附件元数据与表单数据搬移至 _history 历史库表，单事务可回滚，附件路径保持可解析。
+      
   en: >
       Moves each document as a unit - instance, nodes, tasks, trail, signatures, attachment metadata and form data - into _history tables inside one rollback-safe transaction, keeping attachment paths resolvable.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.614Z"
+fingerprint: a5c8c53b676315cbf9ccdfb80d068b584cf8e89cdb8f4dda5c25769eecec1871
 source:
   - path: "doc/data-model.md"
     line: 822
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           执行批次整单搬迁。
+          
       en: >
           Runs a batch migration to the history store.
+          
   - protocol: http
     method: POST
     path: "/api/v1/archive/jobs/{job_id}/rollback"
     description:
       zh: >
           回滚中断的搬迁批次。
+          
       en: >
           Rolls back an interrupted migration batch.
+          
 deps:
   - kind: dataflow
     to: oa.form.matter

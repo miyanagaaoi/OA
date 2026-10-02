@@ -11,9 +11,9 @@ description:
   en: >
       The document form inside the overlay: every field is read-only after submission (changes require an approver to reject and the initiator to resubmit) and read-only values use a canvas-subtle block; amounts are tnum right-aligned with two decimals and a ten-thousand-yuan conversion above one million; the header carries title, status badge and document number, with print / route / more as secondary actions on the right.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:46.293Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.720Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 871
@@ -31,15 +31,19 @@ apis:
     description:
       zh: >
           读取已提交的表单值、模板版本与字段级权限。
+          
       en: >
           Read the submitted form values, template version and field-level permissions.
+          
   - protocol: file
     path: "print/preview-{form_type}-a4.html"
     description:
       zh: >
           按单据类型渲染的 A4 打印稿模板。
+          
       en: >
           A4 print sheet template rendered per document type.
+          
 deps:
   - kind: dataflow
     to: oa.workflow.runtime.instance.state

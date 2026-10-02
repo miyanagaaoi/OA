@@ -7,11 +7,13 @@ name: {zh: "补件提交与回原节点", en: "Submit Supplement & Return"}
 description:
   zh: >
       发起人提交补件：仅可新增附件（flow_attachment.round 等于本次补件轮次）与 ≤500 字的补件说明。提交后清空子状态 pending_supplement、supplement_count +1、补件记录置已补件，节点实例回到 active，任务回到请求补件的审批人。补件不算驳回，不写驳回记录。
+      
   en: >
       The initiator submits the supplement: only newly uploaded attachments (flow_attachment.round equals the supplement round) and a supplement note of up to 500 characters. Submission clears the sub-status, increments supplement_count, marks the record submitted and returns the node to active with tasks back to the requesting approver. A supplement is not a rejection and never writes a rejection record.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:37:49.931Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.773Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 325

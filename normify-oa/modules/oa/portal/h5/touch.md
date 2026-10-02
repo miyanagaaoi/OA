@@ -7,11 +7,13 @@ name: {zh: "H5 触控尺寸", en: "H5 Touch Targets"}
 description:
   zh: >
       H5 触控与控件尺寸：可点击元素与控件高度不低于 44px（spacing.control-h5），列表用卡片列表（不做表格），字段单列、标签在上；正文仍为 14px，不因触控目标放大而降低密度。
+      
   en: >
       H5 touch and control sizing: every clickable element and control is at least 44px tall (spacing.control-h5) and lists become card lists rather than tables; form fields are single-column with the label above the control; body text stays 14px so larger targets do not cost density.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.726Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 724
@@ -29,8 +31,10 @@ apis:
     description:
       zh: >
           H5 待办卡片列表页。
+          
       en: >
           H5 pending task card list route.
+          
 deps:
   - kind: dataflow
     to: oa.workflow.task

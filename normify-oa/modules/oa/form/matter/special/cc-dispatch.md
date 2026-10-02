@@ -7,11 +7,13 @@ name: {zh: "抄送人写入与通知", en: "CC Write & Notify"}
 description:
   zh: >
       抄送人（≤20 人、通讯录内、去重）在提交时写入并派发抄送通知；抄送人可见单据但不产生待办、不参与审议。
+      
   en: >
       CC users (≤20, from the directory, de-duplicated) are persisted at submission and receive CC notices; they can view the document but get no todo and take no part in the decision.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.665Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 86
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           写入抄送人并派发抄送通知。
+          
       en: >
           Persists CC users and dispatches CC notices.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/matter/instances/{instance_id}/cc-users"
     description:
       zh: >
           读取单据抄送人清单。
+          
       en: >
           Reads a document's CC list.
+          
 deps:
   - kind: call
     to: oa.notify.cc

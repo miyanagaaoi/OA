@@ -7,11 +7,13 @@ name: {zh: "离职闸门", en: "Resignation Gate"}
 description:
   zh: >
       办理离职前统计并提示名下未处理任务数量，强制先转办或改派；离职后不再参与新的审批人解析，在途单据仍由快照审批人处理。
+      
   en: >
       Before resignation, surface the number of unhandled tasks and force transfer or reassignment first; after resignation the user is excluded from new approver resolution while in-flight documents stay with their snapshot approvers.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.605Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 241
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           统计名下未处理待办数量（离职前置提示）。
+          
       en: >
           Count unhandled tasks as a pre-resignation prompt.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/users/{user_id}/resign"
     description:
       zh: >
           办理离职；存在未处理待办时拒绝。
+          
       en: >
           Complete resignation; rejected while tasks remain.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/users/{user_id}/reassign"
     description:
       zh: >
           离职前批量转办/改派名下待办。
+          
       en: >
           Bulk transfer or reassign tasks before resignation.
+          
 deps:
   - kind: call
     to: oa.workflow.task

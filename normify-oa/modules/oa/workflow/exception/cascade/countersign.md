@@ -7,11 +7,13 @@ name: {zh: "会签驳回联动", en: "Countersign Rejection Cascade"}
 description:
   zh: >
       会签节点中任一人驳回 → 该节点立即驳回 → 单据回到发起人；同节点其余未处理任务全部置为「已自动关闭」，不再等待剩余会签人；已达阈值的历史同意记录保留在轨迹中，但节点结论为驳回。
+      
   en: >
       Any single rejection on a countersign node rejects the node immediately and returns the document to the initiator; every other pending task of that node becomes auto-closed instead of waiting for the remaining signers. Approvals already recorded stay in the trail while the node verdict is rejection.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.756Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 386
@@ -29,15 +31,19 @@ apis:
     description:
       zh: >
           会签节点驳回联动（节点驳回 + 其余任务自动关闭）。
+          
       en: >
           Countersign rejection cascade: reject node and close remaining tasks.
+          
   - protocol: kafka
     path: "oa.workflow.node.rejected"
     description:
       zh: >
           节点驳回事件（驱动实例回发起人）。
+          
       en: >
           Event emitted when a node is rejected.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

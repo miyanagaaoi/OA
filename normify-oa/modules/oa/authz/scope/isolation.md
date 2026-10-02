@@ -7,11 +7,13 @@ name: {zh: "跨公司与越权拦截", en: "Isolation & Denial"}
 description:
   zh: >
       子公司数据隔离与越权拦截：列表与搜索中不出现越权单据，直接构造 URL 访问返回无权限（非空页）；越权尝试写入安全审计。
+      
   en: >
       Subsidiary isolation and unauthorized-access blocking: out-of-scope documents never appear in lists or search, direct URL access returns a permission error rather than an empty page, and attempts are written to the security audit.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.635Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 159
@@ -25,16 +27,20 @@ apis:
     description:
       zh: >
           断言当前用户对目标单据有访问权。
+          
       en: >
           Asserts access to a target document.
+          
   - protocol: http
     method: GET
     path: "/api/v1/authz/scope-check"
     description:
       zh: >
           返回当前用户对指定资源的判定结果。
+          
       en: >
           Returns the access verdict for a resource.
+          
 deps:
   - kind: call
     to: oa.authz.scope.filter

@@ -11,9 +11,9 @@ description:
   en: >
       Site-wide HTTPS with modern cipher suites, HSTS and security response headers, and private storage that refuses direct attachment links without authentication.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.719Z"
+fingerprint: be29667d4e39e20604635d25a37b43052c385d937b656fcaabc6dba1e57dfca8
 source:
   - path: "doc/prd-0.1.md"
     line: 535
@@ -27,13 +27,17 @@ apis:
     description:
       zh: >
           HTTPS 与密码套件配置。
+          
       en: >
           HTTPS and cipher-suite configuration.
+          
   - protocol: file
     path: "deploy/nginx/hsts.conf"
     description:
       zh: >
           HSTS 与安全响应头配置。
+          
       en: >
           HSTS and security response headers.
+          
 ---

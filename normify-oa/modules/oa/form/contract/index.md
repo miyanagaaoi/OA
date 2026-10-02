@@ -7,11 +7,13 @@ name: {zh: "合同审批单", en: "Contract Approval Form"}
 description:
   zh: >
       合同审批单（form_type=contract）：对方主体、合同类型、金额与期限等要素，须上传合同文本附件；金额遵循只读与不可导出规则；集团层打印使用「集团合同类文件流转审批单」版式。
+      
   en: >
       Contract approval form (form_type=contract): counterparty, contract type, amount and period fields plus a mandatory contract text attachment; subject also to the fund-style read-only and non-exportable amount rules; group-level output uses the group contract routing sheet.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:55:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.657Z"
+fingerprint: be29667d4e39e20604635d25a37b43052c385d937b656fcaabc6dba1e57dfca8
 source:
   - path: "doc/forms.md"
     line: 124

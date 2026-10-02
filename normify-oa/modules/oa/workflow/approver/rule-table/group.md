@@ -7,11 +7,13 @@ name: {zh: "集团层规则", en: "Group-Layer Rules"}
 description:
   zh: >
       集团分管领导（按事项类别匹配集团层绑定的分管领导，类别为快照不可改判）与集团董事长（唯一候选人）两条规则的解析；类别仅作分类标签、不参与路由（REQ-FLOW-001）。
+      
   en: >
       Resolves the group line leader (matched to the category snapshot bound at group level) and the chairman (single candidate); the category is a configuration label only and never affects routing (REQ-FLOW-001).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.748Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 213
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           按事项类别快照匹配集团层绑定的分管领导（类别只作标签不参与路由）。
+          
       en: >
           Matches the group line leader by the category snapshot (label only, never routing).
+          
   - protocol: http
     method: POST
     path: "/api/v1/approver-rules/chairman/resolve"
     description:
       zh: >
           取集团董事长（唯一候选人）。
+          
       en: >
           Resolves the group chairman as the single candidate.
+          
 deps:
   - kind: call
     to: oa.identity.org

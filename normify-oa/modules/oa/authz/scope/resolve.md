@@ -7,11 +7,13 @@ name: {zh: "用户数据域解析", en: "Data Scope Resolution"}
 description:
   zh: >
       解析用户的最终数据域：合并多角色取最宽口径，叠加角色生效组织范围（scope_org_id）与一人多岗归属，输出可直接用于过滤的口径对象。
+      
   en: >
       Resolves a user's final data scope by merging roles with the widest-wins rule, layering each role's effective org scope (scope_org_id) and multi-post affiliations into a filter-ready scope object.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.636Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 169
@@ -25,16 +27,20 @@ apis:
     description:
       zh: >
           解析指定用户的数据域口径对象。
+          
       en: >
           Resolves the scope object of a user.
+          
   - protocol: http
     method: GET
     path: "/api/v1/authz/my-scope"
     description:
       zh: >
           返回当前登录人的数据域。
+          
       en: >
           Returns the caller's data scope.
+          
 deps:
   - kind: call
     to: oa.authz.scope.catalog

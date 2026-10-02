@@ -7,11 +7,13 @@ name: {zh: "签名策略与超时开关", en: "Signature Policy & Timeout Switch
 description:
   zh: >
       节点级 sign_policy（required 强制 / optional 可选 / none 不签名，默认集团分管领导与董事长节点强制）、timeout_hours（须显式配置且 ≥24h，超时仅催办不自动跳过）、allow_add_sign（加签）、allow_jump（自由跳转默认关闭）、allow_route（集团层流转/回退开关）（REQ-FLOW-007/003/004/020、REQ-SIGN-003）。
+      
   en: >
       Node-level sign_policy (required/optional/none; group line leader and chairman default to required), timeout_hours (explicit and ≥24h, reminder only and never auto-skip), allow_add_sign, allow_jump (off by default) and allow_route for group-layer routing/return (REQ-FLOW-007/003/004/020, REQ-SIGN-003).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.752Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 346
@@ -29,24 +31,30 @@ apis:
     description:
       zh: >
           读取签名策略、超时时长与加签/跳转/流转开关。
+          
       en: >
           Reads signature policy, timeout hours and the add-sign/jump/route switches.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/flow-nodes/{node_id}/policy"
     description:
       zh: >
           写入签名策略、超时时长与三个开关。
+          
       en: >
           Writes signature policy, timeout hours and the three switches.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow-nodes/{node_id}/policy/validate"
     description:
       zh: >
           校验超时 ≥24h、强制签名默认值与开关适用性。
+          
       en: >
           Validates timeout ≥24h, the mandatory-signature defaults and switch applicability.
+          
 deps:
   - kind: reference
     to: oa.workflow.definition.node-schema

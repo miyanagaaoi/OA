@@ -7,11 +7,13 @@ name: {zh: "业务线分管领导", en: "Business-line Leaders"}
 description:
   zh: >
       集团层按业务线绑定分管领导（财务/人力/行政/经营等分类）：用于集团分管领导节点的审批人解析，并决定其按业务线的数据可见范围。
+      
   en: >
       Group-level leaders are bound per business line (finance, HR, administration, operations): it drives approver resolution for the group-executive node and their business-line data scope.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.688Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 137
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           查询各业务线分管领导。
+          
       en: >
           Lists leaders per business line.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/identity/leaders/lines/{category}"
     description:
       zh: >
           设置某业务线的分管领导。
+          
       en: >
           Sets the leader of a business line.
+          
 deps:
   - kind: call
     to: oa.identity.position.leader-bind

@@ -7,11 +7,13 @@ name: {zh: "H5 手写签名面板", en: "H5 Signature Pad"}
 description:
   zh: >
       手写签名面板：H5 自适应宽度 × 高 200px（桌面 640×200），canvas-subtle 底 + 1px 虚线边框 + rounded.sm；上方提示「请在框内签名」，下方为「清除」「使用预存签名」「确认签名」；线条 2px 墨色圆头平滑曲线，未签名时「确认」禁用。
+      
   en: >
       The handwritten signature pad: 200px tall and full width on H5 (640×200 on desktop) on a canvas-subtle fill with a 1px dashed border and rounded.sm; the prompt Please sign inside the box sits above, with Clear, Use preset signature and Confirm signature below; strokes are 2px ink round-capped smooth curves and Confirm stays disabled until something is drawn.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.726Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 901
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           提交手写签名图（绑定设备指纹与 IP）。
+          
       en: >
           Submit a handwritten signature image bound to device fingerprint and IP.
+          
   - protocol: http
     method: GET
     path: "/api/v1/portal/h5/signatures/preset"
     description:
       zh: >
           调用用户预存签名（一键复用）。
+          
       en: >
           Load the user's preset signature for one-tap reuse.
+          
 deps:
   - kind: call
     to: oa.sign.capture

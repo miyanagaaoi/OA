@@ -11,9 +11,9 @@ description:
   en: >
       The write channel while awaiting supplement: only `attachments` and `supplement_note` are writable; `supplement_note` (≥5 and ≤500 characters) lands in `flow_supplement.submitted_note` and enters the approval trail, with attachments stored per round.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:03:06.031Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.682Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 33
@@ -28,8 +28,10 @@ apis:
     description:
       zh: >
           提交补件说明与补件附件。
+          
       en: >
           Submits a supplement note with attachments.
+          
 deps:
   - kind: call
     to: oa.workflow.supplement

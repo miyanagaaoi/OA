@@ -7,11 +7,13 @@ name: {zh: "审批人解析规则声明", en: "Approver Rule Declaration"}
 description:
   zh: >
       节点上 approver_rule 与 approver_param 的声明与校验：dept_leader / department_leader / finance_leader / company_exec / gm / group_dept_leader / group_dept / group_exec / chairman / designated / initiator_pick；designated 需给出 user_ids 或 role_code。此处只声明规则编码，实际解析由审批人解析模块在发起时执行（REQ-FLOW-011）。
+      
   en: >
       Declares and validates the node's approver_rule and approver_param: dept_leader/department_leader/finance_leader/company_exec/gm/group_dept_leader/group_dept/group_exec/chairman/designated/initiator_pick; designated requires user_ids or role_code. Only the rule code is declared here — resolution runs at submission in the approver module (REQ-FLOW-011).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.750Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 307
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           读取节点的审批人解析规则与参数。
+          
       en: >
           Reads the node approver rule and its parameters.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/flow-nodes/{node_id}/approver-rule"
     description:
       zh: >
           写入审批人解析规则编码与参数。
+          
       en: >
           Writes the approver rule code and parameters.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow-nodes/{node_id}/approver-rule/validate"
     description:
       zh: >
           校验规则编码、designated 参数与 role_code 存在性。
+          
       en: >
           Validates the rule code, designated parameters and role_code existence.
+          
 deps:
   - kind: reference
     to: oa.workflow.definition.node-schema

@@ -7,11 +7,13 @@ name: {zh: "导出管控", en: "Export Control"}
 description:
   zh: >
       导出功能仅系统管理员可用，金额字段对非财务角色不可导出；导出前统一鉴权，防止绕过界面直接调用接口导出。
+      
   en: >
       Export is restricted to system admins and amount fields cannot be exported by non-finance roles; every export is authorised up front so the UI cannot be bypassed by calling the API directly.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.637Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 192
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           导出前鉴权（角色与字段范围）。
+          
       en: >
           Authorises an export by role and field.
+          
   - protocol: http
     method: GET
     path: "/api/v1/authz/export-policy"
     description:
       zh: >
           读取导出权限与字段限制策略。
+          
       en: >
           Reads the export policy.
+          
 deps:
   - kind: call
     to: oa.authz.visibility.field.amount

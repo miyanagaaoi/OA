@@ -11,9 +11,9 @@ description:
   en: >
       Failure counting and lockout: five consecutive failures lock the account for fifteen minutes, with lockouts listed for administrators.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:00:16.150Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.718Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 536
@@ -25,13 +25,17 @@ apis:
     description:
       zh: >
           查询当前锁定账号及其失败次数。
+          
       en: >
           Lists currently locked accounts with the failure count.
+          
   - protocol: file
     path: "reports/security/lockouts-{date}.csv"
     description:
       zh: >
           按日导出锁定与解锁事件供复核。
+          
       en: >
           Daily export of lockout and unlock events for review.
+          
 ---

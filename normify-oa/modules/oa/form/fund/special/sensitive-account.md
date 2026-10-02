@@ -7,11 +7,13 @@ name: {zh: "收款账号加密与脱敏", en: "Payee Account Encryption & Maskin
 description:
   zh: >
       收款账号为敏感字段：以加密形式存储（非明文）；列表与详情默认脱敏为 `****1234`；完整值仅财务角色与系统管理员可见，且不可导出。
+      
   en: >
       The payee account is sensitive: stored encrypted rather than in clear text; masked as `****1234` in lists and detail; the full value is visible only to finance roles and admins and is never exportable.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.663Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 108
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           按角色返回脱敏或完整收款账号。
+          
       en: >
           Returns the masked or full payee account per role.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/fund/fields/payee-account/mask"
     description:
       zh: >
           生成脱敏展示值（****1234）。
+          
       en: >
           Builds the masked display value (****1234).
+          
 deps:
   - kind: reference
     to: oa.authz.visibility

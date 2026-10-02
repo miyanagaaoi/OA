@@ -11,9 +11,9 @@ description:
   en: >
       A block-style upload button with capacity copy (at most 30 files, 500MB each) instead of a large dashed drop zone; uploaded files appear as list rows (icon, name, size, delete) with no image thumbnail grid; over-limit uploads state the exact cap, and supplement attachments carry their round number.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:37.558Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.731Z"
+fingerprint: ad88e328b04de7a8d2ba605f8fc806c579bcb555ef8cadc76b8edcedbd0695f5
 source:
   - path: "DESIGN.md"
     line: 867
@@ -31,16 +31,20 @@ apis:
     description:
       zh: >
           上传附件（类型与大小白名单校验）。
+          
       en: >
           Upload an attachment with type and size allow-list checks.
+          
   - protocol: http
     method: DELETE
     path: "/api/v1/portal/initiate/attachments/{attachment_id}"
     description:
       zh: >
           删除未提交单据的附件。
+          
       en: >
           Delete an attachment of an unsubmitted document.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

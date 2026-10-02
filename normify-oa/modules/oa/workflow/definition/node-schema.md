@@ -7,11 +7,13 @@ name: {zh: "节点定义与节点类型", en: "Node Definitions & Node Types"}
 description:
   zh: >
       flow_node 节点定义本体：节点序号 seq（与 PRD 6.3 的①②③对应）、node_code、显示名与节点类型 node_type（approve 审批 / condition 条件（二期预留）/ cc 抄送 / archive 归档登记）；维护模板内 seq 唯一与节点增删改。
+      
   en: >
       The flow_node definition itself: sequence seq mapped to PRD 6.3's ①-⑦, node_code, display name and node_type (approve / condition reserved for phase 2 / cc / archive), keeping seq unique within a template and supporting node add, update and delete.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.753Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 297
@@ -25,40 +27,50 @@ apis:
     description:
       zh: >
           流程节点定义表（seq、节点类型、行为配置列）。
+          
       en: >
           Flow node definition table (seq, node type, behavior columns).
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow-templates/{template_id}/nodes"
     description:
       zh: >
           按模板读取节点定义列表（按 seq 排序）。
+          
       en: >
           Lists node definitions of a template ordered by seq.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow-templates/{template_id}/nodes"
     description:
       zh: >
           在草稿模板上新增节点并分配 seq。
+          
       en: >
           Adds a node to a draft template and assigns its seq.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/flow-nodes/{node_id}"
     description:
       zh: >
           更新节点名称、编码与节点类型。
+          
       en: >
           Updates node name, code and node type.
+          
   - protocol: http
     method: DELETE
     path: "/api/v1/flow-nodes/{node_id}"
     description:
       zh: >
           删除草稿模板中的节点。
+          
       en: >
           Deletes a node from a draft template.
+          
 deps:
   - kind: call
     to: oa.workflow.definition.template.registry

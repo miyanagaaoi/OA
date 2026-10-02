@@ -7,11 +7,13 @@ name: {zh: "版本发布走管理后台", en: "Publish via Admin Console"}
 description:
   zh: >
       设计成果的发布链路：校验通过后生成待发布版本、提交发布申请，由管理后台完成发布并记录变更前后值与操作人；已发起实例仍按旧版本执行（REQ-FLOW-006、REQ-ADMIN-002、REQ-LOG-004）。
+      
   en: >
       Publish pipeline for design output: after validation passes, generate the pending version, submit a publish request and let the admin console complete publishing while recording before/after values and the operator; in-flight instances keep running on the old version (REQ-FLOW-006, REQ-ADMIN-002, REQ-LOG-004).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.756Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 349
@@ -29,23 +31,29 @@ apis:
     description:
       zh: >
           提交发布申请（含校验回执摘要）。
+          
       en: >
           Submits a publish request with the validation summary.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow-designs/{template_id}/publish-requests/{request_id}"
     description:
       zh: >
           查询发布申请状态与结果。
+          
       en: >
           Queries the publish request status and result.
+          
   - protocol: kafka
     path: "oa.workflow.template.publish-requested"
     description:
       zh: >
           发布申请提交事件，供管理后台与审计消费。
+          
       en: >
           Event emitted when a publish request is submitted, consumed by the admin console and audit.
+          
 deps:
   - kind: call
     to: oa.workflow.definition.template.version

@@ -11,9 +11,9 @@ description:
   en: >
       Single org node detail including type, parent path and enable/disable state.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:01:04.995Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.698Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 135
@@ -25,6 +25,8 @@ apis:
     description:
       zh: >
           单个组织节点的只读详情。
+          
       en: >
           Read-only detail of one org node.
+          
 ---

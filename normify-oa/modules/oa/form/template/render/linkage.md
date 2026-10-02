@@ -7,11 +7,13 @@ name: {zh: "字段联动求值", en: "Field Linkage Evaluation"}
 description:
   zh: >
       联动规则求值：字段的显示、必填与取值依赖其他字段，如 involve_cost → amount/cost_bearer、contract_type → contract_type_other、seal_type → cert_name/seal_count、return_status → return_date、is_framework → period_end。
+      
   en: >
       Evaluates linkage rules where visibility, requiredness and value depend on other fields, e.g. involve_cost → amount/cost_bearer, contract_type → contract_type_other, seal_type → cert_name/seal_count, return_status → return_date, is_framework → period_end.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.678Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 23
@@ -35,14 +37,18 @@ apis:
     description:
       zh: >
           求值联动结果（显示/必填/可写/取值）。
+          
       en: >
           Evaluates linkage results (visibility, requiredness, writability, derived value).
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/templates/{form_type}/schema/linkages"
     description:
       zh: >
           读取模板声明的联动规则。
+          
       en: >
           Reads the linkage rules declared by a template.
+          
 ---

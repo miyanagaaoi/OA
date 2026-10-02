@@ -7,11 +7,13 @@ name: {zh: "组织批量调整导入", en: "Org Bulk Import"}
 description:
   zh: >
       Excel 批量导入与导出组织树；公司重组等批量调整前先给出受影响在途单据清单，管理员确认后才执行，避免快照策略下单据卡死。
+      
   en: >
       Excel bulk import and export of the org tree; before restructuring, the affected in-flight documents are listed and execution requires admin confirmation, so snapshots cannot strand documents.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.683Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 234
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           解析导入文件并给出冲突与受影响在途清单。
+          
       en: >
           Parses the upload and returns conflicts plus affected in-flight documents.
+          
   - protocol: http
     method: POST
     path: "/api/v1/identity/orgs/import"
     description:
       zh: >
           确认后执行批量导入。
+          
       en: >
           Executes the bulk import after confirmation.
+          
   - protocol: http
     method: GET
     path: "/api/v1/identity/orgs/export"
     description:
       zh: >
           导出组织树。
+          
       en: >
           Exports the org tree.
+          
 deps:
   - kind: call
     to: oa.identity.org.node

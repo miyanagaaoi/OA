@@ -7,11 +7,13 @@ name: {zh: "轨迹时间轴展示", en: "Trail Timeline"}
 description:
   zh: >
       按轨迹顺序输出单据审批时间轴，以及按节点实例分组的轨迹视图，供详情页、打印与历史预览复用；读侧不做任何写回。
+      
   en: >
       Renders the per-document approval timeline by trail sequence and a node-grouped trail view reused by detail, print and archived preview; the read side never writes back.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.627Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 427
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           按顺序返回单据审批时间轴。
+          
       en: >
           Returns the ordered approval timeline of a document.
+          
   - protocol: http
     method: GET
     path: "/api/v1/instances/{instance_id}/trail/nodes"
     description:
       zh: >
           按节点实例分组返回轨迹。
+          
       en: >
           Returns the trail grouped by node instance.
+          
 deps:
   - kind: dataflow
     to: oa.audit.trace.thread

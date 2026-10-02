@@ -11,9 +11,9 @@ description:
   en: >
       Configures any-sign, all-sign or sequential approval per node together with a pass threshold expressed as a percentage or an absolute headcount, with the absolute form taking precedence when both are present.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:02:57.577Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.598Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 218
@@ -28,16 +28,20 @@ apis:
     description:
       zh: >
           设置节点的或签/会签/依次与通过阈值。
+          
       en: >
           Set decision mode and pass threshold for a node.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/flow-nodes/{node_id}/decision/validate"
     description:
       zh: >
           校验阈值写法（百分比或绝对人数）。
+          
       en: >
           Validate the threshold form (percent or headcount).
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

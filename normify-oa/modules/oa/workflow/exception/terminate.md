@@ -7,11 +7,13 @@ name: {zh: "终止", en: "Terminate"}
 description:
   zh: >
       系统管理员与集团分管领导可终止流程，必须填写原因；终止后实例状态置「已终止」（终态，不可再提交），全部进行中节点实例与任务取消或自动关闭，并通知发起人；终止动作写入审计日志。
+      
   en: >
       System administrators and the group line leader may terminate a flow and must give a reason. The instance becomes terminated, a final state that can never be submitted again; every processing node instance and task is cancelled or auto-closed and the initiator is notified. The action is written to the audit log.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.759Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 393
@@ -29,16 +31,20 @@ apis:
     description:
       zh: >
           终止流程（原因必填，终态不可再提交）。
+          
       en: >
           Terminate the flow with a mandatory reason; the state is final.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow/instances/{instance_id}/terminable"
     description:
       zh: >
           判定当前用户是否具备终止权限。
+          
       en: >
           Check whether the current user may terminate.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

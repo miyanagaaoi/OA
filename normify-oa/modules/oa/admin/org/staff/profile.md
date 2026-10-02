@@ -11,9 +11,9 @@ description:
   en: >
       Create and maintain user profiles: unique account, salted password hash, encrypted phone, employee number for watermarks, owning org and company; supports password reset and employment-status changes.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:03:29.097Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.607Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 435
@@ -28,32 +28,40 @@ apis:
     description:
       zh: >
           按组织/状态/关键字查询人员列表。
+          
       en: >
           List users filtered by org, status or keyword.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/users"
     description:
       zh: >
           新建人员档案与账号（账号唯一校验）。
+          
       en: >
           Create a user profile with unique-account validation.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/admin/users/{user_id}"
     description:
       zh: >
           修改人员信息与归属组织/公司。
+          
       en: >
           Update user profile and owning org/company.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/users/{user_id}/reset-password"
     description:
       zh: >
           重置密码并强制下次登录修改。
+          
       en: >
           Reset the password and force a change at next login.
+          
 deps:
   - kind: call
     to: oa.identity.user

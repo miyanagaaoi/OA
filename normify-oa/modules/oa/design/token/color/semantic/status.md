@@ -7,11 +7,13 @@ name: {zh: "五套语义色值", en: "Status Color Values"}
 description:
   zh: >
       五套语义色与浅底配对：success #1f7a4d / #e6f4ec、warning #9a6200 / #fdf1dd（偏暗琥珀以满足 4.6:1）、error #c02b25 / #fbeaea、info #1f5ae0 / #eef3fe（与 primary 同值——系统里「蓝」只有一个含义）、neutral #5b6472 / #eef0f4。
+      
   en: >
       The five semantic colours with their surfaces: success #1f7a4d on #e6f4ec, warning #9a6200 on #fdf1dd (a deliberately darker amber to reach 4.6:1 on white), error #c02b25 on #fbeaea, info #1f5ae0 on #eef3fe (identical to primary because blue means exactly one thing in this system) and neutral #5b6472 on #eef0f4.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.649Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 670
@@ -25,8 +27,10 @@ apis:
     description:
       zh: >
           五套语义色及其浅底配对的 CSS 变量。
+          
       en: >
           Semantic colour CSS custom properties, each with its surface pair.
+          
 deps:
   - kind: reference
     to: oa.design.a11y

@@ -7,11 +7,13 @@ name: {zh: "移动端短链", en: "Mobile Short Link"}
 description:
   zh: >
       移动端短链：把 H5 入口地址压缩为短链供二维码与线下张贴使用，支持有效期与访问统计；短链跳转不携带业务数据，落地后按登录态决定进入登录页或待办列表。
+      
   en: >
       The mobile short link compresses the H5 entry address for QR codes and printed notices, with an expiry and visit statistics; the redirect carries no business data, and after landing the login state decides whether the user sees the sign-in page or the pending list.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.724Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 415
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           创建 H5 入口短链（含有效期与访问统计）。
+          
       en: >
           Create a short link for the H5 entry with expiry and visit statistics.
+          
   - protocol: http
     method: GET
     path: "/s/{code}"
     description:
       zh: >
           短链跳转至 H5 门户（不携带业务数据）。
+          
       en: >
           Short link redirect to the H5 portal (carries no business data).
+          
 deps:
   - kind: call
     to: oa.integration.gateway

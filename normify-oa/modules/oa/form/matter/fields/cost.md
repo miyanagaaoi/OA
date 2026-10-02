@@ -11,9 +11,9 @@ description:
   en: >
       Cost involved `involve_cost` (boolean, required, default no), amount `amount` (amount, conditionally required, see rule 1.5) and cost bearer `cost_bearer` (org, conditionally required, defaults to the initiator's company, limited to that company and below); involve_cost also decides whether the finance review node is skipped.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:46.572Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.664Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 82
@@ -25,24 +25,30 @@ apis:
     description:
       zh: >
           事项单费用字段组定义。
+          
       en: >
           Cost field group definition for matter forms.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/matter/fields/involve-cost/linkage"
     description:
       zh: >
           求值涉及费用字段的显示与必填联动（路由判定见专用规则）。
+          
       en: >
           Evaluates visibility and requiredness linkage for the cost field (the routing decision lives in the dedicated rules).
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/matter/fields/cost-bearer/default"
     description:
       zh: >
           取发起人所属公司作为费用承担主体默认值。
+          
       en: >
           Returns the initiator's company as the default cost bearer.
+          
 deps:
   - kind: reference
     to: oa.identity.org

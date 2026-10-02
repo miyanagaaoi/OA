@@ -7,11 +7,13 @@ name: {zh: "离职与待办清理闸门", en: "Resignation Handover Gate"}
 description:
   zh: >
       员工离职前必须处理完名下全部待办：系统提示未处理任务数量并强制先转办或改派，完成后才允许将状态置为离职（快照策略的补偿控制，AC-12）。
+      
   en: >
       Resignation requires all of a user's pending tasks to be handled first: the system reports the count of unfinished tasks and forces transfer or reassignment before the status can become resigned — the compensating control for snapshots.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.694Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 234
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           返回名下未处理待办数量与清单。
+          
       en: >
           Returns the count and list of pending tasks.
+          
   - protocol: http
     method: POST
     path: "/api/v1/identity/users/{id}/resign"
     description:
       zh: >
           待办清空后办理离职。
+          
       en: >
           Marks resignation after tasks are cleared.
+          
   - protocol: http
     method: POST
     path: "/api/v1/identity/users/{id}/handover"
     description:
       zh: >
           批量转办/改派名下待办。
+          
       en: >
           Bulk-transfers or reassigns pending tasks.
+          
 deps:
   - kind: call
     to: oa.identity.user.profile

@@ -11,9 +11,9 @@ description:
   en: >
       Sets the data_scope value of a role among the five allowed values and keeps the role's group/company level consistent with it.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:21.642Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.586Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 174
@@ -28,16 +28,20 @@ apis:
     description:
       zh: >
           查询角色的数据域配置。
+          
       en: >
           Read the data scope configured for a role.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/admin/roles/{role_id}/data-scope"
     description:
       zh: >
           设置角色数据域（本人→全集团）。
+          
       en: >
           Set the role data scope (self to group-wide).
+          
 deps:
   - kind: call
     to: oa.authz.scope

@@ -7,11 +7,13 @@ name: {zh: "回到本部门", en: "Return to Own Department"}
 description:
   zh: >
       把后续流转收束回本部门，由本部门决定下一步；同一部门连续「回到本部门」不超过 2 次，超出拒绝；该动作不计入流转+回退总次数，但必须记入审计日志；是「禁止回流已处理部门」闸门的唯一例外。
+      
   en: >
       Funnels the subsequent routing back to the own department so that this department decides the next step; the same department may return home at most twice consecutively, after which the action is rejected. The action does not count towards the routing quota but must be written to the audit log, and it is the only exception to the no-reflux gate.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.760Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 324
@@ -29,16 +31,20 @@ apis:
     description:
       zh: >
           将后续流转收束回本部门（连续 ≤2 次）。
+          
       en: >
           Funnel subsequent routing back to the own department (max twice consecutively).
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow/instances/{instance_id}/back-home-count"
     description:
       zh: >
           读取本部门连续「回到本部门」次数。
+          
       en: >
           Read how many times the department returned home in a row.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

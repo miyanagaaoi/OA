@@ -11,9 +11,9 @@ description:
   en: >
       In-list search (the system deliberately has no global search box): document type, status, submission date range, initiator/department, amount range and document-number keyword; filters persist across the four tabs; organisation nodes outside the caller's data scope never appear as filter options.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:37.558Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.732Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 891
@@ -28,16 +28,20 @@ apis:
     description:
       zh: >
           返回可用筛选项（按数据域裁剪）。
+          
       en: >
           Returns available filter options clipped to the caller's data scope.
+          
   - protocol: http
     method: POST
     path: "/api/v1/portal/workbench/query"
     description:
       zh: >
           按筛选条件分页查询单据（每页 10/20/50）。
+          
       en: >
           Paged document query by filter conditions (10/20/50 per page).
+          
 deps:
   - kind: call
     to: oa.authz.scope

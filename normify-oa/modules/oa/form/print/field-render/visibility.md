@@ -7,11 +7,13 @@ name: {zh: "打印可见性", en: "Print Visibility"}
 description:
   zh: >
       字段带 printVisible（默认 true）；内部备注类字段（如 cost_bearer）可设为 false；involve_cost 打印为「资金审批内容」正文的一部分，不单独成行。
+      
   en: >
       Fields carry printVisible (default true); internal-note fields such as cost_bearer can be set false; involve_cost prints as part of the fund-approval body text rather than its own row.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.669Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 368
@@ -26,14 +28,18 @@ apis:
     description:
       zh: >
           返回打印稿可见字段集合。
+          
       en: >
           Returns the fields visible on the sheet.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/forms/templates/{form_type}/schema/fields/{field_id}/print-visible"
     description:
       zh: >
           配置字段的 printVisible。
+          
       en: >
           Configures a field's printVisible.
+          
 ---

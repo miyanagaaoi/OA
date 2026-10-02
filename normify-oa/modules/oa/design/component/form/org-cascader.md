@@ -7,11 +7,13 @@ name: {zh: "组织四级联级选择器", en: "Org Cascader"}
 description:
   zh: >
       组织架构选择器：集团—公司—部门—科室四级联级面板，每级 240px 宽，支持搜索定位；只在数据权限边界内展示节点——无权限的组织节点不可见而非置灰，避免通过选择器探测组织架构（对应 5.2 权限模型）。
+      
   en: >
       The organisation picker: a four-level cascade from group to company to department to section, 240px wide per level with search; it only renders nodes inside the caller's data scope — out-of-scope nodes are invisible rather than disabled, so the picker cannot be used to probe the org chart.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.644Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 851
@@ -25,8 +27,10 @@ apis:
     description:
       zh: >
           组织联级选择器样式：每级 240px 宽的四级面板，可见性受数据权限约束。
+          
       en: >
           Org cascader CSS: four-level panels 240px wide with permission-filtered visibility.
+          
 deps:
   - kind: reference
     to: oa.authz.scope

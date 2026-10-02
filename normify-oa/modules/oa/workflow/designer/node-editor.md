@@ -7,11 +7,13 @@ name: {zh: "节点属性面板", en: "Node Property Panel"}
 description:
   zh: >
       设计器节点属性面板：选择审批人解析规则、配置决议模式与通过阈值、签名是否强制、超时时长、是否允许加签/跳转，统一透传到节点行为配置与规则声明（REQ-FLOW-008）。
+      
   en: >
       Designer node property panel: choose the approver rule, configure decision mode and pass threshold, mandatory signature, timeout hours and the add-sign/jump switches, forwarded uniformly to the node behavior config and rule declaration (REQ-FLOW-008).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.755Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 352
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           读取节点属性面板所需的全部配置。
+          
       en: >
           Reads all configuration needed by the node property panel.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/flow-designs/{template_id}/nodes/{node_id}/properties"
     description:
       zh: >
           保存节点属性面板改动并分发到各配置模块。
+          
       en: >
           Saves property panel changes and dispatches them to the config modules.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow-designs/options"
     description:
       zh: >
           提供规则、决议模式、节点类型与签名策略候选项。
+          
       en: >
           Provides option catalogs for rules, decision modes, node types and signature policies.
+          
 deps:
   - kind: call
     to: oa.workflow.definition.node-behavior.decision

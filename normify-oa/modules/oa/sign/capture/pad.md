@@ -7,11 +7,13 @@ name: {zh: "签名面板交互", en: "Signature Pad UI"}
 description:
   zh: >
       移动端 H5 与桌面端的签名面板：审批人点击「签名确认」后弹出画布，支持触屏手写、鼠标书写、撤销与清空重写，采集笔迹点序列（含时间与压感）后交由笔迹渲染模块生成签名图。
+      
   en: >
       The signature pad for mobile H5 and desktop: tapping sign-confirm opens a canvas supporting touch and mouse drawing, undo and clear; stroke points (with time and pressure) are captured and handed to the stroke renderer.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.739Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 365
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           打开签名面板会话，返回画布尺寸与采集参数。
+          
       en: >
           Opens a signature pad session and returns canvas size and capture parameters.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/sign/capture/sessions/{session_id}/strokes"
     description:
       zh: >
           提交手写笔迹点序列（触屏或鼠标）。
+          
       en: >
           Submits handwritten stroke points (touch or mouse).
+          
   - protocol: http
     method: POST
     path: "/api/v1/sign/capture/sessions/{session_id}/confirm"
     description:
       zh: >
           确认签名并触发生成签名图。
+          
       en: >
           Confirms the signature and triggers image generation.
+          
 deps:
   - kind: call
     to: oa.sign.capture.stroke

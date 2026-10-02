@@ -7,11 +7,13 @@ name: {zh: "组织停用闸门", en: "Org Disable Gate"}
 description:
   zh: >
       停用组织节点前统计并展示该节点全部在途单据，确认后方可停用；停用后该节点不可再作为发起者归属节点，重新启用需再次校验。
+      
   en: >
       Before disabling an org node, count and display all in-flight documents of that node and require confirmation; a disabled node cannot own new initiators, and re-enabling re-runs the check.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.607Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 240
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           统计该节点在途单据数量（停用前置校验）。
+          
       en: >
           Count in-flight documents of the node as a pre-disable check.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/orgs/{org_id}/disable"
     description:
       zh: >
           确认后停用组织节点。
+          
       en: >
           Disable the org node after confirmation.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/orgs/{org_id}/enable"
     description:
       zh: >
           重新启用组织节点。
+          
       en: >
           Re-enable the org node.
+          
 deps:
   - kind: call
     to: oa.workflow.runtime

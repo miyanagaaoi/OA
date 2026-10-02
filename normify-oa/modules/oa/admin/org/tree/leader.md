@@ -11,9 +11,9 @@ description:
   en: >
       Maintain primary and deputy org leaders (multiple leaders and multiple posts per person), optionally bound to a matter category as the single authoritative source for approver resolution; a vacancy affects the initiate-time block check.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:21.642Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.608Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 88
@@ -28,24 +28,30 @@ apis:
     description:
       zh: >
           查询组织负责人（正职/副职）。
+          
       en: >
           List org leaders (primary/deputy).
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/orgs/{org_id}/leaders"
     description:
       zh: >
           新增负责人，可绑定正副职与事项类别。
+          
       en: >
           Add a leader with type and optional matter category.
+          
   - protocol: http
     method: DELETE
     path: "/api/v1/admin/org-leaders/{leader_id}"
     description:
       zh: >
           移除负责人并提示受影响节点。
+          
       en: >
           Remove a leader and report affected nodes.
+          
 deps:
   - kind: call
     to: oa.workflow.approver

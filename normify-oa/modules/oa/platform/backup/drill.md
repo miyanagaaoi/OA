@@ -11,9 +11,9 @@ description:
   en: >
       A quarterly restore drill into an isolated environment with a written record, proving that the ten-year audit retention promise is actually recoverable.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.711Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 538
@@ -25,13 +25,17 @@ apis:
     description:
       zh: >
           登记一次季度恢复演练。
+          
       en: >
           Records a quarterly restore drill.
+          
   - protocol: file
     path: "reports/backup/restore-drill-{quarter}.md"
     description:
       zh: >
           恢复演练记录与结论。
+          
       en: >
           Restore drill record and conclusions.
+          
 ---

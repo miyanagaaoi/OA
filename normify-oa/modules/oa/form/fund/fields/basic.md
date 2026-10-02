@@ -7,11 +7,13 @@ name: {zh: "资金基础字段组", en: "Fund Basic Field Group"}
 description:
   zh: >
       资金事由 title（text≤60、必填）、事项分类 category（select、配置项、默认「经济」、不参与路由）、申请金额 amount（amount、必填、> 0，为 0 或空时禁止提交）；金额以 DECIMAL(18,2) 存储。
+      
   en: >
       Fund reason `title` (text ≤60, required), category `category` (select, configurable, defaults to economy, does not drive routing) and requested amount `amount` (amount, required, > 0; zero or empty blocks submission), stored as DECIMAL(18,2).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.661Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 102
@@ -26,22 +28,28 @@ apis:
     description:
       zh: >
           资金单基础字段组定义。
+          
       en: >
           Basic field group definition for fund forms.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/forms/fund/instances/{instance_id}/draft/basic"
     description:
       zh: >
           保存资金单基础字段草稿。
+          
       en: >
           Saves the fund basic field group draft.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/fund/fields/amount/submit-guard"
     description:
       zh: >
           金额为 0 或空时阻断提交。
+          
       en: >
           Blocks submission when the amount is zero or empty.
+          
 ---

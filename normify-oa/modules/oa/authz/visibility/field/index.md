@@ -7,11 +7,13 @@ name: {zh: "字段级限制", en: "Field-level Limits"}
 description:
   zh: >
       一期硬编码的字段级规则：合同金额与资金金额对非财务角色只读且不可导出，手机号在通讯录默认脱敏；不做字段级白名单配置（列为 P2）。
+      
   en: >
       Hard-coded phase-one field rules: contract and fund amounts are read-only and non-exportable for non-finance roles, and phone numbers are masked in the directory; no configurable field whitelist (P2).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.638Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 192

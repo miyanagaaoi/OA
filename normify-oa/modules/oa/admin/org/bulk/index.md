@@ -7,11 +7,13 @@ name: {zh: "批量导入导出", en: "Bulk Import & Export"}
 description:
   zh: >
       以 Excel 批量导入组织架构与人员（公司重组等场景），导入前给出受影响在途单据清单，确认后方可执行；人员与组织支持导出，导出仅系统管理员可用。
+      
   en: >
       Excel-based bulk import of org structures and users (for reorganisations), presenting the affected in-flight documents before the import is confirmed; users and orgs can be exported, and export is limited to the system administrator.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.604Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 435

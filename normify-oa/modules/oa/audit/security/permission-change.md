@@ -7,11 +7,13 @@ name: {zh: "权限变更日志", en: "Permission-Change Log"}
 description:
   zh: >
       角色、数据域、权限树勾选与流程模板发布的变更全部留痕，强制记录操作人、时间与变更前后值，满足权限变更的可追溯要求。
+      
   en: >
       Logs every change to roles, data scopes, permission-tree selections and flow template publications, always capturing actor, timestamp and before/after values for permission-change traceability.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.625Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 429
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           记录一条权限变更（含前后值）。
+          
       en: >
           Records one permission change with before/after values.
+          
   - protocol: http
     method: GET
     path: "/api/v1/audit/permission-changes"
     description:
       zh: >
           按时间与对象检索权限变更日志。
+          
       en: >
           Lists permission-change log entries.
+          
 deps:
   - kind: event
     to: oa.authz.rbac

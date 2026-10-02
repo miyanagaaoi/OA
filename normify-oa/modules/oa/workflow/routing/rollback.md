@@ -7,11 +7,13 @@ name: {zh: "回退上一节点", en: "Roll Back to Previous Node"}
 description:
   zh: >
       把单据退回上一个已完成节点重审：必须填写原因；当前节点实例置 returned，上一节点实例回到 active 且 returned_count +1，上一节点通过后自动回到本节点。同一节点最多被回退 2 次，每次计入总闸门（流转+回退 ≤5）。
+      
   en: >
       Roll the document back to the previous completed node for re-approval: a reason is mandatory; the current node instance becomes returned, the previous node instance returns to active with returned_count +1, and once it passes the document automatically comes back. A node may be rolled back at most twice and each rollback counts towards the total gate.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:37:49.931Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.764Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 323

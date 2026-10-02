@@ -11,9 +11,9 @@ description:
   en: >
       Mail subject and body templates per notification type, rendering document elements and a deep link; fonts and images are localized with no public CDN.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:03:34.857Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.709Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 408

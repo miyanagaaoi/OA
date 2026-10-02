@@ -7,11 +7,13 @@ name: {zh: "详情操作栏", en: "Detail Action Bar"}
 description:
   zh: >
       浮层底部操作栏（高 60px，按钮右对齐）：同意 / 驳回 / 流转 / 回退上一节点 / 回到本部门 / 要求补充材料 / 终止 / 转办 / 打印；一屏一主按钮，危险操作二次确认且确认文案写明动作与对象；待补件期间其他角色只读不可审批。
+      
   en: >
       The overlay footer action bar (60px tall, buttons right-aligned): approve, reject, route to another department, revert to previous node, return to own department, request more material, terminate, transfer and print; exactly one primary button, destructive actions need a second confirmation naming action and object, and while awaiting material the document is read-only for every other role.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.719Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 775
@@ -32,24 +34,30 @@ apis:
     description:
       zh: >
           提交一个审批动作（同意 / 驳回 / 流转 / 回退 / 终止 / 补件）。
+          
       en: >
           Submit one approval action (approve, reject, route, revert, terminate, supplement).
+          
   - protocol: http
     method: GET
     path: "/api/v1/portal/detail/{instance_id}/available-actions"
     description:
       zh: >
           当前用户可用动作（受节点状态与角色约束）。
+          
       en: >
           Actions available to the current user, constrained by node state and role.
+          
   - protocol: http
     method: GET
     path: "/detail/{instance_id}/print-preview"
     description:
       zh: >
           打印预览页（渲染该实例的 A4 打印稿）。
+          
       en: >
           Print preview route rendering the A4 sheet for this instance.
+          
 deps:
   - kind: call
     to: oa.workflow.task

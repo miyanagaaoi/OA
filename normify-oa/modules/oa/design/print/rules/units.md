@@ -11,9 +11,9 @@ description:
   en: >
       Print styles use mm and pt, never px, for paper and margins; print sheets do not reuse the business component classes (.btn, .card, .pill and friends) so status colour and radius cannot leak in; document content is data-driven (field order from the form template, seals and signatures from flow_signature, trail from sys_thread); the on-screen tool bar hides itself when printing.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:07:45.845Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.648Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 1050

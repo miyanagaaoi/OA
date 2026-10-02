@@ -11,9 +11,9 @@ description:
   en: >
       Computes the writable field set per document state and blocks out-of-scope writes: while awaiting supplement all main fields are read-only and changes must go through reject → edit → resubmit; state comes from the process instance.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:02:25.478Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.682Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 29
@@ -25,16 +25,20 @@ apis:
     description:
       zh: >
           写入前状态白名单校验。
+          
       en: >
           Guards a write against the state whitelist.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/instances/{instance_id}/writable-fields"
     description:
       zh: >
           返回当前状态下的可写字段集合。
+          
       en: >
           Returns the writable field set for the current state.
+          
 deps:
   - kind: dataflow
     to: oa.workflow.runtime

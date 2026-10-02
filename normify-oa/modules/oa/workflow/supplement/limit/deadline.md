@@ -7,11 +7,13 @@ name: {zh: "补件时限与超时催办", en: "Supplement Deadline & Overdue"}
 description:
   zh: >
       补件时限默认 3 个工作日（deadline 在请求时按工作日历计算）；超时后 flow_supplement.status 置已超时，仅向发起人发送站内信与邮件催办，不自动驳回、不自动通过；扫描依据状态与时限索引。
+      
   en: >
       The supplement deadline defaults to three working days and is computed on the working calendar when the request is made. Once overdue the record becomes overdue and only in-app and email reminders go to the initiator - never an automatic rejection or approval. The scan uses the status and deadline index.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.771Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 325
@@ -32,23 +34,29 @@ apis:
     description:
       zh: >
           计算并写入补件时限（请求后 3 个工作日）。
+          
       en: >
           Compute and store the deadline three working days after the request.
+          
   - protocol: http
     method: POST
     path: "/api/v1/flow/supplements/{supplement_id}/overdue-scan"
     description:
       zh: >
           超时扫描：状态置已超时并仅催办发起人。
+          
       en: >
           Overdue scan: mark overdue and remind the initiator only.
+          
   - protocol: kafka
     path: "oa.workflow.supplement.overdue"
     description:
       zh: >
           补件超时事件（触发催办通知）。
+          
       en: >
           Event emitted when a supplement passes its deadline.
+          
 deps:
   - kind: call
     to: oa.notify.reminder

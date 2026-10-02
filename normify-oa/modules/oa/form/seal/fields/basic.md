@@ -7,11 +7,13 @@ name: {zh: "印鉴基础字段组", en: "Seal Basic Field Group"}
 description:
   zh: >
       用印/借用事由 title（text≤60、必填）、事项类别 category（固定「行政」、默认行政、置灰不可选）、用途说明 purpose（textarea≤500、≥5 字符，is_external=是 时下限提升至 20 字符）、附件 attachments（files、非必填）。
+      
   en: >
       Seal/borrow reason `title` (text ≤60, required), category `category` (fixed to admin, defaulted and greyed out), purpose `purpose` (textarea ≤500, ≥5 characters, raised to 20 when `is_external` is yes) and attachments `attachments` (files, optional).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.674Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 157
@@ -29,22 +31,28 @@ apis:
     description:
       zh: >
           印鉴单基础字段组定义。
+          
       en: >
           Basic field group definition for seal forms.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/forms/seal/instances/{instance_id}/draft/basic"
     description:
       zh: >
           保存印鉴单基础字段草稿。
+          
       en: >
           Saves the seal basic field group draft.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/seal/fields/purpose/min-length-evaluate"
     description:
       zh: >
           求值用途说明的长度下限（对外时 20）。
+          
       en: >
           Evaluates the purpose minimum length (20 when external).
+          
 ---

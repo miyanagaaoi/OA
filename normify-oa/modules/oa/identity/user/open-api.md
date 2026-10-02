@@ -7,11 +7,13 @@ name: {zh: "人员只读查询接口", en: "User Read-only Query API"}
 description:
   zh: >
       内部人员只读查询（姓名、工号、组织、在职状态），供门户、通讯录与集成面复用；手机号等敏感字段不外发（对外的 open 前缀由集成分支暴露）。
+      
   en: >
       Internal read-only user queries (name, employee number, org, employment status) reused by the portal, directory and integration surface; sensitive fields such as phone numbers are excluded (the public open prefix belongs to the integration branch).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:03:46.357Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.693Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 509
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           内部只读人员列表。
+          
       en: >
           Internal read-only user list.
+          
   - protocol: http
     method: GET
     path: "/api/v1/users/{id}"
     description:
       zh: >
           内部只读人员详情（无敏感字段）。
+          
       en: >
           Internal read-only user detail without sensitive fields.
+          
 deps:
   - kind: call
     to: oa.identity.user.profile

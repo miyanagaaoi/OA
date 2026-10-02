@@ -7,11 +7,13 @@ name: {zh: "印鉴证照使用审批单", en: "Seal & Licence Sheet"}
 description:
   zh: >
       印鉴证照使用审批单沿用集团单版式推导（实单无对应件）：使用单位 / 用印类型 / 证照名称 / 使用期限 / 证件归还状态按集团单三栏表头与写值区排列，签名栏与收尾行与集团单一致；实测高度 205mm，由用印类型与证照名称字段驱动。
+      
   en: >
       The seal-and-licence approval sheet derives from the group sheet layout because no paper original exists: using unit, seal type, licence name, period of use and return status follow the group sheet three-column header and value cells, with the same signature bands and closing row; it measures 205mm and is driven by the seal-type and licence-name fields.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.646Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 966
@@ -25,8 +27,10 @@ apis:
     description:
       zh: >
           由集团单版式推导的印鉴证照使用审批单模板。
+          
       en: >
           Seal and licence approval sheet template derived from the group sheet.
+          
 deps:
   - kind: reference
     to: oa.form.seal

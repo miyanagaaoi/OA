@@ -7,11 +7,13 @@ name: {zh: "只追加约束", en: "Append-only Guard"}
 description:
   zh: >
       应用层禁用 UPDATE/DELETE，并在数据库层用触发器对审计日志与签名记录强制拒绝修改和删除，形成双保险的不可篡改基线。
+      
   en: >
       Application layer forbids UPDATE/DELETE while database triggers reject modification and deletion of audit logs and signature records, forming a two-layer immutability baseline.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.620Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/data-model.md"
     line: 739
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           校验目标表是否处于只追加保护下。
+          
       en: >
           Asserts that a target table is under append-only protection.
+          
   - protocol: http
     method: GET
     path: "/api/v1/audit/immutability/constraints"
     description:
       zh: >
           列出不可变约束与触发器清单。
+          
       en: >
           Lists immutability constraints and triggers.
+          
 deps:
   - kind: reference
     to: oa.audit.oplog.capture

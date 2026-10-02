@@ -7,11 +7,13 @@ name: {zh: "金额与履约期字段组", en: "Amount & Term Field Group"}
 description:
   zh: >
       合同金额 amount（amount、必填、> 0，金额规则见 1.5）、履约开始 period_start（date、必填）、履约结束 period_end（date、必填、≥ period_start）、是否框架合同 is_framework（boolean、必填、默认否）。
+      
   en: >
       Contract amount `amount` (amount, required, > 0 per rule 1.5), performance start `period_start` (date, required), performance end `period_end` (date, required, ≥ start) and framework flag `is_framework` (boolean, required, default no).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.655Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 136
@@ -26,14 +28,18 @@ apis:
     description:
       zh: >
           金额与履约期字段组定义。
+          
       en: >
           Amount and performance-term field group definition.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/contract/fields/period/validate"
     description:
       zh: >
           校验履约期结束 ≥ 开始。
+          
       en: >
           Validates that the term's end is ≥ its start.
+          
 ---

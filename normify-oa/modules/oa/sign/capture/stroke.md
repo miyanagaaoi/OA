@@ -11,9 +11,9 @@ description:
   en: >
       Normalizes stroke points into a PNG signature image (fixed canvas, transparent background, smoothing), writes it to private local storage with a file hash, and offers a preview before confirmation.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:03:14.314Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.740Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 365
@@ -28,16 +28,20 @@ apis:
     description:
       zh: >
           将笔迹点序列渲染为规范化 PNG 签名图。
+          
       en: >
           Renders stroke points into a normalized PNG signature image.
+          
   - protocol: http
     method: GET
     path: "/api/v1/sign/capture/render/{render_token}/preview"
     description:
       zh: >
           预览本次生成的签名图（鉴权后返回）。
+          
       en: >
           Previews the generated signature image behind authentication.
+          
 deps:
   - kind: call
     to: oa.sign.record.append

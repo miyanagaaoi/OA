@@ -7,11 +7,13 @@ name: {zh: "转办与改派", en: "Transfer & Reassignment"}
 description:
   zh: >
       任务处理人的两种变更方式：转办由审批人本人发起，须填写原因，且转办对象必须是同一数据域内可见该单据的人（含跨公司），转办后原审批人失去该任务；改派仅系统管理员可用，用于人员离职或快照审批人不可用，同样必须填写原因并全程留痕。
+      
   en: >
       Two ways to change a task owner: transfer, raised by the approver with a mandatory reason and only to people inside the same data scope who can see the document; and reassignment, restricted to system administrators for departed or unavailable snapshot approvers, also with a mandatory audited reason.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.778Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 390

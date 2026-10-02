@@ -11,9 +11,9 @@ description:
   en: >
       MVP path: approved contract documents are exported manually by the group office or business development for archiving, with no system-to-system integration.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:59:23.046Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.694Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 522
@@ -25,13 +25,17 @@ apis:
     description:
       zh: >
           导出已审批通过的合同文本供人工归档。
+          
       en: >
           Exports an approved contract for manual archiving.
+          
   - protocol: file
     path: "export/contracts/{instance_id}.pdf"
     description:
       zh: >
           导出的合同文本文件。
+          
       en: >
           Exported contract file.
+          
 ---

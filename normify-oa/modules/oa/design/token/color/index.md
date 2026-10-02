@@ -7,11 +7,13 @@ name: {zh: "颜色令牌", en: "Color Tokens"}
 description:
   zh: >
       全部颜色令牌：品牌与强调色（唯一企业蓝）、四级表面阶梯与两级细线、文字四级、侧栏反向令牌、状态语义色五套、遮罩与焦点环；每个颜色都有明确的职责边界，越界使用是最常见的评审驳回项。
+      
   en: >
       Every colour token: brand and accent (the single corporate blue), the four-step surface ladder with two hairlines, four levels of ink, the sidebar inverse set, the five semantic status colours and the overlay and focus ring; each colour has an explicit responsibility boundary, and crossing it is the most common review rejection.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.648Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 612

@@ -7,11 +7,13 @@ name: {zh: "归还字段组", en: "Return Field Group"}
 description:
   zh: >
       归还状态 return_status（select、必填、默认未归还、审批中可改、仅归档节点可改）与归还时间 return_date（datetime、return_status=已归还 时必填、审批中可改）。
+      
   en: >
       Return status `return_status` (select, required, default pending, editable during approval but only by the archive node) and return time `return_date` (datetime, required when the status is returned, editable during approval).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.675Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 166
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           归还字段组定义。
+          
       en: >
           Return field group definition.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/forms/seal/instances/{instance_id}/return-status"
     description:
       zh: >
           更新归还状态（白名单内可改）。
+          
       en: >
           Updates the return status within its whitelist.
+          
 deps:
   - kind: reference
     to: oa.form.dict.seal-cert.return-status

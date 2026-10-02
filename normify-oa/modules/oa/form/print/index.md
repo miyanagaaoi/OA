@@ -7,11 +7,13 @@ name: {zh: "A4 打印稿", en: "A4 Print Sheets"}
 description:
   zh: >
       四类单据的 A4 打印稿：集团层用「集团合同类文件流转审批单」「资金审批单」版式，子公司用「内部审批单」版式；不使用屏幕端样式（无色块/圆角/投影），黑白复印后信息不丢失，页面高度限制 297mm。
+      
   en: >
       A4 print layout for all four document types, matching the group's existing paper forms: the group contract routing sheet and fund approval sheet at group level, the internal approval sheet at subsidiary level; no colour blocks, radius or shadows, information must survive black-and-white copying, content limited to a 297mm page height.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T07:55:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.670Z"
+fingerprint: 5883aa646f67a11c8e8b36e5f15710e6d844f8dba655168aa236901439b5150c
 source:
   - path: "doc/forms.md"
     line: 360

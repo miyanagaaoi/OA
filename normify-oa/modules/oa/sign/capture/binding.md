@@ -7,11 +7,13 @@ name: {zh: "签名与审批动作绑定", en: "Signature Binding & Forensics"}
 description:
   zh: >
       将签名与具体审批动作绑定：签名时间戳由服务端生成（不信任客户端时间），同时采集设备指纹（浏览器指纹）、IP 与 User-Agent 作为取证信息，与签名图一并写入签名记录，用于责任认定。
+      
   en: >
       Binds a signature to a specific approval act: the timestamp is server-generated while device/browser fingerprint, IP and User-Agent are captured as forensic evidence alongside the image.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.738Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 368
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           把签名绑定到审批任务，时间戳由服务端生成。
+          
       en: >
           Binds a signature to an approval task with a server-generated timestamp.
+          
   - protocol: http
     method: POST
     path: "/api/v1/sign/capture/fingerprint"
     description:
       zh: >
           采集设备指纹（浏览器指纹）与 IP / User-Agent。
+          
       en: >
           Captures the device/browser fingerprint plus IP and User-Agent.
+          
   - protocol: http
     method: GET
     path: "/api/v1/sign/capture/evidence/{signature_id}"
     description:
       zh: >
           查询某条签名记录的取证信息。
+          
       en: >
           Reads the forensic evidence of one signature record.
+          
 deps:
   - kind: call
     to: oa.sign.record.append

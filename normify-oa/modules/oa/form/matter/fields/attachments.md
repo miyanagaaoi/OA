@@ -7,11 +7,13 @@ name: {zh: "事项单附件字段组", en: "Matter Attachments Group"}
 description:
   zh: >
       事项单附件 attachments（files、非必填、格式与大小见 1.4）；发起后为「仅补件」可写，补件时 round ≥ 1。
+      
   en: >
       Matter attachments `attachments` (files, optional, format and size per 1.4); after initiation they are writable only during supplement, where round ≥ 1.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.664Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 87
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           事项单附件字段组定义。
+          
       en: >
           Matter attachment field group definition.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/forms/matter/instances/{instance_id}/attachments"
     description:
       zh: >
           落存事项单附件（仅补件可写）。
+          
       en: >
           Stores matter attachments (writable only during supplement).
+          
 deps:
   - kind: call
     to: oa.form.template.attachment

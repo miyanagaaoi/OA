@@ -7,11 +7,13 @@ name: {zh: "改派", en: "Reassignment"}
 description:
   zh: >
       仅系统管理员可改派任务，用于快照审批人离职、调岗或不可用的场景；必须填写改派原因并留痕（任务状态置已改派 + 操作日志）。一期在途单据不改派，改派是审批人快照策略的必要补偿控制。
+      
   en: >
       Only system administrators may reassign a task, used when a snapshot approver has left or become unavailable; a reason is mandatory and every reassignment is audited. In-flight documents are never reassigned automatically - reassignment compensates for the immutable approver snapshot.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.778Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 391
@@ -29,16 +31,20 @@ apis:
     description:
       zh: >
           管理员改派任务（原因必填并留痕）。
+          
       en: >
           Administrator reassignment with a mandatory audited reason.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow/tasks/pending-reassign"
     description:
       zh: >
           快照审批人不可用的待改派任务清单。
+          
       en: >
           Tasks whose snapshot approver is unavailable.
+          
 deps:
   - kind: call
     to: oa.audit.oplog

@@ -7,11 +7,13 @@ name: {zh: "签名栏", en: "Signature Blocks"}
 description:
   zh: >
       强制签名节点在打印稿上留空白签名栏（`签名：____ 年 月 日`），资金单为集团职能部门/集团分管领导/集团董事长三段；已签署的展示签名缩略图 + 时间戳文字，印章/签名取自签名记录。
+      
   en: >
       Nodes that require a signature leave a blank signature line on the sheet (signature ____ date); the fund sheet has three sections (group function department, group executives, chairman); already-signed blocks print a signature thumbnail with a timestamp, taking seals and signatures from signature records.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.672Z"
+fingerprint: ad88e328b04de7a8d2ba605f8fc806c579bcb555ef8cadc76b8edcedbd0695f5
 source:
   - path: "DESIGN.md"
     line: 1000
@@ -28,16 +30,20 @@ apis:
     description:
       zh: >
           多轮签名栏片段。
+          
       en: >
           Partial for multi-section signature blocks.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/print/{instance_id}/signatures"
     description:
       zh: >
           取签名与印章用于打印栏位。
+          
       en: >
           Fetches signatures and seals for the print blocks.
+          
 deps:
   - kind: reference
     to: oa.sign.record

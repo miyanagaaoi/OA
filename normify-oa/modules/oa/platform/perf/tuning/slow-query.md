@@ -11,9 +11,9 @@ description:
   en: >
       Periodic slow-query review with archived logs and remediation notes when the latency budget is missed.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:01:04.995Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.715Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 534
@@ -25,13 +25,17 @@ apis:
     description:
       zh: >
           查询慢查询清单与索引建议。
+          
       en: >
           Reads the slow-query list with index suggestions.
+          
   - protocol: file
     path: "reports/db/slow-query-{date}.log"
     description:
       zh: >
           按日归档的慢查询日志。
+          
       en: >
           Archived slow-query log per day.
+          
 ---

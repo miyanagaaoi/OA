@@ -7,11 +7,13 @@ name: {zh: "签名记录查询与展示", en: "Signature Record Query"}
 description:
   zh: >
       查询单据的全部签名记录（含历史版本、设备指纹、IP、签署时间）与单条详情，并提供鉴权后的签名图下载；签名图禁止直链，越权访问返回无权限而非空白页。
+      
   en: >
       Queries all signature records of a document (including historical versions, device fingerprints, IP and signing times) plus single-record detail, and serves the image behind an authenticated download.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.746Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 368
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           单据签名记录列表（含历史版本）。
+          
       en: >
           Lists signature records of a document including historical versions.
+          
   - protocol: http
     method: GET
     path: "/api/v1/sign/records/{id}"
     description:
       zh: >
           签名记录详情（含取证信息）。
+          
       en: >
           Reads one signature record with its forensic evidence.
+          
   - protocol: http
     method: GET
     path: "/api/v1/sign/records/{id}/image"
     description:
       zh: >
           鉴权下载签名图（禁止直链）。
+          
       en: >
           Authenticated download of the signature image, never a public link.
+          
 deps:
   - kind: reference
     to: oa.sign.record.append

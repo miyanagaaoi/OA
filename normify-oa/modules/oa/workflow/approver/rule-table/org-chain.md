@@ -7,11 +7,13 @@ name: {zh: "组织链规则", en: "Org-Chain Rules"}
 description:
   zh: >
       直属部门负责人（取发起者科室负责人，科室未设负责人时上溯取所属部门负责人）、分公司分管领导（按发起者所属公司匹配）、子公司总经理（取发起者所属公司总经理）三条规则的解析。
+      
   en: >
       Resolves the three org-chain rules: direct department leader (leader of the initiator's section, falling back up to the parent department leader), branch line leader (matched by the initiator's company) and subsidiary GM (GM of the initiator's company).
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.749Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 208
@@ -26,24 +28,30 @@ apis:
     description:
       zh: >
           取发起者科室负责人，未设则上溯取所属部门负责人。
+          
       en: >
           Resolves the section leader, falling back up to the parent department leader.
+          
   - protocol: http
     method: POST
     path: "/api/v1/approver-rules/company-exec/resolve"
     description:
       zh: >
           按发起者所属公司匹配分公司绑定的分管领导。
+          
       en: >
           Resolves the branch line leader bound to the initiator's company.
+          
   - protocol: http
     method: POST
     path: "/api/v1/approver-rules/gm/resolve"
     description:
       zh: >
           取发起者所属公司的总经理。
+          
       en: >
           Resolves the GM of the initiator's company.
+          
 deps:
   - kind: call
     to: oa.identity.org

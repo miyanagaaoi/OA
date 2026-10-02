@@ -11,9 +11,9 @@ description:
   en: >
       Applies the verifiable data-scope rules to every read so a subsidiary can never see another company's documents.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:00:16.149Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.696Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 169
@@ -25,6 +25,8 @@ apis:
     description:
       zh: >
           在响应离开网关前按调用方数据域过滤结果集。
+          
       en: >
           Filters a result set by the caller's data scope before it leaves the gateway.
+          
 ---

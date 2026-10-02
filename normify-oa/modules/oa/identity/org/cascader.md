@@ -7,11 +7,13 @@ name: {zh: "组织选择器与可见边界", en: "Org Cascader & Visibility"}
 description:
   zh: >
       四级联级组织选择器与搜索定位（每级面板 240px、支持搜索）；无数据权限的组织节点不渲染（不可见优先于禁用），避免通过选择器探测组织架构。
+      
   en: >
       Four-level org cascader with per-level search (240px panels); nodes outside the caller's data scope are not rendered at all (invisible rather than disabled) so the picker cannot be used to probe the org tree.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.683Z"
+fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"
     line: 845
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           返回权限边界内的联级组织选项。
+          
       en: >
           Returns cascader options within the caller's scope.
+          
   - protocol: http
     method: GET
     path: "/api/v1/identity/orgs/search"
     description:
       zh: >
           按名称搜索可见组织节点。
+          
       en: >
           Searches visible org nodes by name.
+          
 deps:
   - kind: call
     to: oa.identity.org.node

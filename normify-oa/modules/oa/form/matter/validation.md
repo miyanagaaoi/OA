@@ -7,11 +7,13 @@ name: {zh: "事项单校验规则", en: "Matter Form Validation"}
 description:
   zh: >
       事项单专属校验：标题 ≤60、事项描述 ≥10 且 ≤2000、involve_cost=是 时 amount/cost_bearer 条件必填、expect_date 不早于今天、cc_users ≤20 且去重、附件格式与大小；全部在服务端执行。
+      
   en: >
       Matter-specific validation: title ≤60, description ≥10 and ≤2000, amount/cost_bearer required when involve_cost=yes, expect_date not earlier than today, cc_users ≤20 and de-duplicated, attachment format and size; all server-side.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.667Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 79
@@ -23,16 +25,20 @@ apis:
     description:
       zh: >
           事项单提交前整体校验。
+          
       en: >
           Full pre-submit validation for matter forms.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/matter/validate/cost-conditional"
     description:
       zh: >
           涉及费用时的条件必填与金额校验。
+          
       en: >
           Conditional-required and amount checks when cost is involved.
+          
 deps:
   - kind: call
     to: oa.form.template.validate

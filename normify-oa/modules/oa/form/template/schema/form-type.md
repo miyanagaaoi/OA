@@ -7,11 +7,13 @@ name: {zh: "四类单据模板", en: "Four Document Templates"}
 description:
   zh: >
       四类单据（事项 matter / 资金 fund / 合同 contract / 印鉴证照 seal）的模板组合：表单模板 + 流程模板，靠组合区分而非分支；模板版本号与发布；已发起单据不受模板变更影响。
+      
   en: >
       Template composition for the four document types (matter/fund/contract/seal): form template plus process template, distinguished by composition rather than branching; template versions and publishing; started documents are unaffected by later template changes.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.679Z"
+fingerprint: be29667d4e39e20604635d25a37b43052c385d937b656fcaabc6dba1e57dfca8
 source:
   - path: "doc/forms.md"
     line: 395
@@ -26,32 +28,40 @@ apis:
     description:
       zh: >
           列出四类单据模板。
+          
       en: >
           Lists the four document templates.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/templates/{form_type}"
     description:
       zh: >
           读取单据模板详情。
+          
       en: >
           Reads a document template's detail.
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/templates/{form_type}/versions"
     description:
       zh: >
           新建模板版本（字段变更先升版本）。
+          
       en: >
           Creates a new template version (field changes bump the version first).
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/templates/{form_type}/versions/{version}/publish"
     description:
       zh: >
           发布模板版本，供新单据使用。
+          
       en: >
           Publishes a template version for new documents.
+          
 deps:
   - kind: reference
     to: oa.workflow.definition

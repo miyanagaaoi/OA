@@ -11,9 +11,9 @@ description:
   en: >
       Dictionary items are maintained in the admin console and stored in `sys_dict_item` (REQ-ADMIN-004); new options need no release. Forms read enabled items through a cache that is invalidated when the console changes them.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:03:06.031Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.659Z"
+fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
 source:
   - path: "doc/forms.md"
     line: 178
@@ -28,24 +28,30 @@ apis:
     description:
       zh: >
           读取字典的启用项列表。
+          
       en: >
           Reads a dictionary's enabled items.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/dicts/{dict_key}/items/{code}"
     description:
       zh: >
           读取单个字典项（code 与名称）。
+          
       en: >
           Reads a single dictionary item (code and name).
+          
   - protocol: http
     method: POST
     path: "/api/v1/forms/dicts/cache/refresh"
     description:
       zh: >
           字典缓存失效与重建。
+          
       en: >
           Invalidates and rebuilds the dictionary cache.
+          
 deps:
   - kind: call
     to: oa.admin.dict

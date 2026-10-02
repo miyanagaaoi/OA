@@ -7,11 +7,13 @@ name: {zh: "抄送落库与可见性", en: "CC Dispatch & Visibility"}
 description:
   zh: >
       汇总发起人自选与模板固定抄送人，按 (instance_id, user_id) 唯一键去重后写入 flow_cc（source 标记来源），赋予只读可见性；抄送不进入审批链、不产生待办。
+      
   en: >
       Merges and de-duplicates initiator-selected and template-fixed recipients into flow_cc (source marks the origin) and grants read-only visibility; CC never enters the approval chain.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.704Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 409
@@ -25,23 +27,29 @@ apis:
     description:
       zh: >
           抄送表（source / read_at，唯一键 instance_id+user_id）。
+          
       en: >
           CC table (source / read_at, unique instance+user).
+          
   - protocol: http
     method: POST
     path: "/api/v1/notifications/cc/resolve"
     description:
       zh: >
           合并抄送人并去重落库。
+          
       en: >
           Merges CC recipients and de-duplicates before storing.
+          
   - protocol: kafka
     path: "oa.notify.cc.created"
     description:
       zh: >
           抄送建立事件。
+          
       en: >
           Event published when CC recipients are created.
+          
 deps:
   - kind: reference
     to: oa.authz.visibility

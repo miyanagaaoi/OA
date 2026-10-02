@@ -11,9 +11,9 @@ description:
   en: >
       Reads and saves the set of permission-tree nodes ticked for a role, supporting node-by-node cascading and bulk ticking, with the resulting delta handed to the permission-change log.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:04:21.642Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.588Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 165
@@ -31,24 +31,30 @@ apis:
     description:
       zh: >
           查询角色已勾选的权限树节点。
+          
       en: >
           List the permission-tree nodes already ticked for a role.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/admin/roles/{role_id}/permissions"
     description:
       zh: >
           保存角色的权限树勾选结果。
+          
       en: >
           Save the ticked permission nodes of a role.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/roles/{role_id}/permissions/batch"
     description:
       zh: >
           批量勾选/取消权限节点。
+          
       en: >
           Tick or untick many nodes in one call.
+          
 deps:
   - kind: call
     to: oa.authz.rbac

@@ -7,11 +7,13 @@ name: {zh: "H5 底部操作栏", en: "H5 Bottom Action Bar"}
 description:
   zh: >
       H5 底部操作栏：高 60px 常驻、白底 + 1px 上边框（不用阴影，避免滚动闪烁），适配 env(safe-area-inset-bottom)；同意为主按钮占满剩余宽度，拒绍为 96px 次按钮，「更多」（转办 / 加签）为文本按钮。
+      
   en: >
       The H5 bottom action bar: a persistent 60px band, white with a 1px top border instead of a shadow to avoid flicker while scrolling, padded for env(safe-area-inset-bottom); approve is the primary button filling the remaining width, reject is a fixed 96px secondary button and More (transfer / countersign) is a text button.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.724Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 893
@@ -29,8 +31,10 @@ apis:
     description:
       zh: >
           从 H5 底部操作栏提交审批动作。
+          
       en: >
           Submit an approval action from the H5 bottom bar.
+          
 deps:
   - kind: call
     to: oa.workflow.task

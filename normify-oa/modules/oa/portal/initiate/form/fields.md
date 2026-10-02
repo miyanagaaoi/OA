@@ -7,11 +7,13 @@ name: {zh: "字段控件", en: "Field Controls"}
 description:
   zh: >
       字段控件集：input / select / date-picker（高 32px、rounded.sm、聚焦保留 2px 焦点环）、textarea（最小 88px、上限 500 字）、checkbox / radio / switch、四级组织 cascader（每级 240px，无权限节点不可见）、金额控件（tnum 右对齐、千分位、两位小数）；只读字段值用 canvas-subtle 底块呈现且不加边框。
+      
   en: >
       The field control set: input / select / date-picker (32px tall, rounded.sm, 2px focus ring kept on focus), textarea (min 88px, 500-character cap), checkbox / radio / switch, the four-level organisation cascader (240px per level, nodes outside scope invisible) and the amount control (tnum right-aligned, thousands separators, two decimals); read-only values are shown in a canvas-subtle block without borders.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.728Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 845
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           字段定义：类型、标签、必填、只读、字段级权限。
+          
       en: >
           Field definitions: type, label, required, read-only and field-level permissions.
+          
   - protocol: http
     method: POST
     path: "/api/v1/portal/initiate/fields/amount/format"
     description:
       zh: >
           金额输入即时格式化（千分位与两位小数）。
+          
       en: >
           Live amount formatting with thousands separators and two decimals.
+          
 deps:
   - kind: call
     to: oa.form.template

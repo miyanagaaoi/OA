@@ -7,11 +7,13 @@ name: {zh: "金额字段只读", en: "Amount Field Read-only"}
 description:
   zh: >
       合同金额与资金金额对非财务类角色只读展示、不可导出；**系统管理员与财务角色可导出且导出行为留痕**（V0.4）；判定不依赖字段级配置，一期为硬编码规则。
+      
   en: >
       Contract and fund amounts are read-only for non-finance roles and cannot be exported; Finance roles and system administrators may export, and every export is logged. The rule is hard-coded in phase one and does not depend on field-level configuration.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:31:36.607Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.637Z"
+fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
     line: 192

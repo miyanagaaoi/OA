@@ -11,9 +11,9 @@ description:
   en: >
       Creates and edits flow template drafts, including node list and ordering, and hands the layout to the graphical designer; unpublished drafts can be deleted outright.
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:02:57.577Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.601Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 436
@@ -28,32 +28,40 @@ apis:
     description:
       zh: >
           查询流程模板列表（含版本与状态）。
+          
       en: >
           List flow templates with version and status.
+          
   - protocol: http
     method: POST
     path: "/api/v1/admin/flow-templates"
     description:
       zh: >
           新建流程模板草稿。
+          
       en: >
           Create a flow template draft.
+          
   - protocol: http
     method: PUT
     path: "/api/v1/admin/flow-templates/{template_id}"
     description:
       zh: >
           编辑模板草稿（节点、顺序、表单 Schema）。
+          
       en: >
           Edit the draft (nodes, order, form schema).
+          
   - protocol: http
     method: DELETE
     path: "/api/v1/admin/flow-templates/{template_id}"
     description:
       zh: >
           删除未发布的模板草稿。
+          
       en: >
           Delete an unpublished template draft.
+          
 deps:
   - kind: call
     to: oa.workflow.definition

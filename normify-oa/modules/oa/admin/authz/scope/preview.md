@@ -7,11 +7,13 @@ name: {zh: "可见范围试算", en: "Visibility Preview"}
 description:
   zh: >
       在数据域配置生效前，通过抽样试算该角色可见的单据范围并展示角色×数据域对照表，便于管理员验收。
+      
   en: >
       Lets an administrator verify a data-scope configuration before it goes live by simulating which documents a role would see and by showing the role-by-scope matrix.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.588Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 169
@@ -26,16 +28,20 @@ apis:
     description:
       zh: >
           按角色试算可见单据范围（抽样）。
+          
       en: >
           Simulate the visible documents of a role on a sample.
+          
   - protocol: http
     method: GET
     path: "/api/v1/admin/data-scope/matrix"
     description:
       zh: >
           角色×数据域对照表。
+          
       en: >
           Role by data-scope cross reference table.
+          
 deps:
   - kind: call
     to: oa.authz.scope

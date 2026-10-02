@@ -7,11 +7,13 @@ name: {zh: "公文接收及处理块", en: "Document Receipt Block"}
 description:
   zh: >
       合同单核心特征，最多 3 段：每段为「接收单位 / 接收人 / 签收时间」（内嵌表格分三格，仅竖线）+ 处理意见多行区 + 落款与日期右对齐；每段对应一次集团层流转。
+      
   en: >
       The contract sheet's core feature, up to three segments: each holds receiving unit / receiver / receipt time (a three-cell inline table with vertical rules only), a multi-line handling opinion and a right-aligned sign-off with date; each segment corresponds to one group-level routing.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.672Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 1007
@@ -25,16 +27,20 @@ apis:
     description:
       zh: >
           公文接收及处理重复块片段。
+          
       en: >
           Partial for the repeated document-receipt block.
+          
   - protocol: http
     method: GET
     path: "/api/v1/forms/print/{instance_id}/routing-blocks"
     description:
       zh: >
           取流转记录生成接收处理段。
+          
       en: >
           Builds receipt segments from routing records.
+          
 deps:
   - kind: dataflow
     to: oa.workflow.routing

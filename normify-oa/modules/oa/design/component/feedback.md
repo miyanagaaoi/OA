@@ -11,9 +11,9 @@ description:
   en: >
       The feedback family: modal (centred, 560 / 400 / 720px wide, with a specific confirm label), drawer (480px on the right, 640px for logs), notification-toast (360px top-right with a 3px status bar on the left, auto-dismissed after three seconds on success but persistent with retry on failure), watermark, signature-pad and signature-stamp (a signature image can never be deleted, only re-signed).
       
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:07:45.845Z"
-fingerprint: pending
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.643Z"
+fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"
     line: 895

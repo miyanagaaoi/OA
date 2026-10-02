@@ -7,11 +7,13 @@ name: {zh: "转办", en: "Transfer"}
 description:
   zh: >
       审批人将本人任务转办给他人：必须填写转办原因；转办对象必须是同一数据域内可见该单据的人（含跨公司），由可见性规则过滤候选人；转办后原审批人失去该任务，flow_task 记录原处理人与转办原因，转办记录写入审批轨迹。
+      
   en: >
       An approver transfers the task: a reason is mandatory and the target must be someone inside the same data scope who can see the document. The original approver loses the task; the previous assignee and the reason are stored on flow_task and the transfer is written to the approval trail.
-revision: "0000000000000000000000000000000000000000"
-updated_at: "2026-10-02T08:10:00Z"
-fingerprint: pending
+      
+revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
+updated_at: "2026-10-02T08:54:26.778Z"
+fingerprint: d5b4933a64a6731ce61ce8bf6124aed59bc0b9c7e8708d0d9023a825d94afebf
 source:
   - path: "doc/prd-0.1.md"
     line: 390
@@ -29,23 +31,29 @@ apis:
     description:
       zh: >
           转办本人任务（原因必填、对象须同域可见）。
+          
       en: >
           Transfer the task with a mandatory reason to a visible person.
+          
   - protocol: http
     method: GET
     path: "/api/v1/flow/tasks/{task_id}/transfer-candidates"
     description:
       zh: >
           可转办对象清单（同一数据域内可见该单据的人）。
+          
       en: >
           Transfer candidates visible for this document.
+          
   - protocol: kafka
     path: "oa.workflow.task.transferred"
     description:
       zh: >
           任务转办事件（通知新处理人并记轨迹）。
+          
       en: >
           Event emitted when a task is transferred.
+          
 deps:
   - kind: call
     to: oa.authz.visibility
