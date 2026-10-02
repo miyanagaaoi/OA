@@ -1,0 +1,6 @@
+﻿user_account,org_path,post_name,is_primary,remark
+zhangsan01,集团/公司A/财务部/资金科,资金科科长,是,示例：主岗
+zhangsan01,集团/公司A/财务部,财务部专员,否,示例：兼岗（一人多岗，同人多条记录）
+lisi0002,集团/公司A/财务部,财务部经理,是,示例：主岗
+wangwu03,集团/公司A,总经理,是,示例：主岗
+zhaoliu04,集团/财务部,财务部负责人,是,示例：主岗

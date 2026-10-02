@@ -188,15 +188,17 @@
 
 四类模板固定 `code`/`form_type` = `matter` / `fund` / `contract` / `seal`，各一个 `published` 版本（v1）；下表 7 个节点配置已与 [`templates.md`](templates.md) §1.1~1.5 对齐（**测试基线配置**）：
 
-| seq | `node_code` | 节点名 | `approver_rule` | `decision_mode` | `pass_threshold` | `sign_policy` | `timeout_hours` | `allow_addsign` | `allow_jump` | `allow_route` | 跳过条件 |
+| seq | `node_code` | 节点名 | `approver_rule` | `decision_mode` | `pass_threshold` | `sign_policy` | `timeout_hours` | `allow_add_sign` | `allow_jump` | `allow_route` | 跳过条件 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `dept_leader` | 直属部门负责人 | `dept_leader_upward`（科室无负责人则上溯部门） | `any` 或签 | NULL（过半） | `optional` | 48 | true | false | false | — |
-| 2 | `finance_review` | 财务部复核（= 集团归口，只审一次） | `finance_owner`（恒取财务部负责人） | `any`（会签用例单独改 `all` + 阈值） | NULL（**会签用例改为 `2`**） | `optional` | 48 | true | false | **true** | `{"field":"involve_cost","op":"eq","value":false}`（**唯一可跳过节点**） |
-| 3 | `branch_leader` | 分公司分管领导 | `branch_leader` | `any` | NULL | `optional` | 48 | true | false | false | — |
-| 4 | `subsidiary_gm` | 子公司总经理 | `subsidiary_gm` | `any` | NULL | `optional` | 48 | true | false | false | — |
-| 5 | `group_leader` | 集团分管领导 | `group_leader`（按业务线匹配） | `any` | NULL | **`required`** | 48 | true | false | **true** | — |
-| 6 | `chairman` | 集团董事长 | `chairman` | `any` | NULL | **`required`** | 48 | true | false | **true** | — |
-| 7 | `archive_register` | 归档登记（集团处理部门流转） | `designated`（`approver_param.role_code=finance_clerk` → U-23 孙内） | `any` | NULL | `none`（仅登记不审批） | 24 | false | false | false | — |
+| 1 | `dept_leader` | 直属部门负责人 | `dept_leader_upward`（科室无负责人则上溯部门） | `any` 或签 | NULL（过半） | `optional` | 24 | true | false | false | — |
+| 2 | `finance_review` | 财务部复核（= 集团归口，只审一次） | `finance_owner`（恒取财务部负责人） | `any`（会签用例单独改 `all` + 阈值） | NULL（**会签用例改为 `2`**） | `optional` | **48** | true | false | **true** | `{"field":"involve_cost","op":"eq","value":false}`（**唯一可跳过节点**） |
+| 3 | `branch_leader` | 分公司分管领导 | `branch_leader` | `any` | NULL | `optional` | 24 | true | false | false | — |
+| 4 | `subsidiary_gm` | 子公司总经理 | `subsidiary_gm` | `any` | NULL | `optional` | 24 | true | false | false | — |
+| 5 | `group_leader` | 集团分管领导 | `group_leader`（按业务线匹配） | `any` | NULL | **`required`** | 24 | true | false | **true** | — |
+| 6 | `chairman` | 集团董事长 | `chairman` | `any` | NULL | **`required`** | 24 | true | false | **true** | — |
+| 7 | `archive_register` | 归档登记（集团处理部门流转） | `designated`（`approver_param.role_code=finance_clerk` → U-23 孙内） | **不适用（`NULL`）** | NULL | `none`（仅登记不审批） | 24 | false | false | false | — |
+
+> **超时基线（与本表一致，已按 `templates.md` §1.0 定稿）**：② = **48h**，其余节点（①③④⑤⑥⑦）= **24h**；⑦ 为登记节点，无决议模式与阈值，**不计入审批时长与效率统计**。
 
 - 四类模板的 ①③④⑦ 配置**完全相同**；② 的跳过条件**仅事项单存在**（资金/合同/印鉴恒为「涉及」，不可跳过）；⑤⑥ 强制签名。
 - **节点⑦ 默认「仅登记不审批」**（`templates.md` §1.1、`enums.md`）：不产生审批决议（轨迹 `action='archive'`，无 `approve`）、**不计入审批时长与审批人效率统计**、`sign_policy=none`；仅登记与留痕。用例见 TC-FLOW-077。
@@ -477,7 +479,7 @@
 | TC-MSG-002 | AC-10 / REQ-MSG-002 | 单据走完全流程并最终通过 | 检查发起人 U-07 的站内信与邮箱 | 站内信 1 条 `msg_type='result'`（已通过）＋邮件 1 条；终审通过邮件内容含结论与单号 | P1 | 三 | 同上 |
 | TC-MSG-003 | AC-10（边界）/ REQ-MSG-002 | 将 SMTP 配置为不可达地址 | 发起单据产生待办 | **流程不被阻塞**（待办正常产生、可审批）；邮件失败被记录且**可查**（失败原因、时间、收件人） | P1 | 三 | 测试 SMTP 桩 |
 | TC-MSG-004 | AC-54 / REQ-MSG-003 | 单据抄送人含 U-08（发起人自选）+ 模板固定抄送人 U-03 | 以 U-08、U-03 查看「抄送我」列表与待办 | ① 两人可见该单据（**只读**）；② 待办数均为 **0**；③ `flow_cc.read_at` 在打开详情后写入，已读时间可查 | P1 | 三 | 单据 OA-2026-310002 |
-| TC-MSG-005 | AC-47 / REQ-FLOW-007 | 单据停在节点②，`timeout_hours=24`、`timeout_cc_superior=1` | 把系统时钟推过 24 小时 → 触发超时任务 | ① U-20 收到站内信 + 邮件催办；② 其上级同时被抄送；③ **不自动跳过、不自动升级**（节点仍 `active`，任务仍 `pending`） | P1 | 三 | 单据 OA-2026-310003 |
+| TC-MSG-005 | AC-47 / REQ-FLOW-007 | 单据停在节点②，`timeout_hours=48`、`timeout_cc_superior=1` | 把系统时钟推过 48 小时 → 触发超时任务 | ① U-20 收到站内信 + 邮件催办；② 其上级同时被抄送；③ **不自动跳过、不自动升级**（节点仍 `active`，任务仍 `pending`） | P1 | 三 | 单据 OA-2026-310003 |
 | TC-MSG-006 | AC-47（边界）/ 9.1 | 后台尝试把节点超时设为 12h | 保存配置 | 被拒并提示超时时长不得小于 24h；设置为 24h 可保存 | P2 | 三 | — |
 
 ### 4.4 附件与鉴权下载（FORM）
@@ -732,7 +734,7 @@
 
 1. **执行前须核对的前置项**（均为文档侧，不阻塞用例设计）：
    - 字典 `dict_type` 的 8 类白名单已定稿（1.2），种子数据以 [`dict-seed.md`](dict-seed.md) §0.3 为准；若种子文件的 `dict_type` 与白名单不符，按 P1 缺陷处理；
-   - `doc/templates.md` 已就位（1.3 已对齐），但其 §0「待业务确认项」T-01~T-08 中的超时时长（48h/24h）与流转开启范围（②⑤⑥）如被业务调整，须同步 1.3 与 TC-MSG-005/006 的前置条件；
+   - `doc/templates.md` 已就位且与本文 §1.3 基线**逐字对齐**（超时 ②=48h 其余 24h、`allow_route` 仅 ②⑤⑥、`allow_jump` 全关、⑦ 无决议模式）；如后续业务调整这些默认值，须同步 §1.3 与 TC-MSG-005/006 的前置条件；
    - 流转/补件闸门数值（Q6）与补件时限（Q7）已定稿，但**必须落为后台可配置项**，用例中的数值取默认值。
 2. **需要时间模拟的用例**：TC-FLOW-038、TC-FLOW-065、TC-FLOW-066、TC-MSG-005、TC-ADMIN-012、TC-NFR-010、TC-NFR-018、TC-USER-001。测试环境须提供可控的时钟推进方式，并在用例记录中写明推进前后的系统时间。
 3. **必须回滚的用例**：TC-ORG-002、TC-FLOW-007、TC-FLOW-013、TC-FLOW-023、TC-AUTH-010、TC-ADMIN-006、TC-ADMIN-007、TC-FORM-002（字典新增）、TC-FLOW-011（模板 v2）、TC-FLOW-041（模板 v3）。执行记录须包含回滚确认。

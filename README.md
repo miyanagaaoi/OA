@@ -24,6 +24,7 @@
 | [`doc/test-cases.md`](doc/test-cases.md) | **可执行验收用例**：206 条，AC-01~AC-61 全覆盖，含越权/会签/补件/闸门/打印/非功能专项 | V0.4 |
 | [`doc/dev-plan-v0.3.md`](doc/dev-plan-v0.3.md) | **开发步骤与排期**：阶段 0 + 5 阶段 23 周，工作包、决策闸门、验收门、关键路径 | 基线 |
 | [`doc/tech-design.md`](doc/tech-design.md) | **技术方案**：总体架构、选型、模块划分、关键设计、部署运维、决策记录 D1–D10 | V1.0 已评审 |
+| [`doc/import-spec.md`](doc/import-spec.md) | **批量导入规格**：组织/人员/负责人/一人多岗/角色分配五个模板、校验规则与错误码、幂等与回滚、补偿控制 | V1.1 |
 | [`DESIGN.md`](DESIGN.md) | **设计语言**：设计令牌、组件规范、A4 打印规格（Stitch DESIGN.md 格式） | V0.4 |
 | [`DESIGN.preview.html`](DESIGN.preview.html) | 全页面预览：登录 / 审批中心 / 四类表单 / 打印预览 / H5 / 审计日志 | 可打开 |
 | [`DESIGN.print-a4.html`](DESIGN.print-a4.html) | 四类单据 A4 实尺打印稿 | 可打开 |
@@ -83,8 +84,29 @@ node tools/validate-design-md.js DESIGN.md
 ├── DESIGN.md / DESIGN.preview.html / DESIGN.print-a4.html   # 设计规范与预览稿
 ├── doc/                                                      # 需求、模型、字典、模板、用例、排期、技术方案
 ├── normify-oa/                                               # 架构结构基线（520 模块 + 渲染数据 + 产物）
-└── tools/                                                    # 校验与辅助脚本
+├── oa-deploy/                                                # 交付物：初始化 SQL（27 表 + 字典 + 四类模板）、批量导入模板
+├── tools/                                                    # 校验与生成脚本（见下表）
+└── .github/workflows/docs-ci.yml                             # 文档与交付产物的持续校验
 ```
+
+**脚本一览**（全部零依赖 Node，已接入 CI）：
+
+| 脚本 | 作用 |
+| --- | --- |
+| `tools/gen-init-sql.js` | 由 `data-model.md` / `dict-seed.md` **生成** `oa-deploy/sql/01-schema.sql`、`02-dict-seed.sql`（`--check` 只校验） |
+| `tools/check-ddl.js` | DDL 结构校验：表数、主键、外键目标、重复列、金额禁用浮点 |
+| `tools/check-templates-sql.js` | 模板 SQL 校验：4 模板 × 7 节点、`form_schema_json` 合法性、闸门与签名口径 |
+| `tools/check-import-csv.js` | 导入模板校验：表头、BOM、枚举、跨文件引用、工号唯一、正职唯一 |
+| `tools/validate-design-md.js` | `DESIGN.md` 设计规范校验 |
+
+**结构维护规则（重要）**：`normify-oa` 各模块的 `source` 指向 `doc/prd-0.1.md`、`doc/data-model.md`、`doc/forms.md`、`DESIGN.md`，且 `fingerprint` 已按这些文档实算。因此**修改这四份文档后，需要执行一次**：
+
+```
+normify_module_refresh({ all: true, repoRoot: "H:\\dsh\\OA" })   # 重算指纹与 revision
+normify_validate({ dir: "H:\\dsh\\OA\\normify-oa", repoRoot: "H:\\dsh\\OA" })   # 应为 0 error
+```
+
+再提交（否则 `normify_validate` 会报 `evidence/fingerprint-drift`）。
 
 ---
 

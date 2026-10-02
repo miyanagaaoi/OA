@@ -1,0 +1,6 @@
+﻿account,employee_no,name,phone,email,company_path,dept_path,status,remark
+zhangsan01,A0001,张三,13800000001,zhangsan@example.com,集团/公司A,集团/公司A/财务部/资金科,在职,示例：科室副职兼财务部专员（一人多岗）
+lisi0002,A0002,李四,13800000002,lisi@example.com,集团/公司A,集团/公司A/财务部,在职,示例：部门正职负责人
+wangwu03,A0003,王五,13800000003,wangwu@example.com,集团/公司A,,在职,示例：子公司总经理，不挂具体部门
+zhaoliu04,A0004,赵六,13800000004,zhaoliu@example.com,集团,集团/财务部,在职,示例：集团归口（财务部）负责人
+sunqi0005,A0005,孙七,13800000005,sunqi@example.com,集团/公司A,集团/公司A/财务部/资金科,离职,示例：离职人员；导入前须清空名下待办（AC-12）

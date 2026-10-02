@@ -50,7 +50,7 @@
 | 0.3 | 环境：开发 / 测试 / 预发三套，私有化、无公网依赖（字体与库本地化） | 环境清单 + 部署脚本 | 运维 |
 | 0.4 | 四类单据**表单模板与流程模板初稿**（**7 节点**主干，逐节点配决议模式/签名策略/超时） | [`templates.md`](templates.md) ✅（模板 JSON + 节点配置） | 产品 + 后端 |
 | 0.5 | 数据字典初值（事项类别五值、合同类型、用印类型、证照类型、付款方式、其他会审部门、归还状态） | [`dict-seed.md`](dict-seed.md) ✅（37 行种子 + 幂等 SQL）；**待生成落库脚本** | 产品 |
-| 0.6 | Excel 批量导入模板 + 校验规则说明（组织、人员、负责人） | 模板文件 + 校验报告样例 | 产品 + 后端 |
+| 0.6 | Excel 批量导入模板 + 校验规则说明（组织、人员、负责人、一人多岗、角色分配） | [`import-spec.md`](import-spec.md) ✅（600 行规格 + 5 份 CSV 模板 + `tools/check-import-csv.js`，T-01~T-16 全部定稿） | 产品 + 后端 |
 | 0.7 | `test-cases.md`：由 **AC-01~AC-61** 派生可执行用例（含越权、会签阈值、补件边界、非功能与后台） | [`test-cases.md`](test-cases.md) ✅（206 条，AC 全覆盖） | 测试 |
 | 0.8 | 打印稿终稿确认（集团单两版 + 子公司内部审批单 + 印鉴证照单，对照 `doc/参考文档/` 实单） | 打印稿确认单 | 产品 + 设计 |
 | 0.9 | **PRD 一致性修订**（见 [`prd-v0.3-review.md`](prd-v0.3-review.md) 第 7 节的 6 件事：财务部数据域口径、Q11/Q12 回扫、DDL 硬错误、ORG/AUTH 编号补定义、非功能验收、决策闸门时点） | `prd-0.1.md` → V0.4 修订稿 | 产品（后端会签） |
@@ -60,7 +60,7 @@
 
 > 阶段 0 的**硬阻塞**为 0.9 与 0.12：前者决定第 1 阶段数据域引擎怎么写，后者决定 2a 能否建表。0.10/0.11 可与第 1 阶段并行。
 >
-> **✅ 文档侧已于 2026-10-02 完成**：0.1 [`tech-design.md`](tech-design.md) **V1.0（D1–D10 已评审确认）**、0.9 `prd-0.1.md` → **V0.4**、0.12 `data-model.md` V0.4（27 张表、DDL 可执行）、0.10 [`enums.md`](enums.md)、0.11 [`dict-seed.md`](dict-seed.md)、0.4 [`templates.md`](templates.md)、0.7 [`test-cases.md`](test-cases.md)，另加终审记录 [`prd-v0.3-review.md`](prd-v0.3-review.md) 与仓库首页 [`../README.md`](../README.md)。**阶段 0 的文档阻塞项已清零**，剩余为工程侧准备：**0.2 CI 流水线**（仓库与首次推送已完成）、**0.3 环境**（开发/测试/预发 + 离线依赖仓库）、**0.5 字典落库脚本**、**0.6 Excel 导入模板**、**0.8 打印稿目视核对**（`DESIGN.print-a4.html`）。
+> **✅ 文档侧已于 2026-10-02 完成**：0.1 [`tech-design.md`](tech-design.md) **V1.0（D1–D10 已评审确认）**、0.9 `prd-0.1.md` → **V0.4**、0.12 `data-model.md` V0.4（27 张表、DDL 可执行）、0.10 [`enums.md`](enums.md)、0.11 [`dict-seed.md`](dict-seed.md)、0.4 [`templates.md`](templates.md)、0.7 [`test-cases.md`](test-cases.md)，另加终审记录 [`prd-v0.3-review.md`](prd-v0.3-review.md) 与仓库首页 [`../README.md`](../README.md)。**阶段 0 的文档阻塞项已清零**，剩余为工程侧准备：**0.2 CI 流水线**（仓库与首次推送已完成、`docs-ci.yml` 已就位）、**0.3 环境**（开发/测试/预发 + 离线依赖仓库）、**0.8 打印稿目视核对**（`DESIGN.print-a4.html`）。**0.5 字典种子 SQL 与 0.6 导入模板均已产出**（`oa-deploy/sql/02-dict-seed.sql`、`oa-deploy/import/*.csv`）。
 
 **决策闸门（W0 内必须关闭）**：~~技术栈~~ ✅（[`tech-design.md`](tech-design.md) D1–D10 已确认）、部署规格（按 REQ-NFR-003 的「总人数 300 / 峰值在线 80 / 审批 30 TPS」）、**邮件通道**（SMTP 服务器与发信人）、时钟与日志留存策略、~~财务部数据域口径~~ ✅（PRD V0.4 附录 D Q13 已裁定——归口类别全可见 + 涉及费用事项单 + 流转链）。
 

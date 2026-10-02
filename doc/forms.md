@@ -171,7 +171,7 @@
 | seal_count | 用印份数 | number | 条件必填 | — | 1–999 整数；`seal_type ≠ 证照借用` 时必填 | 只读 | 1 | 依赖 `seal_type` |
 | is_external | 是否对外提供 | boolean | 是 | — | — | 只读 | 否 | `是` 时 `purpose` 长度下限提升至 20 字符 |
 | return_status | 归还状态 | select | 是 | — | 未归还 / 已归还 / 无需归还 | **三态例外**：草稿可改；审批中仅 **发起人（归还登记）** 与 **节点⑦归档登记人** 可改；待补件期只读 | 未归还 | 改「已归还」需填归还日期 |
-| return_date | 归还日期 | datetime | 条件必填 | — | `return_status = 已归还` 时必填 | **三态例外**：同 `return_status`（仅发起人与节点⑦可改） | — | 依赖 `return_status` |
+| return_date | 归还日期 | date | 条件必填 | — | `return_status = 已归还` 时必填 | **三态例外**：同 `return_status`（仅发起人与节点⑦可改） | — | 依赖 `return_status` |
 | attachments | 附件 | files | 否 | — | 见 1.4 | **仅补件** | — | — |
 
 **业务补充说明**

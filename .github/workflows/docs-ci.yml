@@ -1,0 +1,44 @@
+name: docs-ci
+
+# 文档与交付脚本的持续校验：
+# 把「文档 = 真源」这件事变成可执行的检查，任何一次提交都验证：
+#   DDL 结构、初始化 SQL 与文档一致、流程模板 SQL 合法、导入模板可解析、设计规范合规。
+# 代码工程（oa-server / oa-web）接入后，在其自己的 workflow 中追加构建与单测。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  doc-and-artifact-checks:
+    name: 文档与交付产物校验
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 设计规范校验（DESIGN.md）
+        run: node tools/validate-design-md.js DESIGN.md
+
+      - name: 数据模型 DDL 校验（27 张表 / 主键 / 外键 / 金额非浮点）
+        run: node tools/check-ddl.js doc/data-model.md
+
+      - name: 初始化 SQL 与文档一致性校验（不落盘）
+        run: node tools/gen-init-sql.js --check
+
+      - name: 流程模板 SQL 校验（四类模板 × 7 节点 / JSON 合法 / 闸门口径）
+        run: node tools/check-templates-sql.js oa-deploy/sql/03-templates.sql
+
+      - name: 导入模板校验（组织 / 人员 / 负责人 / 一人多岗）
+        run: node tools/check-import-csv.js oa-deploy/import
+
+      - name: 校验汇总
+        if: always()
+        run: echo "全部检查完成；任一上游步骤失败即视为本次提交不合规。"

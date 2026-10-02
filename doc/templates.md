@@ -50,13 +50,14 @@
 | 决议模式 | 审批节点（①–⑥）默认 `any`（或签）；如需会签，逐节点改 `all` 并配置 `pass_threshold`。**⑦ 归档登记为登记节点：不适用决议模式，`decision_mode` 与 `pass_threshold` 均为 `NULL`**，不产生审批决议、不计入审批时长与效率统计，仅留痕（`sys_thread.action = archive_register`） |
 | 阈值规则 | 支持百分比（如 `66%`）与绝对人数（如 `2`）；**绝对人数优先**；`NULL` 视为过半；百分比**向上取整** |
 | 超时规则 | **仅催办**（站内信 + 邮件），**不自动跳过、不自动升级**；最小可配置 24h。**V0.4 定稿默认值：② = 48h，其余节点（①③④⑤⑥⑦）= 24h**（后台可改，见 §0 T-01） |
+| 超时抄送上级 | `timeout_cc_superior` **默认 0（不抄送）**；需要抄送审批人上级时逐节点置 1（DDL 已有该列；`test-cases.md` TC-MSG-005 验证置 1 的效果） |
 | 自由跳转 | **V0.4 定稿默认值：全部节点 `allow_jump = false`**（关闭）；仅管理员显式开启的节点可用，且必须填写原因并计入审计日志与审批轨迹（见 §0 T-08） |
 | 闸门 | 流转 + 回退总次数 ≤5；同一节点被回退 ≤2；回到本部门连续 ≤2（不计入总次数）；补件同节点 ≤1 / 全单 ≤3 |
 | 模板版本 | 四类单据各自独立模板，`flow_template.code` = 单据类型码，起始 `version = 1` |
 
 ### 1.1 事项审批单（`template.code = matter`）
 
-| seq | node_code | node_name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_addsign | allow_jump | allow_route | 跳过条件 |
+| seq | node_code | name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_add_sign | allow_jump | allow_route | 跳过条件 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `dept_leader` | 直属部门负责人 | `dept_leader_upward` | `any` | NULL | `optional` | 24 | true | false | false | — |
 | **2** | `finance_review` | 财务部复核（= 集团归口） | `finance_owner` | `any` | NULL | `optional` | **48** | true | false | **true** | **`involve_cost = false` 时跳过（唯一可跳过节点）** |
@@ -73,7 +74,7 @@
 
 ### 1.2 资金审批单（`template.code = fund`）
 
-| seq | node_code | node_name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_addsign | allow_jump | allow_route | 跳过条件 |
+| seq | node_code | name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_add_sign | allow_jump | allow_route | 跳过条件 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `dept_leader` | 直属部门负责人 | `dept_leader_upward` | `any` | NULL | `optional` | 24 | true | false | false | — |
 | 2 | `finance_review` | 财务部复核（= 集团归口） | `finance_owner` | `any` | NULL | `optional` | **48** | true | false | `true` | **恒为「涉及」——不可跳过** |
@@ -88,7 +89,7 @@
 
 ### 1.3 合同审批单（`template.code = contract`）
 
-| seq | node_code | node_name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_addsign | allow_jump | allow_route | 跳过条件 |
+| seq | node_code | name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_add_sign | allow_jump | allow_route | 跳过条件 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `dept_leader` | 直属部门负责人 | `dept_leader_upward` | `any` | NULL | `optional` | 24 | true | false | false | — |
 | 2 | `finance_review` | 财务部复核（= 集团归口） | `finance_owner` | `any` | NULL | `optional` | **48** | true | false | `true` | **恒为「涉及」——不可跳过** |
@@ -104,7 +105,7 @@
 
 ### 1.4 印鉴证照审批单（`template.code = seal`）
 
-| seq | node_code | node_name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_addsign | allow_jump | allow_route | 跳过条件 |
+| seq | node_code | name | approver_rule | decision_mode | pass_threshold | sign_policy | timeout_hours | allow_add_sign | allow_jump | allow_route | 跳过条件 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `dept_leader` | 直属部门负责人 | `dept_leader_upward` | `any` | NULL | `optional` | 24 | true | false | false | — |
 | 2 | `finance_review` | 财务部复核（= 集团归口） | `finance_owner` | `any` | NULL | `optional` | **48** | true | false | `true` | **恒为「涉及」——不可跳过** |
@@ -302,9 +303,10 @@
 | `required` | boolean | 是 | 是否无条件必填；条件必填写入 `rules` 的 `conditionalRequired` 并同步 `linkage.requiredWhen` |
 | `rules` | array | 是 | 校验规则数组；无条件必填时可为空数组，不得为 `null` |
 | `maxLength` | integer | 是 | 文本最大字符数；非文本类型填 `0` 表示不适用 |
-| `options` | array | 否 | **内联静态选项**（`checkbox` / `select` / `multiselect`）；与 `optionsSource` 互斥 |
+| `options` | array | 否 | **内联静态选项**（`select` / `multiselect`）；与 `optionsSource` 互斥。**布尔字段（如 `plan_category` / `payment_belong`）不使用 `options`**，其勾选状态由 `type: "boolean"` + `defaultValue: true` 表达（见 `dict-seed.md` §6 / §7） |
 | `linkage` | object | 否 | 联动定义：`visibleWhen` / `requiredWhen` / `clearWhen` |
 | `readonlyAfterSubmit` | boolean | 是 | 提交发起后是否只读；`false` 仅允许用于**服务端字段级白名单**内的字段（一期仅 `return_status` / `return_date` / 补件字段） |
+| `locked` | boolean | 否 | **任何状态都不可编辑**（仅展示 `defaultValue`）：用于合同单 `category` 固定「经营」、印鉴单 `category` 固定「行政」并置灰；缺省 `false`。服务端同样拒绝修改（与三态白名单一致） |
 
 **本契约允许的扩展键**（不在上述列表，但为标准扩展，实现必须支持）：
 
@@ -330,12 +332,13 @@
 | `dateNotBefore` | date / daterange | `value`：`today` / `submit_date` / ISO 日期 | 日期下限 |
 | `dateNotBeforeField` | date | `field` | 不早于另一日期字段（如 `period_end ≥ period_start`） |
 | `pattern` | text | `value`（正则） / `flags` | 格式校验（如统一社会信用代码 18 位） |
-| `filePolicy` | file / files | `maxSizeMb` / `maxCount` / `allowExt` / `denyExt` | 附件白名单与大小限制；缺省取全局规则（50MB、20 个、**15 种格式**，见 `enums.md` §12.1） |
+| `filePolicy` | file / files | `maxSizeMb` / `maxCount` / **`minCount`** / `allowExt` / `denyExt` | 附件白名单与大小限制（`minCount` 表达「本单附件必填 ≥1」，如资金/合同单）；缺省取全局规则（50MB、20 个、**15 种格式**，见 `enums.md` §12.1） |
 | `pickerLimit` | user / org / tag | `max` | 选择数量上限 |
 | `orgScope` | org | `value`：`initiator_company_subtree` 等 | 组织选择范围限制 |
 | `conditionalRequired` | 任意 | `when`（条件对象） | 条件必填 |
 | `inDict` | select / multiselect | `value`：`dictType` | 取值必须属于该字典 |
 | `unique` | text | `scope` | 唯一性校验（如关联合同单号必须存在） |
+| `conditionalMinLength` | text / textarea | `when`（条件对象）/ `min` | 条件最小长度（如印鉴单 `is_external = 是` 时 `purpose` 下限 20 字符） |
 
 所有规则项都支持 `message`（违反时的中文提示文案）。
 
@@ -345,7 +348,7 @@
 {
   "form_type": "matter",
   "template_code": "matter",
-  "schema_version": 3,
+  "schema_version": 1,
   "published_at": "2026-07-09T10:00:00Z",
   "sections": [
     {

@@ -21,3 +21,5 @@
 *.yaml text
 *.html text
 *.js text
+*.sql text
+*.csv text

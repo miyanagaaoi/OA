@@ -1,0 +1,6 @@
+﻿user_account,role_code,scope_org_path,remark
+zhangsan01,employee,,示例：普通员工，数据域按角色默认（不限定组织）
+lisi0002,dept_leader,集团/公司A/财务部,示例：部门负责人，数据域限定本部门
+wangwu03,subsidiary_gm,集团/公司A,示例：子公司总经理，数据域限定本公司
+zhaoliu04,finance_owner,集团/财务部,示例：集团归口（财务部）负责人——流程节点②归口，数据域为归口类别
+zhaoliu04,group_leader,集团,示例：集团分管领导，按分管业务线限定数据域

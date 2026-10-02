@@ -36,7 +36,7 @@ ALTER TABLE sys_dict_item
 
 `matter_category` · `contract_type` · `seal_type` · `cert_type` · `payment_method` · `return_status` · `group_dept` · `review_dept_other`
 
-> `payment_belong` 与 `plan_category` **不在白名单内**——它们是 checkbox 布尔字段，选项存于 `form_schema_json.options`（见 §6、§7）。
+> `payment_belong` 与 `plan_category` **不在白名单内**——它们是 **checkbox 布尔字段**（`type: "boolean"` + `defaultValue: true`），**既不入 `sys_dict_item`、也不写入 `form_schema_json.options`**（见 §6、§7）。
 
 ### 0.4 业务裁定结论（原「待业务确认项」，**全部已关闭**）
 
@@ -226,10 +226,10 @@ ON DUPLICATE KEY UPDATE item_name = VALUES(item_name), item_name_en = VALUES(ite
 > **明确结论**：`payment_belong` 与 `plan_category` 在 V0.4 定稿中均为 **checkbox 布尔字段**（默认均为勾选），**不是字典项**，因此：
 >
 > 1. **不写入 `sys_dict_item`**，不执行任何 `INSERT`；
-> 2. 选项写在 `flow_template.form_schema_json` 的字段项 `options` 中；
+> 2. **不写 `options`**：布尔字段用 `type: "boolean"` + `defaultValue: true` 表达（`templates.md` §2.2 已明确 `options` 仅用于 `select` / `multiselect`）；
 > 3. 一期**只存不用**——流程引擎、数据域过滤、超时规则一律不得引用该字段（PRD 6.1、`data-model.md` 4.4）。
 
-**选项清单（存于 `form_schema_json`，供界面与打印渲染）**：
+**勾选状态说明（仅用于界面与打印渲染，不得据此建字典项）**：
 
 | 字段 | 选项 code | 中文 | 英文 | 排序 | 默认勾选 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -385,8 +385,8 @@ ON DUPLICATE KEY UPDATE item_name = VALUES(item_name), item_name_en = VALUES(ite
 | `return_status` 归还状态 | **字典** | `sys_dict_item` | **是** | 本文档 §9 |
 | `group_dept` 集团职能部门 | **字典**（**标签字典，仅用于打印与统计**） | `sys_dict_item`（**组织关系以 `sys_org` 为准，禁止双写**） | **是** | 本文档 §8.1 |
 | `review_dept_other` 其他会审部门（字典类型） | **字典**（选项**来源于 `group_dept`**，同源同 code） | `sys_dict_item` | **是** | 本文档 §8.2 |
-| **`payment_belong` 付款归属（字段）** | **checkbox 布尔字段（非字典）** | `form_schema_json.options` + `fields_json` | 否（改选项走模板升版本） | 本文档 §6 |
-| **`plan_category` 计划类别（字段）** | **checkbox 布尔字段（非字典）** | `form_schema_json.options` + `fields_json` | 否（改选项走模板升版本） | 本文档 §7 |
+| **`payment_belong` 付款归属（字段）** | **checkbox 布尔字段（非字典）** | `form_schema_json.fields[].type = "boolean"` + `defaultValue: true` + `fields_json` | 否（改语义走模板升版本） | 本文档 §6 |
+| **`plan_category` 计划类别（字段）** | **checkbox 布尔字段（非字典）** | `form_schema_json.fields[].type = "boolean"` + `defaultValue: true` + `fields_json` | 否（改语义走模板升版本） | 本文档 §7 |
 | `other_review_depts` 其他会审部门（**字段**） | **字典驱动字段**（`multiselect`） | `form_schema_json.fields[]`，`optionsSource.dictType = "review_dept_other"` | 选项由字典维护；**字段本身**增删走模板升版本 | 本文档 §0.5、§8.2 |
 
 **三条硬约束**：
