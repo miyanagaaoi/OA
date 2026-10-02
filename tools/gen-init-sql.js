@@ -107,7 +107,7 @@ function analyzeSchema(sql) {
 }
 
 /** 字典种子自检：幂等 INSERT 覆盖的 dict_type 是否都在白名单内、是否误建布尔字段的字典项 */
-function analyzeDictSeed(sql) {
+function analyzeDictSeed(sql, schemaSqlForDuplicateCheck) {
   const errors = [];
   const warnings = [];
   const pairs = new Map();
@@ -130,8 +130,16 @@ function analyzeDictSeed(sql) {
   for (const forbidden of ['payment_belong', 'planned_category']) {
     if (dictTypes.has(forbidden)) errors.push(`${forbidden} 是 checkbox 布尔字段，不得建字典项`);
   }
-  if (!/ALTER TABLE\s+sys_dict_item/i.test(sql)) {
-    warnings.push('未发现 sys_dict_item 的 ALTER TABLE（item_name_en / remark 列），种子数据可能需要这两列');
+  // 漂移断言（2026-10-02 实战教训）：建表语句若已含某列，种子脚本里再 ADD COLUMN 同名列表会导致
+  // Flyway 在**全新库**上执行 V1 → V2 时报 1060 Duplicate column name，应用直接起不来。
+  for (const col of ['item_name_en', 'remark']) {
+    const addRe = new RegExp(`ADD\\s+COLUMN\\s+${col}\\b`, 'i');
+    if (addRe.test(sql) && new RegExp(`\\b${col}\\b`).test(schemaSqlForDuplicateCheck)) {
+      errors.push(
+        `字典种子重复添加列 ${col}：该列已由 01-schema.sql 的建表语句创建，` +
+          '全新库上 Flyway V1→V2 会报 1060 Duplicate column name（应用无法启动）',
+      );
+    }
   }
   if (!/ON DUPLICATE KEY UPDATE/i.test(sql)) {
     warnings.push('未发现 ON DUPLICATE KEY UPDATE，脚本可能不是幂等的');
@@ -169,7 +177,7 @@ function main() {
   // ---------- 02-dict-seed.sql ----------
   const dictBlocks = extractSqlBlocks(dictSrc);
   const dictSql = dictBlocks.join('\n\n');
-  const dict = analyzeDictSeed(dictSql);
+  const dict = analyzeDictSeed(dictSql, schemaSql);
   report.errors.push(...dict.errors);
   report.warnings.push(...dict.warnings.map((w) => `[dict-seed] ${w}`));
 

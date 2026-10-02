@@ -20,17 +20,14 @@
 | **A. SQL INSERT（本文档默认）** | 实施工程师首次部署 | 各表顶部给出可直接执行的 `INSERT`；**幂等**写法为 `INSERT ... ON DUPLICATE KEY UPDATE`，重复执行只更新名称/排序/启用态，不产生重复行 |
 | **B. 管理后台导入模板** | 业务管理员后续维护 | 导入文件为 CSV/Excel，列顺序：`dict_type, item_code, item_name, item_name_en, sort_no, status, remark`；首行为表头；导入前必须校验 `dict_type` 属于本文档第 8 节的**白名单**，拒绝未登记的类型 |
 
-### 0.2 表结构前置说明（**需同步 `data-model.md`**）
+### 0.2 表结构前置说明（**已收口：两列由 `data-model.md` 的建表负责，本文档不输出 ALTER**）
 
-`data-model.md` 3.6 的 `sys_dict_item` 现有列为 `dict_type / item_code / item_name / sort_no / status`。本文档的种子数据需要**英文名**与**备注**两列，建议在 `data-model.md` 侧补列（本文档不修改既有文档）：
+`data-model.md` 3.6 的 `sys_dict_item` **已包含** `item_name_en`（英文名）与 `remark`（备注）两列（列注释写明其承载本文档的 V0.4 种子数据）。
 
-```sql
-ALTER TABLE sys_dict_item
-  ADD COLUMN item_name_en VARCHAR(64)  NULL COMMENT '英文名（打印稿与双语界面使用）' AFTER item_name,
-  ADD COLUMN remark       VARCHAR(255) NULL COMMENT '备注：业务口径、待确认标记'              AFTER status;
-```
+因此**本文档只输出幂等 `INSERT`，不得输出任何 `ALTER TABLE`**。历史教训（2026-10-02 实测）：本节曾给出过一段"建议补列"的 `ALTER TABLE ... ADD COLUMN item_name_en / remark`；当 `data-model.md` 把这两列补进建表语句后，该 ALTER 变成**冗余且致命**——Flyway 在**全新库**上执行 `V1（建表已含两列）→ V2（再次 ADD COLUMN）` 会直接报 `SQL State 42S21 / Error 1060 Duplicate column name 'item_name_en'`，导致**应用无法启动**（`flyway_schema_history` 只会留下 V1 success=1 + V2 success=0）。已从源头修正，并由 `tools/gen-init-sql.js` 增加**漂移断言**防回归：建表语句若已含该列，种子中再出现 `ADD COLUMN <同名列>` 即判为 error。
 
-> 若业务确认**不需要**英文名与备注，可删除上表两列，本文档表格中的「英文」「备注」仅作为知识记录保留。
+> 若业务确认**不需要**英文名与备注，应在 `data-model.md` 的建表语句中删除这两列（而不是在种子脚本里加回 ALTER）；本文档表格中的「英文」「备注」列仅作知识记录保留。
+
 
 ### 0.3 字典类型白名单（对应 §8 边界表）
 

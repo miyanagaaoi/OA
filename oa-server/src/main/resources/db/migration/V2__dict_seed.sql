@@ -1,15 +1,11 @@
 -- ============================================================================
 -- V2 数据字典种子（8 个 dict_type，幂等）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T09:31:03.025Z
+-- 生成时间: 2026-10-02T11:13:46.231Z
 -- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）
 -- 来源: oa-deploy/sql/02-dict-seed.sql ← doc/dict-seed.md
 -- 可重复执行（ON DUPLICATE KEY UPDATE）。
 -- ============================================================================
-
-ALTER TABLE sys_dict_item
-  ADD COLUMN item_name_en VARCHAR(64)  NULL COMMENT '英文名（打印稿与双语界面使用）' AFTER item_name,
-  ADD COLUMN remark       VARCHAR(255) NULL COMMENT '备注：业务口径、待确认标记'              AFTER status;
 
 INSERT INTO sys_dict_item (dict_type, item_code, item_name, item_name_en, sort_no, status, remark) VALUES
 ('matter_category', 'business', '经营', 'Business',    10, 'active', '集团归口恒为财务部；不参与路由'),
