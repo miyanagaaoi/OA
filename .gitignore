@@ -45,3 +45,6 @@ oa-deploy/runtime/*
 oa-deploy/.env
 oa-deploy/nginx/certs/
 oa-deploy/backup/
+# 以下两条必须放在上面的白名单之后：gitignore 中后出现的规则优先，否则会被 !*.ps1 重新包含
+oa-deploy/runtime/local-secrets.ps1
+oa-deploy/runtime/run-app.cmd

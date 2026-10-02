@@ -54,8 +54,26 @@ $AppLog   = Join-Path $Cache   'oa-server.log'
 $AppCmd   = Join-Path $Runtime 'run-app.cmd'
 
 # 数据库账号（application-dev.yml 读的是 OA_DB_USERNAME / OA_DB_PASSWORD）
-$DbUser = 'oa'
-$DbPass = 'oa_dev_pwd'
+#
+# 【密钥不入库】本脚本会随仓库交付，因此**不得**出现真实口令。取值优先级：
+#   1) 同目录的 local-secrets.ps1（已被 .gitignore 忽略；模板见 local-secrets.example.ps1）
+#   2) 环境变量 OA_DB_USERNAME / OA_DB_PASSWORD
+#   3) 都没有 → 直接报错并给出创建指引（**不提供内置默认口令**，避免"默认口令"变成事实上的后门）
+$secretsFile = Join-Path $Runtime 'local-secrets.ps1'
+if (Test-Path $secretsFile) {
+    . $secretsFile
+}
+if (-not $DbUser) { $DbUser = $env:OA_DB_USERNAME }
+if (-not $DbPass) { $DbPass = $env:OA_DB_PASSWORD }
+if (-not $DbUser -or -not $DbPass) {
+    Write-Host ''
+    Write-Host '缺少数据库凭据。请任选其一：' -ForegroundColor Yellow
+    Write-Host "  A) 复制模板并填写： copy `"$Runtime\local-secrets.example.ps1`" `"$secretsFile`""
+    Write-Host '  B) 设置环境变量：     setx OA_DB_USERNAME oa & setx OA_DB_PASSWORD <你的口令>'
+    Write-Host ''
+    Write-Host '（local-secrets.ps1 已在 .gitignore 内，不会入库；脚本不含任何默认口令。）' -ForegroundColor DarkGray
+    exit 2
+}
 
 # ------------------------------------------------------------------ 小工具
 function Write-Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
