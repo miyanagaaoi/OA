@@ -107,7 +107,29 @@ export const demoPasswordPolicy: PasswordPolicy = {
   lockMinutes: 15,
 }
 
+/**
+ * 演示用客户端运行期配置（`VITE_USE_MOCK=true` 且接口不可用时使用）。
+ *
+ * ⚠ 字段形状必须与服务端 `GET /api/v1/auth/client-config` 的领域模型一致（见
+ * `types/api.d.ts` 的 `ClientConfig`）；标题/环境/API 前缀优先取构建期环境变量
+ * （`.env.*` 的 `VITE_APP_TITLE` / `VITE_APP_ENV` / `VITE_API_BASE_URL`），
+ * 保证「演示模式」与「真实后端」显示同一套口径。
+ */
 export const demoClientConfig: ClientConfig = {
+  title: import.meta.env.VITE_APP_TITLE || '集团OA审批系统',
+  env: import.meta.env.VITE_APP_ENV || 'development',
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || '/api/v1',
+  sessionCookieName: import.meta.env.VITE_SESSION_COOKIE_NAME || 'OA_SESSION',
+  forceHttps: import.meta.env.VITE_FORCE_HTTPS === 'true',
+  watermarkOpacity: 0.06,
+  session: { maxDevices: 3, rememberMeDays: 7 },
+  password: {
+    minLength: 8,
+    requireLetter: true,
+    requireDigit: true,
+    lockThreshold: 5,
+    lockMinutes: 15,
+  },
   maxDevices: 3,
   rememberMeDays: 7,
   upload: {
@@ -143,11 +165,12 @@ export const demoSessions: SessionDevice[] = [
   },
 ]
 
-/** 水印：姓名 + 工号，透明度 5%–8%，旋转 -24°，间距 240×160（REQ-USER-004 / AC-44） */
+/** 水印：姓名 + 工号，透明度 6%（区间 5%–8%）、旋转 -24°、间距 240×160（REQ-USER-004 / AC-44） */
 export const demoWatermarkProfile: WatermarkProfile = {
-  text: `${demoCurrentUser.name} · ${demoCurrentUser.employeeNo}`,
+  text: `${demoCurrentUser.name} ${demoCurrentUser.employeeNo}`,
   name: demoCurrentUser.name,
   employeeNo: demoCurrentUser.employeeNo,
+  opacity: 0.06,
   opacityMin: 0.05,
   opacityMax: 0.08,
   rotate: -24,

@@ -146,4 +146,70 @@ public final class AuthDtos {
     /** 通用提示。 */
     public record MessageResponse(String message) {
     }
+
+    /**
+     * 客户端运行期配置（{@code GET /api/v1/auth/client-config}）——
+     * normify 模块 {@code oa.identity.session.client}。
+     *
+     * <p><b>安全边界</b>：本响应只含**非敏感**的运行期参数（标题、环境名、相对 API 前缀、
+     * Cookie 名、会话/口令阈值、水印透明度）。**严禁**把数据源 URL/账号、Redis 地址、
+     * 装配口令（{@code oa.db.*}、{@code spring.datasource.*}、{@code spring.data.redis.*}）、
+     * {@code bcryptStrength}、任何密钥或令牌写进本结构 —— 该接口在登录前即可访问
+     * （{@link com.oa.common.security.Anonymous}）。字段名与前端
+     * {@code oa-web/src/types/api.d.ts} 的 {@code ClientConfig} / {@code oa-web/src/api/auth.ts}
+     * 的 {@code demoClientConfig} 对齐。
+     *
+     * @param title             系统标题（{@code oa.web.title}）
+     * @param env               运行环境（激活 profile，如 {@code dev} / {@code prod}）
+     * @param apiBaseUrl        前端统一 API 前缀（相对路径，如 {@code /api/v1}）
+     * @param sessionCookieName 会话 Cookie 名（HttpOnly；前端只读其存在性）
+     * @param forceHttps        是否强制 HTTPS（取 {@code oa.session.cookie-secure}；dev=false / prod=true）
+     * @param watermarkOpacity  水印透明度（已夹到 5%–8%）
+     * @param session           会话上限（多设备上限、「记住我」天数）
+     * @param password          口令策略（长度、字符要求、失败锁定阈值与时长）
+     */
+    public record ClientConfigResponse(
+            String title,
+            String env,
+            String apiBaseUrl,
+            String sessionCookieName,
+            boolean forceHttps,
+            double watermarkOpacity,
+            SessionLimits session,
+            PasswordLimits password
+    ) {
+    }
+
+    /**
+     * 会话上限。
+     *
+     * <p>两个字段都用 {@code int}（不是 {@code long}）：本工程的
+     * {@code JacksonConfig} 会把 {@code Long}/{@code long}/{@code BigInteger} 序列化成**字符串**
+     * （防 JS 53 位精度丢失）。会话天数与设备数是小整数，没有精度风险，因此刻意用 {@code int}
+     * 让它们在 JSON 里保持 number —— 前端 {@code ClientConfig.maxDevices / rememberMeDays}
+     * 就是 {@code number}，不必再脱一层字符串。
+     *
+     * @param maxDevices     同时在线设备上限（REQ-USER-003，默认 3）
+     * @param rememberMeDays 「记住我」有效期（天，REQ-USER-002，默认 7）
+     */
+    public record SessionLimits(int maxDevices, int rememberMeDays) {
+    }
+
+    /**
+     * 口令策略（登录前提示用；与 {@code GET /auth/password-policy} 同源、不另立口径）。
+     *
+     * @param minLength      最小长度（≥8）
+     * @param requireLetter  必须含字母
+     * @param requireDigit   必须含数字
+     * @param lockThreshold  连续失败锁定阈值（REQ-NFR-005，默认 5）
+     * @param lockMinutes    锁定时长（分钟，默认 15）
+     */
+    public record PasswordLimits(
+            int minLength,
+            boolean requireLetter,
+            boolean requireDigit,
+            int lockThreshold,
+            int lockMinutes
+    ) {
+    }
 }

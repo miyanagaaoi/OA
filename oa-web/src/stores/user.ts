@@ -21,6 +21,7 @@ import {
   revokeSession as revokeSessionApi,
 } from '@/api/auth'
 import { demoClientConfig, demoWatermarkProfile } from '@/api/demo'
+import { clampWatermarkOpacity } from '@/utils/watermark'
 import type {
   CategoryCode,
   ClientConfig,
@@ -31,11 +32,13 @@ import type {
   WatermarkProfile,
 } from '@/types/api'
 
-/** 水印透明度必须收敛在 5%–8%（AC-44），任何来源越界都夹回区间 */
-export function clampWatermarkOpacity(value: number): number {
-  if (!Number.isFinite(value)) return 0.06
-  return Math.min(0.08, Math.max(0.05, value))
-}
+/**
+ * 水印透明度必须收敛在 5%–8%（AC-44），任何来源越界都夹回区间。
+ *
+ * 实现已抽到 `src/utils/watermark.ts`（`api/auth.ts` 的映射层也要用同一份常量与规则）；
+ * 这里**原样再导出**，保持既有的 `import { clampWatermarkOpacity } from '@/stores/user'` 可用。
+ */
+export { clampWatermarkOpacity }
 
 export const useUserStore = defineStore('user', () => {
   // ---- state ----
@@ -79,7 +82,11 @@ export const useUserStore = defineStore('user', () => {
       return clampWatermarkOpacity(watermarkOpacityOverride.value)
     }
     if (watermark.value) {
-      return clampWatermarkOpacity((watermark.value.opacityMin + watermark.value.opacityMax) / 2)
+      // 服务端下发的是**单一真值** `opacity`（已夹到 5%–8%），优先用它；
+      // 旧口径的区间中值只在没有单值时兜底（避免「服务端 0.05、页面显示 0.065」的偏差）。
+      return clampWatermarkOpacity(
+        watermark.value.opacity ?? (watermark.value.opacityMin + watermark.value.opacityMax) / 2,
+      )
     }
     return clampWatermarkOpacity(user.value?.watermarkOpacity ?? 0.06)
   })

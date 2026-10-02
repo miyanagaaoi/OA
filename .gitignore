@@ -33,7 +33,10 @@ oa-web/.env.local
 oa-web/.env.*.local
 
 # ---- 本地运行数据（数据库、附件、签名图、日志）----
-oa-deploy/runtime/
+# 注意：runtime/ 下**只忽略运行数据**；启停脚本是交付物，要入库（用 runtime/* + 白名单反选）
+oa-deploy/runtime/*
+!oa-deploy/runtime/*.ps1
+!oa-deploy/runtime/*.cmd
 *.pid
 *.hprof
 

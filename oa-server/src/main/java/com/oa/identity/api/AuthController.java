@@ -6,6 +6,7 @@ import com.oa.common.config.OaProperties;
 import com.oa.common.security.Anonymous;
 import com.oa.identity.api.dto.AuthDtos;
 import com.oa.identity.app.AuthService;
+import com.oa.identity.app.ClientConfigService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>{@code GET  /api/v1/auth/me} 当前登录人 + 角色 + 数据域</li>
  *   <li>{@code PUT  /api/v1/auth/password} 修改口令（首登强制改密走同一接口）</li>
  *   <li>{@code GET  /api/v1/auth/password-policy} 口令策略（前端前置提示）</li>
+ *   <li>{@code GET  /api/v1/auth/client-config} 客户端运行期配置（非敏感；登录前可取）</li>
  *   <li>{@code GET  /api/v1/auth/lock-status} 锁定状态</li>
  *   <li>{@code POST /api/v1/auth/unlock} 管理员解锁（留痕）</li>
  *   <li>{@code GET  /api/v1/auth/sessions}、{@code DELETE /api/v1/auth/sessions/{id}} 在线设备</li>
@@ -47,10 +49,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final ClientConfigService clientConfigService;
     private final OaProperties properties;
 
-    public AuthController(AuthService authService, OaProperties properties) {
+    public AuthController(AuthService authService, ClientConfigService clientConfigService,
+                          OaProperties properties) {
         this.authService = authService;
+        this.clientConfigService = clientConfigService;
         this.properties = properties;
     }
 
@@ -93,6 +98,25 @@ public class AuthController {
     @Anonymous
     public ApiResponse<AuthDtos.PasswordPolicyResponse> passwordPolicy() {
         return ApiResponse.success(authService.passwordPolicy());
+    }
+
+    /**
+     * {@code GET /api/v1/auth/client-config} —— 前端启动所需**非敏感**运行期配置。
+     *
+     * <p>{@link Anonymous}：前端在**登录页/登录后布局挂载时**都要取它（标题、API 前缀、
+     * Cookie 名、口令提示、会话上限、水印透明度），必须登录前可用。
+     * 放行方式刻意用 {@code @Anonymous} 注解而**不是** {@code oa.web.permit-all} 路径白名单：
+     * 白名单条目是「拦截器级」的整体放行（任何方法/将来新增的方法都自动免认证），
+     * 而注解只对**这一个方法**生效，安全边界更小、可读性更强。因此
+     * {@code oa.web.permit-all} **未新增任何条目**。
+     *
+     * <p>响应内容与「禁止泄露密钥/口令/数据库信息」的边界见
+     * {@link AuthDtos.ClientConfigResponse} 与 {@link ClientConfigService} 的类注释。
+     */
+    @GetMapping("/client-config")
+    @Anonymous
+    public ApiResponse<AuthDtos.ClientConfigResponse> clientConfig() {
+        return ApiResponse.success(clientConfigService.current());
     }
 
     @GetMapping("/lock-status")

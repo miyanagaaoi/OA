@@ -20,6 +20,7 @@ public class OaProperties {
     private final Db db = new Db();
     private final Jackson jackson = new Jackson();
     private final Identity identity = new Identity();
+    private final Watermark watermark = new Watermark();
 
     public Web getWeb() {
         return web;
@@ -47,6 +48,42 @@ public class OaProperties {
 
     public Identity getIdentity() {
         return identity;
+    }
+
+    public Watermark getWatermark() {
+        return watermark;
+    }
+
+    /**
+     * 水印（REQ-USER-004 / AC-44，{@code oa.watermark.*}）。
+     *
+     * <p>透明度区间 <b>5%–8%</b> 是设计常量（见 {@code com.oa.identity.app.WatermarkPolicy}
+     * 的 {@code MIN_OPACITY_PERCENT} / {@code MAX_OPACITY_PERCENT}，来源 DESIGN.md），
+     * 本类只放**环境级**的默认值：任何来源的透明度都必须被夹到该区间内（越界即夹紧，不放行）。
+     */
+    public static class Watermark {
+
+        /** 水印开关的全局默认值（个人偏好接口落地前，服务端给前端的默认口径）。 */
+        private boolean enabled = true;
+
+        /** 水印透明度默认值（0.05–0.08；默认取区间中值 0.06）。 */
+        private double opacity = 0.06;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public double getOpacity() {
+            return opacity;
+        }
+
+        public void setOpacity(double opacity) {
+            this.opacity = opacity;
+        }
     }
 
     /**
@@ -78,6 +115,22 @@ public class OaProperties {
     /** Web 层配置。 */
     public static class Web {
 
+        /**
+         * 系统标题（非敏感运行期配置，供 {@code GET /api/v1/auth/client-config} 下发；
+         * 前端用于浏览器标题与登录页品牌区，值必须与 {@code oa-web/.env.*} 的
+         * {@code VITE_APP_TITLE} 保持一致）。
+         */
+        private String title = "集团OA审批系统";
+
+        /**
+         * 前端请求的统一 API 前缀（非敏感；与 {@code oa-web} 的
+         * {@code VITE_API_BASE_URL} 默认值 {@code /api/v1} 一致）。
+         *
+         * <p>只下发**相对前缀**：绝对地址（协议/主机/端口）由浏览器按当前来源解析，
+         * 既避免把内网拓扑写进响应，也让 dev（Vite 代理）与生产（Nginx 反代）共用同一口径。
+         */
+        private String apiBaseUrl = "/api/v1";
+
         /** 是否开启 CORS。**生产必须关闭**（前后端同源经 Nginx 反代，doc/tech-design.md §2）。 */
         private boolean corsEnabled = false;
 
@@ -95,6 +148,22 @@ public class OaProperties {
 
         public boolean isCorsEnabled() {
             return corsEnabled;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getApiBaseUrl() {
+            return apiBaseUrl;
+        }
+
+        public void setApiBaseUrl(String apiBaseUrl) {
+            this.apiBaseUrl = apiBaseUrl;
         }
 
         public void setCorsEnabled(boolean corsEnabled) {

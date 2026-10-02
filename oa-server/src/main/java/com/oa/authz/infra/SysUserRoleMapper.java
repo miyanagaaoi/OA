@@ -1,7 +1,9 @@
 package com.oa.authz.infra;
 
 import com.oa.authz.domain.SysUserRole;
+import com.oa.authz.infra.row.RoleCountRow;
 import com.oa.authz.infra.row.UserRoleRow;
+import java.util.Collection;
 import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -75,6 +77,25 @@ public interface SysUserRoleMapper {
     /** 该角色被多少用户持有（删除角色前的闸门，也是「失效相关用户缓存」的反查源）。 */
     @Select("SELECT user_id FROM sys_user_role WHERE role_id = #{roleId} ORDER BY user_id ASC")
     List<Long> selectUserIdsByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     * 多个角色的用户分配数（{@code GROUP BY role_id}，一次取回 —— 角色列表页禁止 N+1）。
+     *
+     * <p><b>刻意不 JOIN {@code sys_user}</b>，因此既不带 {@code @dataScope} 标记、
+     * 也**不按数据域裁剪**：本语句只做「某角色被分配了多少条」的聚合，不做任何用户数据的读暴露
+     * （不返回 user_id，不返回用户字段）；口径是全局计数，依据见 {@code AuthzDtos.RoleView} 类注释
+     * （该接口仅授权管理员可见，且与「删除角色时按全量分配数阻断」的服务端行为保持一致）。
+     * 未出现在结果里的 roleId 表示计数为 0（由服务层补 0）。
+     */
+    @Select({"<script>",
+            "SELECT role_id AS roleId, COUNT(1) AS total FROM sys_user_role",
+            "WHERE role_id IN",
+            "<foreach collection='roleIds' item='item' open='(' separator=',' close=')'>",
+            "  #{item}",
+            "</foreach>",
+            "GROUP BY role_id",
+            "</script>"})
+    List<RoleCountRow> countByRoleIds(@Param("roleIds") Collection<Long> roleIds);
 
     /** 新增分配（自增主键回填）。{@code scope_org_key} 是生成列，**不得写**。 */
     @Insert("INSERT INTO sys_user_role (user_id, role_id, scope_org_id, created_by, remark, created_at)"

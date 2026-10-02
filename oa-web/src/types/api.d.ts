@@ -83,12 +83,54 @@ export interface SessionDevice {
   revokedReason?: string | null
 }
 
-/** GET /api/v1/auth/client-config */
+/**
+ * GET /api/v1/auth/client-config —— 服务端下发的**非敏感**运行期配置。
+ *
+ * 形状（服务端 `AuthDtos.ClientConfigResponse`，与 `src/api/auth.ts` 的映射层逐字对齐）：
+ *   `{ title, env, apiBaseUrl, sessionCookieName, forceHttps, watermarkOpacity,
+ *      session: { maxDevices, rememberMeDays },
+ *      password: { minLength, requireLetter, requireDigit, lockThreshold, lockMinutes } }`
+ *
+ * 说明：
+ *   · `maxDevices` / `rememberMeDays` **同时**保留在顶层：**服务端只下发嵌套口径**，
+ *     顶层字段由映射层从 `session` 摊平，供登录页「当前会话上限 N 台设备」直接取用（历史用法）；
+ *   · `upload` **服务端不下发**（不属于非敏感运行期配置契约），映射层回落到演示默认值 ——
+ *     该组数字仅用于表单页的「最多 N 个文件 / 单个最大 M MB」提示，属**待对齐项**；
+ *   · 本接口**不会**返回数据源、Redis、口令哈希成本等敏感信息（服务端有契约测试守卫）。
+ */
 export interface ClientConfig {
-  /** 多设备同时在线上限，默认 3 */
+  /** 系统标题（服务端 `oa.web.title`） */
+  title: string
+  /** 运行环境（激活 profile，如 `dev`） */
+  env: string
+  /** 前端统一 API 前缀（相对路径，如 `/api/v1`） */
+  apiBaseUrl: string
+  /** 会话 Cookie 名（HttpOnly；前端只读存在性） */
+  sessionCookieName: string
+  /** 是否强制 HTTPS（生产 true） */
+  forceHttps: boolean
+  /** 水印透明度（已收敛到 5%–8%） */
+  watermarkOpacity: number
+  /** 会话上限（服务端嵌套口径的原样副本） */
+  session: {
+    maxDevices: number
+    rememberMeDays: number
+  }
+  /** 口令策略（登录前提示用；与 /auth/password-policy 同源） */
+  password: {
+    minLength: number
+    requireLetter: boolean
+    requireDigit: boolean
+    /** 连续失败锁定阈值（REQ-NFR-005，默认 5） */
+    lockThreshold: number
+    /** 锁定时长（分钟，默认 15） */
+    lockMinutes: number
+  }
+  /** 多设备同时在线上限，默认 3（= `session.maxDevices`，摊平副本） */
   maxDevices: number
-  /** 「记住我」天数，默认 7 */
+  /** 「记住我」天数，默认 7（= `session.rememberMeDays`，摊平副本） */
   rememberMeDays: number
+  /** 上传上限（**服务端暂不下发**：映射层回落演示默认值，见上） */
   upload: {
     maxFileSizeMb: number
     maxFilesPerSubmit: number
@@ -148,14 +190,27 @@ export interface RoleBrief {
   dataScope: DataScope
 }
 
-/** GET /api/v1/portal/watermark/profile —— 水印文本与透明度区间 */
+/**
+ * GET /api/v1/portal/watermark/profile —— 当前登录人的水印画像（REQ-USER-004 / AC-44）。
+ *
+ * 服务端形状是 `{enabled, text, opacity, employeeNo, name}`；本领域模型的
+ * `opacityMin/opacityMax/rotate/gapX/gapY` 是**前端补齐**的：
+ *   · 服务端只给单一 `opacity`（已夹到 5%–8%），映射层把它同时写入
+ *     `opacityMin` 与 `opacityMax`，使「取区间中值」的旧逻辑恰好等于服务端值；
+ *   · `rotate` / `gapX` / `gapY` 是 DESIGN.md 的设计常量（-24°、240×160），
+ *     服务端契约里没有，由 `src/utils/watermark.ts` 提供。
+ */
 export interface WatermarkProfile {
-  /** 姓名 + 工号，例如 "降泽宇 · 10086" */
+  /** 姓名 + 工号，例如 "系统管理员 10086"；工号缺失时只有姓名 */
   text: string
   name: string
+  /** 工号；服务端缺失时键不存在 → 映射层归一为 `''` */
   employeeNo: string
-  /** 服务端下发区间，前端必须收敛到 0.05–0.08 */
+  /** 服务端下发的透明度（恒在 0.05–0.08；缺省时由映射层取区间中值） */
+  opacity: number
+  /** 透明度区间下沿（服务端只给单值时 = `opacity`） */
   opacityMin: number
+  /** 透明度区间上沿（服务端只给单值时 = `opacity`） */
   opacityMax: number
   rotate: number
   gapX: number

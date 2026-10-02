@@ -29,7 +29,41 @@ public final class WatermarkPolicy {
     public static final int MAX_OPACITY_PERCENT = 8;
     public static final int ROTATION_DEGREES = -24;
 
+    /** 透明度下限（小数口径 0.05）。 */
+    public static final double MIN_OPACITY = MIN_OPACITY_PERCENT / 100.0;
+
+    /** 透明度上限（小数口径 0.08）。 */
+    public static final double MAX_OPACITY = MAX_OPACITY_PERCENT / 100.0;
+
     private WatermarkPolicy() {
+    }
+
+    /**
+     * 透明度夹紧到 DESIGN.md 规定的 <b>5%–8%</b> 区间（越界即夹紧，绝不放行）。
+     *
+     * <p>背景（2026-xx 收口）：<ul>
+     *   <li>PRD REQ-USER-004 / AC-44 与 DESIGN.md 都要求水印透明度落在 5%–8%：
+     *       低于 5% 等于水印看不见（失去「谁看了这页」的追责意义），高于 8% 会干扰阅读；</li>
+     *   <li>{@code oa.watermark.opacity} 是**环境配置**，可能被手改为越界值
+     *       （例如误写成 {@code 0.6} 或百分数 {@code 6}）——直接下发会让前端画出不合规水印，
+     *       因此服务端在**下发前**统一夹紧，前端另有一层 {@code clampWatermarkOpacity} 兜底；</li>
+     *   <li>{@code NaN} / 无穷等非法浮点按**区间中值 0.065** 处理（不落进 0 或 1 的极端）。</li>
+     * </ul>
+     *
+     * @param opacity 配置透明度（小数口径，如 0.06）
+     * @return 夹紧后的透明度，恒在 {@code [0.05, 0.08]}
+     */
+    public static double clampOpacity(double opacity) {
+        if (Double.isNaN(opacity) || Double.isInfinite(opacity)) {
+            return (MIN_OPACITY + MAX_OPACITY) / 2;
+        }
+        if (opacity < MIN_OPACITY) {
+            return MIN_OPACITY;
+        }
+        if (opacity > MAX_OPACITY) {
+            return MAX_OPACITY;
+        }
+        return opacity;
     }
 
     /** 策略视图（{@code GET /api/v1/identity/watermark-policy}）。 */

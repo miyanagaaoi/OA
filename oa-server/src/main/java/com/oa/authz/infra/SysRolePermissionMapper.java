@@ -1,5 +1,6 @@
 package com.oa.authz.infra;
 
+import com.oa.authz.infra.row.RoleCountRow;
 import java.util.Collection;
 import java.util.List;
 import org.apache.ibatis.annotations.Delete;
@@ -54,6 +55,24 @@ public interface SysRolePermissionMapper {
     /** 该权限被多少角色引用（删除权限节点前的级联影响面）。 */
     @Select("SELECT DISTINCT role_id FROM sys_role_permission WHERE permission_id = #{permissionId}")
     List<Long> selectRoleIdsByPermissionId(@Param("permissionId") Long permissionId);
+
+    /**
+     * 多个角色的权限数（{@code GROUP BY role_id}，一次取回 —— 角色列表页禁止 N+1）。
+     *
+     * <p>口径：{@code sys_role_permission} 的**全表行数**，不按数据域裁剪
+     * （该接口仅授权管理员可见，理由见 {@code AuthzDtos.RoleView} 类注释）。
+     * {@code sys_role_permission} 是配置类表、未登记为受控表，故无需 {@code @dataScope} 标记；
+     * 未出现在结果里的 roleId 表示计数为 0（由服务层补 0，而不是左连接拼全表）。
+     */
+    @Select({"<script>",
+            "SELECT role_id AS roleId, COUNT(1) AS total FROM sys_role_permission",
+            "WHERE role_id IN",
+            "<foreach collection='roleIds' item='item' open='(' separator=',' close=')'>",
+            "  #{item}",
+            "</foreach>",
+            "GROUP BY role_id",
+            "</script>"})
+    List<RoleCountRow> countByRoleIds(@Param("roleIds") Collection<Long> roleIds);
 
     /** 批量写入（一次勾选保存）。 */
     @Insert({"<script>",

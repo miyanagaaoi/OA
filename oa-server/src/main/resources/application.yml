@@ -108,17 +108,29 @@ mybatis-plus:
 # ---------------------------------------------------------------------------
 oa:
   web:
+    # 系统标题（非敏感；GET /api/v1/auth/client-config 下发，与 oa-web 的 VITE_APP_TITLE 对齐）
+    title: 集团OA审批系统
+    # 前端统一 API 前缀（只下发相对路径，绝对地址由浏览器按当前来源解析）
+    api-base-url: /api/v1
     # 生产必须关闭（前后端同源经 Nginx 反代）
     cors-enabled: false
     allowed-origins:
       - http://localhost:5173
       - http://127.0.0.1:5173
+    # 认证拦截器排除路径（登录、口令策略、健康检查等）。
+    # 注意：/api/v1/auth/client-config 与 /api/v1/auth/unlock 等**不走白名单**，
+    # 前者用方法级 @Anonymous 放行（只对这一个方法生效，边界比路径白名单小）。
     permit-all:
       - /api/v1/auth/login
       - /api/v1/auth/password-policy
       - /api/v1/auth/lock-status
       - /actuator/**
       - /error
+  # 水印（REQ-USER-004 / AC-44）：透明度区间 5%–8% 是设计常量（WatermarkPolicy 持有），
+  # 这里的值会在下发前被夹紧到该区间；越界配置不会放行到前端。
+  watermark:
+    enabled: true
+    opacity: 0.06
   session:
     cookie-name: OA_SESSION
     # 会话存储：redis（生产）；memory 为单测/降级预留（需自行装配 Bean）

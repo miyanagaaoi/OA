@@ -5,18 +5,22 @@ import com.oa.authz.domain.SysRole;
 import com.oa.authz.infra.SysRoleCategoryMapper;
 import com.oa.authz.infra.SysRoleMapper;
 import com.oa.authz.infra.SysRoleOrgNodeMapper;
+import com.oa.authz.infra.SysRolePermissionMapper;
 import com.oa.authz.infra.SysUserRoleMapper;
+import com.oa.authz.infra.row.RoleCountRow;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
 import com.oa.common.security.CurrentUser;
 import com.oa.identity.app.OrgService;
 import com.oa.identity.domain.SysOrg;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,6 +52,7 @@ public class RoleService {
     private final SysRoleCategoryMapper roleCategoryMapper;
     private final SysRoleOrgNodeMapper roleOrgNodeMapper;
     private final SysUserRoleMapper userRoleMapper;
+    private final SysRolePermissionMapper rolePermissionMapper;
     private final EffectivePermissionService effectivePermissionService;
     private final AuthzOperatorProvider operatorProvider;
     private final OrgService orgService;
@@ -56,6 +61,7 @@ public class RoleService {
                        SysRoleCategoryMapper roleCategoryMapper,
                        SysRoleOrgNodeMapper roleOrgNodeMapper,
                        SysUserRoleMapper userRoleMapper,
+                       SysRolePermissionMapper rolePermissionMapper,
                        EffectivePermissionService effectivePermissionService,
                        AuthzOperatorProvider operatorProvider,
                        OrgService orgService) {
@@ -63,6 +69,7 @@ public class RoleService {
         this.roleCategoryMapper = roleCategoryMapper;
         this.roleOrgNodeMapper = roleOrgNodeMapper;
         this.userRoleMapper = userRoleMapper;
+        this.rolePermissionMapper = rolePermissionMapper;
         this.effectivePermissionService = effectivePermissionService;
         this.operatorProvider = operatorProvider;
         this.orgService = orgService;
@@ -84,9 +91,14 @@ public class RoleService {
             }
             scope = SysRole.SCOPE_COMPANY;
         }
+        List<SysRole> roles = roleMapper.selectAll(trim(keyword), scope);
+        List<Long> roleIds = idsOf(roles);
+        Map<Long, Integer> permissionCounts = countMap(roleIds, rolePermissionMapper::countByRoleIds);
+        Map<Long, Integer> userCounts = countMap(roleIds, userRoleMapper::countByRoleIds);
         List<AuthzDtos.RoleView> views = new ArrayList<>();
-        for (SysRole role : roleMapper.selectAll(trim(keyword), scope)) {
-            views.add(toView(role));
+        for (SysRole role : roles) {
+            views.add(toView(role, permissionCounts.getOrDefault(role.getId(), 0),
+                    userCounts.getOrDefault(role.getId(), 0)));
         }
         return views;
     }
@@ -147,7 +159,8 @@ public class RoleService {
             roleCategoryMapper.insertBatch(role.getId(), categories);
         }
         log.info("新增角色：id={} code={} roleScope={} dataScope={}", role.getId(), code, roleScope, dataScope);
-        return toView(role);
+        // 新角色的两个计数恒为 0：不发聚合查询，但字段必须存在且为 0（前端不再回退演示值）
+        return toView(role, 0, 0);
     }
 
     /** {@code PUT /api/v1/authz/roles/{id}}。 */
@@ -188,7 +201,7 @@ public class RoleService {
             effectivePermissionService.invalidateByRole(id);
         }
         log.info("修改角色：id={} code={} dataScope={}", id, role.getCode(), dataScope);
-        return toView(requireRole(id));
+        return detail(id);
     }
 
     /** {@code DELETE /api/v1/authz/roles/{id}}。 */
@@ -239,7 +252,7 @@ public class RoleService {
         roleMapper.updateRole(patch);
         effectivePermissionService.invalidateByRole(id);
         log.info("设置角色数据域：roleId={} dataScope={}", id, dataScope);
-        return toView(requireRole(id));
+        return detail(id);
     }
 
     // ---------------------------------------------------------------- 类别范围
@@ -339,9 +352,60 @@ public class RoleService {
     // ---------------------------------------------------------------- 内部
 
     /** 视图（{@code builtIn} 由角色码目录判定，前端据此禁用「删除」与「code/role_scope」编辑）。 */
-    public static AuthzDtos.RoleView toView(SysRole role) {
+    public static AuthzDtos.RoleView toView(SysRole role, int permissionCount, int userCount) {
         return new AuthzDtos.RoleView(role.getId(), role.getCode(), role.getName(), role.getRoleScope(),
-                role.getDataScope(), role.getRemark(), RoleCatalog.isBuiltIn(role.getCode()));
+                role.getDataScope(), role.getRemark(), RoleCatalog.isBuiltIn(role.getCode()),
+                permissionCount, userCount);
+    }
+
+    /**
+     * 单角色详情视图（含真实计数）。
+     *
+     * <p>写接口（改角色 / 改数据域）的回参必须与列表同形状、同真实值：若这里回 0，
+     * 前端拿到响应后刷新列表就会看到「权限数/用户数 94→0」，属于典型的**数据误导**。
+     * 计数走与列表同一条 {@code COUNT ... GROUP BY role_id} 语句（{@code roleIds} 只放一个 id），
+     * 两次查询、无 N+1。
+     */
+    private AuthzDtos.RoleView detail(Long id) {
+        SysRole role = requireRole(id);
+        List<Long> ids = List.of(role.getId());
+        Map<Long, Integer> permissionCounts = countMap(ids, rolePermissionMapper::countByRoleIds);
+        Map<Long, Integer> userCounts = countMap(ids, userRoleMapper::countByRoleIds);
+        return toView(role, permissionCounts.getOrDefault(role.getId(), 0),
+                userCounts.getOrDefault(role.getId(), 0));
+    }
+
+    /**
+     * 角色 id 集合 → { roleId: 计数 }；**一次聚合查询**，空集合直接返回空表。
+     *
+     * <p>复用同一条 {@code COUNT ... GROUP BY role_id} 语句既服务列表（一次多条）也服务
+     * 单角色回显（{@code roleIds} 只放一个 id）；聚合未返回的 roleId 由调用方按 0 兜底
+     * （左连接拼全量角色是另一种写法，但会把「计数为 0」与「角色已删除」混在一起，不采用）。
+     */
+    private Map<Long, Integer> countMap(Collection<Long> roleIds,
+                                        Function<Collection<Long>, List<RoleCountRow>> counter) {
+        Map<Long, Integer> result = new LinkedHashMap<>();
+        if (roleIds == null || roleIds.isEmpty()) {
+            // IN () 是非法 SQL：没有角色时不发查询（也避免无谓的数据库往返）
+            return result;
+        }
+        for (RoleCountRow row : counter.apply(roleIds)) {
+            if (row != null && row.getRoleId() != null) {
+                result.put(row.getRoleId(), row.getTotal() == null ? 0 : row.getTotal());
+            }
+        }
+        return result;
+    }
+
+    /** 角色列表里出现过的 id（保持顺序去重，供两条聚合语句共用）。 */
+    private static List<Long> idsOf(List<SysRole> roles) {
+        List<Long> ids = new ArrayList<>(roles.size());
+        for (SysRole role : roles) {
+            if (role != null && role.getId() != null) {
+                ids.add(role.getId());
+            }
+        }
+        return ids;
     }
 
     private void replaceCategories(Long roleId, Set<String> categories) {

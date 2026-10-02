@@ -285,7 +285,12 @@ function toRoleItem(view: WireRoleView): RoleItem {
      *    保证「9 个内置角色不可删、code/role_scope 只读」不依赖后端字段先落地。
      */
     builtIn: view.builtIn ?? isBuiltInRoleCode(view.code),
-    permissionCount: view.permissionCount ?? 0,
+    /*
+     * 计数：**后端已下发真值**（`AuthzDtos.RoleView.permissionCount/userCount`，批量聚合、非 N+1）。
+     * 因此这里只在**字段缺失**时回退 0（`??` 而非 `||`：下发的 0 就是真的 0，
+     * 例如 company_admin 确实没有用户分配）。
+     */
+    permissionCount: toCount(view.permissionCount, 0),
     userCount: toCount(view.userCount, 0),
     categories: toMatterCategories(view.categories),
     createdAt: view.createdAt ?? undefined,

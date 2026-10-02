@@ -67,7 +67,17 @@ public final class AuthzDtos {
     /**
      * 角色视图。
      *
+     * <p><b>两个计数的口径是「全局」，不按数据域裁剪</b>：{@code permissionCount} /
+     * {@code userCount} 分别取 {@code sys_role_permission}、{@code sys_user_role} 的全表行数，
+     * 与调用者所在公司无关。理由：{@code GET /api/v1/authz/roles} 仅授权管理员可见
+     * （{@link com.oa.authz.app.AuthorizationPolicy} 已强制「非系统管理员 / 分公司流程管理员一律 403」），
+     * 管理员需要看到角色的**真实影响面**（「这个角色发了多少人」）才能判断能否回收或删除；
+     * 若按数据域裁剪，分公司管理员会看到 0，与「删除角色时服务端按全量分配数阻断」的实际行为矛盾，
+     * 属于典型的「数据误导」。**若将来要让计数跟随数据域，必须另行定义接口语义并同步删除本注释的结论。**
+     *
      * @param builtIn 是否为 9 个内置角色码之一（受保护：不可删除、不可改 code 与 role_scope）
+     * @param permissionCount 该角色在 {@code sys_role_permission} 的行数（角色列表页「权限数」列）
+     * @param userCount       该角色在 {@code sys_user_role} 的分配数（角色列表页「用户数」列）
      */
     public record RoleView(
             Long id,
@@ -76,7 +86,9 @@ public final class AuthzDtos {
             String roleScope,
             String dataScope,
             String remark,
-            boolean builtIn
+            boolean builtIn,
+            Integer permissionCount,
+            Integer userCount
     ) {
     }
 

@@ -129,9 +129,13 @@ export interface WireRoleView {
    * 白名单兜底判定（任务书硬要求 3：内置角色禁止删除、禁止改 code/role_scope）。
    */
   builtIn?: boolean | null
-  /** 已授权限数（`int`） */
+  /**
+   * 已授权限数（`int`，JSON number）。
+   * **后端已下发**（`GET|POST|PUT /authz/roles` 全部带真实计数）：缺字段才回退 0，
+   * 下发了 `0` 就是真的 0（不再出现「admin 显示 0 个权限」的假数据）。
+   */
   permissionCount?: number | null
-  /** 已分配用户数（`int` 或 `long`，映射层统一 Number） */
+  /** 已分配用户数（`int`，JSON number；同理：有值即真值，仅缺字段才回退 0） */
   userCount?: WireNumber | null
   /** `data_scope=group_category` 时的类别五值 */
   categories?: string[] | null
@@ -341,7 +345,9 @@ export interface WireChangeLogQueryParams {
 // 待对齐清单（后端本轮补齐后逐条删除）
 // ----------------------------------------------------------------------------
 //  1. `WireRolePermissionUpdateRequest`：提交全量 id 还是仅叶子 id（当前两者都发）。
-//  2. `WireRoleView.builtIn` / `permissionCount` / `userCount` 是否下发（当前用 code 白名单兜底内置判定）。
+//  2. ~~`WireRoleView.builtIn` / `permissionCount` / `userCount` 是否下发~~ —— **已落地**
+//     （2026 收口：`permissionCount` = `sys_role_permission` 行数、`userCount` = `sys_user_role`
+//     分配数，均为**全局口径**；`builtIn` 仍保留 code 白名单兜底）。
 //  3. `WireRoleListResponse`：角色列表是否分页（当前分页与全量数组都支持）。
 //  4. `WireChangeLogView`：前后值是 `beforeJson`/`afterJson` 字符串还是 `before`/`after` 对象。
 //  5. `WireEffectivePermissionView.permissions` 回的是权限码还是 id。
