@@ -79,7 +79,20 @@ public class ImmutableTriggerInitializer implements ApplicationRunner {
         log.info("不可篡改触发器检查完成：脚本 {} 条，新创建 {} 条", statements.size(), created);
     }
 
-    /** 按 {@code //} 切分并只保留建触发器语句（注释块/空块自动跳过）。 */
+    /**
+     * 按「**单独成行的双斜杠**」切分，并只保留建触发器语句（注释块/空块自动跳过）。
+     *
+     * <p><b>为什么必须是行锚定切分（2026-10-02 实战事故）</b>：早期实现用 {@code content.split("//")}
+     * （非锚定）。而本脚本头部的注释里出现了**字面量双斜杠**（原文写作「按 "//" 切分…」），
+     * 于是第一个切分点落在注释内部，产出一个以引号开头的伪语句，它把紧随其后的
+     * {@code CREATE TRIGGER trg_sys_log_no_update} **一并吞掉** → 该语句语法错误 → 触发器永不创建，
+     * 而其余 3 条落在后续块中正常创建。后果是 **AC-20 对 {@code sys_log} 的改保护在数据库层完全不存在**
+     * （{@code UPDATE sys_log} 实测可成功），且启动日志只留一行 ERROR，属静默失效。
+     *
+     * <p>因此：① 切分改为行锚定（注释里出现任何 {@code //} 都不会误切）；
+     * ② 增加**条数自检**：脚本中 {@code CREATE TRIGGER} 的出现次数必须与解析出的语句数一致，
+     * 不一致即判为脚本损坏并抛出（宁可启动失败，也不能静默少建保护）。
+     */
     List<String> loadStatements(String location) throws Exception {
         Resource resource = new DefaultResourceLoader().getResource(location);
         if (!resource.exists()) {
@@ -90,13 +103,42 @@ public class ImmutableTriggerInitializer implements ApplicationRunner {
             content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
         List<String> statements = new ArrayList<>();
-        for (String chunk : content.split("//")) {
+        int declared = 0;
+        // 行锚定：仅匹配「整行只有双斜杠（可含空白）」作为分隔符
+        for (String chunk : content.split("(?m)^\\s*//\\s*$")) {
             String sql = stripLeadingComments(chunk);
-            if (!sql.isBlank() && sql.toUpperCase(Locale.ROOT).contains("CREATE TRIGGER")) {
+            if (sql.isBlank()) {
+                continue;
+            }
+            String upper = sql.toUpperCase(Locale.ROOT);
+            // 只在**剥离注释后**的语句文本里计数：注释里出现 "CREATE TRIGGER" 字样不得被算作声明
+            declared += countOccurrences(upper, "CREATE TRIGGER");
+            if (upper.contains("CREATE TRIGGER")) {
                 statements.add(sql);
             }
         }
+        // 条数自检：脚本里声明几次 CREATE TRIGGER，就必须解析出几条语句
+        if (declared != statements.size()) {
+            throw new IllegalStateException(String.format(
+                    "触发器脚本解析异常：脚本声明 %d 条 CREATE TRIGGER，实际解析出 %d 条（切分或注释损坏）。"
+                            + "文件=%s；这会导致部分不可篡改保护静默缺失（AC-20），已拒绝启动。",
+                    declared, statements.size(), location));
+        }
+        if (statements.isEmpty()) {
+            throw new IllegalStateException("触发器脚本未解析出任何语句：" + location);
+        }
         return statements;
+    }
+
+    /** 统计子串出现次数（用于触发器条数自检）。 */
+    private static int countOccurrences(String haystack, String needle) {
+        int count = 0;
+        int index = haystack.indexOf(needle);
+        while (index >= 0) {
+            count++;
+            index = haystack.indexOf(needle, index + needle.length());
+        }
+        return count;
     }
 
     /** @return 本次是否新建（已存在返回 false） */

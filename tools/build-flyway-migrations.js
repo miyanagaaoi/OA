@@ -180,7 +180,9 @@ function main() {
     ['oa-deploy/sql/01-schema.sql 的 DELIMITER 段'],
     [
       '本文件不是 Flyway 迁移：由 com.oa.platform.bootstrap.ImmutableTriggerInitializer 在启动时读取，',
-      '按 "//" 切分为独立语句，逐条检查 information_schema.TRIGGERS 后**幂等创建缺失项**。',
+      '按「单独成行的双斜杠」切分为独立语句，逐条检查 information_schema.TRIGGERS 后 **幂等创建缺失项**。',
+      '注意：本文件的注释里**不要出现字面量的双斜杠**（历史上曾因此误切、吞掉一条 CREATE TRIGGER，',
+      '导致 sys_log 的改保护静默缺失）；解析器已改为行锚定切分并自带条数自检。',
       '原因：Flyway 的 MySQL 解析器不识别 mysql 客户端的 DELIMITER 语法。',
     ],
   ) + '\n' + triggerSql;
