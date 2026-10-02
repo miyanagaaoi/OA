@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.definition.node-behavior",
+  "updated_at": "2026-10-02T08:03:34.599Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "按节点执行顺序阅读：先判是否跳过，再决定如何决议（或签/会签/依次与阈值），最后约束签名与超时。",
+    "en": "Read in node execution order: whether to skip, then how to decide (any-sign/countersign/sequential with threshold), finally signature and timeout constraints."
+  },
+  "order": [
+    "oa.workflow.definition.node-behavior.skip",
+    "oa.workflow.definition.node-behavior.decision",
+    "oa.workflow.definition.node-behavior.policy"
+  ]
+}

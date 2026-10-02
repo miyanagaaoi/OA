@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.print.page",
+  "updated_at": "2026-10-02T08:07:27.141Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "版心确定后，用四张单据的实测高度校验 297mm 单页预算。",
+    "en": "Once the type area is set, the measured heights of the four sheets verify the 297mm one-page budget."
+  },
+  "order": [
+    "oa.design.print.page.height"
+  ]
+}

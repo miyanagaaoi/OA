@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "oa.archive.policy",
+  "updated_at": "2026-10-02T08:01:33.370Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先判定满 3 年的归档候选，整单搬迁到历史库，随后置为只读、附件迁冷存储，清理只在评审留痕后按申请执行。",
+    "en": "Left to right: candidates older than three years are selected, moved whole into the history store, then frozen read-only with attachments in cold storage; purge only runs after a reviewed request."
+  },
+  "order": [
+    "oa.archive.policy.criteria",
+    "oa.archive.policy.migration",
+    "oa.archive.policy.readonly",
+    "oa.archive.policy.attachment-cold",
+    "oa.archive.policy.purge"
+  ],
+  "groups": [
+    {
+      "id": "intake",
+      "title": {
+        "zh": "归档准入与搬迁",
+        "en": "Admission & Migration"
+      },
+      "children": [
+        "oa.archive.policy.criteria",
+        "oa.archive.policy.migration"
+      ]
+    },
+    {
+      "id": "after",
+      "title": {
+        "zh": "归档后约束",
+        "en": "Post-Archive Rules"
+      },
+      "children": [
+        "oa.archive.policy.readonly",
+        "oa.archive.policy.attachment-cold",
+        "oa.archive.policy.purge"
+      ]
+    }
+  ]
+}

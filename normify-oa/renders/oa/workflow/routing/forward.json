@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.routing.forward",
+  "updated_at": "2026-10-02T08:02:46.777Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先指定承接部门（原因必填），再由流转链推进并生成新承接部门的任务。",
+    "en": "Designate the receiving department with a reason, then the chain advances and creates its tasks."
+  },
+  "order": [
+    "oa.workflow.routing.forward.designate",
+    "oa.workflow.routing.forward.chain"
+  ]
+}

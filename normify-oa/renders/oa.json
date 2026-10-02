@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "oa",
+  "updated_at": "2026-10-02T07:57:20.436Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右阅读：先看主数据（身份与组织、权限与数据域），再看审批中枢（流程引擎、表单与单据），然后是合规与留痕（电子签名、消息通知、审计、归档），接着是运营与触点（管理后台、前端门户、接口集成），最后是承载一切的平台与设计语言。",
+    "en": "Read left to right: master data first (identity, authorization), then the approval core (workflow, forms), then compliance and traceability (signature, notification, audit, archive), then operations and surfaces (admin, portal, integration) and finally the platform and design language everything is built on."
+  },
+  "order": [
+    "oa.identity",
+    "oa.authz",
+    "oa.workflow",
+    "oa.form",
+    "oa.sign",
+    "oa.notify",
+    "oa.audit",
+    "oa.archive",
+    "oa.admin",
+    "oa.portal",
+    "oa.integration",
+    "oa.platform",
+    "oa.design"
+  ],
+  "groups": [
+    {
+      "id": "masterdata",
+      "title": {
+        "zh": "主数据",
+        "en": "Master Data"
+      },
+      "children": [
+        "oa.identity",
+        "oa.authz"
+      ]
+    },
+    {
+      "id": "core",
+      "title": {
+        "zh": "审批中枢",
+        "en": "Approval Core"
+      },
+      "children": [
+        "oa.workflow",
+        "oa.form"
+      ]
+    },
+    {
+      "id": "compliance",
+      "title": {
+        "zh": "合规与留痕",
+        "en": "Compliance & Traceability"
+      },
+      "children": [
+        "oa.sign",
+        "oa.notify",
+        "oa.audit",
+        "oa.archive"
+      ]
+    },
+    {
+      "id": "ops",
+      "title": {
+        "zh": "运营与触点",
+        "en": "Operations & Surfaces"
+      },
+      "children": [
+        "oa.admin",
+        "oa.portal",
+        "oa.integration"
+      ]
+    },
+    {
+      "id": "foundation",
+      "title": {
+        "zh": "平台与体验",
+        "en": "Platform & Experience"
+      },
+      "children": [
+        "oa.platform",
+        "oa.design"
+      ]
+    }
+  ]
+}

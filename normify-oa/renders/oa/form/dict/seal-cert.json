@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.dict.seal-cert",
+  "updated_at": "2026-10-02T08:05:19.816Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "印鉴单的三个下拉来源：用印类型（决定是否填份数）→ 证照名称 → 归还状态。",
+    "en": "The seal form's three option sources: seal type (which decides the copy count), certificate name, and return status."
+  },
+  "order": [
+    "oa.form.dict.seal-cert.seal-type",
+    "oa.form.dict.seal-cert.cert-name",
+    "oa.form.dict.seal-cert.return-status"
+  ]
+}

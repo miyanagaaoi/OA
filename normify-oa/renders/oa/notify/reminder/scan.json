@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.notify.reminder.scan",
+  "updated_at": "2026-10-02T08:03:11.379Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "两条独立扫描：审批任务停留超过节点超时时长（node）与待补件请求超过补件时限（supplement）；两者都只产出催办信号。",
+    "en": "Two independent scans: stalled approval tasks against the node timeout (node) and pending supplement requests against their deadline (supplement). Both only emit reminder signals."
+  },
+  "order": [
+    "oa.notify.reminder.scan.node",
+    "oa.notify.reminder.scan.supplement"
+  ]
+}

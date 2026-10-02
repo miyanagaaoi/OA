@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.component.data-display",
+  "updated_at": "2026-10-02T08:07:26.358Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "表格是默认列表形态 → 状态徽标五态全局唯一 → 流程节点四态与并行分组还原流转。",
+    "en": "The table is the default list form, the five status badges are globally unique and the four node states with parallel grouping render the flow."
+  },
+  "order": [
+    "oa.design.component.data-display.table",
+    "oa.design.component.data-display.status-pill",
+    "oa.design.component.data-display.workflow-step"
+  ]
+}

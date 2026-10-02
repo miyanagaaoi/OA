@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.dict",
+  "updated_at": "2026-10-02T08:03:45.033Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先确定字典类型，再维护字典项与排序启停，最后把变更分发出去（刷新缓存或整表导入导出）。",
+    "en": "Left to right: define the dictionary types, maintain the items with ordering and enable/disable, then deliver the change by refreshing the cache or importing/exporting the whole dictionary."
+  },
+  "order": [
+    "oa.admin.dict.type",
+    "oa.admin.dict.item",
+    "oa.admin.dict.delivery"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.h5",
+  "updated_at": "2026-10-02T08:07:10.890Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "白色骨架与 44px 触控铺底 → 底部操作栏与手写签名完成审批 → 水印与兼容降级兜住安全与可用性。",
+    "en": "The white shell with 44px touch targets comes first, the bottom bar and signature pad finish the approval, and the watermark plus compatibility fallbacks cover safety and usability."
+  },
+  "order": [
+    "oa.portal.h5.shell",
+    "oa.portal.h5.touch",
+    "oa.portal.h5.actionbar",
+    "oa.portal.h5.signature",
+    "oa.portal.h5.watermark",
+    "oa.portal.h5.compat"
+  ],
+  "groups": [
+    {
+      "id": "frame",
+      "title": {
+        "zh": "骨架与尺寸",
+        "en": "Shell & Sizing"
+      },
+      "children": [
+        "oa.portal.h5.shell",
+        "oa.portal.h5.touch"
+      ]
+    },
+    {
+      "id": "act",
+      "title": {
+        "zh": "操作与签署",
+        "en": "Action & Signing"
+      },
+      "children": [
+        "oa.portal.h5.actionbar",
+        "oa.portal.h5.signature"
+      ]
+    },
+    {
+      "id": "safety",
+      "title": {
+        "zh": "安全与兼容",
+        "en": "Safety & Compatibility"
+      },
+      "children": [
+        "oa.portal.h5.watermark",
+        "oa.portal.h5.compat"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.audit",
+  "updated_at": "2026-10-02T08:01:28.008Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先产生留痕（操作日志、审批轨迹、权限变更与登录日志），再由不可篡改与保留期约束兜底——只追加、审计与轨迹保留不少于 10 年、登录日志 1 年、哈希可校验。",
+    "en": "Left to right: traces are produced first (operation log, approval trail, permission and login logs), then immutability and retention enforce append-only storage, ten-year retention and verifiable hashes."
+  },
+  "order": [
+    "oa.audit.oplog",
+    "oa.audit.trace",
+    "oa.audit.security",
+    "oa.audit.integrity"
+  ],
+  "groups": [
+    {
+      "id": "records",
+      "title": {
+        "zh": "留痕记录",
+        "en": "Trace Records"
+      },
+      "children": [
+        "oa.audit.oplog",
+        "oa.audit.trace",
+        "oa.audit.security"
+      ]
+    },
+    {
+      "id": "guarantee",
+      "title": {
+        "zh": "不可篡改与保留",
+        "en": "Immutability & Retention"
+      },
+      "children": [
+        "oa.audit.integrity"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "2026-10-02-oa-architecture-baseline",
+  "title": {
+    "zh": "OA 架构基线：计划态模块树",
+    "en": "OA architecture baseline: planned module tree"
+  },
+  "status": "verified",
+  "intent": {
+    "zh": "以 doc/prd-0.1.md（第5/6/7/8/9章）、doc/data-model.md（26 张表）、doc/forms.md（四类单据与字段字典）、DESIGN.md（设计语言与打印版式）为源，为该集团OA审批系统建立计划态模块树：逐层下钻到单一功能单元，叶子声明 API 契约（http/mysql/event），容器附渲染数据。代码尚未落地，故所有模块为 state=planned。",
+    "en": "Build the planned module tree for the group OA approval system from the PRD (ch.5/6/7/8/9), data-model.md (26 tables), forms.md (four form types and field dictionary) and DESIGN.md (design language and A4 print specs): drill down to single functional units, declare API contracts on leaves, add render data per container. No code has landed yet, so every module is state=planned."
+  },
+  "modules": {
+    "create": []
+  },
+  "acceptance": [
+    "计划态模块树覆盖 PRD 第5/6章全部需求编号（REQ-ORG/AUTH/FLOW/SIGN/MSG/LOG/ADMIN/USER/NFR）与 data-model.md 全部 26 张表",
+    "四类审批单（事项/资金/合同/印鉴）的字段、校验与打印要求均有对应叶子模块",
+    "每个叶子模块声明 1–8 条 API 契约（http/mysql/event），每个容器模块都有 renders 渲染数据（order + reading）",
+    "normify_validate 0 error（warning 需在汇报中说明）",
+    "normify_build 成功产出 tree.json / outline.md / api-index.json / receipt.json，normify_render 产出交互式 HTML"
+  ],
+  "note": "计划态架构基线交付：以 PRD 第5/6章、data-model.md（26 张表）、forms.md（四类单据字段字典）、DESIGN.md（设计语言与 A4 打印规格）为源建成 520 个模块的单树结构（深度 6 段、378 叶子、865 API 契约、528 条依赖箭头、120 层渲染数据）。全部模块保持 state=planned / fingerprint=pending（代码尚未落地，故不 activate）；校验 0 error，余 16 条 structure/leaf-too-coarse 告警系「叶子引用 ≥2 处文档证据」触发（validate.js:113 判定 source.length>=2），为可追溯性有意保留，不阻断编译。表归属已收敛为「每表唯一声明 + 其余 to_api 引用」。",
+  "revision": {
+    "before": null,
+    "after": null
+  },
+  "created_at": "2026-10-02T07:55:24.716Z",
+  "updated_at": "2026-10-02T08:08:48.814Z",
+  "closed_at": "2026-10-02T08:08:48.814Z"
+}

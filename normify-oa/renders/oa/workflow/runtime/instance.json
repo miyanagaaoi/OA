@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.runtime.instance",
+  "updated_at": "2026-10-02T08:03:44.689Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "状态迁移先过守卫（终态、撤回窗口、计数闸门、快照重解析），再落库并广播状态变更事件。",
+    "en": "A transition passes the guards first (terminal state, withdraw window, counter gate, snapshot re-resolution), then persists and broadcasts the status event."
+  },
+  "order": [
+    "oa.workflow.runtime.instance.state",
+    "oa.workflow.runtime.instance.guards"
+  ]
+}

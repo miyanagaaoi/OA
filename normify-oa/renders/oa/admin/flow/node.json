@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.flow.node",
+  "updated_at": "2026-10-02T08:03:57.762Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右：节点如何决议（模式与阈值、签名要求），以及节点在时间上的行为（超时）与流转行为（流转、回退、加签、跳转）。",
+    "en": "Left to right: how the node decides (mode and threshold, then signature policy), then how it behaves in time (timeout) and in routing (flow, rollback, add-sign, jump)."
+  },
+  "order": [
+    "oa.admin.flow.node.decision",
+    "oa.admin.flow.node.sign",
+    "oa.admin.flow.node.timeout",
+    "oa.admin.flow.node.routing"
+  ],
+  "groups": [
+    {
+      "id": "verdict",
+      "title": {
+        "zh": "决议规则",
+        "en": "Verdict Rules"
+      },
+      "children": [
+        "oa.admin.flow.node.decision",
+        "oa.admin.flow.node.sign"
+      ]
+    },
+    {
+      "id": "timing",
+      "title": {
+        "zh": "时限与流转",
+        "en": "Timing & Routing"
+      },
+      "children": [
+        "oa.admin.flow.node.timeout",
+        "oa.admin.flow.node.routing"
+      ]
+    }
+  ]
+}

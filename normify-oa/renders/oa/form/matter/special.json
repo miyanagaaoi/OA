@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.matter.special",
+  "updated_at": "2026-10-02T08:05:13.020Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "提交后生效的三条专用规则：涉及费用决定是否跳过财务复核、类别锁定不可改判、抄送人写入并通知。",
+    "en": "Three rules that take effect after submission: cost involvement decides whether finance review is skipped, the category is frozen, and CC users are persisted and notified."
+  },
+  "order": [
+    "oa.form.matter.special.cost-branch",
+    "oa.form.matter.special.category-lock",
+    "oa.form.matter.special.cc-dispatch"
+  ]
+}

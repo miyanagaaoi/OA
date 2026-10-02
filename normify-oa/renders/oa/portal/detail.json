@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.detail",
+  "updated_at": "2026-10-02T08:07:10.145Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "浮层容器承载只读表单 → 审批轨迹与意见块还原决策过程 → 底部操作栏处置单据，水印覆盖全层防泄露。",
+    "en": "The overlay hosts the read-only form, the trail and opinion blocks reconstruct the decisions, the footer bar acts on the document and the watermark covers the whole layer against leaks."
+  },
+  "order": [
+    "oa.portal.detail.overlay",
+    "oa.portal.detail.form",
+    "oa.portal.detail.trail",
+    "oa.portal.detail.opinion",
+    "oa.portal.detail.actions",
+    "oa.portal.detail.watermark"
+  ],
+  "groups": [
+    {
+      "id": "container",
+      "title": {
+        "zh": "容器与内容",
+        "en": "Container & Content"
+      },
+      "children": [
+        "oa.portal.detail.overlay",
+        "oa.portal.detail.form"
+      ]
+    },
+    {
+      "id": "trail",
+      "title": {
+        "zh": "轨迹与意见",
+        "en": "Trail & Opinions"
+      },
+      "children": [
+        "oa.portal.detail.trail",
+        "oa.portal.detail.opinion"
+      ]
+    },
+    {
+      "id": "action",
+      "title": {
+        "zh": "处置与安全",
+        "en": "Action & Safety"
+      },
+      "children": [
+        "oa.portal.detail.actions",
+        "oa.portal.detail.watermark"
+      ]
+    }
+  ]
+}

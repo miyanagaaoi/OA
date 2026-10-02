@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.initiate.form",
+  "updated_at": "2026-10-02T08:07:09.855Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "分区标题带划分结构 → 字段控件承载录入 → 校验与滚动定位保证提交质量。",
+    "en": "Section bands structure the page, field controls carry the input and validation with scroll-to-first-error protects submission quality."
+  },
+  "order": [
+    "oa.portal.initiate.form.section",
+    "oa.portal.initiate.form.fields",
+    "oa.portal.initiate.form.validate"
+  ]
+}

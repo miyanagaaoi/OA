@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.runtime",
+  "updated_at": "2026-10-02T08:03:44.065Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "先看实例主状态机与计数闸门，再看节点实例推进与待补件子状态，最后由联动规则收口（避免挂单）。",
+    "en": "Start from the instance state machine and counter gates, then node instance advancement with the awaiting-supplement sub-state, closing with the linkage rules that keep nothing hanging."
+  },
+  "order": [
+    "oa.workflow.runtime.instance",
+    "oa.workflow.runtime.node-instance",
+    "oa.workflow.runtime.supplement-state",
+    "oa.workflow.runtime.linkage",
+    "oa.workflow.runtime.counters"
+  ],
+  "groups": [
+    {
+      "id": "instance",
+      "title": {
+        "zh": "实例层",
+        "en": "Instance Layer"
+      },
+      "children": [
+        "oa.workflow.runtime.instance",
+        "oa.workflow.runtime.counters"
+      ]
+    },
+    {
+      "id": "node",
+      "title": {
+        "zh": "节点层",
+        "en": "Node Layer"
+      },
+      "children": [
+        "oa.workflow.runtime.node-instance",
+        "oa.workflow.runtime.supplement-state"
+      ]
+    },
+    {
+      "id": "linkage",
+      "title": {
+        "zh": "状态联动",
+        "en": "Linkage"
+      },
+      "children": [
+        "oa.workflow.runtime.linkage"
+      ]
+    }
+  ]
+}

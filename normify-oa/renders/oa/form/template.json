@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.template",
+  "updated_at": "2026-10-02T08:04:53.154Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "先看模板定义，再看运行时的渲染、校验与三态读写管控，最后是附件规则与提交快照。",
+    "en": "Start with the template definition, then runtime rendering, validation and three-state write control, and finally attachment rules with the submission snapshot."
+  },
+  "order": [
+    "oa.form.template.schema",
+    "oa.form.template.render",
+    "oa.form.template.validate",
+    "oa.form.template.write-model",
+    "oa.form.template.attachment",
+    "oa.form.template.snapshot"
+  ],
+  "groups": [
+    {
+      "id": "tpl-def",
+      "title": {
+        "zh": "模板定义",
+        "en": "Template definition"
+      },
+      "children": [
+        "oa.form.template.schema"
+      ]
+    },
+    {
+      "id": "tpl-runtime",
+      "title": {
+        "zh": "运行时渲染与管控",
+        "en": "Runtime render & control"
+      },
+      "children": [
+        "oa.form.template.render",
+        "oa.form.template.validate",
+        "oa.form.template.write-model"
+      ]
+    },
+    {
+      "id": "tpl-store",
+      "title": {
+        "zh": "附件与快照",
+        "en": "Attachments & snapshot"
+      },
+      "children": [
+        "oa.form.template.attachment",
+        "oa.form.template.snapshot"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.template.write-model",
+  "updated_at": "2026-10-02T08:05:07.607Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先判单据状态给出可写字段，再按角色裁剪与脱敏，最后在待补件状态放行附件与补件说明。",
+    "en": "Resolve writable fields from document state, then mask by role, and finally allow attachments plus the supplement note while awaiting supplement."
+  },
+  "order": [
+    "oa.form.template.write-model.state-whitelist",
+    "oa.form.template.write-model.field-permission",
+    "oa.form.template.write-model.supplement-patch"
+  ]
+}

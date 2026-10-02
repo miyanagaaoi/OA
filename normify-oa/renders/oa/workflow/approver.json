@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.approver",
+  "updated_at": "2026-10-02T08:03:42.858Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "先按规则表解析候选人，发起时一次性固化为快照，并在提交前完成拦截与去重。",
+    "en": "Resolve candidates from the rule table, freeze the snapshot once at submission, and finish the blocking checks and de-duplication before the case is committed."
+  },
+  "order": [
+    "oa.workflow.approver.rule-table",
+    "oa.workflow.approver.snapshot",
+    "oa.workflow.approver.precheck",
+    "oa.workflow.approver.dedup"
+  ],
+  "groups": [
+    {
+      "id": "resolve",
+      "title": {
+        "zh": "解析规则",
+        "en": "Resolution Rules"
+      },
+      "children": [
+        "oa.workflow.approver.rule-table"
+      ]
+    },
+    {
+      "id": "freeze",
+      "title": {
+        "zh": "快照固化",
+        "en": "Snapshot Freezing"
+      },
+      "children": [
+        "oa.workflow.approver.snapshot"
+      ]
+    },
+    {
+      "id": "guard",
+      "title": {
+        "zh": "发起前守卫",
+        "en": "Pre-Submit Guards"
+      },
+      "children": [
+        "oa.workflow.approver.precheck",
+        "oa.workflow.approver.dedup"
+      ]
+    }
+  ]
+}

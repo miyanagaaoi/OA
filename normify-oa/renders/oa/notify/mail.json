@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.notify.mail",
+  "updated_at": "2026-10-02T08:03:09.753Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "触发后先渲染模板（template），再经 SMTP 投递（sender）；投递失败只记录并可手动重试（failure），绝不阻塞审批流程。",
+    "en": "A notification trigger renders the template (template) and is delivered over SMTP (sender); a delivery failure is only recorded and retried on demand (failure) and never blocks the approval flow."
+  },
+  "order": [
+    "oa.notify.mail.trigger",
+    "oa.notify.mail.template",
+    "oa.notify.mail.sender",
+    "oa.notify.mail.failure"
+  ],
+  "groups": [
+    {
+      "id": "build",
+      "title": {
+        "zh": "触发与模板",
+        "en": "Trigger & Template"
+      },
+      "children": [
+        "oa.notify.mail.trigger",
+        "oa.notify.mail.template"
+      ]
+    },
+    {
+      "id": "deliver",
+      "title": {
+        "zh": "投递与失败",
+        "en": "Delivery & Failure"
+      },
+      "children": [
+        "oa.notify.mail.sender",
+        "oa.notify.mail.failure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.fund.special",
+  "updated_at": "2026-10-02T08:05:13.679Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "两个只存不用的勾选字段（不得被流程引用）与一个敏感字段的加密脱敏。",
+    "en": "Two store-only checkboxes that no flow rule may reference, plus encryption and masking for one sensitive field."
+  },
+  "order": [
+    "oa.form.fund.special.plan-category",
+    "oa.form.fund.special.payment-belong",
+    "oa.form.fund.special.sensitive-account"
+  ]
+}

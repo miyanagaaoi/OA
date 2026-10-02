@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.seal",
+  "updated_at": "2026-10-02T08:04:59.890Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "从左到右：字段组（用印、证照、期限、归还）定义数据，校验规则把关，专用规则处理证照借用联动与审批中唯一可改的归还字段。",
+    "en": "Left to right: field groups (seal use, certificate, period, return) define the data, validation guards it, and the specific rules handle borrow linkage and the only fields editable during approval."
+  },
+  "order": [
+    "oa.form.seal.fields",
+    "oa.form.seal.validation",
+    "oa.form.seal.special"
+  ]
+}

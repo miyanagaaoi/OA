@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.a11y",
+  "updated_at": "2026-10-02T08:07:28.026Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "对比度与密度决定「看得清、看得多」→ 焦点环与动效决定「键盘可操作、不刺眼」→ 禁用态与 H5 触控守住下限。",
+    "en": "Contrast and density decide whether content is legible and dense enough, focus and motion keep it keyboard-operable without distraction, and the disabled boundary plus H5 touch targets hold the floor."
+  },
+  "order": [
+    "oa.design.a11y.contrast",
+    "oa.design.a11y.density",
+    "oa.design.a11y.focus",
+    "oa.design.a11y.motion",
+    "oa.design.a11y.disabled",
+    "oa.design.a11y.mobile-touch"
+  ],
+  "groups": [
+    {
+      "id": "visual",
+      "title": {
+        "zh": "视觉可读",
+        "en": "Visual Readability"
+      },
+      "children": [
+        "oa.design.a11y.contrast",
+        "oa.design.a11y.density"
+      ]
+    },
+    {
+      "id": "operability",
+      "title": {
+        "zh": "可操作性",
+        "en": "Operability"
+      },
+      "children": [
+        "oa.design.a11y.focus",
+        "oa.design.a11y.motion"
+      ]
+    },
+    {
+      "id": "boundary",
+      "title": {
+        "zh": "边界与下限",
+        "en": "Boundaries"
+      },
+      "children": [
+        "oa.design.a11y.disabled",
+        "oa.design.a11y.mobile-touch"
+      ]
+    }
+  ]
+}

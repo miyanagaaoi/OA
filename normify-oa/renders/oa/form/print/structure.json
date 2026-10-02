@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.print.structure",
+  "updated_at": "2026-10-02T08:05:24.322Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "自上而下的版面结构：抬头与三栏表头 → 公文接收及处理块（每次集团流转一段）→ 签名栏 → 合并栏与收尾行。",
+    "en": "Top-down page structure: heading with the three-column header, then the receipt blocks (one per group routing), signature blocks, and merged cells with closing rows."
+  },
+  "order": [
+    "oa.form.print.structure.header-block",
+    "oa.form.print.structure.routing-block",
+    "oa.form.print.structure.signature-block",
+    "oa.form.print.structure.merge-rows"
+  ]
+}

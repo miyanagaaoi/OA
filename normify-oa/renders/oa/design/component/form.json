@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.component.form",
+  "updated_at": "2026-10-02T08:07:26.068Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "两个高风险控件：金额（tnum 右对齐、为零禁止提交）与组织四级联级选择（无权限节点不可见）。",
+    "en": "Two high-risk controls: amount (tabular numerals, right-aligned, zero blocks submission) and the four-level org picker (out-of-scope nodes invisible)."
+  },
+  "order": [
+    "oa.design.component.form.amount-input",
+    "oa.design.component.form.org-cascader"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.sign.preset",
+  "updated_at": "2026-10-02T08:03:02.407Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "个人中心里上传/手写保存预存签名并设定默认（profile、default），每次变更都留痕（audit）；审批时一键调用预存签名（picker），随后仍生成一条全新的签名记录。",
+    "en": "In the personal center the user uploads or draws preset signatures and sets a default (profile, default), every change is traced (audit); during approval one tap reuses a preset (picker) and still creates a brand-new signature record."
+  },
+  "order": [
+    "oa.sign.preset.profile",
+    "oa.sign.preset.default",
+    "oa.sign.preset.audit",
+    "oa.sign.preset.picker"
+  ],
+  "groups": [
+    {
+      "id": "manage",
+      "title": {
+        "zh": "个人中心管理",
+        "en": "Personal Center"
+      },
+      "children": [
+        "oa.sign.preset.profile",
+        "oa.sign.preset.default"
+      ]
+    },
+    {
+      "id": "trace",
+      "title": {
+        "zh": "留痕与调用",
+        "en": "Trail & Usage"
+      },
+      "children": [
+        "oa.sign.preset.audit",
+        "oa.sign.preset.picker"
+      ]
+    }
+  ]
+}

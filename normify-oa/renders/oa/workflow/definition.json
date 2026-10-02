@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.definition",
+  "updated_at": "2026-10-02T08:03:33.740Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "先建模板与节点结构（谁在第几步），再配置节点行为（是否跳过、如何决议、签名与超时）与审批人解析规则声明。",
+    "en": "Build the template and node structure first (who approves at which step), then configure node behavior (skip, decision, signature/timeout) and the approver rule declarations."
+  },
+  "order": [
+    "oa.workflow.definition.template",
+    "oa.workflow.definition.node-schema",
+    "oa.workflow.definition.node-behavior",
+    "oa.workflow.definition.approver-rule"
+  ],
+  "groups": [
+    {
+      "id": "structure",
+      "title": {
+        "zh": "模板与节点结构",
+        "en": "Template & Node Structure"
+      },
+      "children": [
+        "oa.workflow.definition.template",
+        "oa.workflow.definition.node-schema"
+      ]
+    },
+    {
+      "id": "behavior",
+      "title": {
+        "zh": "行为与规则",
+        "en": "Behavior & Rules"
+      },
+      "children": [
+        "oa.workflow.definition.node-behavior",
+        "oa.workflow.definition.approver-rule"
+      ]
+    }
+  ]
+}

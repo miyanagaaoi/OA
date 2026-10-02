@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.template.render",
+  "updated_at": "2026-10-02T08:05:06.599Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先按类型映射控件，再按联动规则决定字段的显示、必填与取值。",
+    "en": "Map types to controls first, then let linkage rules decide visibility, requiredness and derived values."
+  },
+  "order": [
+    "oa.form.template.render.control-map",
+    "oa.form.template.render.linkage"
+  ]
+}

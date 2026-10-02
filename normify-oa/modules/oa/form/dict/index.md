@@ -1,0 +1,19 @@
+---
+uid: 3e4c6f5a
+id: oa.form.dict
+parent: oa.form
+state: planned
+name: {zh: "数据字典与下拉项", en: "Dictionary Options"}
+description:
+  zh: >
+      四类单据共用的下拉字典：事项类别、合同类型、用印类型、证照类型、付款归属、计划类别等；由管理后台维护、可增删，运营期调整不经开发；历史单据保留当时所选值。
+  en: >
+      Dictionary options used by all forms - matter category, contract type, seal type, certificate type, payment ownership and planned category - maintained by admins at runtime without code changes; category values are configurable and historical documents keep the chosen value.
+revision: "0000000000000000000000000000000000000000"
+updated_at: "2026-10-02T07:55:00Z"
+fingerprint: pending
+source:
+  - path: "doc/forms.md"
+    line: 176
+    end_line: 263
+---

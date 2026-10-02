@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.deploy",
+  "updated_at": "2026-10-02T07:59:34.434Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先立起部署拓扑，再把资源全部本地化，最后设置环境与运行期可配置项。",
+    "en": "Left to right: stand up the topology, vendor every asset locally, then set environment and runtime-adjustable configuration."
+  },
+  "order": [
+    "oa.platform.deploy.topology",
+    "oa.platform.deploy.localize",
+    "oa.platform.deploy.config"
+  ]
+}

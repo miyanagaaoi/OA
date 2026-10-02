@@ -1,0 +1,811 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>集团OA审批系统 · 审批单打印稿（A4）</title>
+<style>
+/* ============================================================
+   打印稿专用样式
+   - 尺寸：A4 = 210mm × 297mm（物理尺寸，非像素模拟）
+   - 版式参照 doc/参考文档/ 三张实单：7 链表格、无圆角、细实线
+   - 颜色克制：仅"写值区"用 3–4% 浅灰以便区分打印填写区
+   ============================================================ */
+:root{
+  --ink:#000;                  /* 打印稿正文用纯黑，保证复印清晰 */
+  --line:#000;                 /* 表格线 */
+  --line-w:.35mm;
+  --line-bold:.6mm;
+  --fill:transparent;          /* 标签列不填色（与参考单一致，全靠线） */
+  --value-bg:#fafafa;          /* 写值区极浅灰，屏幕可辨、打印几乎不可见 */
+  --hand:"Kaiti SC","KaiTi","STKaiti","楷体",serif;
+  --ui:"Songti SC","SimSun","宋体",serif;
+  --sans:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#e9ecf1}
+body{font-family:var(--ui);color:var(--ink);font-size:10pt;line-height:1.5}
+
+/* ---------- 工具条（打印时隐藏） ---------- */
+.bar{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;
+  padding:8px 16px;background:#151a22;color:#f4f6f9;font-family:var(--sans);font-size:12px;
+}
+.bar b{font-size:13px}
+.bar .nav{display:flex;gap:4px;background:#1e242e;padding:2px;border-radius:4px}
+.bar .nav a{
+  color:#9aa4b2;text-decoration:none;padding:5px 10px;border-radius:2px;white-space:nowrap;
+}
+.bar .nav a:hover{background:#28303c;color:#fff}
+.bar .meta{margin-left:auto;color:#9aa4b2}
+/* 业务确认说明（打印时隐藏） */
+.notes{max-width:210mm;margin:12px auto 0;font-family:var(--sans);font-size:12px;color:#2b3340}
+.notes details{background:#fff;border:1px solid #d7dce4;border-radius:6px;padding:10px 14px}
+.notes summary{cursor:pointer;font-weight:600;color:#1f5ae0}
+.notes ul{margin:8px 0 0;padding-left:18px;line-height:1.7}
+.notes li{margin-bottom:4px}
+
+/* ---------- A4 页面 ---------- */
+/* 屏幕态：宽度固定 210mm，高度由内容决定——这样才能真实测出内容是否超页 */
+.sheet{
+  width:210mm;margin:16px auto;background:#fff;
+  padding:12mm 12mm 10mm;position:relative;
+  box-shadow:0 2px 12px rgba(20,24,31,.18);
+}
+.sheet + .sheet{margin-top:16px}
+/* 打印态：补足整页高度，保证短内容也占满一页 */
+@media print{
+  .sheet{min-height:297mm}
+}
+
+/* ---------- 单据抬头 ---------- */
+.doc-title{
+  text-align:center;font-family:var(--ui);font-weight:700;font-size:16pt;letter-spacing:2px;
+  margin:0 0 4mm;
+}
+.doc-title .sub{display:block;font-size:8pt;font-weight:400;letter-spacing:0;color:#333;margin-top:1mm}
+
+.doc-meta{
+  display:flex;justify-content:space-between;font-size:8pt;color:#222;
+  margin:-2mm 0 1.5mm;line-height:1.4;
+}
+.doc-meta .left,.doc-meta .right{white-space:nowrap}
+.doc-meta .right{text-align:right}
+
+/* ---------- 表格（主体） ---------- */
+table.form{
+  width:100%;border-collapse:collapse;table-layout:fixed;
+}
+table.form td,table.form th{
+  border:var(--line-w) solid var(--line);
+  padding:.9mm 1.6mm;font-size:9.5pt;line-height:1.42;vertical-align:middle;
+  word-break:break-word;
+}
+table.form th{
+  font-weight:400;text-align:center;background:transparent;font-size:9.5pt;
+}
+table.form .lbl{                       /* 标签单元格：居中、不换行优先 */
+  text-align:center;font-family:var(--ui);white-space:nowrap;line-height:1.3;
+}
+table.form .val{background:var(--value-bg)}      /* 写值区 */
+table.form .c{text-align:center}
+table.form .r{text-align:right}
+table.form .big{font-size:11pt;line-height:1.55}
+table.form .tiny{font-size:8.5pt;line-height:1.4;color:#222}
+table.form .mono{font-family:"Consolas","Courier New",monospace;font-variant-numeric:tabular-nums}
+table.form .amount{
+  font-family:"Consolas","Courier New",monospace;font-variant-numeric:tabular-nums;
+  font-weight:700;font-size:10.5pt;
+}
+table.form .h-sign{                       /* 签名位空栏（打印后手签） */
+  color:#666;font-size:8.5pt;
+}
+/* 嵌套表：用于「接收/处理意见」这类分格 */
+table.form table.inner{width:100%;border-collapse:collapse;table-layout:fixed}
+table.form table.inner td{border:0;border-left:var(--line-w) solid var(--line);padding:.8mm 1.4mm}
+table.form table.inner td:first-child{border-left:0}
+
+/* 复选框样式（□ / ■），用文字而非控件，贴合纸质单据 */
+.cb{font-family:var(--sans);font-size:9pt;letter-spacing:0}
+.cb .box{margin:0 1mm 0 3mm}
+.cb .box:first-child{margin-left:0}
+.cb .on::before{content:"☑ "}
+.cb .off::before{content:"☐ "}
+
+/* 手写批注模拟（仅用于示意已签署内容） */
+.sign{font-family:var(--hand);font-size:12pt;color:#111}
+.sign .date{font-family:var(--ui);font-size:8.5pt;color:#333;margin-left:2mm}
+
+/* 处理意见区（多行） */
+.op-cell{vertical-align:top;padding:1.2mm 1.6mm}
+.op-cell .op{margin-bottom:1mm}
+.op-cell .stamp{font-family:var(--ui);font-size:8.5pt;color:#444;text-align:right}
+
+/* 空行占位（打印后手写） */
+.blank-lines{color:#bbb;letter-spacing:.5px}
+.sign-line{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-size:9pt;color:#333;padding-top:2mm;
+}
+.sign-line .lbl2{white-space:nowrap}
+
+/* ---------- 审批记录流水（子公司内部审批单） ---------- */
+table.flow{width:100%;border-collapse:collapse;table-layout:fixed}
+table.flow td{border:var(--line-w) solid var(--line);padding:.9mm 1.6mm;font-size:9.5pt;vertical-align:top;line-height:1.5}
+table.flow td.stage{text-align:center;vertical-align:middle;white-space:nowrap}
+table.flow tr.grp td{background:transparent;text-align:center;font-weight:400}
+table.flow .who{font-family:var(--ui)}
+table.flow .time{font-family:var(--ui);font-size:8.5pt;color:#333}
+table.flow .state{font-family:var(--ui)}
+table.flow .attach{font-size:8.5pt;color:#333}
+
+/* ---------- 页脚 ---------- */
+.foot{
+  position:absolute;left:12mm;right:12mm;bottom:6mm;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:8pt;color:#444;border-top:var(--line-w) solid #999;padding-top:1.2mm;
+}
+.foot .pnum{font-variant-numeric:tabular-nums}
+/* 品牌标识：打印稿白底，logo 的白底自然融合，无需承托砖 */
+.foot .flogo{height:8mm;width:auto;display:block;flex:none}
+.foot .fbrand{display:flex;align-items:center;gap:2mm}
+
+/* ---------- 打印规则 ---------- */
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff}
+  .bar{display:none !important}
+  .notes{display:none !important}
+  .sheet{
+    width:210mm;margin:0;padding:12mm 12mm 10mm;
+    box-shadow:none;page-break-after:always;break-after:page;
+  }
+  .sheet:last-of-type{page-break-after:auto;break-after:auto}
+  table.form td,table.form th,table.flow td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media screen and (max-width:900px){
+  .sheet{width:100%;min-height:0;padding:12px 10px}
+  .bar{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <b>审批单打印稿 · A4 实际尺寸</b>
+  <div class="nav">
+    <a href="#p1">P1 集团合同类文件流转审批单</a>
+    <a href="#p2">P2 资金审批单</a>
+    <a href="#p3">P3 子公司内部审批单</a>
+    <a href="#p4">P4 印鉴证照审批单</a>
+  </div>
+  <span class="meta" id="fit">正在测量 A4 版面…</span>
+</div>
+
+<div class="notes">
+  <details>
+    <summary>本稿依据的五项业务确认（2026-07-09）</summary>
+    <ul>
+      <li><b>Q8 计划类别</b>（计划内/计划外）：纳入字段，<b>一期只存储数据</b>，不参与任何流程判断；后续并入计划管理模块。</li>
+      <li><b>Q9 付款归属</b>（本月度/本年度/以前年度）：同上，<b>默认勾选「本月度」</b>。</li>
+      <li><b>Q10 事项分类</b>：取值改为<b>配置项</b>（数据字典可增删），新增「投资」；<b>五个类别统一归属财务部，不细分</b> —— 事项分类不再决定归口部门。</li>
+      <li><b>Q11 / Q12 归口节点合并</b>（分两步确认）：先确认「财务部复核」与「集团归口部门」<b>是同一件事</b>，再确认分公司层的「归口部门负责人」<b>也并入</b>——最终由财务部<b>一个节点</b>完成费用复核与集团归口审批、只审一次；主干由 10 个节点减为 <b>8 个</b>；撤回边界随之前移。</li>
+      <li><b>连带简化</b>：一期"分支"只剩事项审批单的「是否涉及费用」；该节点被跳过时，归口部门仍记为财务部（仅状态为「已跳过」）。</li>
+    </ul>
+  </details>
+</div>
+
+<!-- ============================================================
+     P1 · 集团合同类文件流转审批单（对应参考图 1）
+     ============================================================ -->
+<div class="sheet" id="p1">
+  <h1 class="doc-title">集团合同类文件流转审批单</h1>
+
+  <table class="form">
+    <colgroup>
+      <col style="width:15mm"><col style="width:42mm">
+      <col style="width:15mm"><col style="width:22mm">
+      <col style="width:15mm"><col style="width:25mm"><col style="width:36mm">
+    </colgroup>
+    <tbody>
+      <!-- 行1 -->
+      <tr>
+        <td class="lbl">提报单位</td>
+        <td class="val c">智澈公司</td>
+        <td class="lbl">责任部门</td>
+        <td class="val c">经发部</td>
+        <td class="lbl">报送时间</td>
+        <td class="val c mono" colspan="2">2026.7.24</td>
+      </tr>
+      <!-- 行2 -->
+      <tr>
+        <td class="lbl">合同编号</td>
+        <td class="val c mono">YX20260724-02</td>
+        <td class="lbl">合同扫描件编号</td>
+        <td class="val c mono">—</td>
+        <td class="lbl">报送人</td>
+        <td class="val c" colspan="2">郑妍</td>
+      </tr>
+      <!-- 行3 -->
+      <tr>
+        <td class="lbl">合同全称</td>
+        <td class="val" colspan="6">忻州热力户端智能管控项目委托施工合同（龙展）</td>
+      </tr>
+      <!-- 行4 -->
+      <tr>
+        <td class="lbl" rowspan="2">合同签订主体<br><span class="tiny">（全称）</span></td>
+        <td class="val" colspan="6">甲方：云羲（山西）数字科技有限公司</td>
+      </tr>
+      <tr>
+        <td class="val" colspan="6">乙方：龙展建设有限公司</td>
+      </tr>
+      <!-- 行5 -->
+      <tr>
+        <td class="lbl">合同金额</td>
+        <td class="val amount c">124,000</td>
+        <td class="lbl">履约期限</td>
+        <td class="val c mono" colspan="2">2026.6.1.—2026.6.15</td>
+        <td class="lbl">合同签订时间</td>
+        <td class="val c mono">2026.6.1</td>
+      </tr>
+      <!-- 行6 -->
+      <tr>
+        <td class="lbl">附送材料</td>
+        <td class="val" colspan="6">
+          合同文本（一式四份）、企业资质文件、授权委托书
+        </td>
+      </tr>
+      <!-- 行7 -->
+      <tr>
+        <td class="lbl">相关说明</td>
+        <td class="val big" colspan="6">
+          根据户端管控项目需要，签订委托施工框架合同，进行旧管路的拆除；过滤球阀、热量表、智能锁闭阀、测温球阀设备的安装与调试和系统录入。<br>
+          工程规模：1000 户　　　单户造价：124 元/户<br>
+          合同金额 124,000 元，本合同一式 4 份，甲方 3 份，乙方 1 份。现申请使用云羲（山西）数字科技有限公司公章 8 枚（含骑缝章 4 枚），聂东南法人名章 4 枚。企业资质文件资料附后。
+        </td>
+      </tr>
+      <!-- 行8~10：公文接收及处理（对应流转链，每部门一块） -->
+      <tr>
+        <td class="lbl" rowspan="3">公文接收<br>及处理</td>
+        <td colspan="6" style="padding:0">
+          <table class="inner">
+            <tr>
+              <td style="width:52mm">接收单位：<span class="val" style="padding:0 1mm">经发部</span></td>
+              <td style="width:44mm">接收人：<span class="val" style="padding:0 1mm">王海</span></td>
+              <td>签收时间：<span class="mono">2026.7.28</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="op-cell" colspan="6">
+          <div class="op">
+            处理意见：户端 2 期 1000 户，单价 124 元/户，质保金 3%，质保期 180 天，保修二年。
+            项目部原要求签订施工合同 <span class="sign">周成祥</span>，做好成本核算。
+          </div>
+          <div class="stamp">赵杰　2026.07.28</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="6" class="c" style="font-size:8.5pt;color:#666">
+          （如无流转，本栏留空；系统打印时按实际流转链生成，最多 3 段）
+        </td>
+      </tr>
+
+      <!-- 行11：其他会审部门（多选，取自数据字典；归口统一为财务部后本栏为"参与会审的部门"） -->
+      <tr>
+        <td class="lbl">其他会审部门</td>
+        <td colspan="6" class="cb" style="padding:1.4mm 2mm">
+          <span class="box off">经营</span>
+          <span class="box on">经济</span>
+          <span class="box off">人力</span>
+          <span class="box on">行政</span>
+          <span class="box off">投资</span>
+          <span class="box off">法务</span>
+        </td>
+      </tr>
+
+      <!-- 行12~14：又一轮接收与处理 -->
+      <tr>
+        <td class="lbl" rowspan="3">公文接收<br>及处理</td>
+        <td colspan="6" style="padding:0">
+          <table class="inner">
+            <tr>
+              <td style="width:52mm">接收单位：<span class="val" style="padding:0 1mm">财务部</span></td>
+              <td style="width:44mm">接收人：<span class="val" style="padding:0 1mm">李四</span></td>
+              <td>签收时间：<span class="mono">2026.7.28　11:37</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="op-cell" colspan="6">
+          <div class="op">处理意见：做好合同款项管理。</div>
+          <div class="stamp">郑秀林　7.28</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="6" style="height:12mm" class="op-cell">
+          <span class="blank-lines">处理意见：</span>
+        </td>
+      </tr>
+
+      <!-- 行15~17：第三轮接收与处理 -->
+      <tr>
+        <td class="lbl" rowspan="3">公文接收<br>及处理</td>
+        <td colspan="6" style="padding:0">
+          <table class="inner">
+            <tr>
+              <td style="width:52mm">接收单位：<span class="val" style="padding:0 1mm">企管部</span></td>
+              <td style="width:44mm">接收人：<span class="val" style="padding:0 1mm">席敏</span></td>
+              <td>签收时间：<span class="mono">7.28　15:20</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="op-cell" colspan="6">
+          <div class="op">处理意见：三级级审核，同意。</div>
+          <div class="stamp">建议推动　<span class="sign">刘东</span>　7.28</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="6" style="height:12mm" class="op-cell">
+          <span class="blank-lines">处理意见：</span>
+        </td>
+      </tr>
+
+      <!-- 行18：集团领导意见（分管领导 + 董事长 合并一格） -->
+      <tr>
+        <td class="lbl">集团领导意见</td>
+        <td colspan="6" class="op-cell big" style="height:34mm">
+          <div style="margin-bottom:6mm">
+            <span style="font-size:9.5pt">集团分管领导意见：</span>
+            <span class="sign">同意报批。</span>
+            <span class="sign">李武</span><span class="sign date">26-7-26</span>
+          </div>
+          <div>
+            <span style="font-size:9.5pt">集团董事长意见：</span>
+            <span class="sign">同意</span>
+            <span class="sign">Wang</span>
+          </div>
+          <div class="sign-line" style="margin-top:4mm">
+            <span class="lbl2">签字：______________________</span>
+            <span class="lbl2">日期：______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行19：公文回传 -->
+      <tr>
+        <td class="lbl">公文回传</td>
+        <td class="lbl" style="border-right:0">回传部门</td>
+        <td class="val c" colspan="2">经发部</td>
+        <td class="lbl">回传时间</td>
+        <td class="val c mono">2026.7.28</td>
+        <td class="lbl">回传人：<span class="val" style="padding:0 1mm">王海</span></td>
+      </tr>
+
+      <!-- 行20：印鉴证照管理部门 -->
+      <tr>
+        <td class="lbl">印鉴证照<br>管理部门</td>
+        <td colspan="6" class="op-cell" style="height:16mm">
+          <div class="tiny" style="color:#666">用印登记：公章 8 枚（含骑缝章 4 枚）、法人名章 4 枚 —— 由集团办登记并留档</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <span class="fbrand"><img class="flogo" src="logo-180.png" alt="集团标识">集团OA审批系统 · 集团合同类文件流转审批单</span>
+    <span>单号 <span class="mono">OA-2026-000420</span> · 模板 v3 · 生成于 2026-07-28 10:12</span>
+    <span class="pnum">第 1 页 / 共 1 页</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     P2 · 资金审批单（对应参考图 2）
+     ============================================================ -->
+<div class="sheet" id="p2">
+  <h1 class="doc-title">资金审批单</h1>
+
+  <table class="form">
+    <colgroup>
+      <col style="width:28mm"><col style="width:23mm"><col style="width:23mm">
+      <col style="width:23mm"><col style="width:23mm"><col style="width:23mm">
+      <col style="width:23mm">
+    </colgroup>
+    <tbody>
+      <!-- 行1：审批单位 -->
+      <tr>
+        <td class="lbl">审批单位</td>
+        <td class="val" colspan="6">太原智澈节能科技有限公司</td>
+      </tr>
+
+      <!-- 行2：事项分类（配置项，含投资；五类统一归口财务部，不参与路由） -->
+      <tr>
+        <td class="lbl">事项分类</td>
+        <td colspan="6" class="cb" style="padding:1.4mm 2mm">
+          <span class="box on">经营</span>
+          <span class="box off">经济</span>
+          <span class="box off">行政</span>
+          <span class="box off">人力</span>
+          <span class="box off">投资</span>
+        </td>
+      </tr>
+
+      <!-- 行3：计划类别（Q8 已确认：一期只存数据，不参与流程判断；默认计划内） -->
+      <tr>
+        <td class="lbl">计划类别</td>
+        <td colspan="3" class="cb" style="padding:1.4mm 2mm"><span class="box on">计划内</span></td>
+        <td colspan="3" class="cb" style="padding:1.4mm 2mm"><span class="box off">计划外</span></td>
+      </tr>
+
+      <!-- 行4：付款归属（Q9 已确认：一期只存数据；默认本月度） -->
+      <tr>
+        <td class="lbl">付款归属</td>
+        <td colspan="6" class="cb" style="padding:1.4mm 2mm">
+          <span class="box on">本月度</span>
+          <span class="box off">本年度</span>
+          <span class="box off">以前年度</span>
+        </td>
+      </tr>
+
+      <!-- 行5：资金审批内容 -->
+      <tr>
+        <td class="lbl">资金审批内容</td>
+        <td colspan="6" class="big" style="padding:2mm 2.4mm;line-height:1.75">
+          以下合同已完成审批，申请预付款项：<br>
+          忻州热力户端智能管控项目委托施工合同（日月峰　金额：639,600 元），申请预付 15%，即 95,940 元<br>
+          忻州热力户端智能管控项目委托施工合同（股铁　金额：325,000 元），申请预付 15%，即 48,750 元<br>
+          忻州热力户端智能管控项目委托施工合同（龙展　金额：124,000 元），申请预付 15%，即 18,600 元<br>
+          <b>合计 163,290 元</b>
+        </td>
+      </tr>
+
+      <!-- 行6：集团归口部门（Q10 后统一为财务部；实单标签保持「集团职能部门」） -->
+      <tr>
+        <td class="lbl">集团职能部门</td>
+        <td colspan="6" class="op-cell" style="height:34mm">
+          <div class="sign" style="margin-bottom:2mm">对应已审批合同签字，申请支付</div>
+          <div class="sign" style="text-align:right">高建　7.26</div>
+          <div class="sign-line" style="margin-top:14mm">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行7：集团分管领导 -->
+      <tr>
+        <td class="lbl">集团分管领导</td>
+        <td colspan="6" class="op-cell" style="height:34mm">
+          <div class="sign" style="margin-bottom:2mm">同意报批。</div>
+          <div class="sign" style="text-align:right">李武　7.26</div>
+          <div class="sign-line" style="margin-top:14mm">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行8：集团董事长 -->
+      <tr>
+        <td class="lbl">集团董事长</td>
+        <td colspan="6" class="op-cell" style="height:34mm">
+          <div class="sign-line" style="margin-top:20mm">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 行9：附：系统侧关联信息（打印稿可选，便于归档核对） -->
+      <tr>
+        <td class="lbl tiny">系统关联</td>
+        <td colspan="6" class="tiny" style="padding:1.4mm 2mm;color:#222">
+          关联合同单号：<span class="mono">OA-2026-000420</span>、<span class="mono">OA-2026-000421</span>、<span class="mono">OA-2026-000422</span>　·　
+          审批链：直属部门负责人 → <b>财务部复核（= 集团归口部门，同一节点 · 只审一次）</b> → 分公司分管领导 → 子公司总经理 → 集团分管领导 → 集团董事长 → 归档登记　·　事项分类、计划类别、付款归属均<b>不参与路由</b>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <span class="fbrand"><img class="flogo" src="logo-180.png" alt="集团标识">集团OA审批系统 · 资金审批单</span>
+    <span>单号 <span class="mono">OA-2026-000423</span> · 模板 v3 · 生成于 2026-07-26 16:40</span>
+    <span class="pnum">第 1 页 / 共 1 页</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     P3 · 子公司内部审批单（对应参考图 3，竖向字段 + 审批记录流水）
+     ============================================================ -->
+<div class="sheet" id="p3">
+  <div class="doc-meta">
+    <span class="left">申请编号：202607240005</span>
+    <span class="right">
+      打印人：郑妍<br>
+      打印时间：2026-07-24 16:51
+    </span>
+  </div>
+
+  <h1 class="doc-title">忻州热力户端智能管控项目委托施工合同（龙展）合同申请</h1>
+
+  <table class="flow">
+    <colgroup>
+      <col style="width:26mm"><col style="width:54mm"><col style="width:26mm"><col>
+    </colgroup>
+    <tbody>
+      <tr>
+        <td class="stage lbl">申请人</td><td class="val">郑妍</td>
+        <td class="stage lbl">申请时间</td><td class="val mono">2026-07-24</td>
+      </tr>
+      <tr>
+        <td class="stage lbl">所属部门</td><td class="val">营销部</td>
+        <td class="stage lbl">审批状态</td><td class="val">审批中</td>
+      </tr>
+
+      <tr class="grp"><td colspan="4"><b>审批详情</b></td></tr>
+
+      <tr>
+        <td class="stage lbl">合同名称</td>
+        <td class="val" colspan="3">忻州热力户端智能管控项目委托施工合同（龙展）</td>
+      </tr>
+      <tr>
+        <td class="stage lbl">合同描述</td>
+        <td class="val" colspan="3" style="line-height:1.6">
+          根据户端管控项目需要，签订委托施工框架合同，进行旧管路的拆除；过滤球阀、热量表、智能锁闭阀、测温球阀设备的安装与调试和系统录入。<br>
+          工程规模：1000 户<br>
+          单户造价：124 元/户<br>
+          合同金额 124,000 元，本合同一式 4 份，甲方 3 份，乙方 1 份。现申请使用云羲（山西）数字科技有限公司公章 8 枚（含骑缝章 4 枚），聂东南法人名章 4 枚。企业资质文件资料附后。
+        </td>
+      </tr>
+
+      <tr class="grp"><td colspan="4"><b>合同有效期</b></td></tr>
+      <tr>
+        <td class="stage lbl">开始时间-结束时间</td>
+        <td class="val mono" colspan="3">2026-06-01 至 2027-06-01　时长 366 天</td>
+      </tr>
+
+      <tr class="grp"><td colspan="4"><b>我方信息</b></td></tr>
+      <tr>
+        <td class="stage lbl">签订公司</td>
+        <td class="val" colspan="3">云羲（山西）数字科技有限公司</td>
+      </tr>
+
+      <tr class="grp"><td colspan="4"><b>对方信息</b></td></tr>
+      <tr>
+        <td class="stage lbl">对方单位名称</td>
+        <td class="val" colspan="3">龙展建设有限公司</td>
+      </tr>
+
+      <tr class="grp"><td colspan="4"><b>审批记录</b></td></tr>
+
+      <tr>
+        <td class="stage lbl">发起</td>
+        <td colspan="3">
+          <div class="who">郑妍 / 发起审批 / <span class="time">2026-07-24 12:39</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">抄送</td>
+        <td colspan="3">
+          <div class="who">系统 / 抄送 1 人　王雅欣 / <span class="time">2026-07-24 12:39</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">系统 / 审批人与发起人为同一人，自动跳过 / <span class="time">2026-07-24 12:39</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">郑妍 / 评论 / <span class="time">2026-07-24 12:42</span></div>
+          <div class="attach">附件：队工墙补专项会议纪要 / 附件：1 个</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">杨雅娴 / 已通过 / <span class="time">2026-07-24 14:34</span></div>
+          <div>建议办理　<span class="sign">杨雅娴</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">王玺钧 / 已通过 / <span class="time">2026-07-24 15:31</span></div>
+          <div>符合项目建设需要，后附比价及会议决议结果，请各部门审批</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">闫德忠 / 已通过 / <span class="time">2026-07-24 15:34</span></div>
+          <div>同意报批　<span class="sign">闫德忠</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">降泽宇 / 已撤回 / <span class="time">2026-07-24 15:41</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">降泽宇 / 已通过 / <span class="time">2026-07-24 15:44</span></div>
+          <div>合同约定工期已过，请核实工程是否已竣工交付，合同款项履行情况请核实。</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">审批</td>
+        <td colspan="3">
+          <div class="who">聂东南 / 已通过 / <span class="time">2026-07-24 16:29</span></div>
+          <div>同意</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">抄送</td>
+        <td colspan="3">
+          <div class="who">系统 / 抄送 5 人　李玥洋、郑妍、官鑫、杨雅娴、樊娟娟 / <span class="time">2026-07-24 16:29</span></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="stage lbl">上传备案</td>
+        <td colspan="3">
+          <div class="who">王雅欣 / 审批中 / -</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <span class="fbrand"><img class="flogo" src="logo-180.png" alt="集团标识">集团OA审批系统 · 子公司合同申请（内部审批单）</span>
+    <span>单号 <span class="mono">OA-2026-000420</span> · 子公司留存联</span>
+    <span class="pnum">第 1 页 / 共 1 页</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     P4 · 印鉴证照审批单（系统自有单据，沿用集团单版式）
+     ============================================================ -->
+<div class="sheet" id="p4">
+  <h1 class="doc-title">印鉴证照使用审批单</h1>
+
+  <table class="form">
+    <colgroup>
+      <col style="width:28mm"><col style="width:22mm"><col style="width:22mm">
+      <col style="width:24mm"><col style="width:22mm"><col style="width:24mm">
+      <col style="width:22mm">
+    </colgroup>
+    <tbody>
+      <tr>
+        <td class="lbl">用印单位</td>
+        <td class="val" colspan="3">云羲（山西）数字科技有限公司</td>
+        <td class="lbl">用印日期</td>
+        <td class="val mono" colspan="2">2026.7.24</td>
+      </tr>
+      <tr>
+        <td class="lbl">用印类型</td>
+        <td colspan="6" class="cb" style="padding:1.4mm 2mm">
+          <span class="box on">公章</span>
+          <span class="box off">合同章</span>
+          <span class="box off">财务章</span>
+          <span class="box off">法人章</span>
+          <span class="box off">证照借用</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">用印份数</td>
+        <td class="val c" colspan="2">8 枚（含骑缝 4 枚）</td>
+        <td class="lbl">证照名称</td>
+        <td class="val c" colspan="3">—</td>
+      </tr>
+      <tr>
+        <td class="lbl">使用期限</td>
+        <td class="val mono c" colspan="3">2026.7.24 — 2026.7.31</td>
+        <td class="lbl">是否对外提供</td>
+        <td class="val c" colspan="2">是</td>
+      </tr>
+      <tr>
+        <td class="lbl">用途说明</td>
+        <td class="val big" colspan="6" style="padding:2mm 2.4mm">
+          用于《忻州热力户端智能管控项目委托施工合同（龙展）》签署，甲方留存 3 份、乙方 1 份，需加盖公章及骑缝章；同时使用法人名章 4 枚。企业资质文件资料附后。
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">关联单据</td>
+        <td class="val mono" colspan="6">OA-2026-000420（集团合同类文件流转审批单）</td>
+      </tr>
+
+      <tr>
+        <td class="lbl">子公司审批</td>
+        <td colspan="6" class="op-cell" style="height:26mm">
+          <div class="who" style="font-size:9.5pt">经办人：郑妍　·　部门负责人：杨雅娴（已通过）</div>
+          <div class="sign-line" style="margin-top:10mm">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="lbl">集团职能部门</td>
+        <td colspan="6" class="op-cell" style="height:30mm">
+          <div class="sign-line" style="margin-top:14mm">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="lbl">集团领导意见</td>
+        <td colspan="6" class="op-cell" style="height:34mm">
+          <div style="margin-bottom:5mm"><span style="font-size:9.5pt">集团分管领导意见：</span></div>
+          <div class="sign-line">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+          <div style="margin:6mm 0 2mm"><span style="font-size:9.5pt">集团董事长意见：</span></div>
+          <div class="sign-line">
+            <span class="lbl2">签名：______________________</span>
+            <span class="lbl2">______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="lbl">印鉴证照<br>管理部门</td>
+        <td colspan="6" class="op-cell" style="height:26mm">
+          <div class="tiny" style="color:#666">用印登记（集团办填写）：实际用印 __ 枚，其中骑缝 __ 枚；证件归还状态：☐ 已归还　☐ 无需归还</div>
+          <div class="sign-line" style="margin-top:8mm">
+            <span class="lbl2">登记人：______________________</span>
+            <span class="lbl2">归还时间：______ 年 ______ 月 ______ 日</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <span class="fbrand"><img class="flogo" src="logo-180.png" alt="集团标识">集团OA审批系统 · 印鉴证照使用审批单</span>
+    <span>单号 <span class="mono">OA-2026-000415</span> · 模板 v3 · 生成于 2026-07-24 16:52</span>
+    <span class="pnum">第 1 页 / 共 1 页</span>
+  </div>
+</div>
+
+<script>
+// A4 版面自检：把每张 .sheet 的渲染高度换算成毫米，与 297mm 对比
+// 注意：仅在屏宽足以按 210mm 渲染时测量（窄屏会回流，读数无意义）
+(function () {
+  var MM = 96 / 25.4; // CSS px per mm
+  var el = document.getElementById('fit');
+  function measure() {
+    var sheets = document.querySelectorAll('.sheet');
+    var out = [];
+    var ok = true;
+    sheets.forEach(function (s, i) {
+      var hMM = s.getBoundingClientRect().height / MM;
+      var over = hMM > 297.5;
+      if (over) ok = false;
+      out.push('P' + (i + 1) + ' ' + hMM.toFixed(0) + 'mm' + (over ? '✗' : '✓'));
+    });
+    el.textContent = 'A4 实测高度（限 297mm）：' + out.join('  ') +
+      (ok ? '　→ 全部单页可容纳' : '　→ 有页面超出，需缩减内容或缩小字号');
+    el.style.color = ok ? '#7ee2a8' : '#ff9a9a';
+  }
+  if (window.innerWidth >= 880) {
+    measure();
+    window.addEventListener('resize', measure);
+  } else {
+    el.textContent = '窗口过窄，无法按 210mm 实测；请最大化窗口或直接打印预览（Ctrl+P）';
+  }
+})();
+</script>
+</body>
+</html>

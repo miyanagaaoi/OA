@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.audit.security",
+  "updated_at": "2026-10-02T08:01:28.532Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：权限变更与登录事件分别留痕，再由安全日志审计视图联合检索、分析失败登录并导出。",
+    "en": "Left to right: permission changes and login events are logged separately, then the security review view queries, analyses failed logins and exports."
+  },
+  "order": [
+    "oa.audit.security.permission-change",
+    "oa.audit.security.login",
+    "oa.audit.security.review"
+  ]
+}

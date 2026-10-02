@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.notify",
+  "updated_at": "2026-10-02T08:03:01.714Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "按触发时序阅读：待办产生先写站内信（inbox）并异步发邮件（mail）；抄送提供只读可见性（cc）；节点或补件超时后只催办、不自动跳过也不自动升级（reminder）。",
+    "en": "Read in trigger order: a new task writes the in-app message (inbox) and asynchronously sends mail (mail); CC grants read-only visibility (cc); an overdue node or supplement only triggers a reminder (reminder), never an automatic skip or escalation."
+  },
+  "order": [
+    "oa.notify.inbox",
+    "oa.notify.mail",
+    "oa.notify.cc",
+    "oa.notify.reminder"
+  ],
+  "groups": [
+    {
+      "id": "channel",
+      "title": {
+        "zh": "通知渠道",
+        "en": "Delivery Channels"
+      },
+      "children": [
+        "oa.notify.inbox",
+        "oa.notify.mail"
+      ]
+    },
+    {
+      "id": "visibility",
+      "title": {
+        "zh": "可见性与催办",
+        "en": "Visibility & Reminders"
+      },
+      "children": [
+        "oa.notify.cc",
+        "oa.notify.reminder"
+      ]
+    }
+  ]
+}

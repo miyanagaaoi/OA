@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.template.attachment",
+  "updated_at": "2026-10-02T08:05:07.920Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "按上传链路：策略校验（格式与大小）→ 私有存储与鉴权下载 → 补件轮次标记。",
+    "en": "Along the upload path: policy checks (format and size), private storage with authorized download, then supplement round marking."
+  },
+  "order": [
+    "oa.form.template.attachment.upload-policy",
+    "oa.form.template.attachment.storage-access",
+    "oa.form.template.attachment.round-marking"
+  ]
+}

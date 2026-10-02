@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "oa.audit.trace",
+  "updated_at": "2026-10-02T08:01:28.358Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：轨迹事件先只追加写入并挂载签名记录，再由时间轴与决议结论视图对外呈现。",
+    "en": "Left to right: trail events are appended and their signatures linked, then the timeline and decision-consensus views present them."
+  },
+  "order": [
+    "oa.audit.trace.thread",
+    "oa.audit.trace.signature-link",
+    "oa.audit.trace.timeline",
+    "oa.audit.trace.consensus"
+  ],
+  "groups": [
+    {
+      "id": "ingest",
+      "title": {
+        "zh": "轨迹采集",
+        "en": "Trail Capture"
+      },
+      "children": [
+        "oa.audit.trace.thread",
+        "oa.audit.trace.signature-link"
+      ]
+    },
+    {
+      "id": "present",
+      "title": {
+        "zh": "轨迹呈现",
+        "en": "Trail Presentation"
+      },
+      "children": [
+        "oa.audit.trace.timeline",
+        "oa.audit.trace.consensus"
+      ]
+    }
+  ],
+  "edge_hints": [
+    {
+      "from": "oa.audit.trace.timeline",
+      "to": "oa.audit.trace.thread",
+      "kind": "dataflow",
+      "lane": 2,
+      "style": "curve"
+    }
+  ]
+}

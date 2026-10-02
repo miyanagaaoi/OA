@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.security.crypto",
+  "updated_at": "2026-10-02T08:00:16.806Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：密码单向哈希、个人信息可逆加密（读取时脱敏），两套密钥统一轮换。",
+    "en": "Left to right: passwords are hashed (one-way), PII is encrypted (reversible, masked on read), and the keys behind both are rotated."
+  },
+  "order": [
+    "oa.platform.security.crypto.hash",
+    "oa.platform.security.crypto.encrypt",
+    "oa.platform.security.crypto.keys"
+  ]
+}

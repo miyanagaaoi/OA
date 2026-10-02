@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.seal.special",
+  "updated_at": "2026-10-02T08:05:19.539Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "提交时的借用联动在前，审批中唯一例外的归还字段白名单在后。",
+    "en": "Borrow linkage applies at submission; the whitelist for the return fields — the sole in-approval exception — follows."
+  },
+  "order": [
+    "oa.form.seal.special.cert-borrow-linkage",
+    "oa.form.seal.special.return-editable"
+  ]
+}

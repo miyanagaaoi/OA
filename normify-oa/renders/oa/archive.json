@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.archive",
+  "updated_at": "2026-10-02T08:01:28.121Z",
+  "mode": "layers",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：归档策略先把满 3 年的完结单据整单搬迁到历史库并置为只读，历史检索再按单号定位、预览并导出归档数据。",
+    "en": "Left to right: the archive policy moves documents finished three years ago into the history store and freezes them read-only, then history search locates, previews and exports archived data."
+  },
+  "order": [
+    "oa.archive.policy",
+    "oa.archive.search"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.designer",
+  "updated_at": "2026-10-02T08:03:41.900Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：画布编排节点、填写节点属性、执行发布前校验，最后由管理后台发布新版本。",
+    "en": "Left to right: orchestrate nodes on the canvas, fill in node properties, run the pre-publish checks, then publish a new version through the admin console."
+  },
+  "order": [
+    "oa.workflow.designer.canvas",
+    "oa.workflow.designer.node-editor",
+    "oa.workflow.designer.validation",
+    "oa.workflow.designer.publish"
+  ],
+  "groups": [
+    {
+      "id": "author",
+      "title": {
+        "zh": "编排与配置",
+        "en": "Authoring"
+      },
+      "children": [
+        "oa.workflow.designer.canvas",
+        "oa.workflow.designer.node-editor"
+      ]
+    },
+    {
+      "id": "ship",
+      "title": {
+        "zh": "校验与发布",
+        "en": "Validate & Publish"
+      },
+      "children": [
+        "oa.workflow.designer.validation",
+        "oa.workflow.designer.publish"
+      ]
+    }
+  ]
+}

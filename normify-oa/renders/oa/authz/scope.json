@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "oa.authz.scope",
+  "updated_at": "2026-10-02T08:05:15.648Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右是一条口径管道：口径取值（self/dept/company/group_all/group_category）→ 用户数据域解析（多角色取最宽）→ 查询过滤条件 → 越权拦截；归口类别口径作为并行输入汇入过滤。",
+    "en": "Left to right is one pipeline: scope catalog (self/dept/company/group_all/group_category) → user scope resolution (widest wins) → query filters → access denial; the category scope feeds the filter as a parallel input."
+  },
+  "order": [
+    "oa.authz.scope.catalog",
+    "oa.authz.scope.category",
+    "oa.authz.scope.resolve",
+    "oa.authz.scope.filter",
+    "oa.authz.scope.isolation"
+  ]
+}

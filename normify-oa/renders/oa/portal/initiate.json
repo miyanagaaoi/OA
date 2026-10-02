@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.initiate",
+  "updated_at": "2026-10-02T08:07:09.542Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从四类单据入口进入 → 单列表单填写 → 右侧吸附目录定位 → 附件上传 → 中途离开时回到草稿箱续编。",
+    "en": "Enter from the four document types, fill the single-column form, jump with the sticky index, upload attachments and resume from the draft box after leaving midway."
+  },
+  "order": [
+    "oa.portal.initiate.catalog",
+    "oa.portal.initiate.form",
+    "oa.portal.initiate.toc",
+    "oa.portal.initiate.upload",
+    "oa.portal.initiate.draft"
+  ],
+  "groups": [
+    {
+      "id": "entry",
+      "title": {
+        "zh": "入口与导航",
+        "en": "Entry & Navigation"
+      },
+      "children": [
+        "oa.portal.initiate.catalog",
+        "oa.portal.initiate.toc"
+      ]
+    },
+    {
+      "id": "fill",
+      "title": {
+        "zh": "填写主体",
+        "en": "Filling Surface"
+      },
+      "children": [
+        "oa.portal.initiate.form",
+        "oa.portal.initiate.upload"
+      ]
+    },
+    {
+      "id": "resume",
+      "title": {
+        "zh": "中断恢复",
+        "en": "Resume"
+      },
+      "children": [
+        "oa.portal.initiate.draft"
+      ]
+    }
+  ]
+}

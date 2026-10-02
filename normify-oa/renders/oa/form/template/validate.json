@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.template.validate",
+  "updated_at": "2026-10-02T08:05:07.207Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "服务端按模板 schema 逐类校验：基础必填与长度 → 数值金额与文件 → 依赖字段的条件必填；前端校验仅为体验。",
+    "en": "The server validates by schema category: required and length first, then amounts and files, then conditional requiredness; front-end checks are convenience only."
+  },
+  "order": [
+    "oa.form.template.validate.required-length",
+    "oa.form.template.validate.date",
+    "oa.form.template.validate.amount",
+    "oa.form.template.validate.file",
+    "oa.form.template.validate.conditional"
+  ],
+  "groups": [
+    {
+      "id": "val-base",
+      "title": {
+        "zh": "基础规则",
+        "en": "Base rules"
+      },
+      "children": [
+        "oa.form.template.validate.required-length",
+        "oa.form.template.validate.date"
+      ]
+    },
+    {
+      "id": "val-value",
+      "title": {
+        "zh": "数值与文件",
+        "en": "Values & files"
+      },
+      "children": [
+        "oa.form.template.validate.amount",
+        "oa.form.template.validate.file"
+      ]
+    },
+    {
+      "id": "val-conditional",
+      "title": {
+        "zh": "联动必填",
+        "en": "Conditional"
+      },
+      "children": [
+        "oa.form.template.validate.conditional"
+      ]
+    }
+  ]
+}

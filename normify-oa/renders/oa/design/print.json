@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.print",
+  "updated_at": "2026-10-02T08:07:26.830Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "先确立纸张、版心与打印专用规则 → 再落到集团单与子公司单两种版式 → 最后由页脚与打印字段映射收尾。",
+    "en": "Paper, type area and print-only rules come first, then the group and subsidiary sheet layouts, finished by the footer and the print field mapping."
+  },
+  "order": [
+    "oa.design.print.page",
+    "oa.design.print.rules",
+    "oa.design.print.group-sheet",
+    "oa.design.print.subsidiary-sheet",
+    "oa.design.print.header-footer",
+    "oa.design.print.field-map"
+  ],
+  "groups": [
+    {
+      "id": "paper",
+      "title": {
+        "zh": "纸张与规则",
+        "en": "Paper & Rules"
+      },
+      "children": [
+        "oa.design.print.page",
+        "oa.design.print.rules"
+      ]
+    },
+    {
+      "id": "sheet",
+      "title": {
+        "zh": "单据版式",
+        "en": "Sheet Layouts"
+      },
+      "children": [
+        "oa.design.print.group-sheet",
+        "oa.design.print.subsidiary-sheet"
+      ]
+    },
+    {
+      "id": "delivery",
+      "title": {
+        "zh": "交付细节",
+        "en": "Delivery Details"
+      },
+      "children": [
+        "oa.design.print.header-footer",
+        "oa.design.print.field-map"
+      ]
+    }
+  ]
+}

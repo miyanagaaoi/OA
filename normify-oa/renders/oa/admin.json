@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin",
+  "updated_at": "2026-10-02T08:03:42.552Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "按配置动线从左到右阅读：先选对象（组织与人员、数据字典），再配规则（流程与表单、权限与数据域），然后看运行结果（报表），最后是管理员自身的权力边界。",
+    "en": "Read left to right along the configuration flow: pick the objects first (org and staff, dictionary), then set the rules (process and forms, permissions and data scope), then read the results (reports), and finally the administrator's own boundaries."
+  },
+  "order": [
+    "oa.admin.org",
+    "oa.admin.dict",
+    "oa.admin.flow",
+    "oa.admin.authz",
+    "oa.admin.report",
+    "oa.admin.boundary"
+  ],
+  "groups": [
+    {
+      "id": "masterdata",
+      "title": {
+        "zh": "主数据配置",
+        "en": "Master Data Config"
+      },
+      "children": [
+        "oa.admin.org",
+        "oa.admin.dict"
+      ]
+    },
+    {
+      "id": "rules",
+      "title": {
+        "zh": "流程与权限配置",
+        "en": "Process & Permission Config"
+      },
+      "children": [
+        "oa.admin.flow",
+        "oa.admin.authz"
+      ]
+    },
+    {
+      "id": "ops",
+      "title": {
+        "zh": "运营与边界",
+        "en": "Operations & Boundaries"
+      },
+      "children": [
+        "oa.admin.report",
+        "oa.admin.boundary"
+      ]
+    }
+  ]
+}

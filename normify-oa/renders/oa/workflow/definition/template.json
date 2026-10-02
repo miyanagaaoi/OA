@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.definition.template",
+  "updated_at": "2026-10-02T08:03:34.163Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先有模板元数据与表单绑定，再由版本管理累积发布版本：已发起实例锁旧版本，新实例走新版本。",
+    "en": "Template metadata and form binding come first, then versioning accumulates published versions: in-flight instances keep the old version while new ones use the new one."
+  },
+  "order": [
+    "oa.workflow.definition.template.registry",
+    "oa.workflow.definition.template.version"
+  ]
+}

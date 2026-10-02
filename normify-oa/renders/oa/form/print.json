@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.print",
+  "updated_at": "2026-10-02T08:05:00.482Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "先选版式与纸张版心，再搭结构要件，然后按字段属性渲染并附上附件清单，最后以打印专用样式（黑白可读、不用主题色）收口。",
+    "en": "Pick the variant and page setup first, then the structure blocks, then render fields with the attachment list, all under print-only styles that stay readable in black and white."
+  },
+  "order": [
+    "oa.form.print.variant",
+    "oa.form.print.page",
+    "oa.form.print.structure",
+    "oa.form.print.field-render",
+    "oa.form.print.attachment-list",
+    "oa.form.print.style-isolation"
+  ],
+  "groups": [
+    {
+      "id": "print-layout",
+      "title": {
+        "zh": "版式与版面",
+        "en": "Layouts & page"
+      },
+      "children": [
+        "oa.form.print.variant",
+        "oa.form.print.page",
+        "oa.form.print.structure"
+      ]
+    },
+    {
+      "id": "print-fields",
+      "title": {
+        "zh": "字段与附件呈现",
+        "en": "Fields & attachments"
+      },
+      "children": [
+        "oa.form.print.field-render",
+        "oa.form.print.attachment-list"
+      ]
+    },
+    {
+      "id": "print-style",
+      "title": {
+        "zh": "样式隔离",
+        "en": "Style isolation"
+      },
+      "children": [
+        "oa.form.print.style-isolation"
+      ]
+    }
+  ]
+}

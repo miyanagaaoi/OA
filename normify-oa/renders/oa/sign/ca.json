@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.sign.ca",
+  "updated_at": "2026-10-02T08:03:08.999Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "一期先把 CA 预留字段落全（fields），再定义验签结果状态机与唯一回写通道（verify），最后是二期接入所需的能力开关与协议位（roadmap）。",
+    "en": "Phase one lands the fields first (fields), then defines the verification result state machine and its single write-back path (verify), and finally the capability switches and protocol slots for phase two (roadmap)."
+  },
+  "order": [
+    "oa.sign.ca.fields",
+    "oa.sign.ca.verify",
+    "oa.sign.ca.roadmap"
+  ]
+}

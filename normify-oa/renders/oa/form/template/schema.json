@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.template.schema",
+  "updated_at": "2026-10-02T08:05:06.302Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "按数据流：先定字段（含字段 ID 不复用），再组四类单据模板，最后把下拉字段绑到字典。",
+    "en": "By data flow: define fields first (IDs never reused), then compose the four document templates, then bind select fields to dictionaries."
+  },
+  "order": [
+    "oa.form.template.schema.field-def",
+    "oa.form.template.schema.form-type",
+    "oa.form.template.schema.dict-binding"
+  ]
+}

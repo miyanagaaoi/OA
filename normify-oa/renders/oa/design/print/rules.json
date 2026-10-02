@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.print.rules",
+  "updated_at": "2026-10-02T08:07:27.439Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "黑白复印可读性是硬约束（颜色不得承载信息），单位与样式隔离保证打印稿不渗入界面样式。",
+    "en": "Monochrome copy safety is a hard rule (colour may not carry information) and unit plus style isolation keeps UI styling out of the print sheet."
+  },
+  "order": [
+    "oa.design.print.rules.mono-copy",
+    "oa.design.print.rules.units"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.task.transfer",
+  "updated_at": "2026-10-02T08:02:40.704Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "转办由审批人本人发起（对象须同域可见），改派仅系统管理员可用。",
+    "en": "Approvers transfer their own tasks to visible people; only system administrators reassign."
+  },
+  "order": [
+    "oa.workflow.task.transfer.handover",
+    "oa.workflow.task.transfer.reassign"
+  ]
+}

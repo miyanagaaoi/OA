@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "oa.identity.position",
+  "updated_at": "2026-10-02T08:05:04.521Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从左到右：先维护负责人绑定与一人多岗（分管领导按业务线绑定），再由查询与上溯输出审批人候选人；调岗变更汇入事件，但不改动在途单据。",
+    "en": "Left to right: bind leaders and multi-posts first (line leaders by business line), then resolve approver candidates with upward escalation; transfers emit an event without touching in-flight documents."
+  },
+  "order": [
+    "oa.identity.position.leader-bind",
+    "oa.identity.position.multi-post",
+    "oa.identity.position.line-leader",
+    "oa.identity.position.leader-lookup",
+    "oa.identity.position.assignment"
+  ],
+  "groups": [
+    {
+      "id": "binding",
+      "title": {
+        "zh": "绑定",
+        "en": "Binding"
+      },
+      "children": [
+        "oa.identity.position.leader-bind",
+        "oa.identity.position.multi-post",
+        "oa.identity.position.line-leader"
+      ]
+    },
+    {
+      "id": "resolve",
+      "title": {
+        "zh": "解析与变更",
+        "en": "Resolution & Change"
+      },
+      "children": [
+        "oa.identity.position.leader-lookup",
+        "oa.identity.position.assignment"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.authz.rbac",
+  "updated_at": "2026-10-02T08:05:10.770Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从左到右：先定角色与权限树，再把角色授予用户、把权限与组织节点授予角色（逐级勾选），最后由有效权限计算产出菜单，所有变更写入权限变更日志。",
+    "en": "Left to right: define roles and the permission tree, then assign roles to users and permissions plus org nodes to roles (ticked level by level), compute effective permissions, and log every change."
+  },
+  "order": [
+    "oa.authz.rbac.role",
+    "oa.authz.rbac.permission-tree",
+    "oa.authz.rbac.user-role",
+    "oa.authz.rbac.grant",
+    "oa.authz.rbac.effective",
+    "oa.authz.rbac.change-log"
+  ],
+  "groups": [
+    {
+      "id": "define",
+      "title": {
+        "zh": "角色与权限定义",
+        "en": "Definitions"
+      },
+      "children": [
+        "oa.authz.rbac.role",
+        "oa.authz.rbac.permission-tree"
+      ]
+    },
+    {
+      "id": "assign",
+      "title": {
+        "zh": "分配",
+        "en": "Assignment"
+      },
+      "children": [
+        "oa.authz.rbac.user-role",
+        "oa.authz.rbac.grant"
+      ]
+    },
+    {
+      "id": "runtime",
+      "title": {
+        "zh": "生效与留痕",
+        "en": "Runtime & Trace"
+      },
+      "children": [
+        "oa.authz.rbac.effective",
+        "oa.authz.rbac.change-log"
+      ]
+    }
+  ]
+}

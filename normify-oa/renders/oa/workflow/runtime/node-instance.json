@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.runtime.node-instance",
+  "updated_at": "2026-10-02T08:03:45.275Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先落库节点状态，再由推进逻辑决定下一节点（应用跳过条件）、回退上一节点或收口实例。",
+    "en": "The node status is persisted first, then advancement decides the next node (applying skip conditions), a return to the previous node, or completion of the instance."
+  },
+  "order": [
+    "oa.workflow.runtime.node-instance.state",
+    "oa.workflow.runtime.node-instance.advance"
+  ]
+}

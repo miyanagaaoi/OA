@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration.gateway.authz",
+  "updated_at": "2026-10-02T08:00:16.751Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "请求闸门从左到右：先确认调用方身份，再收窄其可见数据，最后拒绝来自外部的一切写入。",
+    "en": "Request gate left to right: prove who the caller is, narrow the data they may see, then refuse any write from outside."
+  },
+  "order": [
+    "oa.integration.gateway.authz.authenticate",
+    "oa.integration.gateway.authz.scope",
+    "oa.integration.gateway.authz.write-guard"
+  ]
+}

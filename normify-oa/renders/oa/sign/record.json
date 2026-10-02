@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "oa.sign.record",
+  "updated_at": "2026-10-02T08:03:02.830Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "写入侧：签名记录只追加（append），哈希覆盖含 CA 预留字段（hash），由数据库触发器与应用层双重保证不可修改删除（immutable）；读取侧：记录查询与鉴权下载（query），签名图与附件的私有存储、上传限制与 sha256 校验统一由 file-integrity 承担。",
+    "en": "Write side: records are appended only (append), the hash covers the reserved CA fields (hash) and triggers plus application discipline forbid mutation (immutable). Read side: query and authenticated download (query), while private storage, upload limits and sha256 checks for images and attachments sit in file-integrity."
+  },
+  "order": [
+    "oa.sign.record.append",
+    "oa.sign.record.hash",
+    "oa.sign.record.immutable",
+    "oa.sign.record.query",
+    "oa.sign.record.file-integrity"
+  ],
+  "groups": [
+    {
+      "id": "write",
+      "title": {
+        "zh": "只追加与防篡改",
+        "en": "Append-Only & Tamper-Evident"
+      },
+      "children": [
+        "oa.sign.record.append",
+        "oa.sign.record.hash",
+        "oa.sign.record.immutable"
+      ]
+    },
+    {
+      "id": "read",
+      "title": {
+        "zh": "读取与文件完整性",
+        "en": "Query & File Integrity"
+      },
+      "children": [
+        "oa.sign.record.query",
+        "oa.sign.record.file-integrity"
+      ]
+    }
+  ]
+}

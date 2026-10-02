@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration.gateway",
+  "updated_at": "2026-10-02T07:59:34.214Z",
+  "mode": "grid",
+  "max_columns": 4,
+  "reading": {
+    "zh": "请求链路从左到右：按版本路由 → 鉴权与数据域过滤 → 限流与幂等 → 返回统一错误与追踪信息。",
+    "en": "Request path left to right: route by version → authenticate and filter by data scope → rate-limit and de-duplicate → return the unified error/trace envelope."
+  },
+  "order": [
+    "oa.integration.gateway.routing",
+    "oa.integration.gateway.authz",
+    "oa.integration.gateway.ratelimit",
+    "oa.integration.gateway.error"
+  ]
+}

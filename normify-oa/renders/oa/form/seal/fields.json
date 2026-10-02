@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.seal.fields",
+  "updated_at": "2026-10-02T08:05:19.270Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "按填单顺序：事由与用途 → 用印类型与份数 → 证照名称（借用时必填）→ 使用期限 → 归还状态与时间（仅归档节点可改）。",
+    "en": "In filling order: reason and purpose, seal type and count, certificate name (required when borrowing), usage period, then return status and time (editable only by the archive node)."
+  },
+  "order": [
+    "oa.form.seal.fields.basic",
+    "oa.form.seal.fields.seal",
+    "oa.form.seal.fields.cert",
+    "oa.form.seal.fields.period",
+    "oa.form.seal.fields.return"
+  ]
+}

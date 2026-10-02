@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "oa.authz.visibility",
+  "updated_at": "2026-10-02T08:05:15.985Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从上到下：先判定「这张单据能不能看见」（流转链可见性、抄送/待补件只读），再判定「看见后能不能改、能不能导出」（金额只读、手机号脱敏、导出仅管理员）。",
+    "en": "Top down: first whether the document is visible at all (routing-chain visibility, CC and pending-supplement read-only), then what may be edited or exported once visible (amounts read-only, masked phones, admin-only export)."
+  },
+  "order": [
+    "oa.authz.visibility.routing",
+    "oa.authz.visibility.readonly-state",
+    "oa.authz.visibility.field",
+    "oa.authz.visibility.export"
+  ],
+  "groups": [
+    {
+      "id": "visible",
+      "title": {
+        "zh": "可见性",
+        "en": "Visibility"
+      },
+      "children": [
+        "oa.authz.visibility.routing",
+        "oa.authz.visibility.readonly-state"
+      ]
+    },
+    {
+      "id": "fields",
+      "title": {
+        "zh": "字段与导出",
+        "en": "Fields & Export"
+      },
+      "children": [
+        "oa.authz.visibility.field",
+        "oa.authz.visibility.export"
+      ]
+    }
+  ]
+}

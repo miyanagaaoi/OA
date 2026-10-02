@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.authz",
+  "updated_at": "2026-10-02T08:05:10.459Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先定角色与权限树（能做什么），再定数据域口径（能看哪些范围），最后是流转可见性与字段限制（同一单据里看到什么）。",
+    "en": "Left to right: roles and the permission tree first (what you may do), then data-scope rules (which range you may see), and finally routing visibility and field limits (what you see inside one document)."
+  },
+  "order": [
+    "oa.authz.rbac",
+    "oa.authz.scope",
+    "oa.authz.visibility"
+  ]
+}

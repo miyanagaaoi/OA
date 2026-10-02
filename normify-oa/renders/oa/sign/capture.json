@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.sign.capture",
+  "updated_at": "2026-10-02T08:03:02.054Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先判定本节点的签名要求（policy），再弹出签名面板采集笔迹并渲染签名图（pad → stroke），最后与审批动作绑定、补齐取证信息后写入签名记录（binding）；分组仅表示职责边界。",
+    "en": "First resolve the node's signature requirement (policy), then open the pad to capture strokes and render the image (pad then stroke), and finally bind it to the approval act with forensic evidence (binding); groups only mark responsibility boundaries."
+  },
+  "order": [
+    "oa.sign.capture.policy",
+    "oa.sign.capture.pad",
+    "oa.sign.capture.stroke",
+    "oa.sign.capture.binding"
+  ],
+  "groups": [
+    {
+      "id": "rule",
+      "title": {
+        "zh": "策略与绑定",
+        "en": "Policy & Binding"
+      },
+      "children": [
+        "oa.sign.capture.policy",
+        "oa.sign.capture.binding"
+      ]
+    },
+    {
+      "id": "pad",
+      "title": {
+        "zh": "采集与渲染",
+        "en": "Pad & Rendering"
+      },
+      "children": [
+        "oa.sign.capture.pad",
+        "oa.sign.capture.stroke"
+      ]
+    }
+  ]
+}

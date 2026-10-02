@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.identity.session.login",
+  "updated_at": "2026-10-02T08:05:10.145Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先看密码策略与哈希校验（失败计入锁定），再看会话签发与登出——两步串成一次登录。",
+    "en": "First the password policy and hash verification (failures feed lockout), then session issuing and logout — the two steps of one login."
+  },
+  "order": [
+    "oa.identity.session.login.password",
+    "oa.identity.session.login.issue"
+  ]
+}

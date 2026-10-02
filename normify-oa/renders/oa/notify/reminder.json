@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.notify.reminder",
+  "updated_at": "2026-10-02T08:03:10.927Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：扫描节点与补件超时（scan 下分节点、补件两路）→ 站内信 + 邮件双通道下发催办（dispatch）→ 必要时抄送上级（escalate）；全程只催办，不自动跳过、不自动升级。",
+    "en": "Left to right: scan for overdue tasks and supplements (scan, split into node and supplement), dispatch the reminder over both channels (dispatch), and optionally CC the superior (escalate) — always a reminder only, never an automatic skip or escalation."
+  },
+  "order": [
+    "oa.notify.reminder.scan",
+    "oa.notify.reminder.dispatch",
+    "oa.notify.reminder.escalate"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration",
+  "updated_at": "2026-10-02T07:59:34.089Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右：网关与鉴权/数据域过滤是所有外部调用的入口；主数据只读接口供 HR 等下游系统调用；合同系统集成与归档数据抽取位于系统边界的另一侧。",
+    "en": "Left to right: the gateway and its auth/scope filter front everything; the read-only master-data API is what downstream systems (HR) call; contract-system integration and warehouse extraction sit on the other side of the boundary."
+  },
+  "order": [
+    "oa.integration.gateway",
+    "oa.integration.masterdata",
+    "oa.integration.contract",
+    "oa.integration.warehouse"
+  ],
+  "groups": [
+    {
+      "id": "outbound",
+      "title": {
+        "zh": "对外接口",
+        "en": "Exposed Interfaces"
+      },
+      "children": [
+        "oa.integration.gateway",
+        "oa.integration.masterdata"
+      ]
+    },
+    {
+      "id": "external",
+      "title": {
+        "zh": "外部系统",
+        "en": "External Systems"
+      },
+      "children": [
+        "oa.integration.contract",
+        "oa.integration.warehouse"
+      ]
+    }
+  ]
+}

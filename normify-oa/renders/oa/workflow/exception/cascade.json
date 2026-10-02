@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.exception.cascade",
+  "updated_at": "2026-10-02T08:02:52.083Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "会签驳回与协同部门驳回都触发其余任务自动关闭，并让单据回到发起人。",
+    "en": "A countersign rejection or a collaboration rejection both auto-close the remaining tasks and return the document to the initiator."
+  },
+  "order": [
+    "oa.workflow.exception.cascade.countersign",
+    "oa.workflow.exception.cascade.collaboration"
+  ]
+}

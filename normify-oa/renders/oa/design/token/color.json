@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.token.color",
+  "updated_at": "2026-10-02T08:07:19.005Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "品牌与强调色只出现在白名单四处 → 四级表面与两级细线建立层级 → 文字四级保证对比度 → 反向令牌只服务侧栏 → 状态语义色独占第二色系。",
+    "en": "Brand and accent stay whitelisted to four uses, the surface ladder and hairlines build hierarchy, the ink ladder secures contrast, inverse tokens serve the sidebar only and semantic colours own the second palette."
+  },
+  "order": [
+    "oa.design.token.color.brand",
+    "oa.design.token.color.surface",
+    "oa.design.token.color.text",
+    "oa.design.token.color.inverse",
+    "oa.design.token.color.semantic"
+  ],
+  "groups": [
+    {
+      "id": "brand",
+      "title": {
+        "zh": "品牌与文字",
+        "en": "Brand & Text"
+      },
+      "children": [
+        "oa.design.token.color.brand",
+        "oa.design.token.color.text"
+      ]
+    },
+    {
+      "id": "surface",
+      "title": {
+        "zh": "表面与侧栏",
+        "en": "Surface & Sidebar"
+      },
+      "children": [
+        "oa.design.token.color.surface",
+        "oa.design.token.color.inverse"
+      ]
+    },
+    {
+      "id": "status",
+      "title": {
+        "zh": "状态语义",
+        "en": "Status Semantics"
+      },
+      "children": [
+        "oa.design.token.color.semantic"
+      ]
+    }
+  ]
+}

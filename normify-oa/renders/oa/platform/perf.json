@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.perf",
+  "updated_at": "2026-10-02T07:59:34.540Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先定容量基线，再按基线量响应时间，未达标处做索引与慢查询治理。",
+    "en": "Left to right: agree the capacity baseline, measure latency against it, then tune indexes and slow queries where the budget is missed."
+  },
+  "order": [
+    "oa.platform.perf.capacity",
+    "oa.platform.perf.latency",
+    "oa.platform.perf.tuning"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.authz.scope",
+  "updated_at": "2026-10-02T08:03:58.281Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先设数据域，再绑定它据以过滤的事项类别，最后试算该角色实际能看到哪些单据。",
+    "en": "Left to right: set the data scope, bind the matter categories it filters on, then simulate which documents the role would actually see."
+  },
+  "order": [
+    "oa.admin.authz.scope.assign",
+    "oa.admin.authz.scope.category",
+    "oa.admin.authz.scope.preview"
+  ]
+}

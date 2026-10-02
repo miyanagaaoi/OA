@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.supplement",
+  "updated_at": "2026-10-02T08:02:47.198Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：发起补件（过次数与时限）→ 实例进入待补件子状态 → 字段边界限制 → 发起人提交补件回到请求节点。",
+    "en": "Left to right: raise the request through quota and deadline, enter the pending sub-status, apply the field scope, then submit back to the requesting node."
+  },
+  "order": [
+    "oa.workflow.supplement.request",
+    "oa.workflow.supplement.limit",
+    "oa.workflow.supplement.pending",
+    "oa.workflow.supplement.field-scope",
+    "oa.workflow.supplement.submit"
+  ],
+  "groups": [
+    {
+      "id": "supp-request",
+      "title": {
+        "zh": "发起与限额",
+        "en": "Request"
+      },
+      "children": [
+        "oa.workflow.supplement.request",
+        "oa.workflow.supplement.limit"
+      ]
+    },
+    {
+      "id": "supp-pending",
+      "title": {
+        "zh": "待补件与边界",
+        "en": "Pending & Scope"
+      },
+      "children": [
+        "oa.workflow.supplement.pending",
+        "oa.workflow.supplement.field-scope"
+      ]
+    },
+    {
+      "id": "supp-submit",
+      "title": {
+        "zh": "补件提交",
+        "en": "Submission"
+      },
+      "children": [
+        "oa.workflow.supplement.submit"
+      ]
+    }
+  ]
+}

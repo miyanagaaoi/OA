@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.detail.trail",
+  "updated_at": "2026-10-02T08:07:10.437Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先看串行节点四态，再看并行协同分组的部门进度。",
+    "en": "Serial node states first, then the parallel collaboration group with per-department progress."
+  },
+  "order": [
+    "oa.portal.detail.trail.node",
+    "oa.portal.detail.trail.parallel"
+  ]
+}

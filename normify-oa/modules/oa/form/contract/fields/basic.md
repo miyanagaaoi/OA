@@ -1,0 +1,46 @@
+---
+uid: 6956e5f3
+id: oa.form.contract.fields.basic
+parent: oa.form.contract.fields
+state: planned
+name: {zh: "合同基础字段组", en: "Contract Basic Field Group"}
+description:
+  zh: >
+      合同基础信息字段：合同名称 title（text ≤80，必填）、事项类别 category（固定为经营 business，默认且置灰）、合同类型 contract_type（select，见 forms.md 6.3）与其他类型说明 contract_type_other（text ≤40，类型为「其他」时必填）。
+  en: >
+      Contract basics: contract name `title` (text ≤80, required), category `category` (fixed to business, defaulted and greyed out), contract type `contract_type` (select per section 6.3) and other-type note `contract_type_other` (text ≤40, required when the type is other).
+revision: "0000000000000000000000000000000000000000"
+updated_at: "2026-10-02T08:36:43.524Z"
+fingerprint: pending
+source:
+  - path: "doc/forms.md"
+    line: 130
+    end_line: 133
+apis:
+  - protocol: http
+    method: GET
+    path: "/api/v1/forms/contract/field-groups/basic"
+    description:
+      zh: >
+          合同单基础字段组定义。
+          
+      en: >
+          Basic field group definition for contract forms.
+          
+  - protocol: http
+    method: PUT
+    path: "/api/v1/forms/contract/instances/{instance_id}/draft/basic"
+    description:
+      zh: >
+          保存合同单基础字段草稿。
+          
+      en: >
+          Saves the contract basic field group draft.
+          
+deps:
+  - kind: reference
+    to: oa.form.dict.contract-type
+    from_api: "GET /api/v1/forms/contract/field-groups/basic"
+    to_api: "GET /api/v1/forms/dicts/contract-type/items"
+    label: {zh: "合同类型取值来源", en: "Contract type options"}
+---

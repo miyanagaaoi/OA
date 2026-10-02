@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.supplement.limit",
+  "updated_at": "2026-10-02T08:02:51.275Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先校验同节点 1 次 / 全单 3 次的次数上限，再计算三工作日时限并做超时催办。",
+    "en": "Check the quota first, then compute the three-working-day deadline and scan overdue supplements."
+  },
+  "order": [
+    "oa.workflow.supplement.limit.quota",
+    "oa.workflow.supplement.limit.deadline"
+  ]
+}

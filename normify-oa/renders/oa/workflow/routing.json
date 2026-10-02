@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.routing",
+  "updated_at": "2026-10-02T08:02:46.584Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：指定承接部门并连续流转 → 回退上一节点 → 回到本部门收束 → 两道闸门 → 流转可见性判定。",
+    "en": "Left to right: designate and chain routing, roll back to the previous node, return home, pass the two gates, then visibility."
+  },
+  "order": [
+    "oa.workflow.routing.forward",
+    "oa.workflow.routing.rollback",
+    "oa.workflow.routing.back-home",
+    "oa.workflow.routing.gate",
+    "oa.workflow.routing.visibility"
+  ],
+  "groups": [
+    {
+      "id": "routing-forward",
+      "title": {
+        "zh": "流转",
+        "en": "Routing"
+      },
+      "children": [
+        "oa.workflow.routing.forward"
+      ]
+    },
+    {
+      "id": "routing-back",
+      "title": {
+        "zh": "回退与收束",
+        "en": "Rollback & Return Home"
+      },
+      "children": [
+        "oa.workflow.routing.rollback",
+        "oa.workflow.routing.back-home"
+      ]
+    },
+    {
+      "id": "routing-gate",
+      "title": {
+        "zh": "闸门与可见性",
+        "en": "Gates & Visibility"
+      },
+      "children": [
+        "oa.workflow.routing.gate",
+        "oa.workflow.routing.visibility"
+      ]
+    }
+  ]
+}

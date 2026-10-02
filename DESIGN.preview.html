@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>集团OA审批系统 · 全页面预览（方案 D）</title>
+<style>
+/* ============================================================
+   设计令牌（与 DESIGN.md front matter 一一对应）
+   ============================================================ */
+:root{
+  --primary:#1f5ae0; --primary-hover:#1749bd; --primary-active:#12398f; --on-primary:#fff;
+  --primary-subtle:#eef3fe; --primary-border:#c4d5f8;
+  --ink:#14181f; --ink-muted:#4a5563; --ink-subtle:#5f6b7a; --ink-disabled:#aeb7c4;
+  --canvas:#fff; --canvas-subtle:#f7f8fa; --surface-1:#f2f4f7; --surface-2:#e6e9ef;
+  --hairline:#e2e5ea; --hairline-strong:#c8cdd6;
+  --inv-canvas:#151a22; --inv-surface-1:#1e242e; --inv-surface-2:#28303c;
+  --inv-ink:#f4f6f9; --inv-ink-muted:#9aa4b2;
+  --success:#1f7a4d; --success-bg:#e6f4ec;
+  --warning:#9a6200; --warning-bg:#fdf1dd;
+  --error:#c02b25; --error-bg:#fbeaea;
+  --info:#1f5ae0; --info-bg:#eef3fe;
+  --neutral:#5b6472; --neutral-bg:#eef0f4;
+  --sp-xxs:4px; --sp-xs:8px; --sp-sm:12px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-xxl:48px;
+  --control:32px; --control-h5:44px;
+  --r-xs:2px; --r-sm:4px; --r-md:6px; --r-lg:8px; --r-pill:9999px;
+  --sh-3:0 4px 12px rgba(20,24,31,.10), 0 1px 3px rgba(20,24,31,.06);
+  --sh-4:0 12px 32px rgba(20,24,31,.16);
+  --nav-w:224px; --nav-w-rail:64px;
+  --font: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--surface-1);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:600}
+a{color:var(--primary);text-decoration:none}
+:focus-visible{outline:none;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--primary);border-radius:var(--r-sm)}
+[hidden]{display:none !important}
+
+/* ===== 预览工具条（不属于产品 UI） ===== */
+.pv-bar{display:flex;align-items:center;gap:var(--sp-xs);height:48px;padding:0 var(--sp-md);background:var(--inv-canvas);color:var(--inv-ink);font-size:12px;overflow-x:auto}
+.pv-bar b{font-size:14px;white-space:nowrap}
+.pv-bar .tagline{background:var(--primary);padding:2px 8px;border-radius:var(--r-xs);font-weight:600;white-space:nowrap}
+.pv-bar nav{display:flex;gap:2px;background:var(--inv-surface-1);padding:2px;border-radius:var(--r-sm);white-space:nowrap}
+.pv-bar nav button{appearance:none;border:0;background:transparent;color:var(--inv-ink-muted);font:500 12px/1 var(--font);padding:6px 10px;border-radius:var(--r-xs);cursor:pointer}
+.pv-bar nav button:hover{background:var(--inv-surface-2)}
+.pv-bar nav button.on{background:var(--primary);color:#fff}
+.pv-bar .sp{margin-left:auto;display:flex;align-items:center;gap:var(--sp-xs);color:var(--inv-ink-muted);white-space:nowrap}
+.pv-bar kbd{background:var(--inv-surface-2);border-radius:var(--r-xs);padding:1px 5px;font-family:var(--mono);font-size:11px}
+.switch{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+
+/* ===== 应用外壳 ===== */
+.app{display:grid;grid-template-columns:var(--nav-w) minmax(0,1fr);height:calc(100vh - 48px);background:var(--canvas);transition:grid-template-columns 160ms ease-out}
+.app.rail{grid-template-columns:var(--nav-w-rail) minmax(0,1fr)}
+@media(prefers-reduced-motion:reduce){.app{transition:none}}
+
+/* ===== 品牌标识（logo-180.png，根目录；白底已抠除为透明） =====
+   透明底后无需承托砖，可直接置于深色侧栏；红色为品牌色，是界面上
+   唯一一处非企业蓝的彩色（见 DESIGN.md「品牌标识」例外规则）。 */
+.brand-logo{display:inline-grid;place-items:center;flex:none}
+.brand-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.sidebar{background:var(--inv-canvas);color:var(--inv-ink-muted);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.drawer-head{flex:none;display:flex;align-items:center;gap:var(--sp-xs);height:48px;padding:0 var(--sp-sm);margin:var(--sp-xs);background:var(--inv-surface-1);border-radius:var(--r-xs);color:var(--inv-ink);font-size:13px}
+.drawer-head .brand-logo{width:28px;height:28px}
+.drawer-head .org{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawer-head .caret{color:var(--inv-ink-muted);font-size:10px}
+.nav-group{padding:var(--sp-xs)}
+.nav-cap{font-size:11px;color:var(--inv-ink-muted);opacity:.75;padding:var(--sp-xs);letter-spacing:.4px;white-space:nowrap}
+.nav-item{display:flex;align-items:center;gap:var(--sp-xs);height:36px;padding:0 var(--sp-sm);border-radius:var(--r-xs);font-size:13px;color:var(--inv-ink-muted);cursor:pointer;position:relative;white-space:nowrap}
+.nav-item:hover{background:var(--inv-surface-2)}
+.nav-item.on{background:var(--inv-surface-1);color:var(--inv-ink)}
+.nav-item.on::before{content:"";position:absolute;left:4px;top:9px;bottom:9px;width:2px;background:var(--primary);border-radius:1px}
+.nav-item .ico{width:20px;text-align:center;flex:none}
+.nav-item .lbl{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.nav-item .badge{margin-left:auto;background:var(--primary);color:#fff;font-size:11px;font-weight:500;min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-xs);display:grid;place-items:center}
+.rail .nav-cap,.rail .nav-item .lbl,.rail .nav-item .badge,.rail .drawer-head .org,.rail .drawer-head .caret,.rail .user-box .u-txt,.rail .nav-ph{display:none}
+.rail .nav-item{justify-content:center;padding:0}
+.rail .nav-item.on::before{left:2px}
+.rail .drawer-head{justify-content:center;padding:0}
+.rail .user-box{justify-content:center}
+.rail .nav-item:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 8px);top:6px;background:var(--ink);color:#fff;font-size:12px;padding:4px 8px;border-radius:var(--r-sm);white-space:nowrap;z-index:30}
+.nav-ph{padding:var(--sp-sm);font-size:11px;color:var(--inv-ink-muted);opacity:.55;border-top:1px dashed var(--inv-surface-2);margin-top:var(--sp-sm);line-height:1.6}
+.user-box{margin-top:auto;padding:var(--sp-sm);border-top:1px solid var(--inv-surface-1);display:flex;align-items:center;gap:var(--sp-xs)}
+.avatar{width:28px;height:28px;border-radius:var(--r-pill);background:var(--inv-surface-1);color:var(--inv-ink);display:grid;place-items:center;font-size:12px;flex:none}
+.user-box .u-name{font-size:13px;color:var(--inv-ink)}
+.user-box .u-meta{font-size:11px;color:var(--inv-ink-muted)}
+
+/* ===== 主区 ===== */
+.main{display:flex;flex-direction:column;min-width:0;background:var(--canvas)}
+.topbar{flex:none;height:56px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--sp-md);padding:0 var(--sp-lg);overflow-x:auto}
+.page-title{font-size:18px;font-weight:600;white-space:nowrap}
+.tabs{display:flex;gap:var(--sp-md);height:56px;align-items:center}
+.tab{font:500 13px/1 var(--font);color:var(--ink-muted);cursor:pointer;padding:6px 0;border-bottom:2px solid transparent;display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--primary);border-bottom-color:var(--primary)}
+.tab .cnt{background:var(--surface-1);color:var(--ink-muted);font-size:11px;min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-xs);display:grid;place-items:center}
+.tab.on .cnt{background:var(--primary-subtle);color:var(--primary)}
+.tools{margin-left:auto;display:flex;gap:var(--sp-xs);align-items:center;white-space:nowrap}
+.field{height:var(--control);border:1px solid var(--hairline);border-radius:var(--r-sm);background:var(--canvas);font:400 13px/1 var(--font);color:var(--ink);padding:0 12px}
+.field:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--primary)}
+.field.area{height:auto;min-height:88px;padding:8px 12px;line-height:1.6;resize:vertical;width:100%;font-size:14px}
+.field.err{border-color:var(--error)}
+.err-msg{font-size:12px;color:var(--error);margin-top:2px}
+
+/* ===== 表格 ===== */
+.table-wrap{flex:1;overflow:auto;min-height:0}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+table.tbl th{position:sticky;top:0;z-index:2;background:var(--canvas-subtle);color:var(--ink-muted);font:500 13px/1.4 var(--font);letter-spacing:.2px;height:40px;text-align:left;padding:0 var(--sp-sm);white-space:nowrap;border-bottom:1px solid var(--hairline)}
+table.tbl td{height:44px;padding:0 var(--sp-sm);border-bottom:1px solid var(--hairline);white-space:nowrap}
+table.tbl tbody tr{cursor:pointer}
+table.tbl tbody tr:hover td{background:var(--canvas-subtle)}
+table.tbl tbody tr.sel td{background:var(--primary-subtle)}
+table.tbl tbody tr.sel td:first-child{box-shadow:inset 2px 0 0 var(--primary)}
+table.tbl.compact td{height:36px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.amount{font-variant-numeric:tabular-nums;font-weight:500;text-align:right;white-space:nowrap}
+.amount .wan{color:var(--ink-subtle);font-size:12px;font-weight:400;margin-left:4px}
+.c{text-align:center}
+.r{text-align:right}
+.type-ico{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:var(--r-xs);background:var(--surface-1);color:var(--ink-muted);font-size:11px;margin-right:6px;vertical-align:-4px}
+.table-foot{flex:none;padding:var(--sp-xs) var(--sp-lg);border-top:1px solid var(--hairline);font-size:12px;color:var(--ink-subtle);display:flex;align-items:center;gap:var(--sp-sm)}
+.table-foot .pg{margin-left:auto;display:flex;gap:2px}
+.pgbtn{min-width:24px;height:24px;padding:0 6px;display:grid;place-items:center;border-radius:var(--r-xs);cursor:pointer;font-size:12px}
+.pgbtn:hover{background:var(--canvas-subtle)}
+.pgbtn.on{background:var(--primary-subtle);color:var(--primary);font-weight:500}
+
+/* ===== 状态与标签 ===== */
+.pill{display:inline-flex;align-items:center;padding:1px 6px;border-radius:var(--r-sm);font-size:11px;white-space:nowrap}
+.pill-pending{background:var(--warning-bg);color:var(--warning)}
+.pill-approved{background:var(--success-bg);color:var(--success)}
+.pill-rejected{background:var(--error-bg);color:var(--error)}
+.pill-processing{background:var(--info-bg);color:var(--info)}
+.pill-closed{background:var(--surface-1);color:var(--neutral)}
+.tag{display:inline-flex;align-items:center;padding:1px 6px;border-radius:var(--r-xs);font-size:11px}
+.tag-neutral{background:var(--neutral-bg);color:var(--neutral)}
+.tag-info{background:var(--info-bg);color:var(--info)}
+.tag-success{background:var(--success-bg);color:var(--success)}
+.tag-warning{background:var(--warning-bg);color:var(--warning)}
+.tag-error{background:var(--error-bg);color:var(--error)}
+
+/* ===== 按钮 ===== */
+.btn{height:var(--control);padding:0 14px;border-radius:var(--r-sm);font:500 13px/1 var(--font);cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary{background:var(--primary);color:var(--on-primary)}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-primary:active{background:var(--primary-active)}
+.btn-primary[disabled]{background:var(--primary-border);color:var(--ink-muted);cursor:not-allowed}
+.btn-secondary{background:var(--canvas);color:var(--ink);border-color:var(--hairline-strong)}
+.btn-secondary:hover{background:var(--canvas-subtle)}
+.btn-ghost{background:transparent;color:var(--primary);padding:0 8px;height:28px}
+.btn-ghost:hover{background:var(--primary-subtle)}
+.btn-danger{background:var(--error);color:#fff}
+.btn-danger-ghost{background:var(--canvas);color:var(--error);border-color:var(--hairline)}
+.btn-h5{height:var(--control-h5);font-size:15px}
+
+/* ===== 浮层 ===== */
+.scrim{position:fixed;inset:48px 0 0 0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity 160ms;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.modal{position:fixed;left:50%;top:calc(48px + 4vh);transform:translate(-50%,12px);width:min(980px,92vw);height:82vh;background:var(--canvas);border-radius:var(--r-md);box-shadow:var(--sh-4);z-index:50;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 160ms,transform 180ms}
+.modal.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.modal.sm{width:min(560px,92vw);height:auto;max-height:80vh}
+@media(prefers-reduced-motion:reduce){.modal,.scrim{transition:none}}
+.m-head{flex:none;min-height:56px;display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-lg);border-bottom:1px solid var(--hairline)}
+.m-head h3{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m-head .mono-no{font-family:var(--mono);font-size:12px;color:var(--ink-subtle);white-space:nowrap}
+.m-head .x{margin-left:auto;width:28px;height:28px;border:0;background:transparent;border-radius:var(--r-sm);cursor:pointer;color:var(--ink-muted);font-size:16px;flex:none}
+.m-head .x:hover{background:var(--canvas-subtle)}
+.m-body{flex:1;overflow-y:auto;min-height:0;padding:var(--sp-lg)}
+.modal.sm .m-body{padding:var(--sp-lg)}
+.m-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:var(--sp-md);align-items:start}
+@media(max-width:1100px){.m-grid{grid-template-columns:1fr}}
+.m-foot{flex:none;border-top:1px solid var(--hairline);padding:var(--sp-sm) var(--sp-lg);display:flex;gap:var(--sp-xs);align-items:center;flex-wrap:wrap}
+.m-foot textarea{flex:1;min-width:180px;height:36px;border:1px solid var(--hairline);border-radius:var(--r-sm);padding:8px 12px;font:400 13px/1.4 var(--font);resize:none}
+.m-foot textarea:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--primary)}
+
+/* ===== 卡片 / 表单 ===== */
+.card{border:1px solid var(--hairline);border-radius:var(--r-md);background:var(--canvas)}
+.card-h{padding:var(--sp-sm) var(--sp-md);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--sp-xs);font-size:14px;font-weight:600}
+.card-h .r{margin-left:auto;display:flex;gap:var(--sp-xs);align-items:center;font-weight:400}
+.card-b{padding:var(--sp-md)}
+.sec+.sec{margin-top:var(--sp-md);padding-top:var(--sp-md);border-top:1px dashed var(--hairline)}
+.sec-title{font-size:13px;font-weight:600;color:var(--ink-muted);margin-bottom:var(--sp-xs)}
+.amount-hero{display:flex;align-items:baseline;gap:var(--sp-xs);flex-wrap:wrap}
+.amount-hero .cur{font-size:16px;color:var(--ink-muted)}
+.amount-hero .n{font-size:32px;font-weight:600;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.amount-hero .wan{font-size:12px;color:var(--ink-subtle)}
+.rows{display:grid;grid-template-columns:104px minmax(0,1fr);gap:var(--sp-xs) var(--sp-md)}
+.rows dt{color:var(--ink-muted);font:500 13px/1.6 var(--font);text-align:right;padding-top:1px}
+.rows dd{margin:0;min-width:0;font-size:14px}
+.rows dd.ro{background:var(--canvas-subtle);border-radius:var(--r-xs);padding:2px 8px;display:inline-block}
+.req::before{content:"*";color:var(--error);margin-right:3px}
+.hint{font-size:12px;color:var(--ink-subtle)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.file{display:flex;align-items:center;gap:var(--sp-xs);padding:6px 0;font-size:13px;border-bottom:1px dashed var(--hairline)}
+.file:last-child{border-bottom:0}
+.file .sz{margin-left:auto;font-size:12px;color:var(--ink-subtle);font-variant-numeric:tabular-nums}
+.drop{border:1px dashed var(--hairline-strong);background:var(--canvas-subtle);border-radius:var(--r-md);padding:var(--sp-lg);text-align:center;color:var(--ink-muted);font-size:13px;cursor:pointer}
+.drop:hover{border-color:var(--primary);color:var(--primary)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-md) var(--sp-lg)}
+@media(max-width:900px){.form-grid{grid-template-columns:1fr}}
+.f-label{font-size:13px;color:var(--ink-muted);margin-bottom:4px;display:block}
+.f-full{grid-column:1/-1}
+.choice{display:flex;gap:var(--sp-md);flex-wrap:wrap;align-items:center;min-height:var(--control)}
+.choice label{display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer}
+input[type=checkbox],input[type=radio]{width:15px;height:15px;accent-color:var(--primary);margin:0}
+
+/* ===== 审批记录 ===== */
+.trail .step{display:grid;grid-template-columns:22px minmax(0,1fr);gap:var(--sp-xs);position:relative;padding-bottom:var(--sp-md)}
+.trail .step:last-child{padding-bottom:0}
+.trail .dot{width:22px;height:22px;border-radius:var(--r-pill);display:grid;place-items:center;font-size:11px;border:1px solid var(--hairline);color:var(--ink-disabled);background:var(--canvas);z-index:1}
+.trail .line{position:absolute;left:10.5px;top:22px;bottom:0;width:2px;background:var(--hairline)}
+.trail .step:last-child .line{display:none}
+.trail .step.done .dot{border-color:var(--primary-border);color:var(--ink)}
+.trail .step.done .line{background:var(--primary)}
+.trail .step.current .dot{background:var(--primary);border-color:var(--primary);color:#fff}
+.trail .step.timeout .dot{border-color:var(--error);color:var(--error)}
+.trail .nm{font-size:13px;font-weight:500}
+.trail .step.pending .nm{color:var(--ink-disabled);font-weight:400}
+.trail .mt{font-size:11px;color:var(--ink-subtle)}
+.trail .op{margin-top:5px;background:var(--canvas-subtle);border-radius:var(--r-sm);padding:6px 10px;font-size:13px}
+.tsig{height:36px;max-width:130px;background:repeating-linear-gradient(135deg,#fbfcfd,#fbfcfd 6px,#f4f6f9 6px,#f4f6f9 12px);border-radius:var(--r-xs);display:grid;place-items:center;font-size:11px;color:var(--ink-subtle);font-style:italic;margin-top:5px}
+.par{margin-top:5px;border:1px dashed var(--hairline-strong);border-radius:var(--r-sm);padding:6px 10px;background:var(--canvas-subtle)}
+.par .ph{display:flex;font-size:11px;color:var(--ink-muted);margin-bottom:2px}
+.par .ph .pg2{margin-left:auto;font-variant-numeric:tabular-nums}
+.par .pr{display:flex;gap:6px;font-size:12px;padding:1px 0}
+.par .pr.dim{color:var(--ink-muted)}
+
+/* ===== 签名板 ===== */
+.sign-pad{width:100%;max-width:560px;height:180px;background:var(--canvas-subtle);border:1px dashed var(--hairline-strong);border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-disabled);font-size:13px;position:relative}
+.sign-pad .stroke{position:absolute;left:20%;top:48%;width:170px;height:50px;border-bottom:2px solid var(--ink);border-radius:0 0 60% 40%/0 0 100% 60%;transform:rotate(-6deg);opacity:.85}
+
+/* ===== 登录页 ===== */
+.login-wrap{display:grid;grid-template-columns:minmax(0,1fr) 460px;min-height:calc(100vh - 48px);background:var(--canvas)}
+@media(max-width:900px){.login-wrap{grid-template-columns:1fr}.login-side{display:none}}
+.login-side{background:var(--inv-canvas);color:var(--inv-ink);padding:var(--sp-xxl);display:flex;flex-direction:column;justify-content:center;gap:var(--sp-md)}
+.login-side .brand{display:flex;align-items:center;gap:var(--sp-sm);font-size:20px;font-weight:600}
+.login-side .brand .brand-logo{width:44px;height:44px;border-radius:var(--r-md)}
+.login-side p{color:var(--inv-ink-muted);font-size:14px;max-width:420px;margin:0}
+.login-side ul{color:var(--inv-ink-muted);font-size:13px;line-height:2;padding-left:18px;margin:0}
+.login-pane{display:flex;flex-direction:column;justify-content:center;padding:var(--sp-xxl) var(--sp-xl);border-left:1px solid var(--hairline)}
+.login-form{max-width:340px;width:100%}
+.login-form h2{font-size:20px;margin-bottom:var(--sp-xxs)}
+.login-form .sub{font-size:13px;color:var(--ink-subtle);margin-bottom:var(--sp-lg)}
+.login-form .f{margin-bottom:var(--sp-sm)}
+.login-form .field{width:100%}
+.login-form .row{display:flex;align-items:center;justify-content:space-between;margin:var(--sp-sm) 0 var(--sp-md);font-size:13px}
+.login-form .btn{width:100%;justify-content:center;height:36px}
+
+/* ===== H5 ===== */
+.h5-stage{display:flex;gap:var(--sp-lg);padding:var(--sp-lg);overflow-x:auto;align-items:flex-start;background:var(--surface-1);flex:1}
+.h5{width:390px;flex:none;background:var(--canvas);border:1px solid var(--hairline-strong);border-radius:var(--r-lg);overflow:hidden;position:relative;box-shadow:var(--sh-3);display:flex;flex-direction:column;height:720px}
+.h5-top{flex:none;height:48px;display:flex;align-items:center;gap:var(--sp-xs);padding:0 var(--sp-sm);border-bottom:1px solid var(--hairline);background:var(--canvas);position:relative;z-index:2}
+.h5-top .t{font-size:16px;font-weight:600}
+.h5-top .back{width:32px;height:32px;display:grid;place-items:center;color:var(--ink-muted)}
+.h5-body{flex:1;overflow-y:auto;padding:var(--sp-sm);position:relative}
+.h5-bar{flex:none;min-height:60px;display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm);border-top:1px solid var(--hairline);background:var(--canvas)}
+.h5-bar .spacer{flex:1}
+.wm{position:absolute;inset:0;overflow:hidden;pointer-events:none;user-select:none;z-index:0}
+.wm span{position:absolute;font-size:12px;color:var(--ink);opacity:.06;transform:rotate(-24deg);white-space:nowrap}
+.h5-item{padding:var(--sp-sm);border:1px solid var(--hairline);border-radius:var(--r-sm);margin-bottom:var(--sp-xs);position:relative;z-index:1}
+.h5-item .r1{display:flex;align-items:center;gap:var(--sp-xs);margin-bottom:4px}
+.h5-item .r1 .t{font-size:14px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.h5-item .r2{display:flex;align-items:center;font-size:12px;color:var(--ink-subtle)}
+.h5-item .r2 .amt{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:500;color:var(--ink)}
+.h5-field{display:block;margin-bottom:var(--sp-sm);position:relative;z-index:1}
+.h5-field .lb{font-size:13px;color:var(--ink-muted);margin-bottom:4px;display:block}
+.h5-field .ctl{min-height:44px;border:1px solid var(--hairline);border-radius:var(--r-sm);background:var(--canvas);display:flex;align-items:center;padding:0 12px;font-size:14px}
+.h5-field .ctl.ro{background:var(--canvas-subtle);color:var(--ink-muted)}
+.h5-field .ctl.area{align-items:flex-start;padding-top:10px;color:var(--ink-subtle)}
+
+/* ===== 打印预览 ===== */
+.print-stage{flex:1;overflow:auto;background:#e9ecf1;padding:var(--sp-lg);display:flex;justify-content:center}
+.sheet{width:210mm;min-height:296mm;background:#fff;padding:12mm;box-shadow:0 2px 12px rgba(20,24,31,.18);position:relative;flex:none}
+.sheet .doc-title{text-align:center;font-family:"SimSun","Songti SC",serif;font-weight:700;font-size:16pt;letter-spacing:2px;margin-bottom:4mm}
+table.pform{width:100%;border-collapse:collapse;table-layout:fixed;font-family:"SimSun","Songti SC",serif;font-size:9.5pt}
+table.pform td{border:.35mm solid #000;padding:.9mm 1.6mm;vertical-align:middle;line-height:1.42}
+table.pform .lbl{text-align:center;white-space:nowrap}
+table.pform .val{background:#fafafa}
+table.pform .c{text-align:center}
+table.pform .amount{font-family:Consolas,monospace;font-weight:700;text-align:center;font-size:10.5pt}
+table.pform .big{font-size:11pt;line-height:1.55}
+table.pform .sign-line{display:flex;justify-content:space-between;font-size:9pt;color:#333;padding-top:2mm}
+.sheet .pfoot{position:absolute;left:12mm;right:12mm;bottom:6mm;display:flex;justify-content:space-between;font-size:8pt;color:#444;border-top:.35mm solid #999;padding-top:1.2mm}
+
+/* ===== 反例（检验"不做"清单） ===== */
+.anti .btn{border-radius:var(--r-pill)}
+.anti .btn-primary{background:linear-gradient(135deg,#1f5ae0,#7b3fe4)}
+.anti .sidebar{background:linear-gradient(180deg,#1b2233,#2b1b3a)}
+.anti .card{border-color:transparent;border-radius:var(--r-lg);box-shadow:var(--sh-3)}
+.anti .pill,.anti .tag{border-radius:var(--r-pill)}
+.anti .pill-pending{background:var(--warning);color:#fff}
+.anti .pill-approved{background:var(--success);color:#fff}
+.anti .pill-rejected{background:var(--error);color:#fff}
+.anti .pill-processing{background:var(--info);color:#fff}
+.anti .amount{text-align:left;font-weight:400}
+.anti .topbar{background:linear-gradient(90deg,#eef3fe,#fff)}
+.anti table.tbl tbody tr:hover td{background:var(--primary-subtle)}
+.anti .m-foot{flex-direction:row-reverse;justify-content:flex-end}
+
+/* 审核页：只读字段值（与提交表单的字段一一对应） */
+.rows dd.ro2{background:var(--canvas-subtle);border-radius:var(--r-xs);padding:2px 8px;display:inline-block}
+.rows dd .star{color:var(--error);margin-left:2px}
+.sec-title .src{font-weight:400;color:var(--ink-subtle);font-size:12px;margin-left:6px}
+.flowlist{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--ink-muted)}
+.flowlist .arw{color:var(--ink-disabled)}
+.flowlist .nd{background:var(--canvas-subtle);border-radius:var(--r-xs);padding:2px 8px}
+.flowlist .nd.cur{background:var(--primary-subtle);color:var(--primary);font-weight:500}
+
+/* ===== 提示条 ===== */
+.toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,16px);background:var(--ink);color:#fff;font-size:13px;padding:10px 16px;border-radius:var(--r-sm);box-shadow:var(--sh-3);opacity:0;pointer-events:none;transition:opacity 160ms,transform 160ms;z-index:80;max-width:80vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ===== 发起申请（模板广场，参照 doc/参考文档/发起审批页面.jpg）===== */
+.tpl-page{flex:1;overflow-y:auto;min-height:0;padding:var(--sp-lg) var(--sp-xl)}
+.tpl-inner{max-width:1180px;margin:0 auto}
+.tpl-search{position:relative;max-width:560px}
+.tpl-search input{width:100%;height:40px;border:1px solid var(--hairline);border-radius:var(--r-sm);padding:0 12px 0 36px;font:400 14px/1 var(--font);background:var(--canvas)}
+.tpl-search input:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--primary)}
+.tpl-search .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-subtle);font-size:14px}
+.tpl-sec{margin-top:var(--sp-xl)}
+.tpl-sec > h3{font-size:16px;margin-bottom:var(--sp-sm)}
+.tpl-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-sm)}
+@media(max-width:1200px){.tpl-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.tpl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tpl-card{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-md);cursor:pointer;min-height:64px}
+.tpl-card:hover{border-color:var(--hairline-strong);background:var(--canvas-subtle)}
+.tpl-card.on{border-color:var(--primary);background:var(--primary-subtle)}
+.tpl-ico{width:32px;height:32px;border-radius:var(--r-sm);background:var(--primary-subtle);color:var(--primary);display:grid;place-items:center;font-size:15px;flex:none}
+.tpl-card .nm{font-size:14px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpl-card .go{margin-left:auto;color:var(--ink-subtle);font-size:12px}
+/* 全部申请：左分类 + 右卡片 */
+.tpl-split{display:grid;grid-template-columns:180px minmax(0,1fr);border:1px solid var(--hairline);border-radius:var(--r-md);overflow:hidden;background:var(--canvas)}
+@media(max-width:900px){.tpl-split{grid-template-columns:1fr}.tpl-cats{display:flex;overflow-x:auto;border-right:0!important;border-bottom:1px solid var(--hairline)}}
+.tpl-cats{background:var(--canvas-subtle);border-right:1px solid var(--hairline);padding:var(--sp-xs)}
+.tpl-cat{padding:8px var(--sp-sm);border-radius:var(--r-sm);font-size:14px;color:var(--ink-muted);cursor:pointer;white-space:nowrap}
+.tpl-cat:hover{background:var(--surface-1)}
+.tpl-cat.on{background:var(--primary-subtle);color:var(--primary);font-weight:500}
+.tpl-body{padding:var(--sp-md)}
+.tpl-body > h4{font-size:15px;margin-bottom:var(--sp-sm)}
+
+/* ===== 表单填写（单列，参照 doc/参考文档/合同审批表单填写页面.jpg）===== */
+.form-page{flex:1;overflow-y:auto;min-height:0;background:var(--surface-1)}
+.form-stage{max-width:1080px;margin:0 auto;padding:var(--sp-lg) var(--sp-lg) 0;display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-lg)}
+@media(min-width:1440px){.form-stage{grid-template-columns:minmax(0,760px) 140px;justify-content:center;gap:var(--sp-xl)}}
+.form-col{min-width:0}
+.form-outline{display:none}
+@media(min-width:1440px){
+  .form-outline{display:block;position:sticky;top:var(--sp-lg);align-self:start;font-size:12px}
+  .form-outline .oh{color:var(--ink-subtle);margin-bottom:var(--sp-xs);font-size:11px;letter-spacing:.4px}
+  .form-outline a{display:block;color:var(--ink-muted);padding:4px 0;border-left:2px solid transparent;padding-left:10px}
+  .form-outline a:hover{color:var(--ink)}
+  .form-outline a.on{color:var(--primary);border-left-color:var(--primary);font-weight:500}
+}
+.form-head{margin-bottom:var(--sp-md)}
+.form-head h2{font-size:18px}
+.form-head .desc{font-size:13px;color:var(--ink-subtle);margin-top:2px}
+.form-note{display:flex;align-items:center;gap:var(--sp-xs);background:var(--info-bg);border-radius:var(--r-sm);padding:var(--sp-xs) var(--sp-sm);font-size:13px;margin-bottom:var(--sp-md)}
+.form-note .sp{margin-left:auto;display:flex;gap:var(--sp-sm)}
+.form-note a{font-size:13px}
+.form-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-md);padding:var(--sp-lg)}
+.band{background:var(--surface-1);border-radius:var(--r-xs);padding:6px var(--sp-sm);font-size:13px;font-weight:600;color:var(--ink-muted);margin:var(--sp-lg) 0 var(--sp-md);cursor:pointer;display:flex;align-items:center;gap:var(--sp-xs)}
+.band:first-child{margin-top:0}
+.band .tg{margin-left:auto;font-size:11px;color:var(--ink-subtle);font-weight:400}
+.frow{margin-bottom:var(--sp-md)}
+.frow label{display:block;font-size:13px;color:var(--ink-muted);margin-bottom:6px}
+.frow label .star{color:var(--error);margin-left:2px}
+.frow label .opt{color:var(--ink-subtle);font-size:12px;margin-left:4px}
+.frow .ctl{width:100%;height:36px;border:1px solid var(--hairline);border-radius:var(--r-sm);padding:0 12px;font:400 14px/1 var(--font);color:var(--ink);background:var(--canvas)}
+.frow .ctl:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--primary)}
+.frow .ctl:disabled,.frow .ctl.ro{background:var(--canvas-subtle);color:var(--ink-muted)}
+.frow area.ctl,.frow .ctl.area{height:auto;min-height:104px;padding:10px 12px;line-height:1.6;resize:vertical;font-size:14px}
+.frow .ctl.err{border-color:var(--error)}
+.frow .msg{font-size:12px;color:var(--error);margin-top:4px}
+.frow .tip{font-size:12px;color:var(--ink-subtle);margin-top:4px}
+.upbtn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:1px solid var(--hairline-strong);border-radius:var(--r-sm);background:var(--canvas);font:500 13px/1 var(--font);cursor:pointer}
+.upbtn:hover{background:var(--canvas-subtle);border-color:var(--primary);color:var(--primary)}
+.multi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--sp-lg)}
+@media(max-width:760px){.multi{grid-template-columns:1fr}}
+.form-foot{position:sticky;bottom:0;background:var(--canvas);border-top:1px solid var(--hairline);margin-top:var(--sp-lg);padding:var(--sp-sm) 0;display:flex;gap:var(--sp-xs);align-items:center}
+.form-foot .sp{flex:1}
+.flow-empty{background:var(--surface-1);border-radius:var(--r-sm);padding:var(--sp-md);font-size:13px;color:var(--ink-subtle);text-align:center}
+.notes{max-width:1200px;margin:var(--sp-md) auto;padding:0 var(--sp-md);font-size:12px;display:none}
+.notes.on{display:block}
+.notes .ncard{background:#fff;border:1px solid #d7dce4;border-radius:var(--r-md);padding:12px 16px}
+.notes .ncard h4{font-size:13px;margin-bottom:6px;color:var(--primary)}
+.notes ul{margin:0;padding-left:18px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<!-- ================= 预览工具条 ================= -->
+<div class="pv-bar">
+  <span class="tagline">全页面预览</span>
+  <b>方案 D · 全宽表格 + 浮层详情</b>
+  <nav id="screenNav">
+    <button data-screen="login">登录</button>
+    <button data-screen="todo" class="on">待我审批</button>
+    <button data-screen="done">我已审批</button>
+    <button data-screen="mine">我发起的</button>
+    <button data-screen="cc">抄送我的</button>
+    <button data-screen="start">发起申请</button>
+    <button data-screen="new-contract">合同审批单</button>
+    <button data-screen="new-seal">印鉴证照单</button>
+    <button data-screen="print">打印预览</button>
+    <button data-screen="h5">移动端</button>
+    <button data-screen="logs">审计日志</button>
+  </nav>
+  <span class="sp">
+    <label class="switch"><input type="checkbox" id="antiChk"> 反例</label>
+    <kbd>Ctrl</kbd>+<kbd>\</kbd> 抽缩导航
+  </span>
+</div>
+
+<!-- ================= 1. 登录页 ================= -->
+<div class="login-wrap" id="s-login" hidden>
+  <div class="login-side">
+    <div class="brand"><span class="brand-logo"><img src="logo-180.png" alt="集团标识"></span>集团OA审批系统</div>
+    <p>统一审批入口，覆盖集团总部及所有子公司。四类审批单线上流转，多公司权限隔离，跨部门协同审批。</p>
+    <ul>
+      <li>集团—公司—部门—科室 四级组织</li>
+      <li>事项 / 资金 / 合同 / 印鉴证照 四类单据</li>
+      <li>电子签名、审批留痕、审计不可篡改</li>
+      <li>私有化本地部署，不依赖公网</li>
+    </ul>
+  </div>
+  <div class="login-pane">
+    <div class="login-form">
+      <h2>登录</h2>
+      <div class="sub">请使用集团统一账号登录</div>
+      <div class="f"><label class="f-label" for="acc">账号</label><input id="acc" class="field" value="lishi" autocomplete="username"></div>
+      <div class="f"><label class="f-label" for="pwd">密码</label><input id="pwd" class="field" type="password" value="········" autocomplete="current-password"></div>
+      <div class="row">
+        <label class="switch"><input type="checkbox" checked> 记住我（7 天内免登录）</label>
+        <a href="#" onclick="toast('请联系 IT 部门重置密码');return false">忘记密码？</a>
+      </div>
+      <button class="btn btn-primary" onclick="toast('登录成功后进入「待我审批」');go('todo')">登录</button>
+      <div class="hint" style="margin-top:12px">H5 端：浏览器直接访问网址；OA 首页提供二维码与短链供扫码进入。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 2~6. 列表页（应用外壳） ================= -->
+<div class="app" id="app" hidden>
+  <aside class="sidebar">
+    <div class="drawer-head"><span class="brand-logo"><img src="logo-180.png" alt="集团标识"></span><span class="org">供热集团公司</span><span class="caret">▾</span></div>
+    <div class="nav-group">
+      <div class="nav-cap">审批中心</div>
+      <div class="nav-item" data-tab="todo" data-tip="待我审批"><span class="ico">▤</span><span class="lbl">待我审批</span><span class="badge">8</span></div>
+      <div class="nav-item" data-tab="done" data-tip="我已审批"><span class="ico">▥</span><span class="lbl">我已审批</span></div>
+      <div class="nav-item" data-tab="mine" data-tip="我发起的"><span class="ico">▧</span><span class="lbl">我发起的</span><span class="badge">2</span></div>
+      <div class="nav-item" data-tab="cc" data-tip="抄送我的"><span class="ico">▨</span><span class="lbl">抄送我的</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cap">发起</div>
+      <div class="nav-item" data-screen="new-matter" data-tip="事项审批单"><span class="ico">＋</span><span class="lbl">事项审批单</span></div>
+      <div class="nav-item" data-screen="new-fund" data-tip="资金审批单"><span class="ico">¥</span><span class="lbl">资金审批单</span></div>
+      <div class="nav-item" data-screen="new-contract" data-tip="合同审批单"><span class="ico">▦</span><span class="lbl">合同审批单</span></div>
+      <div class="nav-item" data-screen="new-seal" data-tip="印鉴证照单"><span class="ico">◉</span><span class="lbl">印鉴证照单</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cap">管理</div>
+      <div class="nav-item" data-screen="logs" data-tip="审计日志"><span class="ico">▩</span><span class="lbl">审计日志</span></div>
+      <div class="nav-item" data-screen="print" data-tip="打印预览"><span class="ico">▣</span><span class="lbl">打印预览</span></div>
+      <div class="nav-item" data-screen="h5" data-tip="移动端预览"><span class="ico">▢</span><span class="lbl">移动端预览</span></div>
+    </div>
+    <div class="nav-ph">其他模块待添加<br>（合同管理 / 计划管理 / 经营决策 / 人力资源…）</div>
+    <div class="user-box"><span class="avatar">李</span><div class="u-txt"><div class="u-name">李四</div><div class="u-meta">财务部 · 工号 10237</div></div></div>
+  </aside>
+
+  <div class="main">
+    <!-- 顶栏：标题随标签页变化 -->
+    <div class="topbar">
+      <span class="page-title" id="pageTitle">待我审批</span>
+      <div class="tabs" id="tabs">
+        <span class="tab on" data-tab="todo">待我审批<span class="cnt">8</span></span>
+        <span class="tab" data-tab="done">我已审批<span class="cnt">126</span></span>
+        <span class="tab" data-tab="mine">我发起的<span class="cnt">2</span></span>
+        <span class="tab" data-tab="cc">抄送我的</span>
+      </div>
+      <div class="tools">
+        <input class="field" style="width:240px" placeholder="搜索单号 / 标题 / 发起人">
+        <button class="btn btn-secondary">导出</button>
+      </div>
+    </div>
+
+    <!-- 待我审批 -->
+    <div class="table-wrap" data-pane="todo">
+      <table class="tbl">
+        <thead><tr>
+          <th style="width:170px">单号</th><th style="width:86px">类型</th><th>标题</th>
+          <th style="width:120px">发起人</th><th style="width:180px" class="amount">金额</th>
+          <th style="width:150px">当前节点</th><th style="width:96px" class="c">状态</th><th style="width:120px">到达时间</th>
+        </tr></thead>
+        <tbody>
+          <tr class="sel" data-open><td><span class="num">OA-2026-000421</span></td><td><span class="type-ico">¥</span>资金</td><td>8 月供热管网维护款支付</td><td>王强</td><td class="amount">1,250,000.00<span class="wan">125.00 万</span></td><td>子公司总经理</td><td class="c"><span class="pill pill-pending">待我审批</span></td><td>07-09 09:12</td></tr>
+          <tr data-open data-detail="modalContract"><td><span class="num">OA-2026-000420</span></td><td><span class="type-ico">▦</span>合同</td><td>2026 年度煤炭采购框架合同</td><td>赵敏</td><td class="amount">8,600,000.00<span class="wan">860.00 万</span></td><td>财务部复核</td><td class="c"><span class="pill pill-pending">待我审批</span></td><td>07-09 08:40</td></tr>
+          <tr data-open data-detail="modalMatter"><td><span class="num">OA-2026-000418</span></td><td><span class="type-ico">▤</span>事项</td><td>医疗公司新增科室设备采购申请</td><td>孙倩</td><td class="amount">386,400.00<span class="wan">38.64 万</span></td><td>财务部复核</td><td class="c"><span class="pill pill-pending">待我审批</span></td><td>07-08 17:05</td></tr>
+          <tr data-open data-detail="modalSeal"><td><span class="num">OA-2026-000415</span></td><td><span class="type-ico">◉</span>印鉴</td><td>投标文件用印（公章 3 份）</td><td>周涛</td><td class="amount">—</td><td>集团分管领导</td><td class="c"><span class="pill pill-processing">审批中</span></td><td>07-08 14:22</td></tr>
+          <tr data-open><td><span class="num">OA-2026-000411</span></td><td><span class="type-ico">¥</span>资金</td><td>贸易公司 7 月运费结算</td><td>吴迪</td><td class="amount">96,800.00<span class="wan">9.68 万</span></td><td>协同 · 财务部</td><td class="c"><span class="pill pill-processing">审批中</span></td><td>07-08 11:30</td></tr>
+          <tr data-open data-detail="modalMatter"><td><span class="num">OA-2026-000408</span></td><td><span class="type-ico">▤</span>事项</td><td>供热公司客户服务中心值班调整</td><td>刘洋</td><td class="amount">—</td><td>—</td><td class="c"><span class="pill pill-closed">已撤回</span></td><td>07-07 16:10</td></tr>
+          <tr data-open data-detail="modalContract"><td><span class="num">OA-2026-000402</span></td><td><span class="type-ico">▦</span>合同</td><td>医疗公司物业服务合同续签</td><td>陈静</td><td class="amount">452,000.00<span class="wan">45.20 万</span></td><td>已完成</td><td class="c"><span class="pill pill-approved">已通过</span></td><td>07-06 09:50</td></tr>
+          <tr data-open data-detail="modalMatter"><td><span class="num">OA-2026-000399</span></td><td><span class="type-ico">▤</span>事项</td><td>集团办公用品年度框架采购</td><td>郑凯</td><td class="amount">128,000.00<span class="wan">12.80 万</span></td><td>已退回发起人</td><td class="c"><span class="pill pill-rejected">已驳回</span></td><td>07-05 15:32</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 我已审批 -->
+    <div class="table-wrap" data-pane="done" hidden>
+      <table class="tbl">
+        <thead><tr>
+          <th style="width:170px">单号</th><th style="width:86px">类型</th><th>标题</th>
+          <th style="width:120px">发起人</th><th style="width:180px" class="amount">金额</th>
+          <th style="width:130px">我的结论</th><th style="width:150px">审批时间</th><th style="width:96px" class="c">状态</th>
+        </tr></thead>
+        <tbody>
+          <tr data-open><td><span class="num">OA-2026-000417</span></td><td><span class="type-ico">¥</span>资金</td><td>供热公司 6 月电费结算</td><td>王强</td><td class="amount">268,500.00<span class="wan">26.85 万</span></td><td><span class="tag tag-success">已同意</span></td><td>07-08 16:20</td><td class="c"><span class="pill pill-approved">已通过</span></td></tr>
+          <tr data-open><td><span class="num">OA-2026-000416</span></td><td><span class="type-ico">▦</span>合同</td><td>贸易公司仓储租赁合同</td><td>吴迪</td><td class="amount">1,080,000.00<span class="wan">108.00 万</span></td><td><span class="tag tag-warning">要求补充材料</span></td><td>07-08 14:05</td><td class="c"><span class="pill pill-processing">待补件</span></td></tr>
+          <tr data-open><td><span class="num">OA-2026-000410</span></td><td><span class="type-ico">▤</span>事项</td><td>医疗公司消防演练经费申请</td><td>孙倩</td><td class="amount">42,000.00<span class="wan">4.20 万</span></td><td><span class="tag tag-success">已同意</span></td><td>07-07 10:12</td><td class="c"><span class="pill pill-approved">已通过</span></td></tr>
+          <tr data-open><td><span class="num">OA-2026-000405</span></td><td><span class="type-ico">◉</span>印鉴</td><td>资质证书借用（3 天）</td><td>周涛</td><td class="amount">—</td><td><span class="tag tag-error">已驳回</span></td><td>07-06 15:41</td><td class="c"><span class="pill pill-rejected">已驳回</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 我发起的 -->
+    <div class="table-wrap" data-pane="mine" hidden>
+      <table class="tbl">
+        <thead><tr>
+          <th style="width:170px">单号</th><th style="width:86px">类型</th><th>标题</th>
+          <th style="width:180px" class="amount">金额</th><th style="width:160px">当前节点</th>
+          <th style="width:150px">提交时间</th><th style="width:110px" class="c">状态</th><th style="width:120px">操作</th>
+        </tr></thead>
+        <tbody>
+          <tr data-open><td><span class="num">OA-2026-000421</span></td><td><span class="type-ico">¥</span>资金</td><td>8 月供热管网维护款支付</td><td class="amount">1,250,000.00<span class="wan">125.00 万</span></td><td>子公司总经理</td><td>07-09 09:12</td><td class="c"><span class="pill pill-processing">审批中</span></td><td><span class="link" style="color:var(--primary)">撤回</span></td></tr>
+          <tr data-open data-detail="modalMatter"><td><span class="num">OA-2026-000418</span></td><td><span class="type-ico">▤</span>事项</td><td>医疗公司新增科室设备采购申请</td><td class="amount">386,400.00<span class="wan">38.64 万</span></td><td>财务部复核</td><td>07-08 17:05</td><td class="c"><span class="pill pill-processing">审批中</span></td><td><span class="link" style="color:var(--primary)">撤回</span></td></tr>
+          <tr data-open><td><span class="num">OA-2026-000390</span></td><td><span class="type-ico">▦</span>合同</td><td>供热管网改造施工合同</td><td class="amount">2,340,000.00<span class="wan">234.00 万</span></td><td>已完成</td><td>06-28 11:20</td><td class="c"><span class="pill pill-approved">已通过</span></td><td><span class="link" style="color:var(--primary)">打印</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 抄送我的 -->
+    <div class="table-wrap" data-pane="cc" hidden>
+      <table class="tbl">
+        <thead><tr>
+          <th style="width:170px">单号</th><th style="width:86px">类型</th><th>标题</th>
+          <th style="width:120px">发起人</th><th style="width:180px" class="amount">金额</th>
+          <th style="width:150px">抄送时间</th><th style="width:96px" class="c">状态</th><th style="width:90px" class="c">已读</th>
+        </tr></thead>
+        <tbody>
+          <tr data-open><td><span class="num">OA-2026-000410</span></td><td><span class="type-ico">▤</span>事项</td><td>医疗公司消防演练经费申请</td><td>孙倩</td><td class="amount">42,000.00<span class="wan">4.20 万</span></td><td>07-07 10:30</td><td class="c"><span class="pill pill-approved">已通过</span></td><td class="c"><span class="tag tag-neutral">已读</span></td></tr>
+          <tr data-open><td><span class="num">OA-2026-000405</span></td><td><span class="type-ico">◉</span>印鉴</td><td>资质证书借用（3 天）</td><td>周涛</td><td class="amount">—</td><td>07-06 15:50</td><td class="c"><span class="pill pill-rejected">已驳回</span></td><td class="c"><span class="tag tag-warning">未读</span></td></tr>
+          <tr data-open><td><span class="num">OA-2026-000396</span></td><td><span class="type-ico">¥</span>资金</td><td>集团总部办公楼物业费</td><td>郑凯</td><td class="amount">186,000.00<span class="wan">18.60 万</span></td><td>07-03 09:15</td><td class="c"><span class="pill pill-approved">已通过</span></td><td class="c"><span class="tag tag-neutral">已读</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 审计日志 -->
+    <div class="table-wrap" data-pane="logs" hidden>
+      <table class="tbl compact">
+        <thead><tr>
+          <th style="width:170px">时间</th><th style="width:110px">操作人</th><th style="width:130px">动作</th>
+          <th style="width:110px">对象类型</th><th style="width:170px">对象</th><th>变更前后</th><th style="width:130px">IP</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="num">2026-07-09 15:11:02</span></td><td>李四</td><td>approve</td><td>task</td><td><span class="num">TASK-88213</span></td><td>待处理 → 已同意</td><td><span class="num">10.20.3.41</span></td></tr>
+          <tr><td><span class="num">2026-07-09 15:10:48</span></td><td>王海</td><td>route</td><td>instance</td><td><span class="num">OA-2026-000421</span></td><td>经发部 → 财务部（流转 1/5）</td><td><span class="num">10.20.5.18</span></td></tr>
+          <tr><td><span class="num">2026-07-09 14:20:11</span></td><td>王强</td><td>supplement_submit</td><td>instance</td><td><span class="num">OA-2026-000421</span></td><td>待补件 → 已补件（第 1 次）</td><td><span class="num">10.20.7.9</span></td></tr>
+          <tr><td><span class="num">2026-07-09 11:02:37</span></td><td>陈志远</td><td>supplement_request</td><td>instance</td><td><span class="num">OA-2026-000421</span></td><td>进行中 → 待补件</td><td><span class="num">10.20.2.55</span></td></tr>
+          <tr><td><span class="num">2026-07-09 10:00:12</span></td><td>系统管理员</td><td>grant</td><td>role</td><td><span class="num">ROLE-finance</span></td><td>data_scope: company → group_all</td><td><span class="num">10.20.1.8</span></td></tr>
+          <tr><td><span class="num">2026-07-09 09:12:03</span></td><td>王强</td><td>create</td><td>instance</td><td><span class="num">OA-2026-000421</span></td><td>— → 审批中（快照冻结 7 节点）</td><td><span class="num">10.20.7.9</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-foot">
+      <span id="footInfo">共 128 条 · 已选 1 条</span>
+      <span class="pg"><span class="pgbtn">‹</span><span class="pgbtn on">1</span><span class="pgbtn">2</span><span class="pgbtn">3</span><span class="pgbtn">›</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 7. 发起申请（模板广场，参照 doc/参考文档/发起审批页面.jpg） ================= -->
+<div class="app" id="appStart" hidden>
+  <aside class="sidebar">
+    <div class="drawer-head"><span class="brand-logo"><img src="logo-180.png" alt="集团标识"></span><span class="org">供热集团公司</span><span class="caret">▾</span></div>
+    <div class="nav-group">
+      <div class="nav-cap">审批中心</div>
+      <div class="nav-item" data-tab="todo" data-tip="待我审批"><span class="ico">▤</span><span class="lbl">待我审批</span><span class="badge">8</span></div>
+      <div class="nav-item" data-tab="done" data-tip="我已审批"><span class="ico">▥</span><span class="lbl">我已审批</span></div>
+      <div class="nav-item" data-tab="mine" data-tip="我发起的"><span class="ico">▧</span><span class="lbl">我发起的</span><span class="badge">2</span></div>
+      <div class="nav-item" data-tab="cc" data-tip="抄送我的"><span class="ico">▨</span><span class="lbl">抄送我的</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cap">发起</div>
+      <div class="nav-item" data-screen="start" data-tip="发起申请"><span class="ico">✦</span><span class="lbl">发起申请</span></div>
+      <div class="nav-item" data-screen="new-contract" data-tip="合同审批单"><span class="ico">▦</span><span class="lbl">合同审批单</span></div>
+      <div class="nav-item" data-screen="new-fund" data-tip="资金审批单"><span class="ico">¥</span><span class="lbl">资金审批单</span></div>
+      <div class="nav-item" data-screen="new-matter" data-tip="事项审批单"><span class="ico">▤</span><span class="lbl">事项审批单</span></div>
+      <div class="nav-item" data-screen="new-seal" data-tip="印鉴证照单"><span class="ico">◉</span><span class="lbl">印鉴证照单</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cap">管理</div>
+      <div class="nav-item" data-screen="logs" data-tip="审计日志"><span class="ico">▩</span><span class="lbl">审计日志</span></div>
+      <div class="nav-item" data-screen="print" data-tip="打印预览"><span class="ico">▣</span><span class="lbl">打印预览</span></div>
+      <div class="nav-item" data-screen="h5" data-tip="移动端预览"><span class="ico">▢</span><span class="lbl">移动端预览</span></div>
+    </div>
+    <div class="nav-ph">其他模块待添加<br>（效率诊断 / 数据管理 / 合同管理 / 计划管理 / 人力资源…）</div>
+    <div class="user-box"><span class="avatar">王</span><div class="u-txt"><div class="u-name">王强</div><div class="u-meta">供热公司 运维部 · 工号 10088</div></div></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title">发起申请</span>
+      <div class="tools">
+        <button class="btn btn-secondary" onclick="toast('草稿箱共 16 条')">草稿箱（16）</button>
+      </div>
+    </div>
+
+    <div class="tpl-page">
+      <div class="tpl-inner">
+        <div class="tpl-search">
+          <span class="ico">🔍</span>
+          <input placeholder="请输入申请名称">
+        </div>
+
+        <div class="tpl-sec">
+          <h3>推荐使用</h3>
+          <div class="tpl-grid">
+            <div class="tpl-card on" data-screen="new-contract"><span class="tpl-ico">▦</span><span class="nm">合同审批（含用印）</span></div>
+            <div class="tpl-card" data-screen="new-fund"><span class="tpl-ico">¥</span><span class="nm">资金审批</span></div>
+            <div class="tpl-card" data-screen="new-matter"><span class="tpl-ico">▤</span><span class="nm">事项审批</span></div>
+            <div class="tpl-card" data-screen="new-seal"><span class="tpl-ico">◉</span><span class="nm">公章、证照、资质审批</span></div>
+          </div>
+        </div>
+
+        <div class="tpl-sec">
+          <h3>全部申请</h3>
+          <div class="tpl-split">
+            <div class="tpl-cats" id="tplCats">
+              <div class="tpl-cat on" data-cat="all">全部</div>
+              <div class="tpl-cat" data-cat="operate">经营</div>
+              <div class="tpl-cat" data-cat="economy">经济</div>
+              <div class="tpl-cat" data-cat="admin">行政</div>
+              <div class="tpl-cat" data-cat="hr">人力</div>
+              <div class="tpl-cat" data-cat="invest">投资</div>
+            </div>
+            <div class="tpl-body">
+              <h4 id="tplCatName">全部</h4>
+              <div class="tpl-grid" id="tplList">
+                <div class="tpl-card" data-screen="new-contract"><span class="tpl-ico">▦</span><span class="nm">合同审批（含用印）</span></div>
+                <div class="tpl-card" data-screen="new-fund"><span class="tpl-ico">¥</span><span class="nm">资金审批</span></div>
+                <div class="tpl-card" data-screen="new-matter"><span class="tpl-ico">▤</span><span class="nm">事项审批</span></div>
+                <div class="tpl-card" data-screen="new-seal"><span class="tpl-ico">◉</span><span class="nm">公章、证照、资质审批</span></div>
+                <div class="tpl-card" data-screen="new-matter"><span class="tpl-ico">▤</span><span class="nm">合同变更申请</span></div>
+                <div class="tpl-card" data-screen="new-fund"><span class="tpl-ico">¥</span><span class="nm">预付款申请</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="hint" style="margin-top:var(--sp-sm)">分类为**配置项**（后台数据字典维护），仅用于模板归类与统计，不影响流程路由。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 8. 表单填写（单列，参照 doc/参考文档/合同审批表单填写页面.jpg） ================= -->
+<div class="app" id="appNew" hidden>
+  <aside class="sidebar">
+    <div class="drawer-head"><span class="brand-logo"><img src="logo-180.png" alt="集团标识"></span><span class="org">供热集团公司</span><span class="caret">▾</span></div>
+    <div class="nav-group">
+      <div class="nav-cap">审批中心</div>
+      <div class="nav-item" data-tab="todo" data-tip="待我审批"><span class="ico">▤</span><span class="lbl">待我审批</span><span class="badge">8</span></div>
+      <div class="nav-item" data-tab="mine" data-tip="我发起的"><span class="ico">▧</span><span class="lbl">我发起的</span><span class="badge">2</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-cap">发起</div>
+      <div class="nav-item" data-screen="start" data-tip="发起申请"><span class="ico">✦</span><span class="lbl">发起申请</span></div>
+      <div class="nav-item" data-screen="new-contract" data-tip="合同审批单"><span class="ico">▦</span><span class="lbl">合同审批单</span></div>
+      <div class="nav-item" data-screen="new-fund" data-tip="资金审批单"><span class="ico">¥</span><span class="lbl">资金审批单</span></div>
+      <div class="nav-item" data-screen="new-matter" data-tip="事项审批单"><span class="ico">▤</span><span class="lbl">事项审批单</span></div>
+      <div class="nav-item" data-screen="new-seal" data-tip="印鉴证照单"><span class="ico">◉</span><span class="lbl">印鉴证照单</span></div>
+    </div>
+    <div class="nav-ph">其他模块待添加</div>
+    <div class="user-box"><span class="avatar">王</span><div class="u-txt"><div class="u-name">王强</div><div class="u-meta">供热公司 运维部 · 工号 10088</div></div></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title" id="newTitle">合同审批（含用印）</span>
+      <div class="tools">
+        <button class="btn btn-secondary" onclick="toast('已保存草稿，可在草稿箱继续编辑')">保存草稿</button>
+        <button class="btn btn-secondary" onclick="toast('草稿箱共 16 条')">草稿箱（16）</button>
+      </div>
+    </div>
+
+    <div class="form-page">
+      <div class="form-stage">
+        <div class="form-col">
+          <!-- 上次编辑提示 -->
+          <div class="form-note">
+            <span>ⓘ</span>
+            <span>有上次编辑记录</span>
+            <span class="sp">
+              <a href="#" onclick="toast('已载入上次未提交的内容');return false">继续编辑</a>
+              <a href="#" onclick="toast('已删除上次编辑记录');return false">删除</a>
+            </span>
+          </div>
+
+          <div class="form-head">
+            <h2 id="formName">合同审批（含用印）</h2>
+            <div class="desc" id="formDesc">用于合同签订申请</div>
+          </div>
+
+          <div class="form-card">
+            <!-- ========== 合同审批单 ========== -->
+            <div data-form="contract">
+              <div class="band" id="sec-contract-1">申请详情<span class="tg">5 个字段</span></div>
+              <div class="frow"><label for="c-name">合同名称<span class="star">*</span></label><input id="c-name" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="c-type">合同类型<span class="star">*</span></label>
+                <select id="c-type" class="ctl"><option>请选择</option><option>采购合同</option><option>销售合同</option><option>服务合同</option><option>租赁合同</option><option>工程合同</option><option>劳务合同</option><option>其他</option></select>
+              </div>
+              <div class="frow"><label for="c-cat">事项分类<span class="star">*</span><span class="opt">（配置项，不参与路由）</span></label>
+                <select id="c-cat" class="ctl"><option>请选择</option><option>经营</option><option>经济</option><option>行政</option><option>人力</option><option>投资</option></select>
+              </div>
+              <div class="frow"><label for="c-desc">合同描述<span class="star">*</span></label><textarea id="c-desc" class="ctl area" placeholder="合同内容"></textarea></div>
+              <div class="frow"><label for="c-no">合同编号</label><input id="c-no" class="ctl" placeholder="请输入"></div>
+
+              <div class="band" id="sec-contract-2">合同有效期<span class="tg">3 个字段</span></div>
+              <div class="frow"><label for="c-start">开始时间<span class="star">*</span></label><input id="c-start" class="ctl" type="date"></div>
+              <div class="frow"><label for="c-end">结束时间<span class="star">*</span></label><input id="c-end" class="ctl" type="date"></div>
+              <div class="frow"><label for="c-dur">时长（天）<span class="star">*</span></label><input id="c-dur" class="ctl ro" value="自动计算" disabled></div>
+
+              <div class="band" id="sec-contract-3">我方信息<span class="tg">1 个字段</span></div>
+              <div class="frow"><label for="c-our">签订公司<span class="star">*</span></label><input id="c-our" class="ctl" value="云羲（山西）数字科技有限公司" readonly></div>
+              <div class="tip" style="margin:-8px 0 var(--sp-md)">按发起人所属公司自动带出，不可修改。</div>
+
+              <div class="band" id="sec-contract-4">对方信息<span class="tg">3 个字段</span></div>
+              <div class="frow"><label for="c-opp">对方单位名称<span class="star">*</span></label><input id="c-opp" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="c-credit">统一社会信用代码<span class="star">*</span></label><input id="c-credit" class="ctl" placeholder="18 位（数字 + 大写字母）"></div>
+              <div class="frow"><label for="c-contact">对方联系方式</label><input id="c-contact" class="ctl" placeholder="请输入"></div>
+
+              <div class="band" id="sec-contract-5">附件与用印<span class="tg">4 个字段</span></div>
+              <div class="frow"><label>合同文本附件<span class="star">*</span></label>
+                <button class="upbtn" onclick="toast('上传合同文本（上限 30 个文件，最大 500MB/个）')">⬆ 上传文件</button>
+                <div class="tip">上限 30 个文件，最大 500MB/个</div>
+              </div>
+              <div class="frow"><label>盖章备案上传</label>
+                <button class="upbtn" onclick="toast('上传盖章备案扫描件')">⬆ 上传文件</button>
+                <div class="tip">上限 30 个文件，最大 500MB/个</div>
+              </div>
+              <div class="frow"><label>对方资质附件</label>
+                <button class="upbtn" onclick="toast('上传对方资质文件')">⬆ 上传文件</button>
+              </div>
+              <div class="frow"><label for="c-seal">拟用印类型<span class="star">*</span></label>
+                <select id="c-seal" class="ctl"><option>合同章</option><option>公章</option><option>财务章</option><option>法人章</option></select>
+              </div>
+
+              <div class="band" id="sec-contract-6">审批流程</div>
+              <div class="flow-empty">必填信息填写完整后，将显示审批流程</div>
+            </div>
+
+            <!-- ========== 资金审批单 ========== -->
+            <div data-form="fund" hidden>
+              <div class="band" id="sec-fund-1">申请详情</div>
+              <div class="frow"><label for="f-title">资金事由<span class="star">*</span></label><input id="f-title" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="f-cat">事项分类<span class="star">*</span><span class="opt">（统一归口财务部）</span></label>
+                <select id="f-cat" class="ctl"><option>经济</option><option>经营</option><option>行政</option><option>人力</option><option>投资</option></select>
+              </div>
+              <div class="frow"><label for="f-amt">申请金额<span class="star">*</span></label><input id="f-amt" class="ctl" style="text-align:right;font-variant-numeric:tabular-nums" placeholder="0.00"><div class="tip">金额不参与路由；≥100 万时打印稿与详情页同时显示万元换算。</div></div>
+              <div class="frow"><label for="f-payee">收款方名称<span class="star">*</span></label><input id="f-payee" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="f-acct">收款账号<span class="star">*</span></label><input id="f-acct" class="ctl" placeholder="请输入"><div class="tip">敏感字段：仅财务角色与系统管理员可见完整值，列表中脱敏显示。</div></div>
+              <div class="frow"><label for="f-method">支付方式<span class="star">*</span></label>
+                <select id="f-method" class="ctl"><option>银行转账</option><option>银行承兑汇票</option><option>现金</option><option>其他</option></select>
+              </div>
+              <div class="frow"><label for="f-date">计划支付日期<span class="star">*</span></label><input id="f-date" class="ctl" type="date"></div>
+
+              <div class="band" id="sec-fund-2">计划属性<span class="tg">一期仅存储，不参与流程判断</span></div>
+              <div class="frow"><label>计划类别</label>
+                <div class="choice"><label><input type="checkbox" checked> 计划内</label><label><input type="checkbox"> 计划外</label></div>
+                <div class="tip">后续并入「计划管理」模块后启用业务含义。</div>
+              </div>
+              <div class="frow"><label>付款归属</label>
+                <div class="choice"><label><input type="checkbox" checked> 本月度</label><label><input type="checkbox"> 本年度</label><label><input type="checkbox"> 以前年度</label></div>
+              </div>
+
+              <div class="band" id="sec-fund-3">附件</div>
+              <div class="frow"><label>发票 / 合同 / 说明<span class="star">*</span></label>
+                <button class="upbtn" onclick="toast('上传附件（至少 1 个）')">⬆ 上传文件</button>
+                <div class="tip">上限 30 个文件，最大 500MB/个</div>
+              </div>
+              <div class="frow"><label for="f-ref">关联合同单号</label><input id="f-ref" class="ctl" placeholder="选填"></div>
+
+              <div class="band" id="sec-fund-4">审批流程</div>
+              <div class="flow-empty">必填信息填写完整后，将显示审批流程</div>
+            </div>
+
+            <!-- ========== 事项审批单 ========== -->
+            <div data-form="matter" hidden>
+              <div class="band" id="sec-matter-1">申请详情</div>
+              <div class="frow"><label for="m-title">事项标题<span class="star">*</span></label><input id="m-title" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="m-cat">事项分类<span class="star">*</span><span class="opt">（配置项，不参与路由）</span></label>
+                <select id="m-cat" class="ctl"><option>经营</option><option>经济</option><option>行政</option><option>人力</option><option>投资</option></select>
+              </div>
+              <div class="frow"><label>是否涉及费用<span class="star">*</span></label>
+                <div class="choice"><label><input type="radio" name="mcost2" checked> 是</label><label><input type="radio" name="mcost2"> 否</label></div>
+                <div class="tip">选择「否」时流程跳过财务部复核节点；单据的归口部门仍记为财务部。</div>
+              </div>
+              <div class="frow"><label for="m-amt">涉及金额<span class="star">*</span><span class="opt">（涉及费用时必填）</span></label><input id="m-amt" class="ctl" style="text-align:right;font-variant-numeric:tabular-nums" placeholder="0.00"></div>
+              <div class="frow"><label for="m-bear">费用承担主体</label><input id="m-bear" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="m-desc">事项描述<span class="star">*</span></label><textarea id="m-desc" class="ctl area" placeholder="不少于 10 个字符"></textarea></div>
+              <div class="frow"><label for="m-expect">期望完成日期</label><input id="m-expect" class="ctl" type="date"></div>
+
+              <div class="band" id="sec-matter-2">附件与抄送</div>
+              <div class="frow"><label>附件</label>
+                <button class="upbtn" onclick="toast('上传附件（可选）')">⬆ 上传文件</button>
+              </div>
+              <div class="frow"><label for="m-cc">抄送人</label><input id="m-cc" class="ctl" placeholder="从通讯录选择，最多 20 人"><div class="tip">抄送人只读可见，不产生待办。</div></div>
+
+              <div class="band" id="sec-matter-3">审批流程</div>
+              <div class="flow-empty">必填信息填写完整后，将显示审批流程</div>
+            </div>
+
+            <!-- ========== 印鉴证照单 ========== -->
+            <div data-form="seal" hidden>
+              <div class="band" id="sec-seal-1">申请详情</div>
+              <div class="frow"><label for="s-title">用印 / 借用事由<span class="star">*</span></label><input id="s-title" class="ctl" placeholder="请输入"></div>
+              <div class="frow"><label for="s-type">用印类型<span class="star">*</span></label>
+                <select id="s-type" class="ctl"><option>公章</option><option>合同章</option><option>财务章</option><option>法人章</option><option>证照借用</option></select>
+              </div>
+              <div class="frow"><label for="s-cert">证照名称<span class="opt">（用印类型为「证照借用」时必填）</span></label>
+                <select id="s-cert" class="ctl"><option>—（非证照借用）</option><option>营业执照</option><option>税务登记证</option><option>组织机构代码证</option><option>资质证书</option></select>
+              </div>
+              <div class="frow"><label for="s-count">用印份数<span class="star">*</span></label><input id="s-count" class="ctl" placeholder="1–999 的整数"></div>
+              <div class="frow"><label for="s-purpose">用途说明<span class="star">*</span></label><textarea id="s-purpose" class="ctl area" placeholder="不少于 5 个字符"></textarea></div>
+
+              <div class="band" id="sec-seal-2">使用期限</div>
+              <div class="frow"><label for="s-start">使用开始日期<span class="star">*</span></label><input id="s-start" class="ctl" type="date"></div>
+              <div class="frow"><label for="s-end">使用结束日期<span class="star">*</span></label><input id="s-end" class="ctl" type="date"></div>
+              <div class="frow"><label>是否对外提供<span class="star">*</span></label>
+                <div class="choice"><label><input type="radio" name="sext2" checked> 是</label><label><input type="radio" name="sext2"> 否</label></div>
+                <div class="tip">选择「是」时用途说明需不少于 20 个字符。</div>
+              </div>
+
+              <div class="band" id="sec-seal-3">附件与归还</div>
+              <div class="frow"><label>附件</label>
+                <button class="upbtn" onclick="toast('上传附件（可选）')">⬆ 上传文件</button>
+              </div>
+              <div class="frow"><label for="s-return">归还状态<span class="opt">（审批中唯一可改的主字段，由归档节点填写）</span></label>
+                <select id="s-return" class="ctl"><option>未归还</option><option>已归还</option><option>无需归还</option></select>
+              </div>
+
+              <div class="band" id="sec-seal-4">审批流程</div>
+              <div class="flow-empty">必填信息填写完整后，将显示审批流程</div>
+            </div>
+
+            <!-- 底部操作 -->
+            <div class="form-foot">
+              <button class="btn btn-primary" onclick="toast('提交成功：已按发起时快照解析 7 个审批节点，字段转为只读')">提交</button>
+              <button class="btn btn-secondary" onclick="go('start')">取消</button>
+              <span class="sp"></span>
+              <span class="hint">提交后字段全部只读；需要修改须由审批人驳回后重提</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 本页导航（≥1440px 显示） -->
+        <nav class="form-outline" id="formOutline">
+          <div class="oh">本页导航</div>
+          <a href="#sec-contract-1" class="on">申请详情</a>
+          <a href="#sec-contract-2">合同有效期</a>
+          <a href="#sec-contract-3">我方信息</a>
+          <a href="#sec-contract-4">对方信息</a>
+          <a href="#sec-contract-5">附件与用印</a>
+          <a href="#sec-contract-6">审批流程</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 8. 打印预览 ================= -->
+<div class="app" id="appPrint" hidden>
+  <aside class="sidebar">
+    <div class="drawer-head"><span class="brand-logo"><img src="logo-180.png" alt="集团标识"></span><span class="org">供热集团公司</span><span class="caret">▾</span></div>
+    <div class="nav-group">
+      <div class="nav-cap">审批中心</div>
+      <div class="nav-item" data-tab="todo" data-tip="待我审批"><span class="ico">▤</span><span class="lbl">待我审批</span><span class="badge">8</span></div>
+      <div class="nav-item" data-screen="logs" data-tip="审计日志"><span class="ico">▩</span><span class="lbl">审计日志</span></div>
+      <div class="nav-item" data-screen="print" data-tip="打印预览"><span class="ico">▣</span><span class="lbl">打印预览</span></div>
+      <div class="nav-item" data-screen="h5" data-tip="移动端预览"><span class="ico">▢</span><span class="lbl">移动端预览</span></div>
+    </div>
+    <div class="nav-ph">其他模块待添加</div>
+    <div class="user-box"><span class="avatar">李</span><div class="u-txt"><div class="u-name">李四</div><div class="u-meta">财务部 · 工号 10237</div></div></div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title">打印预览 · 资金审批单</span>
+      <div class="tools">
+        <span class="hint">A4 210×297mm · 打印时隐藏界面元素（Ctrl+P → A4 / 100% / 无边距）</span>
+        <button class="btn btn-secondary" onclick="toast('已按 A4 版面生成打印预览')">重新生成</button>
+        <button class="btn btn-primary" onclick="window.print()">打印</button>
+      </div>
+    </div>
+    <div class="print-stage">
+      <div class="sheet">
+        <div class="doc-title">资金审批单</div>
+        <table class="pform">
+          <colgroup><col style="width:28mm"><col style="width:23mm"><col style="width:23mm"><col style="width:23mm"><col style="width:23mm"><col style="width:23mm"><col style="width:23mm"></colgroup>
+          <tbody>
+            <tr><td class="lbl">审批单位</td><td colspan="6" class="val">太原智澈节能科技有限公司</td></tr>
+            <tr><td class="lbl">事项分类</td><td colspan="6">☐经营　☑经济　☐行政　☐人力　☐投资</td></tr>
+            <tr><td class="lbl">计划类别</td><td colspan="3">☑计划内</td><td colspan="3">☐计划外</td></tr>
+            <tr><td class="lbl">付款归属</td><td colspan="6">☑本月度　☐本年度　☐以前年度</td></tr>
+            <tr><td class="lbl">资金审批内容</td><td colspan="6" class="big">以下合同已完成审批，申请预付款项：<br>忻州热力户端智能管控项目委托施工合同（龙展　金额：124,000 元），申请预付 15%，即 18,600 元<br>合计 18,600 元</td></tr>
+            <tr><td class="lbl">集团职能部门</td><td colspan="6" style="height:30mm;vertical-align:top;padding:2mm">
+              处理意见：<br><br>
+              <div class="sign-line"><span>签名：______________________</span><span>______ 年 ______ 月 ______ 日</span></div>
+            </td></tr>
+            <tr><td class="lbl">集团分管领导</td><td colspan="6" style="height:30mm;vertical-align:top;padding:2mm">
+              处理意见：<br><br>
+              <div class="sign-line"><span>签名：______________________</span><span>______ 年 ______ 月 ______ 日</span></div>
+            </td></tr>
+            <tr><td class="lbl">集团董事长</td><td colspan="6" style="height:30mm;vertical-align:top;padding:2mm">
+              <div class="sign-line" style="padding-top:16mm"><span>签名：______________________</span><span>______ 年 ______ 月 ______ 日</span></div>
+            </td></tr>
+            <tr><td class="lbl">系统关联</td><td colspan="6" style="font-size:8.5pt;color:#222">关联单号：OA-2026-000421　·　审批链：直属部门负责人 → 财务部复核（=集团归口部门）→ 分公司分管领导 → 子公司总经理 → 集团分管领导 → 集团董事长 → 归档登记　·　事项分类、计划类别、付款归属均不参与路由</td></tr>
+          </tbody>
+        </table>
+        <div class="pfoot"><span>集团OA审批系统 · 资金审批单</span><span>OA-2026-000421 · 模板 v3</span><span>第 1 页 / 共 1 页</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 9. 移动端预览 ================= -->
+<div class="app" id="appH5" hidden>
+  <aside class="sidebar">
+    <div class="drawer-head"><span class="brand-logo"><img src="logo-180.png" alt="集团标识"></span><span class="org">供热集团公司</span><span class="caret">▾</span></div>
+    <div class="nav-group">
+      <div class="nav-cap">审批中心</div>
+      <div class="nav-item" data-tab="todo" data-tip="待我审批"><span class="ico">▤</span><span class="lbl">待我审批</span><span class="badge">8</span></div>
+      <div class="nav-item" data-screen="logs" data-tip="审计日志"><span class="ico">▩</span><span class="lbl">审计日志</span></div>
+      <div class="nav-item" data-screen="print" data-tip="打印预览"><span class="ico">▣</span><span class="lbl">打印预览</span></div>
+      <div class="nav-item" data-screen="h5" data-tip="移动端预览"><span class="ico">▢</span><span class="lbl">移动端预览</span></div>
+    </div>
+    <div class="nav-ph">其他模块待添加</div>
+    <div class="user-box"><span class="avatar">李</span><div class="u-txt"><div class="u-name">李四</div><div class="u-meta">财务部 · 工号 10237</div></div></div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title">移动端 H5 · 浏览器直接访问</span>
+      <div class="tools"><span class="hint">触控目标 ≥44px · 底部操作栏 60px 常驻 · 姓名+工号水印</span></div>
+    </div>
+    <div class="h5-stage">
+      <!-- H5 待办列表 -->
+      <div class="h5">
+        <div class="h5-top"><span class="t">待我审批</span><span class="hint" style="margin-left:auto">8 条</span></div>
+        <div class="h5-body">
+          <div class="wm"><span style="left:8%;top:6%">李四 10237</span><span style="left:46%;top:22%">李四 10237</span><span style="left:12%;top:44%">李四 10237</span><span style="left:52%;top:62%">李四 10237</span><span style="left:6%;top:82%">李四 10237</span></div>
+          <div class="h5-item"><div class="r1"><span class="type-ico">¥</span><span class="t">8 月供热管网维护款支付</span><span class="pill pill-pending">待审</span></div><div class="r2"><span class="num">OA-2026-000421</span><span class="amt">¥1,250,000.00</span></div></div>
+          <div class="h5-item"><div class="r1"><span class="type-ico">▦</span><span class="t">2026 年度煤炭采购框架合同</span><span class="pill pill-pending">待审</span></div><div class="r2"><span class="num">OA-2026-000420</span><span class="amt">¥8,600,000.00</span></div></div>
+          <div class="h5-item"><div class="r1"><span class="type-ico">▤</span><span class="t">医疗公司新增科室设备采购申请</span><span class="pill pill-pending">待审</span></div><div class="r2"><span class="num">OA-2026-000418</span><span class="amt">¥386,400.00</span></div></div>
+          <div class="h5-item"><div class="r1"><span class="type-ico">◉</span><span class="t">投标文件用印（公章 3 份）</span><span class="pill pill-processing">审批中</span></div><div class="r2"><span class="num">OA-2026-000415</span><span class="amt">—</span></div></div>
+        </div>
+        <div class="h5-bar"><span class="hint" style="margin:auto">① 卡片列表替代表格 · 44px 触控</span></div>
+      </div>
+      <!-- H5 详情 + 操作栏 -->
+      <div class="h5">
+        <div class="h5-top"><span class="back">‹</span><span class="t">资金审批单</span></div>
+        <div class="h5-body">
+          <div class="wm"><span style="left:10%;top:12%">李四 10237</span><span style="left:44%;top:38%">李四 10237</span><span style="left:14%;top:68%">李四 10237</span></div>
+          <div style="text-align:center;padding:var(--sp-sm) 0 var(--sp-md);position:relative;z-index:1">
+            <div class="hint">申请金额</div>
+            <div class="amount-hero" style="justify-content:center"><span class="cur">¥</span><span class="n" style="font-size:26px">1,250,000.00</span></div>
+          </div>
+          <div class="h5-field"><span class="lb">资金事由</span><span class="ctl">8 月供热管网维护款支付</span></div>
+          <div class="h5-field"><span class="lb">收款方</span><span class="ctl">某某市政工程有限公司</span></div>
+          <div class="h5-field"><span class="lb">事项分类 / 计划类别 / 付款归属</span><span class="ctl" style="font-size:13px">经济 · 计划内 · 本月度</span></div>
+          <div class="h5-field"><span class="lb">当前节点</span><span class="ctl" style="color:var(--primary)">子公司总经理 · 待我审批</span></div>
+          <div class="h5-field"><span class="lb">审批意见</span><span class="ctl area" style="min-height:72px">请填写审批意见…</span></div>
+        </div>
+        <div class="h5-bar">
+          <button class="btn btn-secondary btn-h5" style="width:80px;justify-content:center">驳回</button>
+          <button class="btn btn-secondary btn-h5" style="width:88px;justify-content:center">补材料</button>
+          <span class="spacer"></span>
+          <button class="btn btn-primary btn-h5" style="flex:1;justify-content:center" onclick="openSign()">同意并签名</button>
+        </div>
+      </div>
+      <!-- H5 补件 -->
+      <div class="h5">
+        <div class="h5-top"><span class="back">‹</span><span class="t">补充材料</span></div>
+        <div class="h5-body">
+          <div style="background:var(--warning-bg);border-left:3px solid var(--warning);border-radius:var(--r-sm);padding:var(--sp-sm);font-size:13px;margin-bottom:var(--sp-sm);position:relative;z-index:1">
+            <b>第 1 次补件 · 剩余 2 次</b><br>要求：请补充工程量确认单，核对结算口径。截止 07-12 18:00
+          </div>
+          <div class="h5-field"><span class="lb">申请金额（只读）</span><span class="ctl ro">¥1,250,000.00</span></div>
+          <div class="h5-field"><span class="lb">收款方（只读）</span><span class="ctl ro">某某市政工程有限公司</span></div>
+          <div class="h5-field"><span class="lb">事项分类（只读）</span><span class="ctl ro">经济 · 归口财务部</span></div>
+          <div class="h5-field"><span class="lb">补充附件</span><span class="ctl" style="border-style:dashed;justify-content:center;color:var(--ink-subtle)">＋ 上传文件</span></div>
+          <div class="h5-field"><span class="lb">补件说明</span><span class="ctl area" style="min-height:56px">已按要求补充工程量确认单…</span></div>
+        </div>
+        <div class="h5-bar"><button class="btn btn-primary btn-h5" style="flex:1;justify-content:center" onclick="toast('补件已提交，流程回到请求补件的节点')">提交补件</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 浮层：单据详情 ================= -->
+<div class="scrim" id="scrim"></div>
+
+<div class="modal" id="modalDetail">
+  <div class="m-head">
+    <h3 id="dTitle">8 月供热管网维护款支付</h3>
+    <span class="pill pill-pending" id="dPill">待我审批</span>
+    <span class="mono-no">OA-2026-000421</span>
+    <button class="x" onclick="closeModal('modalDetail')">✕</button>
+  </div>
+  <div class="m-body">
+    <div class="m-grid">
+      <div class="card">
+        <div class="card-h">单据信息<span class="r"><span class="tag tag-info">经济类 · 计划内 · 本月度</span></span></div>
+        <div class="card-b">
+          <div class="amount-hero"><span class="cur">¥</span><span class="n">1,250,000.00</span><span class="wan">折合 125.00 万 · 壹佰贰拾伍万元整</span></div>
+          <div class="sec">
+            <div class="sec-title">资金信息</div>
+            <dl class="rows">
+              <dt>资金事由</dt><dd>8 月供热管网维护款支付</dd>
+              <dt>收款方</dt><dd>某某市政工程有限公司</dd>
+              <dt>收款账号</dt><dd><span class="mono">**** **** **** 4218</span> <span class="hint">仅财务角色可见完整值</span></dd>
+              <dt>支付方式</dt><dd>银行转账</dd>
+              <dt>计划支付日期</dt><dd>2026-07-15</dd>
+              <dt>关联合同单号</dt><dd><a class="mono" href="#" onclick="toast('跳转到关联合同单 OA-2026-000420');return false">OA-2026-000420</a></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">发起信息</div>
+            <dl class="rows">
+              <dt>发起人</dt><dd>王强 · 供热公司 运维部</dd>
+              <dt>发起时间</dt><dd>2026-07-09 09:12</dd>
+              <dt>事项分类</dt><dd>经济 <span class="hint">（配置项，不参与路由）</span></dd>
+              <dt>计划类别</dt><dd>计划内 <span class="hint">（一期仅存储）</span></dd>
+              <dt>付款归属</dt><dd>本月度 <span class="hint">（一期仅存储）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">附件（3）</div>
+            <div class="file"><span class="type-ico">PDF</span>管网维护发票.pdf<span class="sz">1.2 MB</span></div>
+            <div class="file"><span class="type-ico">PDF</span>维护合同扫描件.pdf<span class="sz">3.4 MB</span></div>
+            <div class="file"><span class="type-ico">XLS</span>工程量确认单.xlsx <span class="tag tag-warning">第 1 次补件</span><span class="sz">86 KB</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">审批记录<span class="r"><span class="tag tag-neutral">模板 v3</span></span></div>
+        <div class="card-b">
+          <div class="trail">
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">直属部门负责人 · 张伟</div><div class="mt">07-09 09:40 · 已通过</div><div class="op">情况属实，同意上报。</div></div></div>
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">财务部复核 · 李四</div><div class="mt">07-09 10:25 · 已通过 · 签名</div><div class="op">同意，控制好付款节奏。</div><div class="tsig">李四 手写签名</div></div></div>
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">分公司分管领导 · 刘建国</div><div class="mt">07-09 11:02 · 要求补充材料</div><div class="op">请补充工程量确认单，核对结算口径。</div><div style="margin-top:5px"><span class="tag tag-warning">待补件 → 已补件（第 1 次）</span> <span class="hint">07-09 14:20 由发起人补件</span></div></div></div>
+            <div class="step current"><span class="line"></span><span class="dot">●</span><div><div class="nm">子公司总经理 · 陈志远 <span class="tag tag-info">待我处理</span></div><div class="mt">07-09 15:11 到达 · 已等待 1 天 3 小时</div>
+              <div class="par"><div class="ph"><span>协同审批 · 2 个部门</span><span class="pg2">1 / 2 完成</span></div>
+                <div class="pr"><span style="color:var(--success)">✓</span><span>人力资源部</span><span class="hint" style="margin-left:auto">07-09 16:40 同意</span></div>
+                <div class="pr dim"><span>·</span><span>法务岗</span><span class="hint" style="margin-left:auto">待处理</span></div>
+              </div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">5</span><div><div class="nm">集团分管领导</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">6</span><div><div class="nm">集团董事长</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="dot">7</span><div><div class="nm">归档登记</div><div class="mt">未到达 · 超时预警阈值 24h</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="m-foot">
+    <textarea placeholder="填写审批意见（驳回时必填，不少于 5 个字）…"></textarea>
+    <span class="hint" style="font-variant-numeric:tabular-nums">0 / 500</span>
+    <button class="btn btn-danger-ghost" onclick="askReason('驳回','确认驳回《8 月供热管网维护款支付》？')">驳回</button>
+    <button class="btn btn-secondary" onclick="askReason('要求补充材料','将通知发起人补充材料，流程暂停且不计入驳回')">要求补充材料</button>
+    <button class="btn btn-secondary" onclick="openModal('modalAddSign')">加签</button>
+    <button class="btn btn-secondary" onclick="openModal('modalRoute')">流转</button>
+    <button class="btn btn-primary" onclick="openSign()">同意并签名</button>
+  </div>
+</div>
+
+<!-- ===== 审核页 · 合同审批（含用印）—— 字段与提交模板一致 ===== -->
+<div class="modal" id="modalContract">
+  <div class="m-head">
+    <h3>2026 年度煤炭采购框架合同</h3>
+    <span class="pill pill-pending">待我审批</span>
+    <span class="mono-no">OA-2026-000420</span>
+    <button class="x" onclick="closeModal('modalContract')">✕</button>
+  </div>
+  <div class="m-body">
+    <div class="m-grid">
+      <div class="card">
+        <div class="card-h">申请详情<span class="r"><span class="tag tag-info">合同审批（含用印）</span></span></div>
+        <div class="card-b">
+          <div class="amount-hero"><span class="cur">¥</span><span class="n">8,600,000.00</span><span class="wan">折合 860.00 万 · 捌佰陆拾万元整</span></div>
+          <div class="sec">
+            <div class="sec-title">合同信息</div>
+            <dl class="rows">
+              <dt>合同名称</dt><dd>2026 年度煤炭采购框架合同</dd>
+              <dt>合同类型</dt><dd>采购合同</dd>
+              <dt>事项分类</dt><dd>经营 <span class="hint">（配置项，不参与路由）</span></dd>
+              <dt>合同编号</dt><dd><span class="mono">MC-2026-0821</span></dd>
+              <dt>合同金额</dt><dd class="ro2"><span class="mono">8,600,000.00</span> 元 <span class="hint">（乙方：某某煤业集团有限责任公司）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">合同描述</div>
+            <div style="font-size:14px;line-height:1.7">2026 年度动力煤采购，用于供热公司三个热源厂冬季供暖。全年计划采购量 12 万吨，单价随市场价上下浮动不超过 5%，按月结算；履约保证金 3%。</div>
+          </div>
+          <div class="sec">
+            <div class="sec-title">合同有效期</div>
+            <dl class="rows">
+              <dt>开始时间</dt><dd>2026-08-01</dd>
+              <dt>结束时间</dt><dd>2027-07-31</dd>
+              <dt>时长（天）</dt><dd>365 天 <span class="hint">（自动计算）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">我方信息</div>
+            <dl class="rows">
+              <dt>签订公司</dt><dd>云羲（山西）数字科技有限公司 <span class="hint">（按发起人所属公司自动带出）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">对方信息</div>
+            <dl class="rows">
+              <dt>对方单位名称</dt><dd>某某煤业集团有限责任公司</dd>
+              <dt>统一社会信用代码</dt><dd><span class="mono">91140000MA0KX8XXXX</span></dd>
+              <dt>对方联系方式</dt><dd><span class="mono">0351-8888 6666</span>（张经理）</dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">附件与用印<span class="src">模板字段：合同文本附件 / 盖章备案上传 / 对方资质附件 / 拟用印类型</span></div>
+            <div class="file"><span class="type-ico">PDF</span>煤炭采购框架合同（待签）.pdf<span class="sz">2.8 MB</span></div>
+            <div class="file"><span class="type-ico">PDF</span>营业执照与资质证书.pdf<span class="sz">1.1 MB</span></div>
+            <div class="file"><span class="type-ico">PDF</span>上年度履约评价.pdf<span class="sz">640 KB</span></div>
+            <dl class="rows" style="margin-top:var(--sp-sm)">
+              <dt>盖章备案</dt><dd class="ro2">尚未上传 <span class="hint">（审批通过后用印时补充）</span></dd>
+              <dt>拟用印类型</dt><dd>合同章</dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">发起信息</div>
+            <dl class="rows">
+              <dt>发起人</dt><dd>赵敏 · 供热公司 采购部</dd>
+              <dt>发起时间</dt><dd>2026-07-09 08:40</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">审批记录<span class="r"><span class="tag tag-neutral">模板 v3</span></span></div>
+        <div class="card-b">
+          <div class="trail">
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">直属部门负责人 · 周涛</div><div class="mt">07-09 09:05 · 已通过</div><div class="op">采购计划已纳入年度预算，同意。</div></div></div>
+            <div class="step current"><span class="line"></span><span class="dot">●</span><div><div class="nm">财务部复核 · 李四 <span class="tag tag-info">待我处理</span></div><div class="mt">07-09 09:06 到达 · 已等待 6 小时</div>
+              <div class="par"><div class="ph"><span>协同审批 · 2 个部门</span><span class="pg2">1 / 2 完成</span></div>
+                <div class="pr"><span style="color:var(--success)">✓</span><span>法务岗</span><span class="hint" style="margin-left:auto">07-09 10:20 同意</span></div>
+                <div class="pr dim"><span>·</span><span>经发部</span><span class="hint" style="margin-left:auto">待处理</span></div>
+              </div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">3</span><div><div class="nm">分公司分管领导</div><div class="mt">未到达</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">4</span><div><div class="nm">子公司总经理</div><div class="mt">未到达</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">5</span><div><div class="nm">集团分管领导</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">6</span><div><div class="nm">集团董事长</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="dot">7</span><div><div class="nm">归档登记</div><div class="mt">未到达</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="m-foot">
+    <textarea placeholder="填写审批意见（驳回时必填，不少于 5 个字）…"></textarea>
+    <span class="hint" style="font-variant-numeric:tabular-nums">0 / 500</span>
+    <button class="btn btn-danger-ghost" onclick="askReason('驳回','确认驳回《2026 年度煤炭采购框架合同》？')">驳回</button>
+    <button class="btn btn-secondary" onclick="askReason('要求补充材料','将通知发起人补充材料，流程暂停且不计入驳回')">要求补充材料</button>
+    <button class="btn btn-secondary" onclick="openModal('modalAddSign')">加签</button>
+    <button class="btn btn-secondary" onclick="openModal('modalRoute')">流转</button>
+    <button class="btn btn-primary" onclick="openSign()">同意并签名</button>
+  </div>
+</div>
+
+<!-- ===== 审核页 · 事项审批单 —— 字段与提交模板一致 ===== -->
+<div class="modal" id="modalMatter">
+  <div class="m-head">
+    <h3>医疗公司新增科室设备采购申请</h3>
+    <span class="pill pill-pending">待我审批</span>
+    <span class="mono-no">OA-2026-000418</span>
+    <button class="x" onclick="closeModal('modalMatter')">✕</button>
+  </div>
+  <div class="m-body">
+    <div class="m-grid">
+      <div class="card">
+        <div class="card-h">申请详情<span class="r"><span class="tag tag-info">事项审批单</span></span></div>
+        <div class="card-b">
+          <div class="amount-hero"><span class="cur">¥</span><span class="n">386,400.00</span><span class="wan">折合 38.64 万</span></div>
+          <div class="sec">
+            <div class="sec-title">事项信息</div>
+            <dl class="rows">
+              <dt>事项标题</dt><dd>医疗公司新增科室设备采购申请</dd>
+              <dt>事项分类</dt><dd>经济 <span class="hint">（配置项，不参与路由）</span></dd>
+              <dt>是否涉及费用</dt><dd><b>是</b> <span class="hint">（涉及费用 → 不跳过财务部复核节点）</span></dd>
+              <dt>涉及金额</dt><dd class="ro2"><span class="mono">386,400.00</span> 元</dd>
+              <dt>费用承担主体</dt><dd>医疗公司</dd>
+              <dt>期望完成日期</dt><dd>2026-08-15</dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">事项描述</div>
+            <div style="font-size:14px;line-height:1.7">医疗公司新增科室需采购诊疗设备 6 台（含安装调试），已完成三方比价，详见附件报价单与科室会议决议。</div>
+          </div>
+          <div class="sec">
+            <div class="sec-title">附件与抄送<span class="src">模板字段：附件 / 抄送人</span></div>
+            <div class="file"><span class="type-ico">PDF</span>设备报价单.pdf<span class="sz">620 KB</span></div>
+            <div class="file"><span class="type-ico">PDF</span>科室会议决议.pdf<span class="sz">180 KB</span></div>
+            <dl class="rows" style="margin-top:var(--sp-sm)">
+              <dt>抄送人</dt><dd>李玥洋、官鑫 <span class="hint">（2 人 · 只读可见，不产生待办）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">发起信息</div>
+            <dl class="rows">
+              <dt>发起人</dt><dd>孙倩 · 医疗公司 设备科</dd>
+              <dt>发起时间</dt><dd>2026-07-08 17:05</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">审批记录<span class="r"><span class="tag tag-neutral">模板 v3</span></span></div>
+        <div class="card-b">
+          <div class="trail">
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">直属部门负责人 · 科室主任 韩雪</div><div class="mt">07-08 17:40 · 已通过</div><div class="op">设备已列入科室年度计划，同意。</div></div></div>
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">财务部复核 · 李四</div><div class="mt">07-09 09:20 · 已通过 · 签名</div><div class="op">预算科目已核，金额与报价一致。</div><div class="tsig">李四 手写签名</div></div></div>
+            <div class="step current"><span class="line"></span><span class="dot">●</span><div><div class="nm">分公司分管领导 · 刘建国 <span class="tag tag-info">待我处理</span></div><div class="mt">07-09 09:21 到达</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">4</span><div><div class="nm">子公司总经理</div><div class="mt">未到达</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">5</span><div><div class="nm">集团分管领导</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">6</span><div><div class="nm">集团董事长</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="dot">7</span><div><div class="nm">归档登记</div><div class="mt">未到达</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="m-foot">
+    <textarea placeholder="填写审批意见（驳回时必填，不少于 5 个字）…"></textarea>
+    <span class="hint" style="font-variant-numeric:tabular-nums">0 / 500</span>
+    <button class="btn btn-danger-ghost" onclick="askReason('驳回','确认驳回《医疗公司新增科室设备采购申请》？')">驳回</button>
+    <button class="btn btn-secondary" onclick="askReason('要求补充材料','将通知发起人补充材料，流程暂停且不计入驳回')">要求补充材料</button>
+    <button class="btn btn-secondary" onclick="openModal('modalAddSign')">加签</button>
+    <button class="btn btn-secondary" onclick="openModal('modalRoute')">流转</button>
+    <button class="btn btn-primary" onclick="openSign()">同意并签名</button>
+  </div>
+</div>
+
+<!-- ===== 审核页 · 印鉴证照单 —— 字段与提交模板一致 ===== -->
+<div class="modal" id="modalSeal">
+  <div class="m-head">
+    <h3>投标文件用印（公章 3 份）</h3>
+    <span class="pill pill-processing">审批中</span>
+    <span class="mono-no">OA-2026-000415</span>
+    <button class="x" onclick="closeModal('modalSeal')">✕</button>
+  </div>
+  <div class="m-body">
+    <div class="m-grid">
+      <div class="card">
+        <div class="card-h">申请详情<span class="r"><span class="tag tag-info">印鉴证照单</span></span></div>
+        <div class="card-b">
+          <div class="sec">
+            <div class="sec-title">用印信息</div>
+            <dl class="rows">
+              <dt>用印事由</dt><dd>投标文件用印</dd>
+              <dt>用印类型</dt><dd>公章</dd>
+              <dt>证照名称</dt><dd>— <span class="hint">（非证照借用）</span></dd>
+              <dt>用印份数</dt><dd>3 份</dd>
+              <dt>是否对外提供</dt><dd>是 <span class="hint">（用途说明需不少于 20 字）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">用途说明</div>
+            <div style="font-size:14px;line-height:1.7">用于「忻州热力户端智能管控项目」投标文件盖章，投标截止 2026-07-15，需加盖公章 3 份并附法人授权书。</div>
+          </div>
+          <div class="sec">
+            <div class="sec-title">使用期限</div>
+            <dl class="rows">
+              <dt>使用开始日期</dt><dd>2026-07-10</dd>
+              <dt>使用结束日期</dt><dd>2026-07-12</dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">附件与归还<span class="src">模板字段：附件 / 归还状态</span></div>
+            <div class="file"><span class="type-ico">PDF</span>投标文件（待盖章）.pdf<span class="sz">4.6 MB</span></div>
+            <dl class="rows" style="margin-top:var(--sp-sm)">
+              <dt>归还状态</dt><dd class="ro2">未归还 <span class="hint">（审批中唯一可改的主字段，由归档节点填写）</span></dd>
+            </dl>
+          </div>
+          <div class="sec">
+            <div class="sec-title">发起信息</div>
+            <dl class="rows">
+              <dt>发起人</dt><dd>周涛 · 集团办</dd>
+              <dt>发起时间</dt><dd>2026-07-08 14:22</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">审批记录<span class="r"><span class="tag tag-neutral">模板 v3</span></span></div>
+        <div class="card-b">
+          <div class="trail">
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">直属部门负责人 · 集团办 席敏</div><div class="mt">07-08 14:50 · 已通过</div><div class="op">投标事项属实，同意用印。</div></div></div>
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">财务部复核 · 李四</div><div class="mt">07-08 15:30 · 已通过</div><div class="op">无需费用，仅归口确认。</div></div></div>
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">分公司分管领导 · 刘建国</div><div class="mt">07-08 16:10 · 已通过</div></div></div>
+            <div class="step done"><span class="line"></span><span class="dot">✓</span><div><div class="nm">子公司总经理 · 陈志远</div><div class="mt">07-09 09:00 · 已通过</div></div></div>
+            <div class="step current"><span class="line"></span><span class="dot">●</span><div><div class="nm">集团分管领导 <span class="tag tag-info">当前节点</span></div><div class="mt">07-09 09:01 到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="line"></span><span class="dot">6</span><div><div class="nm">集团董事长</div><div class="mt">未到达 · 强制签名</div></div></div>
+            <div class="step pending"><span class="dot">7</span><div><div class="nm">归档登记</div><div class="mt">未到达 · 含用印登记与归还</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="m-foot">
+    <textarea placeholder="填写审批意见（驳回时必填，不少于 5 个字）…"></textarea>
+    <span class="hint" style="font-variant-numeric:tabular-nums">0 / 500</span>
+    <button class="btn btn-danger-ghost" onclick="askReason('驳回','确认驳回《投标文件用印（公章 3 份）》？')">驳回</button>
+    <button class="btn btn-secondary" onclick="askReason('要求补充材料','将通知发起人补充材料，流程暂停且不计入驳回')">要求补充材料</button>
+    <button class="btn btn-secondary" onclick="openModal('modalRoute')">流转</button>
+    <button class="btn btn-primary" onclick="openSign()">审批并签名</button>
+  </div>
+</div>
+
+<!-- 浮层：二次确认 -->
+<div class="modal sm" id="modalConfirm">
+  <div class="m-head"><h3 id="cfTitle">确认操作</h3><button class="x" onclick="closeModal('modalConfirm')">✕</button></div>
+  <div class="m-body">
+    <div id="cfBody" style="font-size:14px">确认执行该操作？</div>
+    <div style="margin-top:var(--sp-md)">
+      <label class="f-label req">原因 / 说明</label>
+      <textarea class="field area" style="min-height:72px" placeholder="请填写原因（≥5 个字）"></textarea>
+      <div class="hint">该操作将写入审批记录与审计日志，不可删除。</div>
+    </div>
+  </div>
+  <div class="m-foot">
+    <span style="flex:1"></span>
+    <button class="btn btn-secondary" onclick="closeModal('modalConfirm')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('modalConfirm');toast('操作已提交，已写入审批记录与审计日志')">确认提交</button>
+  </div>
+</div>
+
+<!-- 浮层：签名 -->
+<div class="modal sm" id="modalSign" style="width:min(640px,92vw)">
+  <div class="m-head"><h3>签名确认</h3><span class="tag tag-warning">本节点强制签名</span><button class="x" onclick="closeModal('modalSign')">✕</button></div>
+  <div class="m-body">
+    <div class="sign-pad"><span class="stroke"></span><span style="position:absolute;bottom:12px;right:14px;font-size:12px">请在框内签名</span></div>
+    <div style="display:flex;gap:var(--sp-xs);margin-top:var(--sp-sm)">
+      <button class="btn btn-secondary" onclick="toast('已清除签名')">清除</button>
+      <button class="btn btn-secondary" onclick="toast('已载入个人中心预存的签名')">使用预存签名</button>
+    </div>
+    <div class="hint" style="margin-top:var(--sp-sm)">签名写入后不可修改、不可删除，仅可重新签署并保留历史版本；将记录时间戳、设备指纹、IP 与防篡改哈希。</div>
+  </div>
+  <div class="m-foot">
+    <span style="flex:1"></span>
+    <button class="btn btn-secondary" onclick="closeModal('modalSign')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('modalSign');toast('已签名并通过，流程推进到下一节点')">确认签名并同意</button>
+  </div>
+</div>
+
+<!-- 浮层：加签 -->
+<div class="modal sm" id="modalAddSign">
+  <div class="m-head"><h3>加签</h3><button class="x" onclick="closeModal('modalAddSign')">✕</button></div>
+  <div class="m-body">
+    <label class="f-label req">加签方式</label>
+    <div class="choice" style="margin-bottom:var(--sp-md)">
+      <label><input type="radio" name="as" checked> 前加签（加签人先审，审完回到我）</label>
+      <label><input type="radio" name="as"> 后加签（我先审，审完加签人再审）</label>
+    </div>
+    <label class="f-label req">加签人</label>
+    <input class="field" style="width:100%" value="法务岗 · 闫德忠">
+    <div class="hint" style="margin-top:var(--sp-xs)">加签人必须签署意见；加签行为与加签链记入审计日志。</div>
+  </div>
+  <div class="m-foot"><span style="flex:1"></span>
+    <button class="btn btn-secondary" onclick="closeModal('modalAddSign')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('modalAddSign');toast('已加签，等待加签人处理')">确认加签</button>
+  </div>
+</div>
+
+<!-- 浮层：流转 -->
+<div class="modal sm" id="modalRoute">
+  <div class="m-head"><h3>流转到其他部门</h3><button class="x" onclick="closeModal('modalRoute')">✕</button></div>
+  <div class="m-body">
+    <div class="hint" style="margin-bottom:var(--sp-sm)">本单已流转/回退 <b>1 / 5</b> 次；已处理过的部门不可再次指定（禁止回流）。</div>
+    <label class="f-label req">承接部门</label>
+    <select class="field" style="width:100%"><option>人力资源部</option><option>集团办</option><option>经发部</option><option>法务岗</option></select>
+    <div style="margin-top:var(--sp-md)">
+      <label class="f-label req">流转原因</label>
+      <textarea class="field area" style="min-height:64px" placeholder="请说明为何需要该部门复核（≥5 个字）"></textarea>
+    </div>
+    <div class="hint" style="margin-top:var(--sp-xs)">承接部门将对本单据可见（仅限本单），但不会因此获得其他同类单据的查看权。</div>
+  </div>
+  <div class="m-foot"><span style="flex:1"></span>
+    <button class="btn btn-secondary" onclick="closeModal('modalRoute')">取消</button>
+    <button class="btn btn-primary" onclick="closeModal('modalRoute');toast('已流转至人力资源部，等待其审批')">确认流转</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="notes" id="notes">
+  <div class="ncard">
+    <h4>本预览覆盖的页面</h4>
+    <ul>
+      <li>登录页 · 待我审批 / 我已审批 / 我发起的 / 抄送我的 · 四类单据发起表单 · 打印预览（A4 实尺）· 移动端 H5 三屏 · 审计日志 · 单据详情浮层（含加签 / 流转 / 补件 / 签名 / 二次确认）</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+/* ===== 页面切换 ===== */
+var SCREENS = ['login','todo','done','mine','cc','start','new-matter','new-fund','new-contract','new-seal','print','h5','logs'];
+var FORM_OF = {'new-matter':'matter','new-fund':'fund','new-contract':'contract','new-seal':'seal'};
+var FORM_META = {
+  'new-contract':{name:'合同审批（含用印）',desc:'用于合同签订申请',outline:['申请详情','合同有效期','我方信息','对方信息','附件与用印','审批流程']},
+  'new-fund':{name:'资金审批单',desc:'用于资金支付与预付款申请',outline:['申请详情','计划属性','附件','审批流程']},
+  'new-matter':{name:'事项审批单',desc:'用于跨部门事项报批',outline:['申请详情','附件与抄送','审批流程']},
+  'new-seal':{name:'印鉴证照单',desc:'用于用印与证照借用申请',outline:['申请详情','使用期限','附件与归还','审批流程']}
+};
+function show(id){
+  SCREENS.forEach(function(s){
+    var el = document.getElementById('s-'+s);
+    if (el) el.hidden = (s !== id);
+  });
+  document.getElementById('app').hidden      = !['todo','done','mine','cc','logs'].includes(id);
+  document.getElementById('appStart').hidden = (id !== 'start');
+  document.getElementById('appNew').hidden   = !Object.keys(FORM_OF).includes(id);
+  document.getElementById('appPrint').hidden = (id !== 'print');
+  document.getElementById('appH5').hidden    = (id !== 'h5');
+}
+function go(id){
+  show(id);
+  // 工具条高亮
+  document.querySelectorAll('#screenNav button').forEach(function(b){ b.classList.toggle('on', b.dataset.screen === id); });
+  // 侧栏高亮 + 标签页联动
+  var tab = ['done','mine','cc'].includes(id) ? id : (['todo','logs'].includes(id) ? 'todo' : null);
+  document.querySelectorAll('.nav-item').forEach(function(n){
+    n.classList.toggle('on', n.dataset.tab === tab || n.dataset.screen === id);
+  });
+  document.querySelectorAll('#tabs .tab').forEach(function(t){ t.classList.toggle('on', t.dataset.tab === tab); });
+  document.querySelectorAll('[data-pane]').forEach(function(p){ p.hidden = (p.dataset.pane !== id); });
+  var titles = {todo:'待我审批',done:'我已审批',mine:'我发起的',cc:'抄送我的',logs:'审计日志',start:'发起申请'};
+  var pt = document.getElementById('pageTitle'); if (pt && titles[id]) pt.textContent = titles[id];
+  // 表单页：标题 / 说明 / 表单容器 / 本页导航
+  if (FORM_OF[id]) {
+    var meta = FORM_META[id];
+    var nt = document.getElementById('newTitle'); if (nt) nt.textContent = meta.name;
+    var fn = document.getElementById('formName'); if (fn) fn.textContent = meta.name;
+    var fd = document.getElementById('formDesc'); if (fd) fd.textContent = meta.desc;
+    document.querySelectorAll('[data-form]').forEach(function(f){ f.hidden = (f.dataset.form !== FORM_OF[id]); });
+    var ol = document.getElementById('formOutline');
+    if (ol) {
+      var pref = 'sec-' + FORM_OF[id] + '-';
+      ol.innerHTML = '<div class="oh">本页导航</div>' + meta.outline.map(function(t, i){
+        return '<a href="#' + pref + (i + 1) + '"' + (i === 0 ? ' class="on"' : '') + '>' + t + '</a>';
+      }).join('');
+    }
+  }
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('#screenNav button').forEach(function(b){
+  b.addEventListener('click', function(){ go(b.dataset.screen); });
+});
+/* 侧栏导航 + 模板卡片：统一事件委托 */
+document.addEventListener('click', function(e){
+  var n = e.target.closest('.nav-item');
+  if (n && (n.dataset.tab || n.dataset.screen)) { go(n.dataset.tab || n.dataset.screen); return; }
+  var c = e.target.closest('.tpl-card');
+  if (c && c.dataset.screen) {
+    document.querySelectorAll('.tpl-card').forEach(function(x){ x.classList.toggle('on', x === c); });
+    go(c.dataset.screen);
+  }
+});
+document.querySelectorAll('#tabs .tab').forEach(function(t){
+  t.addEventListener('click', function(){ go(t.dataset.tab); });
+});
+/* 发起申请：分类切换 */
+document.getElementById('tplCats').addEventListener('click', function(e){
+  var c = e.target.closest('.tpl-cat'); if (!c) return;
+  this.querySelectorAll('.tpl-cat').forEach(function(x){ x.classList.toggle('on', x === c); });
+  document.getElementById('tplCatName').textContent = c.textContent.trim();
+  toast('已筛选分类：' + c.textContent.trim());
+});
+
+/* ===== 抽屉抽缩 ===== */
+function toggleRail(force){
+  var app = document.querySelector('.app:not([hidden])');
+  if (!app) return;
+  app.classList.toggle('rail', force === undefined ? undefined : force);
+}
+document.addEventListener('keydown', function(e){
+  if (e.ctrlKey && e.key === '\\') { e.preventDefault(); toggleRail(); }
+});
+
+/* ===== 浮层 ===== */
+function openModal(id){
+  document.getElementById(id).classList.add('on');
+  document.getElementById('scrim').classList.add('on');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('on');
+  document.getElementById('scrim').classList.remove('on');
+}
+function closeAll(){
+  document.querySelectorAll('.modal').forEach(function(m){ m.classList.remove('on'); });
+  document.getElementById('scrim').classList.remove('on');
+}
+document.getElementById('scrim').addEventListener('click', closeAll);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeAll(); });
+document.querySelectorAll('tr[data-open]').forEach(function(tr){
+  tr.addEventListener('click', function(){
+    document.querySelectorAll('tr.sel').forEach(function(r){ r.classList.remove('sel'); });
+    tr.classList.add('sel');
+    // 按行上的 data-detail 打开对应审核页（四类单据各有独立审核页，字段与提交模板一致）
+    openModal(tr.dataset.detail || 'modalDetail');
+  });
+});
+function askReason(title, body){
+  document.getElementById('cfTitle').textContent = title;
+  document.getElementById('cfBody').textContent = body;
+  openModal('modalConfirm');
+}
+function openSign(){ openModal('modalSign'); }
+
+/* ===== 提示 ===== */
+var toastTimer;
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 2600);
+}
+
+/* ===== 反例开关 ===== */
+document.getElementById('antiChk').addEventListener('change', function(){
+  document.querySelectorAll('.app, .login-wrap, #appStart, #appNew').forEach(function(el){
+    el.classList.toggle('anti', this.checked);
+  }, this);
+  document.getElementById('notes').classList.toggle('on', this.checked);
+});
+
+/* 初始化 */
+go('todo');
+</script>
+</body>
+</html>

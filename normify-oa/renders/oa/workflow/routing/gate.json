@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.routing.gate",
+  "updated_at": "2026-10-02T08:02:46.976Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "先过总次数闸门，再过禁止回流闸门，最后把动作统一留痕。",
+    "en": "Total-count gate first, then the no-reflux gate; every action is trailed."
+  },
+  "order": [
+    "oa.workflow.routing.gate.quota",
+    "oa.workflow.routing.gate.no-reflux",
+    "oa.workflow.routing.gate.audit"
+  ]
+}

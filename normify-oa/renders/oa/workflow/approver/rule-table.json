@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.approver.rule-table",
+  "updated_at": "2026-10-02T08:03:43.456Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "按主干节点顺序阅读：组织链派生 → 财务部归口 → 集团层 → 手工指定与协同勾选。",
+    "en": "Read in trunk-node order: org-chain derivation → Finance ownership → group layer → manual assignment and collaboration hooks."
+  },
+  "order": [
+    "oa.workflow.approver.rule-table.org-chain",
+    "oa.workflow.approver.rule-table.finance",
+    "oa.workflow.approver.rule-table.group",
+    "oa.workflow.approver.rule-table.manual"
+  ],
+  "groups": [
+    {
+      "id": "org",
+      "title": {
+        "zh": "组织派生",
+        "en": "Org-Derived"
+      },
+      "children": [
+        "oa.workflow.approver.rule-table.org-chain",
+        "oa.workflow.approver.rule-table.finance"
+      ]
+    },
+    {
+      "id": "group",
+      "title": {
+        "zh": "集团层",
+        "en": "Group Layer"
+      },
+      "children": [
+        "oa.workflow.approver.rule-table.group"
+      ]
+    },
+    {
+      "id": "manual",
+      "title": {
+        "zh": "手工与协同",
+        "en": "Manual & Collab"
+      },
+      "children": [
+        "oa.workflow.approver.rule-table.manual"
+      ]
+    }
+  ]
+}

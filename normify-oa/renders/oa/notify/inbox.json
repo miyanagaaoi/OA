@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.notify.inbox",
+  "updated_at": "2026-10-02T08:03:09.378Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "写入侧：触发点按模板写入站内信（template → publish）；消费侧：用户看到未读计数与列表并跳回单据（read、list）。",
+    "en": "On the write side a trigger picks the text template and stores the message (template then publish); on the consume side the user sees unread counts and the list with deep links (read, list)."
+  },
+  "order": [
+    "oa.notify.inbox.publish",
+    "oa.notify.inbox.template",
+    "oa.notify.inbox.read",
+    "oa.notify.inbox.list"
+  ],
+  "groups": [
+    {
+      "id": "write",
+      "title": {
+        "zh": "写入侧",
+        "en": "Write Side"
+      },
+      "children": [
+        "oa.notify.inbox.publish",
+        "oa.notify.inbox.template"
+      ]
+    },
+    {
+      "id": "consume",
+      "title": {
+        "zh": "消费侧",
+        "en": "Consume Side"
+      },
+      "children": [
+        "oa.notify.inbox.read",
+        "oa.notify.inbox.list"
+      ]
+    }
+  ]
+}

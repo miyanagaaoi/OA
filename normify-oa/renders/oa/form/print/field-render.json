@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.print.field-render",
+  "updated_at": "2026-10-02T08:05:24.880Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "字段上纸的四条规则：标签映射 → 可见性 → 勾选框符号 → 金额与编号等宽格式。",
+    "en": "Four rules for putting fields on paper: label mapping, visibility, checkbox symbols, and monospaced amounts and numbers."
+  },
+  "order": [
+    "oa.form.print.field-render.label-map",
+    "oa.form.print.field-render.visibility",
+    "oa.form.print.field-render.checkbox",
+    "oa.form.print.field-render.amount-number"
+  ]
+}

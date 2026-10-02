@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "oa.form",
+  "updated_at": "2026-10-02T08:04:52.756Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从模板层看起：模板驱动四类单据的字段与校验，字典提供下拉取值，打印稿按字段属性输出 A4 版式。",
+    "en": "Start at the template layer: templates drive the fields and validation of the four documents, dictionaries supply the options, and printing renders fields onto the A4 sheet."
+  },
+  "order": [
+    "oa.form.template",
+    "oa.form.matter",
+    "oa.form.fund",
+    "oa.form.contract",
+    "oa.form.seal",
+    "oa.form.dict",
+    "oa.form.print"
+  ],
+  "groups": [
+    {
+      "id": "template-layer",
+      "title": {
+        "zh": "模板层",
+        "en": "Template layer"
+      },
+      "children": [
+        "oa.form.template"
+      ]
+    },
+    {
+      "id": "documents",
+      "title": {
+        "zh": "四类单据",
+        "en": "Four documents"
+      },
+      "children": [
+        "oa.form.matter",
+        "oa.form.fund",
+        "oa.form.contract",
+        "oa.form.seal"
+      ]
+    },
+    {
+      "id": "dict-print",
+      "title": {
+        "zh": "字典与打印",
+        "en": "Dictionary & print"
+      },
+      "children": [
+        "oa.form.dict",
+        "oa.form.print"
+      ]
+    }
+  ]
+}

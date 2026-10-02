@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "oa.archive.search",
+  "updated_at": "2026-10-02T08:01:28.875Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：统一入口按年代路由到在线库或历史库，按单号定位后只读预览详情与轨迹，最后按年度导出审计文件。",
+    "en": "Left to right: one entry routes by age to the live or history store, lookup resolves the document number, preview shows read-only detail and trail, and export produces yearly audit files."
+  },
+  "order": [
+    "oa.archive.search.router",
+    "oa.archive.search.lookup",
+    "oa.archive.search.preview",
+    "oa.archive.search.export"
+  ],
+  "groups": [
+    {
+      "id": "entry",
+      "title": {
+        "zh": "检索入口",
+        "en": "Search Entry"
+      },
+      "children": [
+        "oa.archive.search.router",
+        "oa.archive.search.lookup"
+      ]
+    },
+    {
+      "id": "output",
+      "title": {
+        "zh": "预览与导出",
+        "en": "Preview & Export"
+      },
+      "children": [
+        "oa.archive.search.preview",
+        "oa.archive.search.export"
+      ]
+    }
+  ],
+  "edge_hints": [
+    {
+      "from": "oa.archive.search.lookup",
+      "to": "oa.archive.search.router",
+      "kind": "call",
+      "lane": 2
+    }
+  ]
+}

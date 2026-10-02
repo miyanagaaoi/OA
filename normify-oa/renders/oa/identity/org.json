@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.identity.org",
+  "updated_at": "2026-10-02T08:05:03.480Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从左到右：节点与路径是底座；选择器只暴露权限边界内的节点；停用与批量导入都受「在途单据必须处理完」闸门约束；最后以只读接口对外复用。",
+    "en": "Left to right: node and path maintenance are the base; the cascader exposes only in-scope nodes; disabling and bulk import are gated by in-flight documents; the read-only API is reused externally."
+  },
+  "order": [
+    "oa.identity.org.node",
+    "oa.identity.org.path",
+    "oa.identity.org.cascader",
+    "oa.identity.org.state",
+    "oa.identity.org.import",
+    "oa.identity.org.read-api"
+  ],
+  "groups": [
+    {
+      "id": "structure",
+      "title": {
+        "zh": "结构与路径",
+        "en": "Structure & Path"
+      },
+      "children": [
+        "oa.identity.org.node",
+        "oa.identity.org.path"
+      ]
+    },
+    {
+      "id": "gate",
+      "title": {
+        "zh": "变更与闸门",
+        "en": "Change & Gates"
+      },
+      "children": [
+        "oa.identity.org.state",
+        "oa.identity.org.import"
+      ]
+    },
+    {
+      "id": "surface",
+      "title": {
+        "zh": "触点与开放",
+        "en": "Surfaces & Open API"
+      },
+      "children": [
+        "oa.identity.org.cascader",
+        "oa.identity.org.read-api"
+      ]
+    }
+  ]
+}

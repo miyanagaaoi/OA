@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.deploy.config",
+  "updated_at": "2026-10-02T08:00:54.326Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "两类配置：部署启动所需的环境设置，以及上线后运营可自行调整、不需发版的运行期可配置项。",
+    "en": "Two kinds of configuration: what the deployment needs to start (environment) and what operations may tune afterwards without a release (runtime items)."
+  },
+  "order": [
+    "oa.platform.deploy.config.environment",
+    "oa.platform.deploy.config.runtime-items"
+  ]
+}

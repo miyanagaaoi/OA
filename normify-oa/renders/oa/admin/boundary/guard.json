@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.boundary.guard",
+  "updated_at": "2026-10-02T08:04:30.511Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先是单据与日志的删除禁令，再是已批单据结果冻结；两道闸门都会拒绝并记录每一次尝试。",
+    "en": "Left to right: the deletion ban on documents and logs, then the freeze on the verdict of approved documents; both gates reject and log every attempt."
+  },
+  "order": [
+    "oa.admin.boundary.guard.doc",
+    "oa.admin.boundary.guard.verdict"
+  ]
+}

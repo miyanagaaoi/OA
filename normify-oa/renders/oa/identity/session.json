@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "oa.identity.session",
+  "updated_at": "2026-10-02T08:05:09.697Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从左到右：先失败锁定与登录编排（校验凭证后签发会话），再由记住我与多设备维持/限制会话，最后是登录日志留痕与客户端（二维码入口、浏览器兼容）接入。",
+    "en": "Left to right: lockout and login orchestration (issue the session after verification), then remember-me and multi-device limits, and finally login logging and client access (entry tickets, browser compatibility)."
+  },
+  "order": [
+    "oa.identity.session.lockout",
+    "oa.identity.session.login",
+    "oa.identity.session.remember-me",
+    "oa.identity.session.device",
+    "oa.identity.session.login-log",
+    "oa.identity.session.client"
+  ],
+  "groups": [
+    {
+      "id": "chain",
+      "title": {
+        "zh": "登录链路",
+        "en": "Login Chain"
+      },
+      "children": [
+        "oa.identity.session.lockout",
+        "oa.identity.session.login",
+        "oa.identity.session.remember-me",
+        "oa.identity.session.device"
+      ]
+    },
+    {
+      "id": "log-client",
+      "title": {
+        "zh": "日志与接入",
+        "en": "Log & Client"
+      },
+      "children": [
+        "oa.identity.session.login-log",
+        "oa.identity.session.client"
+      ]
+    }
+  ]
+}

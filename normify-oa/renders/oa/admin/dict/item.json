@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.dict.item",
+  "updated_at": "2026-10-02T08:03:58.574Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先增改字典项，再管理排序与启停；已被引用的选项只能停用，不能删除。",
+    "en": "Left to right: create or edit the items, then manage their display order and active state; in-use items can only be disabled, never deleted."
+  },
+  "order": [
+    "oa.admin.dict.item.crud",
+    "oa.admin.dict.item.order"
+  ]
+}

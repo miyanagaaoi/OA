@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.component",
+  "updated_at": "2026-10-02T08:07:19.907Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "按界面骨架阅读：操作（按钮）→ 录入（表单）→ 展示（表格与徽标）→ 导航与反馈 → 最后逐条自检组件硬约束。",
+    "en": "Read along the UI skeleton: actions, then input, then display, then navigation and feedback, ending with the hard constraints to self-check one by one."
+  },
+  "order": [
+    "oa.design.component.button",
+    "oa.design.component.form",
+    "oa.design.component.data-display",
+    "oa.design.component.navigation",
+    "oa.design.component.feedback",
+    "oa.design.component.constraints"
+  ],
+  "groups": [
+    {
+      "id": "input",
+      "title": {
+        "zh": "操作与录入",
+        "en": "Action & Input"
+      },
+      "children": [
+        "oa.design.component.button",
+        "oa.design.component.form"
+      ]
+    },
+    {
+      "id": "output",
+      "title": {
+        "zh": "数据展示",
+        "en": "Display"
+      },
+      "children": [
+        "oa.design.component.data-display"
+      ]
+    },
+    {
+      "id": "frame",
+      "title": {
+        "zh": "框架与反馈",
+        "en": "Frame & Feedback"
+      },
+      "children": [
+        "oa.design.component.navigation",
+        "oa.design.component.feedback"
+      ]
+    },
+    {
+      "id": "rule",
+      "title": {
+        "zh": "硬约束",
+        "en": "Hard Constraints"
+      },
+      "children": [
+        "oa.design.component.constraints"
+      ]
+    }
+  ]
+}

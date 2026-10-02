@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.report",
+  "updated_at": "2026-10-02T08:03:50.193Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右：先看流程量与耗时，再看审批人效率与待办积压，接着看超时率，最后看驳回质量与仅管理员可用的导出。",
+    "en": "Read left to right: volume and duration first, then approver efficiency and pending backlog, then the timeout rate, and finally rejection quality plus the administrator-only export."
+  },
+  "order": [
+    "oa.admin.report.volume",
+    "oa.admin.report.approver",
+    "oa.admin.report.timeout",
+    "oa.admin.report.reject",
+    "oa.admin.report.export"
+  ],
+  "groups": [
+    {
+      "id": "efficiency",
+      "title": {
+        "zh": "效率与超时",
+        "en": "Efficiency & Timeout"
+      },
+      "children": [
+        "oa.admin.report.volume",
+        "oa.admin.report.approver",
+        "oa.admin.report.timeout"
+      ]
+    },
+    {
+      "id": "quality",
+      "title": {
+        "zh": "质量与导出",
+        "en": "Quality & Export"
+      },
+      "children": [
+        "oa.admin.report.reject",
+        "oa.admin.report.export"
+      ]
+    }
+  ]
+}

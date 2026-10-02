@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.workbench.table",
+  "updated_at": "2026-10-02T08:07:09.206Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先定义列（含等宽右对齐的金额列），再是行内操作（最多 3 个，超出收进「更多」）。",
+    "en": "Columns come first, including the tabular-numeral amount column, then the row actions: at most three with the rest folded into More."
+  },
+  "order": [
+    "oa.portal.workbench.table.columns",
+    "oa.portal.workbench.table.actions"
+  ]
+}

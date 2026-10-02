@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.notify.cc",
+  "updated_at": "2026-10-02T08:03:10.328Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "发起时确定抄送人（config：发起人自选 + 模板固定），落库并授予只读可见性（dispatch），抄送人打开单据后回写已读回执（read）。",
+    "en": "At submission the CC set is fixed from both sources (config), stored and granted read-only visibility (dispatch), and the recipient's opening of the document writes the read receipt (read)."
+  },
+  "order": [
+    "oa.notify.cc.config",
+    "oa.notify.cc.dispatch",
+    "oa.notify.cc.read"
+  ]
+}

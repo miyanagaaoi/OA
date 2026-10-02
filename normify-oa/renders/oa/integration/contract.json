@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration.contract",
+  "updated_at": "2026-10-02T07:59:34.329Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "一期只做人工导出（字段映射保证语义一致）；右侧的台账同步是二期目标。",
+    "en": "Phase one only exports approved contracts by hand (mapping keeps the field meaning straight); the ledger sync on the right is the phase-two target."
+  },
+  "order": [
+    "oa.integration.contract.mapping",
+    "oa.integration.contract.export",
+    "oa.integration.contract.sync"
+  ]
+}

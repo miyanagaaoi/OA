@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.authz.visibility.field",
+  "updated_at": "2026-10-02T08:05:16.283Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "字段级限制分两族：金额（合同金额、资金金额对非财务角色只读）与联系方式（手机号默认脱敏 138****8888）。",
+    "en": "Field limits come in two families: amounts (contract and fund amounts read-only for non-finance roles) and contact data (phones masked as 138****8888)."
+  },
+  "order": [
+    "oa.authz.visibility.field.amount",
+    "oa.authz.visibility.field.contact"
+  ]
+}

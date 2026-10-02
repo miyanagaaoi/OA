@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.task.addsign",
+  "updated_at": "2026-10-02T08:02:40.889Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "前加签加签人先审、审完回本人；后加签本人审完再审；两者都写入加签链。",
+    "en": "Add-sign before acts first and returns to the approver; add-sign after acts last; both are recorded in the chain."
+  },
+  "order": [
+    "oa.workflow.task.addsign.pre",
+    "oa.workflow.task.addsign.post",
+    "oa.workflow.task.addsign.chain"
+  ]
+}

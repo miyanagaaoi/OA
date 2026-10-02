@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.contract.fields",
+  "updated_at": "2026-10-02T08:05:13.969Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "按合同要素：名称与类型 → 对方主体与信用代码 → 金额与履约期（含框架合同）→ 拟用印类型 → 合同文本与资质附件。",
+    "en": "By contract element: name and type, counterparty with credit code, amount and term (including framework contracts), intended seal type, then contract text and credential attachments."
+  },
+  "order": [
+    "oa.form.contract.fields.basic",
+    "oa.form.contract.fields.counterparty",
+    "oa.form.contract.fields.amount-period",
+    "oa.form.contract.fields.seal-ref",
+    "oa.form.contract.fields.attachments"
+  ]
+}

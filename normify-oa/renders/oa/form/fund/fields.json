@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.fund.fields",
+  "updated_at": "2026-10-02T08:05:13.388Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "按填单顺序：事由与金额（必填 > 0）→ 收款方与账号（加密脱敏）→ 支付方式与日期 → 附件（必填 ≥1）。",
+    "en": "In filling order: reason and amount (required, > 0), payee and account (encrypted and masked), payment method and date, then attachments (required, ≥1)."
+  },
+  "order": [
+    "oa.form.fund.fields.basic",
+    "oa.form.fund.fields.payee",
+    "oa.form.fund.fields.payment",
+    "oa.form.fund.fields.attachments"
+  ]
+}

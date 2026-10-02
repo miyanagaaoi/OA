@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.print.variant",
+  "updated_at": "2026-10-02T08:05:23.855Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "四种版式对应四类单据：集团合同类与资金单严格对齐实单，子公司内部审批单用竖向字段 + 审批流水，印鉴单沿用集团单推导。",
+    "en": "Four layouts for four documents: the group contract and fund sheets mirror the paper forms, the subsidiary sheet uses vertical fields plus an approval trail, and the seal sheet derives from the group layout."
+  },
+  "order": [
+    "oa.form.print.variant.group-contract",
+    "oa.form.print.variant.group-fund",
+    "oa.form.print.variant.subsidiary-internal",
+    "oa.form.print.variant.seal-cert"
+  ],
+  "groups": [
+    {
+      "id": "variant-group",
+      "title": {
+        "zh": "集团单",
+        "en": "Group sheets"
+      },
+      "children": [
+        "oa.form.print.variant.group-contract",
+        "oa.form.print.variant.group-fund"
+      ]
+    },
+    {
+      "id": "variant-subsidiary",
+      "title": {
+        "zh": "子公司单",
+        "en": "Subsidiary sheet"
+      },
+      "children": [
+        "oa.form.print.variant.subsidiary-internal"
+      ]
+    },
+    {
+      "id": "variant-seal",
+      "title": {
+        "zh": "印鉴单",
+        "en": "Seal sheet"
+      },
+      "children": [
+        "oa.form.print.variant.seal-cert"
+      ]
+    }
+  ]
+}

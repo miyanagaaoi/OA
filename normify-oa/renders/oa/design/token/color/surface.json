@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.token.color.surface",
+  "updated_at": "2026-10-02T08:07:19.303Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先用表面阶梯表达层级，再用细线补足边界；两者配对使用，不跳级。",
+    "en": "The ladder expresses hierarchy and hairlines sharpen boundaries; the two are paired and the ladder is never skipped."
+  },
+  "order": [
+    "oa.design.token.color.surface.ladder",
+    "oa.design.token.color.surface.hairline"
+  ]
+}

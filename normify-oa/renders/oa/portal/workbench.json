@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.workbench",
+  "updated_at": "2026-10-02T08:07:08.873Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "先由标签页与筛选确定范围 → 全宽数据表承载纵向比对 → 批量操作作用于勾选行 → 空状态兜底无待办场景。",
+    "en": "Tabs and filters narrow the scope first, the full-width table carries vertical comparison, batch actions apply to the selected rows and the empty state covers having nothing to do."
+  },
+  "order": [
+    "oa.portal.workbench.tabs",
+    "oa.portal.workbench.filter",
+    "oa.portal.workbench.table",
+    "oa.portal.workbench.batch",
+    "oa.portal.workbench.empty"
+  ],
+  "groups": [
+    {
+      "id": "scope",
+      "title": {
+        "zh": "定位与切换",
+        "en": "Scope & Switching"
+      },
+      "children": [
+        "oa.portal.workbench.tabs",
+        "oa.portal.workbench.filter"
+      ]
+    },
+    {
+      "id": "list",
+      "title": {
+        "zh": "列表主体",
+        "en": "List Body"
+      },
+      "children": [
+        "oa.portal.workbench.table",
+        "oa.portal.workbench.batch"
+      ]
+    },
+    {
+      "id": "fallback",
+      "title": {
+        "zh": "状态兜底",
+        "en": "Empty Fallback"
+      },
+      "children": [
+        "oa.portal.workbench.empty"
+      ]
+    }
+  ]
+}

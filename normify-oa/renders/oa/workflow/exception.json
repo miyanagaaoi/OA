@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.exception",
+  "updated_at": "2026-10-02T08:02:51.648Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：驳回与联动关闭 → 撤回与重新提交（重解析快照）→ 终止与超时催办。",
+    "en": "Left to right: rejection and cascade closing, withdrawal and resubmission with a fresh snapshot, termination and timeout reminders."
+  },
+  "order": [
+    "oa.workflow.exception.reject",
+    "oa.workflow.exception.cascade",
+    "oa.workflow.exception.withdraw",
+    "oa.workflow.exception.resubmit",
+    "oa.workflow.exception.terminate",
+    "oa.workflow.exception.timeout"
+  ],
+  "groups": [
+    {
+      "id": "exc-reject",
+      "title": {
+        "zh": "驳回",
+        "en": "Rejection"
+      },
+      "children": [
+        "oa.workflow.exception.reject",
+        "oa.workflow.exception.cascade"
+      ]
+    },
+    {
+      "id": "exc-initiator",
+      "title": {
+        "zh": "发起人侧",
+        "en": "Initiator Side"
+      },
+      "children": [
+        "oa.workflow.exception.withdraw",
+        "oa.workflow.exception.resubmit"
+      ]
+    },
+    {
+      "id": "exc-terminal",
+      "title": {
+        "zh": "终态与超时",
+        "en": "Terminal & Timeout"
+      },
+      "children": [
+        "oa.workflow.exception.terminate",
+        "oa.workflow.exception.timeout"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "oa.audit.oplog",
+  "updated_at": "2026-10-02T08:01:28.236Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：操作日志由统一入口只追加写入，配置类变更同时生成变更前后值快照，最后由检索与导出面提供查询。",
+    "en": "Left to right: entries are appended through one ingestion point, configuration changes add before/after snapshots, and the query surface serves retrieval and export."
+  },
+  "order": [
+    "oa.audit.oplog.capture",
+    "oa.audit.oplog.diff",
+    "oa.audit.oplog.query"
+  ],
+  "edge_hints": [
+    {
+      "from": "oa.audit.oplog.capture",
+      "to": "oa.audit.oplog.query",
+      "kind": "dataflow",
+      "lane": 0
+    },
+    {
+      "from": "oa.audit.oplog.diff",
+      "to": "oa.audit.oplog.capture",
+      "kind": "dataflow",
+      "lane": 2
+    }
+  ]
+}

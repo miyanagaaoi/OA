@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.matter.fields",
+  "updated_at": "2026-10-02T08:05:12.686Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "按填单顺序：基础信息 → 费用（条件必填并决定分支）→ 期望日期与抄送人 → 附件（仅补件可写）。",
+    "en": "In filling order: basics, then cost (conditionally required and branching), then expected date with CC, then attachments (writable only during supplement)."
+  },
+  "order": [
+    "oa.form.matter.fields.basic",
+    "oa.form.matter.fields.cost",
+    "oa.form.matter.fields.schedule-cc",
+    "oa.form.matter.fields.attachments"
+  ]
+}

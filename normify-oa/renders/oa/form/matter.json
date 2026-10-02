@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.matter",
+  "updated_at": "2026-10-02T08:04:53.461Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "从左到右：字段组定义数据，校验规则把关，专用规则决定是否涉及费用的分支与类别锁定。",
+    "en": "Left to right: field groups define the data, validation guards it, and the specific rules decide the cost branch and the category lock."
+  },
+  "order": [
+    "oa.form.matter.fields",
+    "oa.form.matter.validation",
+    "oa.form.matter.special"
+  ]
+}

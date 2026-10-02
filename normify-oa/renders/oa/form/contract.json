@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.contract",
+  "updated_at": "2026-10-02T08:04:59.563Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "从左到右：字段组（对方主体、金额与履约期、拟用印）定义数据，校验规则把关，专用规则处理框架合同、重复用印与人工归档。",
+    "en": "Left to right: field groups (counterparty, amount and term, intended seal) define the data, validation guards it, and the specific rules handle framework contracts, repeated seals and manual archiving."
+  },
+  "order": [
+    "oa.form.contract.fields",
+    "oa.form.contract.validation",
+    "oa.form.contract.special"
+  ]
+}

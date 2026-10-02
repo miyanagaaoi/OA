@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.backup",
+  "updated_at": "2026-10-02T07:59:34.596Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：保留策略决定每日全量备份，季度恢复演练证明备份真的可用。",
+    "en": "Left to right: the retention policy drives the daily full backup, and a quarterly restore drill proves the backups are actually usable."
+  },
+  "order": [
+    "oa.platform.backup.retention",
+    "oa.platform.backup.daily",
+    "oa.platform.backup.drill"
+  ]
+}

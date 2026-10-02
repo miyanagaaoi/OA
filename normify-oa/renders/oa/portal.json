@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal",
+  "updated_at": "2026-10-02T08:07:08.508Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "沿一次审批动线从左到右读：待办工作台看到任务 → 发起并填写表单 → 详情浮层完成审批；下一组是移动端 H5 与扫码 / 短链入口，二者与桌面共用同一套设计令牌。",
+    "en": "Follow one approval journey left to right: see the task on the workbench, initiate and fill the form, then approve in the detail overlay; the next group is mobile H5 with its QR and short-link entry, sharing one token set with the desktop."
+  },
+  "order": [
+    "oa.portal.workbench",
+    "oa.portal.initiate",
+    "oa.portal.detail",
+    "oa.portal.h5",
+    "oa.portal.entry"
+  ],
+  "groups": [
+    {
+      "id": "desktop",
+      "title": {
+        "zh": "桌面审批动线",
+        "en": "Desktop Approval Flow"
+      },
+      "children": [
+        "oa.portal.workbench",
+        "oa.portal.initiate",
+        "oa.portal.detail"
+      ]
+    },
+    {
+      "id": "mobile",
+      "title": {
+        "zh": "移动端与入口",
+        "en": "Mobile & Entry"
+      },
+      "children": [
+        "oa.portal.h5",
+        "oa.portal.entry"
+      ]
+    }
+  ]
+}

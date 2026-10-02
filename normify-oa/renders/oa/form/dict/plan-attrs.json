@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.dict.plan-attrs",
+  "updated_at": "2026-10-02T08:05:20.085Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "资金单两个只存不用字段的取值来源，均带默认勾选项。",
+    "en": "Option sources for the fund form's two store-only fields, each with a default selection."
+  },
+  "order": [
+    "oa.form.dict.plan-attrs.plan-category",
+    "oa.form.dict.plan-attrs.payment-belong"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.report.volume",
+  "updated_at": "2026-10-02T08:04:29.126Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先看有多少单据在流转（流程量），再看它们耗时多久（平均耗时与最慢节点）。",
+    "en": "Left to right: how many documents flow through (volume), then how long they take (average duration and slowest nodes)."
+  },
+  "order": [
+    "oa.admin.report.volume.count",
+    "oa.admin.report.volume.duration"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.audit.integrity",
+  "updated_at": "2026-10-02T08:01:28.643Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先以只追加约束与各引擎实现差异固守不可篡改，再按保留期到期交归档，最后以哈希校验证明记录未被改写。",
+    "en": "Left to right: append-only guards and per-engine implementations lock immutability, retention hands expired data to archiving, and hash verification proves records are unmodified."
+  },
+  "order": [
+    "oa.audit.integrity.immutable",
+    "oa.audit.integrity.engine-parity",
+    "oa.audit.integrity.retention",
+    "oa.audit.integrity.verify"
+  ],
+  "groups": [
+    {
+      "id": "guard",
+      "title": {
+        "zh": "只追加约束",
+        "en": "Append-only Guard"
+      },
+      "children": [
+        "oa.audit.integrity.immutable",
+        "oa.audit.integrity.engine-parity"
+      ]
+    },
+    {
+      "id": "lifecycle",
+      "title": {
+        "zh": "保留、到期与校验",
+        "en": "Retention & Verification"
+      },
+      "children": [
+        "oa.audit.integrity.retention",
+        "oa.audit.integrity.verify"
+      ]
+    }
+  ]
+}

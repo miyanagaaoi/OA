@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration.warehouse",
+  "updated_at": "2026-10-02T07:59:34.382Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "管道从左到右：冻结归档结构 → 定时抽取 → 与源单据对账。",
+    "en": "Pipeline left to right: freeze the archive schema → run the scheduled extraction → reconcile the extracted rows against the source."
+  },
+  "order": [
+    "oa.integration.warehouse.schema",
+    "oa.integration.warehouse.extract",
+    "oa.integration.warehouse.quality"
+  ]
+}

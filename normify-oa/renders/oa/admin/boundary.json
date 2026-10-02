@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.boundary",
+  "updated_at": "2026-10-02T08:06:31.802Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右：先是约束管理员的硬闸门与系统参数，再是每次操作留下的留痕，以及快照审批人无法处理时的兜底权限。",
+    "en": "Left to right: the hard gates and system parameters that bound the administrator, then the trail every action leaves and the fallback powers used when a snapshot approver cannot act."
+  },
+  "order": [
+    "oa.admin.boundary.guard",
+    "oa.admin.boundary.settings",
+    "oa.admin.boundary.trace",
+    "oa.admin.boundary.fallback"
+  ],
+  "groups": [
+    {
+      "id": "rules",
+      "title": {
+        "zh": "禁区与参数",
+        "en": "Gates & Settings"
+      },
+      "children": [
+        "oa.admin.boundary.guard",
+        "oa.admin.boundary.settings"
+      ]
+    },
+    {
+      "id": "trail",
+      "title": {
+        "zh": "留痕与兜底",
+        "en": "Trail & Fallback"
+      },
+      "children": [
+        "oa.admin.boundary.trace",
+        "oa.admin.boundary.fallback"
+      ]
+    }
+  ]
+}

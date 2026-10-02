@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "oa.archive.policy.migration",
+  "updated_at": "2026-10-02T08:01:28.982Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先编归档批次计划，再整单执行搬迁，最后核对条数与哈希；核对不通过则阻断后续批次。",
+    "en": "Left to right: plan the archive batch, run the whole-document migration, then reconcile counts and hashes; a mismatch blocks later batches."
+  },
+  "order": [
+    "oa.archive.policy.migration.plan",
+    "oa.archive.policy.migration.execute",
+    "oa.archive.policy.migration.verify"
+  ],
+  "edge_hints": [
+    {
+      "from": "oa.archive.policy.migration.plan",
+      "to": "oa.archive.policy.migration.execute",
+      "kind": "call",
+      "lane": 0
+    },
+    {
+      "from": "oa.archive.policy.migration.execute",
+      "to": "oa.archive.policy.migration.verify",
+      "kind": "dataflow",
+      "lane": 0
+    }
+  ]
+}

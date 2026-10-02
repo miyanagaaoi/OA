@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.org.bulk",
+  "updated_at": "2026-10-02T08:03:52.094Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先预检受影响的在途单据，再执行批量导入，最后走仅管理员可用的导出。",
+    "en": "Left to right: preview the affected in-flight documents first, then execute the bulk import, and finally export through the administrator-only path."
+  },
+  "order": [
+    "oa.admin.org.bulk.impact",
+    "oa.admin.org.bulk.import",
+    "oa.admin.org.bulk.export"
+  ]
+}

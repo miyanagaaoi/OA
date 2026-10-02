@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "oa.portal.entry",
+  "updated_at": "2026-10-02T08:07:17.924Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "二维码与短链解决「怎么进来」→ 记住我与多设备上限解决「进来后会话怎么保持与收束」。",
+    "en": "The QR code and short link answer how users get in; remember-me and the device cap then govern how the session persists and is bounded."
+  },
+  "order": [
+    "oa.portal.entry.qr",
+    "oa.portal.entry.shortlink",
+    "oa.portal.entry.remember-me",
+    "oa.portal.entry.device"
+  ],
+  "groups": [
+    {
+      "id": "scan",
+      "title": {
+        "zh": "扫码入口",
+        "en": "Scan Entry"
+      },
+      "children": [
+        "oa.portal.entry.qr",
+        "oa.portal.entry.shortlink"
+      ]
+    },
+    {
+      "id": "session",
+      "title": {
+        "zh": "登录保持",
+        "en": "Session Persistence"
+      },
+      "children": [
+        "oa.portal.entry.remember-me",
+        "oa.portal.entry.device"
+      ]
+    }
+  ]
+}

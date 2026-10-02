@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.org",
+  "updated_at": "2026-10-02T08:03:43.203Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右：先建组织节点树，再录人员档案与任职，接着分配角色，最后用批量导入导出处理公司重组这类大规模调整。",
+    "en": "Left to right: build the org node tree, then record staff profiles and posts, assign roles, and finally use bulk import/export for large-scale changes such as reorganisations."
+  },
+  "order": [
+    "oa.admin.org.tree",
+    "oa.admin.org.staff",
+    "oa.admin.org.roleassign",
+    "oa.admin.org.bulk"
+  ],
+  "groups": [
+    {
+      "id": "org",
+      "title": {
+        "zh": "组织",
+        "en": "Organization"
+      },
+      "children": [
+        "oa.admin.org.tree"
+      ]
+    },
+    {
+      "id": "people",
+      "title": {
+        "zh": "人员",
+        "en": "People"
+      },
+      "children": [
+        "oa.admin.org.staff",
+        "oa.admin.org.roleassign"
+      ]
+    },
+    {
+      "id": "bulk",
+      "title": {
+        "zh": "批量作业",
+        "en": "Bulk Operations"
+      },
+      "children": [
+        "oa.admin.org.bulk"
+      ]
+    }
+  ]
+}

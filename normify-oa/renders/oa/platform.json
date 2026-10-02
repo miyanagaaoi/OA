@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform",
+  "updated_at": "2026-10-02T07:59:34.155Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从左到右：先完成私有化部署与安全加固，再保证它跑得快（容量、响应、索引）且可恢复（每日备份、季度恢复演练、保留策略）。",
+    "en": "Left to right: deploy and secure the on-premise instance, then keep it fast (capacity, latency, indexing) and recoverable (daily backup, quarterly restore drills, retention)."
+  },
+  "order": [
+    "oa.platform.deploy",
+    "oa.platform.security",
+    "oa.platform.perf",
+    "oa.platform.backup"
+  ],
+  "groups": [
+    {
+      "id": "runtime",
+      "title": {
+        "zh": "部署与安全",
+        "en": "Deployment & Security"
+      },
+      "children": [
+        "oa.platform.deploy",
+        "oa.platform.security"
+      ]
+    },
+    {
+      "id": "assurance",
+      "title": {
+        "zh": "性能与容灾",
+        "en": "Performance & Continuity"
+      },
+      "children": [
+        "oa.platform.perf",
+        "oa.platform.backup"
+      ]
+    }
+  ]
+}

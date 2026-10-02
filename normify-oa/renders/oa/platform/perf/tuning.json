@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.perf.tuning",
+  "updated_at": "2026-10-02T08:01:07.587Z",
+  "mode": "layers",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：左侧是声明的索引方案（意图），右侧是慢查询复核（实际反馈）。",
+    "en": "Left to right: the declared index plan is what we intend, the slow-query review is what reality reports back."
+  },
+  "order": [
+    "oa.platform.perf.tuning.index-plan",
+    "oa.platform.perf.tuning.slow-query"
+  ]
+}

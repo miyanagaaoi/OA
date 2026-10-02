@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.contract.special",
+  "updated_at": "2026-10-02T08:05:18.755Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先看框架合同的金额与期限约束，再看与印鉴单的重复用印提示，最后是审批通过后的人工导出归档。",
+    "en": "Framework amount and term constraints first, then the repeated-seal warning shared with the seal form, and finally manual export archiving after approval."
+  },
+  "order": [
+    "oa.form.contract.special.framework-amount",
+    "oa.form.contract.special.seal-duplicate",
+    "oa.form.contract.special.manual-archive"
+  ]
+}

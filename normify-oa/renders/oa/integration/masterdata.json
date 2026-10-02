@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration.masterdata",
+  "updated_at": "2026-10-02T07:59:34.272Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：下游系统先持有只读凭证，再查询组织树与人员目录。",
+    "en": "Left to right: a downstream system first holds a read-only credential, then queries the organisation tree and the user directory."
+  },
+  "order": [
+    "oa.integration.masterdata.credential",
+    "oa.integration.masterdata.org",
+    "oa.integration.masterdata.user"
+  ]
+}

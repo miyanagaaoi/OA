@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.print.group-sheet",
+  "updated_at": "2026-10-02T08:07:27.733Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "集团单三种落点：合同单的公文接收及处理重复块、资金单的多轮签名栏、印鉴证照单的推导版式。",
+    "en": "Three group-level instantiations: the contract sheet's repeated receipt blocks, the fund sheet's multi-round signature bands and the derived seal-and-licence sheet."
+  },
+  "order": [
+    "oa.design.print.group-sheet.receive-block",
+    "oa.design.print.group-sheet.signature-block",
+    "oa.design.print.group-sheet.seal-license"
+  ]
+}

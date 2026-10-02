@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.task",
+  "updated_at": "2026-10-02T08:02:40.309Z",
+  "mode": "groups",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：任务台账落库 → 决议模式与阈值 → 并行协同任务组 → 转办/改派 → 加签 → 自由跳转；箭头表示任务与决议的流转。",
+    "en": "Left to right: task ledger, decision modes and thresholds, parallel collaboration groups, transfer and reassignment, add-sign, free jump."
+  },
+  "order": [
+    "oa.workflow.task.record",
+    "oa.workflow.task.decision",
+    "oa.workflow.task.collaboration",
+    "oa.workflow.task.transfer",
+    "oa.workflow.task.addsign",
+    "oa.workflow.task.jump"
+  ],
+  "groups": [
+    {
+      "id": "task-core",
+      "title": {
+        "zh": "任务与决议",
+        "en": "Tasks & Decisions"
+      },
+      "children": [
+        "oa.workflow.task.record",
+        "oa.workflow.task.decision"
+      ]
+    },
+    {
+      "id": "task-collab",
+      "title": {
+        "zh": "协同与换人",
+        "en": "Collaboration & Handover"
+      },
+      "children": [
+        "oa.workflow.task.collaboration",
+        "oa.workflow.task.transfer"
+      ]
+    },
+    {
+      "id": "task-extra",
+      "title": {
+        "zh": "加签与跳转",
+        "en": "Add-sign & Jump"
+      },
+      "children": [
+        "oa.workflow.task.addsign",
+        "oa.workflow.task.jump"
+      ]
+    }
+  ]
+}

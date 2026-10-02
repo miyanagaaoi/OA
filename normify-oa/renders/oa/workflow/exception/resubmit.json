@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.exception.resubmit",
+  "updated_at": "2026-10-02T08:02:52.461Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "先按最新模板重解析审批人快照，再重置已审节点与任务，从①重走。",
+    "en": "Re-resolve the approver snapshot against the latest template, then reset the reviewed nodes and tasks and restart from node one."
+  },
+  "order": [
+    "oa.workflow.exception.resubmit.snapshot",
+    "oa.workflow.exception.resubmit.node-reset"
+  ]
+}

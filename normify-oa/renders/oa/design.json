@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "oa.design",
+  "updated_at": "2026-10-02T08:07:18.223Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "令牌是唯一取值来源 → 组件把令牌组装成界面 → 打印稿独立成体系 → 可读性与密度横切校验三者。",
+    "en": "Tokens are the only source of values, components assemble them into the UI, print sheets form an independent system and legibility with density cuts across all three."
+  },
+  "order": [
+    "oa.design.token",
+    "oa.design.component",
+    "oa.design.print",
+    "oa.design.a11y"
+  ],
+  "groups": [
+    {
+      "id": "base",
+      "title": {
+        "zh": "基础与组件",
+        "en": "Foundation & Components"
+      },
+      "children": [
+        "oa.design.token",
+        "oa.design.component"
+      ]
+    },
+    {
+      "id": "output",
+      "title": {
+        "zh": "打印与可读性",
+        "en": "Print & Legibility"
+      },
+      "children": [
+        "oa.design.print",
+        "oa.design.a11y"
+      ]
+    }
+  ]
+}

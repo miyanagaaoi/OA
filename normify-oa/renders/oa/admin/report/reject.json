@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.report.reject",
+  "updated_at": "2026-10-02T08:04:30.048Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先看驳回发生的频率，再看驳回的原因分布（从审批意见中聚合）。",
+    "en": "Left to right: how often documents are rejected, then why they are rejected, aggregated from the approver opinions."
+  },
+  "order": [
+    "oa.admin.report.reject.rate",
+    "oa.admin.report.reject.reason"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "oa.form.dict",
+  "updated_at": "2026-10-02T08:05:00.183Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "字典项统一由后台维护（左），按单据分组的取值在中间，最后是提交时的取值校验。",
+    "en": "Dictionary items are maintained in the console (left), the per-document option groups sit in the middle, and value validation happens at submission (right)."
+  },
+  "order": [
+    "oa.form.dict.option-source",
+    "oa.form.dict.category",
+    "oa.form.dict.payment-method",
+    "oa.form.dict.contract-type",
+    "oa.form.dict.seal-cert",
+    "oa.form.dict.plan-attrs",
+    "oa.form.dict.option-validate"
+  ],
+  "groups": [
+    {
+      "id": "dict-source",
+      "title": {
+        "zh": "字典来源",
+        "en": "Option source"
+      },
+      "children": [
+        "oa.form.dict.option-source"
+      ]
+    },
+    {
+      "id": "dict-docs",
+      "title": {
+        "zh": "单据通用字典",
+        "en": "Shared document dictionaries"
+      },
+      "children": [
+        "oa.form.dict.category",
+        "oa.form.dict.payment-method",
+        "oa.form.dict.contract-type"
+      ]
+    },
+    {
+      "id": "dict-seal",
+      "title": {
+        "zh": "印鉴字典",
+        "en": "Seal dictionaries"
+      },
+      "children": [
+        "oa.form.dict.seal-cert"
+      ]
+    },
+    {
+      "id": "dict-plan",
+      "title": {
+        "zh": "计划属性字典",
+        "en": "Plan attribute dictionaries"
+      },
+      "children": [
+        "oa.form.dict.plan-attrs"
+      ]
+    },
+    {
+      "id": "dict-guard",
+      "title": {
+        "zh": "取值校验",
+        "en": "Value validation"
+      },
+      "children": [
+        "oa.form.dict.option-validate"
+      ]
+    }
+  ]
+}

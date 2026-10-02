@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "oa.design.token.color.semantic",
+  "updated_at": "2026-10-02T08:07:19.601Z",
+  "mode": "grid",
+  "reading": {
+    "zh": "先取值（五套主色与浅底），再按边界使用（仅状态徽标 / 流程节点 / 风险提示 / 校验信息）。",
+    "en": "Values first (five colours with their surfaces), then the boundaries within which they may be used: badges, flow nodes, risk notices and validation only."
+  },
+  "order": [
+    "oa.design.token.color.semantic.status",
+    "oa.design.token.color.semantic.usage"
+  ]
+}

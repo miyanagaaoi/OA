@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.org.staff",
+  "updated_at": "2026-10-02T08:03:51.704Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先建档案与账号，再加一人多岗任职，最后走离职闸门（必须先清空名下待办）。",
+    "en": "Left to right: create the profile and account, add multi-post assignments, and finally handle resignation through the gate that requires all pending tasks to be cleared."
+  },
+  "order": [
+    "oa.admin.org.staff.profile",
+    "oa.admin.org.staff.position",
+    "oa.admin.org.staff.offboard"
+  ]
+}

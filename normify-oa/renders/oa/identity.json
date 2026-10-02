@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.identity",
+  "updated_at": "2026-10-02T08:05:03.196Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先看组织与岗位（组织树决定人员归属与负责人绑定），再看人员与登录（档案、通讯录与会话把组织与岗位串起来）。",
+    "en": "Read left to right: organization and posts first (the org tree drives affiliation and leader binding), then people and login (profiles, directory and sessions tying them together)."
+  },
+  "order": [
+    "oa.identity.org",
+    "oa.identity.position",
+    "oa.identity.user",
+    "oa.identity.session"
+  ],
+  "groups": [
+    {
+      "id": "org-post",
+      "title": {
+        "zh": "组织与岗位",
+        "en": "Organization & Posts"
+      },
+      "children": [
+        "oa.identity.org",
+        "oa.identity.position"
+      ]
+    },
+    {
+      "id": "people-login",
+      "title": {
+        "zh": "人员与登录",
+        "en": "People & Login"
+      },
+      "children": [
+        "oa.identity.user",
+        "oa.identity.session"
+      ]
+    }
+  ]
+}

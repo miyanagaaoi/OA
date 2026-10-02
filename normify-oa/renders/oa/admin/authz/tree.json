@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.admin.authz.tree",
+  "updated_at": "2026-10-02T08:03:58.023Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先为角色勾选权限节点，再约束谁可以把这份能力继续下放——分公司流程管理员不可再分配。",
+    "en": "Left to right: tick the permission nodes for a role, then constrain who may pass that ability on - branch admins cannot re-delegate."
+  },
+  "order": [
+    "oa.admin.authz.tree.assign",
+    "oa.admin.authz.tree.delegate"
+  ]
+}

@@ -1,0 +1,18 @@
+# ---- 工具缓存与临时产物（可再生，不入库）----
+.cache/
+node_modules/
+*.log
+*.tmp
+
+# ---- 打包产物（如需分发请显式加入）----
+*.tgz
+
+# ---- 操作系统杂物 ----
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---- 编辑器/IDE ----
+.vscode/
+.idea/
+*.swp

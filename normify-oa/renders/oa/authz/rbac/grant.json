@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "oa.authz.rbac.grant",
+  "updated_at": "2026-10-02T08:05:15.341Z",
+  "mode": "grid",
+  "max_columns": 2,
+  "reading": {
+    "zh": "同一角色的授权分两维：能用的功能菜单/按钮，与能访问的组织节点；两维共同决定最终可见范围（组织节点维度不可跨出授权人自身边界）。",
+    "en": "A role's grant has two dimensions: the menus/buttons it may use and the org nodes it may access; together they fix the visible range and the org dimension never exceeds the granter's boundary."
+  },
+  "order": [
+    "oa.authz.rbac.grant.menu",
+    "oa.authz.rbac.grant.org-node"
+  ]
+}

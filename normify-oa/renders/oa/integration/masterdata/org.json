@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.integration.masterdata.org",
+  "updated_at": "2026-10-02T08:00:54.179Z",
+  "mode": "layers",
+  "max_columns": 3,
+  "reading": {
+    "zh": "从左到右：先遍历组织树，再打开单个节点，最后读该节点负责人——单据路由最终依赖这一项。",
+    "en": "Left to right: walk the tree, open one node, then read who leads it (which is what document routing ultimately depends on)."
+  },
+  "order": [
+    "oa.integration.masterdata.org.tree",
+    "oa.integration.masterdata.org.detail",
+    "oa.integration.masterdata.org.leader"
+  ]
+}

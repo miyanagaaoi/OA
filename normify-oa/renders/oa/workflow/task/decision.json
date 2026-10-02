@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.workflow.task.decision",
+  "updated_at": "2026-10-02T08:02:40.504Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "先定决议模式（或签/会签/依次），再解析通过阈值，最后做驳回意见与候选人去重等前置校验。",
+    "en": "Pick the decision mode, resolve the pass threshold, then run the opinion and deduplication pre-checks."
+  },
+  "order": [
+    "oa.workflow.task.decision.mode",
+    "oa.workflow.task.decision.threshold",
+    "oa.workflow.task.decision.guard"
+  ]
+}

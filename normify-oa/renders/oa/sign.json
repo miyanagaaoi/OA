@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "oa.sign",
+  "updated_at": "2026-10-02T08:03:01.364Z",
+  "mode": "groups",
+  "max_columns": 2,
+  "reading": {
+    "zh": "从左到右：先在 H5 或桌面端手写采集、或一键调用预存签名（capture、preset），再按只追加与不可篡改要求落库留痕（record），最后是为二期可靠电子签名预留的 CA 通道（ca）。",
+    "en": "Left to right: capture a handwritten signature or reuse a preset (capture, preset), persist it append-only and tamper-evident (record), and finally the CA channel reserved for phase-two qualified e-signatures (ca)."
+  },
+  "order": [
+    "oa.sign.capture",
+    "oa.sign.preset",
+    "oa.sign.record",
+    "oa.sign.ca"
+  ],
+  "groups": [
+    {
+      "id": "capture",
+      "title": {
+        "zh": "签名产生与预存",
+        "en": "Capture & Presets"
+      },
+      "children": [
+        "oa.sign.capture",
+        "oa.sign.preset"
+      ]
+    },
+    {
+      "id": "guard",
+      "title": {
+        "zh": "记录、合规与 CA 预留",
+        "en": "Records, Compliance & CA"
+      },
+      "children": [
+        "oa.sign.record",
+        "oa.sign.ca"
+      ]
+    }
+  ]
+}

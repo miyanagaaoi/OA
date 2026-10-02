@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "oa.platform.security",
+  "updated_at": "2026-10-02T07:59:34.486Z",
+  "mode": "grid",
+  "max_columns": 3,
+  "reading": {
+    "zh": "分层防护从左到右：传输加密 → 口令强度与锁定 → 敏感字段落库加密。",
+    "en": "Defence in layers left to right: encrypted transport, then credential strength and lockout, then encryption of sensitive fields at rest."
+  },
+  "order": [
+    "oa.platform.security.transport",
+    "oa.platform.security.password",
+    "oa.platform.security.crypto"
+  ]
+}

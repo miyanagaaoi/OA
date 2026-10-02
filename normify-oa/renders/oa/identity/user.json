@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "oa.identity.user",
+  "updated_at": "2026-10-02T08:05:03.768Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从左到右：先看人员档案与通讯录（手机号默认脱敏），再看批量导入与只读接口两个数据进出通道，最后是离职待办闸门与水印身份要素。",
+    "en": "Left to right: profiles and the directory (phones masked by default), then the two data channels (bulk import, read-only API), and finally the resignation gate and watermark identity elements."
+  },
+  "order": [
+    "oa.identity.user.profile",
+    "oa.identity.user.directory",
+    "oa.identity.user.import",
+    "oa.identity.user.open-api",
+    "oa.identity.user.resign",
+    "oa.identity.user.watermark"
+  ],
+  "groups": [
+    {
+      "id": "master",
+      "title": {
+        "zh": "档案与目录",
+        "en": "Profile & Directory"
+      },
+      "children": [
+        "oa.identity.user.profile",
+        "oa.identity.user.directory"
+      ]
+    },
+    {
+      "id": "io",
+      "title": {
+        "zh": "批量与开放",
+        "en": "Bulk & Open API"
+      },
+      "children": [
+        "oa.identity.user.import",
+        "oa.identity.user.open-api"
+      ]
+    },
+    {
+      "id": "lifecycle",
+      "title": {
+        "zh": "生命周期与身份要素",
+        "en": "Lifecycle & Identity"
+      },
+      "children": [
+        "oa.identity.user.resign",
+        "oa.identity.user.watermark"
+      ]
+    }
+  ]
+}
