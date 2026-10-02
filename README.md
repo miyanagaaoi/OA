@@ -84,10 +84,20 @@ node tools/validate-design-md.js DESIGN.md
 ├── DESIGN.md / DESIGN.preview.html / DESIGN.print-a4.html   # 设计规范与预览稿
 ├── doc/                                                      # 需求、模型、字典、模板、用例、排期、技术方案
 ├── normify-oa/                                               # 架构结构基线（520 模块 + 渲染数据 + 产物）
-├── oa-deploy/                                                # 交付物：初始化 SQL（27 表 + 字典 + 四类模板）、批量导入模板
+├── oa-server/                                                # 后端工程（Spring Boot 3.2 / Java 21，已含 Flyway 迁移）
+├── oa-web/                                                   # 前端工程（Vue 3 + TS + Vite + Element Plus）
+├── oa-deploy/                                                # 交付物：初始化 SQL、导入模板、Compose/Nginx、环境清单
 ├── tools/                                                    # 校验与生成脚本（见下表）
-└── .github/workflows/docs-ci.yml                             # 文档与交付产物的持续校验
+└── .github/workflows/docs-ci.yml                             # 文档、交付产物与前后端构建的持续校验
 ```
+
+**工程骨架状态（阶段 1 开工）**：后端 `mvn test` **30 个单测全绿**（数据域 SQL 纯函数 / 三态白名单 / 会话锁定 / Mapper XML）；前端 `vue-tsc` + `vite build` 通过；本地工具链 JDK 21 + Maven 3.9 + Node 24/pnpm 11。
+
+| 组件 | 启动方式 |
+| --- | --- |
+| 后端 | `cd oa-server && mvn spring-boot:run`（Flyway 自动执行 `V1/V2/V3`；触发器由启动时幂等创建） |
+| 前端 | `cd oa-web && pnpm install && pnpm dev`（`/api` 代理到 8080） |
+| 依赖（MySQL 8 / Redis 7 / Nginx） | `cd oa-deploy && cp .env.example .env && docker compose up -d` |
 
 **脚本一览**（全部零依赖 Node，已接入 CI）：
 

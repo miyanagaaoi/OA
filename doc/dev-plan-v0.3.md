@@ -88,6 +88,13 @@
 
 **出口（DoD）**：AC-01、AC-02、AC-17 全部通过；越权专项测试（含手改 URL、直连接口）零放行；权限与数据域变更写入审计日志（REQ-LOG-004 的产生侧）。
 
+> **开工状态（2026-10-02）：工程骨架已落地并本地验证通过**
+> - 后端 [`oa-server/`](../oa-server)：Spring Boot 3.2.12 + Java 21 + MyBatis-Plus（Boot 3 专属 starter）+ Flyway + Redis；**`mvn test` 30 个单测全绿**（数据域 SQL 纯函数 12 条、三态白名单 9 条、会话与锁定 8 条、Mapper XML 解析 1 条）
+> - 前端 [`oa-web/`](../oa-web)：Vue 3.4 + TS + Vite 5 + Element Plus + Pinia；**`vue-tsc` 与 `vite build` 均通过**
+> - 部署：[`oa-deploy/docker-compose.yml`](../oa-deploy/docker-compose.yml) + [`nginx/oa.conf`](../oa-deploy/nginx/oa.conf) + [`oa-server/Dockerfile`](../oa-server/Dockerfile) + [`env-checklist.md`](../oa-deploy/env-checklist.md)（＝工作项 0.3）
+> - 已具备骨架：**1.3 登录与会话**（login/logout/me、失败锁定、多设备会话）、**1.5 数据域引擎**（`DataScopeSqlBuilder` 纯函数 + `DataScopeInterceptor` 唯一入口 + 标记缺失时 fail-closed）、**1.6 字段级限制**（三态白名单 `FormWritePolicy`）、**1.7 安全基座**（HTTPS/CSP/不可篡改触发器/BCrypt）、**1.9 设计基座**（`tokens.scss` 对齐 `DESIGN.md`、水印与三态组件、登录/待办/详情/打印四视图）
+> - 尚未开始：**1.1/1.2**（组织树、岗位与负责人）、**1.4**（角色与权限树）、**1.8**（组织人员维护与批量导入落地）
+
 **风险**：数据域是最容易"上线后才发现漏过滤"的地方 → 建议在第 1 阶段末做一次**逐接口矩阵测试**（角色 × 数据范围 × 入口）。
 
 ---

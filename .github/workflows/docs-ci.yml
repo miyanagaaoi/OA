@@ -45,3 +45,55 @@ jobs:
       - name: 校验汇总
         if: always()
         run: echo "全部检查完成；任一上游步骤失败即视为本次提交不合规。"
+
+  backend:
+    name: 后端构建与单测（oa-server）
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: oa-server
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: 编译与单测（数据域 SQL / 三态白名单 / 会话锁定 / Mapper 解析）
+        run: mvn -B test
+
+      - name: 打包（不跑测试，验证可交付）
+        run: mvn -B -q -DskipTests package
+
+  frontend:
+    name: 前端类型检查与构建（oa-web）
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: oa-web
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: 安装依赖（锁定文件，允许构建脚本见 pnpm-workspace.yaml）
+        run: pnpm install --frozen-lockfile
+
+      - name: 类型检查（vue-tsc）
+        run: pnpm typecheck
+
+      - name: 构建（vite build）
+        run: pnpm build
