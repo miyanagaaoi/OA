@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oa.authz.api.dto.AuthzDtos;
 import com.oa.common.config.JacksonConfig;
 import com.oa.common.config.OaProperties;
-import com.oa.common.web.WebMvcConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -23,7 +22,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  *   <li>{@code permissionIds} 的**字符串 id** 能绑定到 {@code List<Long>}
  *       （{@code JacksonConfig} 只把 Long <b>序列化</b>成字符串，反序列化兼容两种形态）；</li>
  *   <li>额外字段 {@code leafIds}/{@code halfCheckedIds} **不会**被拒绝——
- *       {@code WebMvcConfig#oaJacksonCustomizer} 已关闭 {@code FAIL_ON_UNKNOWN_PROPERTIES}
+ *       {@code JacksonConfig#oaDateTimeCustomizer} 已关闭 {@code FAIL_ON_UNKNOWN_PROPERTIES}
  *       （Spring Boot 默认即关闭，本工程显式再关一次；本测试即其回归防线）；</li>
  *   <li>{@code mode} 缺省绑定为 {@code null}，由服务层归一为 {@code auto}
  *       （见 {@code RolePermissionService#normalizeMode}）。</li>
@@ -31,12 +30,13 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  */
 class RolePermissionRequestBindingTest {
 
-    /** 与运行时同口径的 ObjectMapper：JacksonConfig（数字转字符串）+ WebMvcConfig（未知字段忽略）。 */
+    /** 与运行时同口径的 ObjectMapper：JacksonConfig 的两个 customizer（数字转字符串 + 时间与未知字段）。 */
     private static ObjectMapper runtimeMapper() {
         OaProperties properties = new OaProperties();
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        new JacksonConfig().oaNumberAsStringCustomizer(properties).customize(builder);
-        new WebMvcConfig(null, properties).oaJacksonCustomizer(properties).customize(builder);
+        JacksonConfig jacksonConfig = new JacksonConfig();
+        jacksonConfig.oaNumberAsStringCustomizer(properties).customize(builder);
+        jacksonConfig.oaDateTimeCustomizer(properties).customize(builder);
         return builder.build();
     }
 

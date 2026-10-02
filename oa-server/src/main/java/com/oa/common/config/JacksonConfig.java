@@ -1,8 +1,15 @@
 package com.oa.common.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +57,36 @@ public class JacksonConfig {
                 builder.serializerByType(Long.TYPE, ToStringSerializer.instance);
                 builder.serializerByType(BigInteger.class, ToStringSerializer.instance);
             }
+        };
+    }
+
+    /**
+     * Jackson 配置（时间与解析特性）——**自 {@code common.web.WebMvcConfig} 迁入**。
+     *
+     * <p>为什么必须放在这里：{@code WebMvcConfig} 构造器注入 {@code AuthInterceptor}，
+     * 而 {@code AuthInterceptor} 构造器注入 {@code ObjectMapper}。若 {@code WebMvcConfig}
+     * 再产出 {@link Jackson2ObjectMapperBuilderCustomizer}，就形成**纯构造器注入的环**
+     * （builder → webMvcConfig → authInterceptor → objectMapper → builder），
+     * Spring 无法用 early-reference 打破（{@code spring.main.allow-circular-references=true} 无效），
+     * 应用在**任何 profile（含 prod/Docker）都无法启动**。
+     *
+     * <p>职责：
+     * <ul>
+     *   <li>时区统一 {@code OaProperties.Jackson.timeZone}（默认 Asia/Shanghai）；</li>
+     *   <li>时间格式统一 {@code yyyy-MM-dd HH:mm:ss}（禁用时间戳数组）；</li>
+     *   <li>反序列化忽略未知字段（前端多传字段不得导致 400；与幂等无关）。</li>
+     * </ul>
+     */
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer oaDateTimeCustomizer(OaProperties properties) {
+        OaProperties.Jackson jackson = properties.getJackson();
+        return builder -> {
+            builder.timeZone(TimeZone.getTimeZone(jackson.getTimeZone()));
+            builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(jackson.getDateFormat());
+            builder.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
+            builder.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
         };
     }
 }
