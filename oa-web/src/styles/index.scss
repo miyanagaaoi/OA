@@ -1,0 +1,472 @@
+// ============================================================================
+//  oa-web · 全局样式入口
+// ----------------------------------------------------------------------------
+//  引入顺序固定，不要调整：
+//    1) tokens.scss          —— 唯一色值来源，只 @use 这一次（避免 :root 重复）
+//    2) element-overrides.scss —— Element Plus 主题（SCSS 变量 + CSS 变量）
+//    3) print-a4.scss        —— A4 打印规格（@page / mm / pt）
+//    4) 本文件其余部分       —— reset、排版基线、通用工具类、H5 断点
+//
+//  来源：`DESIGN.md` 全篇 + `doc/tech-design.md` §3.1 / §6
+// ============================================================================
+
+@use './tokens.scss' as t;
+@use './element-overrides.scss';
+@use './print-a4.scss';
+
+// ---------------------------------------------------------------------------
+// Reset（最小必要集，不引入任何第三方 normalize）
+// ---------------------------------------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html {
+  // 关闭移动端自动字号放大，保证 H5 控件尺寸受令牌控制
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--oa-color-surface-1);
+  color: var(--oa-color-ink);
+  font: var(--oa-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+dl,
+dd {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--oa-color-primary);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--oa-color-primary-hover);
+  }
+}
+
+button {
+  font-family: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+// 数字对齐：金额、工号、单号一律等宽数字
+.oa-tnum,
+.oa-mono,
+.oa-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+// ---------------------------------------------------------------------------
+// 排版工具类（对应 DESIGN.md › Typography › Hierarchy）
+// ---------------------------------------------------------------------------
+.oa-text-display {
+  font: var(--oa-font-display);
+  letter-spacing: #{t.$oa-letter-spacing-display};
+}
+
+.oa-text-title-page {
+  font: var(--oa-font-title-page);
+  letter-spacing: #{t.$oa-letter-spacing-title-page};
+}
+
+.oa-text-title-section {
+  font: var(--oa-font-title-section);
+}
+
+.oa-text-body {
+  font: var(--oa-font-body);
+}
+
+.oa-text-body-sm {
+  font: var(--oa-font-body-sm);
+}
+
+.oa-text-label {
+  font: var(--oa-font-label);
+}
+
+.oa-text-caption {
+  font: var(--oa-font-caption);
+  letter-spacing: #{t.$oa-letter-spacing-caption};
+}
+
+.oa-text-muted {
+  color: var(--oa-color-ink-muted);
+}
+
+.oa-text-subtle {
+  color: var(--oa-color-ink-subtle);
+}
+
+.oa-mono {
+  font: var(--oa-font-mono);
+}
+
+// 金额：等宽数字 + 右对齐 + 两位小数
+.oa-amount {
+  font: var(--oa-font-amount);
+  text-align: right;
+  white-space: nowrap;
+
+  &.is-lg {
+    font: var(--oa-font-amount-lg);
+    letter-spacing: #{t.$oa-letter-spacing-amount-lg};
+  }
+
+  .wan {
+    margin-left: 4px;
+    font-size: var(--oa-font-size-caption);
+    font-weight: 400;
+    color: var(--oa-color-ink-subtle);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 表面与容器（深度靠线，不靠影）
+// ---------------------------------------------------------------------------
+.oa-card {
+  background: var(--oa-color-canvas);
+  border: 1px solid var(--oa-color-hairline);
+  border-radius: var(--oa-radius-md);
+  padding: 20px;
+  box-shadow: none;
+}
+
+.oa-panel-header {
+  padding: 0 0 var(--oa-space-sm);
+  font: var(--oa-font-title-section);
+  color: var(--oa-color-ink);
+}
+
+.oa-form-section {
+  background: var(--oa-color-canvas);
+  border-radius: var(--oa-radius-md);
+  padding: 20px 24px;
+}
+
+// 字段行：标签 96px 右对齐 + 控件自适应（桌面）；H5 单列标签在上
+.oa-field-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: var(--oa-space-md);
+  align-items: start;
+  padding: var(--oa-space-xs) 0;
+
+  > .oa-field-label {
+    padding-top: 7px;
+    text-align: right;
+    font: var(--oa-font-label);
+    color: var(--oa-color-ink-muted);
+
+    &.is-required::before {
+      content: '*';
+      margin-right: 2px;
+      color: var(--oa-color-error);
+    }
+  }
+}
+
+// 单据发起表单：单列、标签在上（DESIGN.md › 单据发起与表单填写）
+.oa-field-stack {
+  display: block;
+  margin-bottom: var(--oa-space-md);
+
+  > .oa-field-label {
+    display: block;
+    margin-bottom: var(--oa-space-xs);
+    font: var(--oa-font-label);
+    color: var(--oa-color-ink-muted);
+  }
+}
+
+// 分区标题带：整行浅底带、高 32px、可折叠
+.oa-section-band {
+  display: flex;
+  align-items: center;
+  gap: var(--oa-space-xs);
+  height: 32px;
+  padding: 0 var(--oa-space-sm);
+  margin-bottom: var(--oa-space-sm);
+  background: var(--oa-color-canvas-subtle);
+  border-radius: var(--oa-radius-xs);
+  font: var(--oa-font-label);
+  color: var(--oa-color-ink);
+}
+
+// ---------------------------------------------------------------------------
+// 状态徽标 / 标签 / 流程节点（附录 B：全局唯一，不得扩展）
+// ---------------------------------------------------------------------------
+.oa-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--oa-radius-sm);
+  font: var(--oa-font-caption);
+  white-space: nowrap;
+  background: var(--oa-color-neutral-surface);
+  color: var(--oa-color-neutral);
+
+  &.is-pending {
+    background: var(--oa-color-warning-surface);
+    color: var(--oa-color-warning);
+  }
+
+  &.is-approved {
+    background: var(--oa-color-success-surface);
+    color: var(--oa-color-success);
+  }
+
+  &.is-rejected {
+    background: var(--oa-color-error-surface);
+    color: var(--oa-color-error);
+  }
+
+  &.is-processing {
+    background: var(--oa-color-info-surface);
+    color: var(--oa-color-info);
+  }
+
+  &.is-closed {
+    background: var(--oa-color-surface-1);
+    color: var(--oa-color-neutral);
+  }
+}
+
+.oa-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--oa-radius-xs);
+  font: var(--oa-font-caption);
+  background: var(--oa-color-neutral-surface);
+  color: var(--oa-color-neutral);
+
+  &.is-info {
+    background: var(--oa-color-info-surface);
+    color: var(--oa-color-info);
+  }
+
+  &.is-success {
+    background: var(--oa-color-success-surface);
+    color: var(--oa-color-success);
+  }
+
+  &.is-warning {
+    background: var(--oa-color-warning-surface);
+    color: var(--oa-color-warning);
+  }
+
+  &.is-error {
+    background: var(--oa-color-error-surface);
+    color: var(--oa-color-error);
+  }
+}
+
+// 审批轨迹节点圆点：已完成 / 进行中 / 未到达 / 超时
+.oa-step {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--oa-radius-full);
+  border: 1px solid var(--oa-color-primary-border);
+  background: var(--oa-color-canvas);
+  color: var(--oa-color-ink);
+  font: var(--oa-font-body-sm);
+  flex: none;
+
+  &.is-current {
+    border-color: var(--oa-color-primary);
+    background: var(--oa-color-primary);
+    color: var(--oa-color-on-primary);
+  }
+
+  &.is-pending {
+    border-color: var(--oa-color-hairline);
+    color: var(--oa-color-ink-disabled);
+  }
+
+  &.is-timeout {
+    border-color: var(--oa-color-error);
+    color: var(--oa-color-error);
+  }
+}
+
+// 审批意见块
+.oa-opinion-block {
+  padding: var(--oa-space-sm);
+  border-radius: var(--oa-radius-sm);
+  background: var(--oa-color-canvas-subtle);
+  font: var(--oa-font-body);
+
+  .meta {
+    margin-top: var(--oa-space-xs);
+    font: var(--oa-font-caption);
+    color: var(--oa-color-ink-subtle);
+  }
+}
+
+// 空状态
+.oa-empty {
+  padding: var(--oa-space-xxl) var(--oa-space-lg);
+  text-align: center;
+  color: var(--oa-color-ink-subtle);
+
+  .ico {
+    margin: 0 auto var(--oa-space-md);
+    color: var(--oa-color-ink-disabled);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 焦点与动效
+// ---------------------------------------------------------------------------
+:focus-visible {
+  outline: none;
+  box-shadow: var(--oa-shadow-focus-ring);
+  border-radius: var(--oa-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// H5 适配（DESIGN.md › Responsive Strategy › Mobile / PRD 6.8）
+//   · 触控目标 ≥44px
+//   · 底部操作栏 60px 常驻 + env(safe-area-inset-bottom)
+// ---------------------------------------------------------------------------
+@media (max-width: t.$oa-bp-mobile-lg) {
+  .oa-field-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--oa-space-xs);
+
+    > .oa-field-label {
+      padding-top: 0;
+      text-align: left;
+    }
+  }
+
+  // 触控目标不低于 44px：所有可点控件在 H5 上一律抬到 control-h5
+  .el-button,
+  .el-input__wrapper,
+  .el-select__wrapper,
+  .el-textarea__inner,
+  .el-checkbox,
+  .el-radio,
+  .el-switch {
+    min-height: var(--oa-space-control-h5);
+  }
+
+  .el-button {
+    height: var(--oa-space-control-h5);
+    padding: 0 var(--oa-space-md);
+  }
+
+  .el-input,
+  .el-select,
+  .el-date-editor {
+    --el-input-height: var(--oa-space-control-h5);
+  }
+}
+
+// H5 底部操作栏：高 60px、白底 + 上边框 1px（不用阴影，避免滚动闪烁带）
+.oa-h5-action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--oa-space-xs);
+  height: calc(var(--oa-action-bar-h) + var(--oa-safe-bottom));
+  padding: 0 var(--oa-space-sm) var(--oa-safe-bottom);
+  background: var(--oa-color-canvas);
+  border-top: 1px solid var(--oa-color-hairline);
+
+  // 主按钮占剩余宽度，次按钮固定 96px
+  .oa-h5-primary {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .oa-h5-secondary {
+    flex: 0 0 96px;
+  }
+
+  .oa-h5-more {
+    flex: none;
+  }
+}
+
+// 有底部操作栏时给内容留出空间
+.oa-has-h5-action-bar {
+  padding-bottom: calc(var(--oa-action-bar-h) + var(--oa-safe-bottom) + var(--oa-space-md));
+}
+
+// 屏幕专属：打印时隐藏
+.oa-screen-only {
+  // 实际隐藏规则在 print-a4.scss 的 @media print 内
+}
+
+// 无障碍：仅供读屏
+.oa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

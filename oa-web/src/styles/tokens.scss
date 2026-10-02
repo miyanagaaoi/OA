@@ -1,0 +1,389 @@
+// ============================================================================
+//  oa-web · 设计令牌（Design Tokens）
+// ----------------------------------------------------------------------------
+//  来源：`DESIGN.md`（设计规范 V0.4，2026-10-02 配套修订）
+//    · YAML front matter `colors`        → 颜色令牌（逐项对应，不新增/不改值）
+//    · YAML front matter `typography`    → 字体族 / 字号 / 字重 / 行高 / 字距
+//    · YAML front matter `rounded`       → 圆角令牌
+//    · YAML front matter `spacing`       → 间距与控件尺寸令牌
+//    · YAML front matter `components`    → 组件级令牌（表面色/圆角/高度），见文件末
+//    · 正文「打印规格」                  → 打印专用令牌（mm / pt）
+//    · 正文「Panel 布局令牌」            → 审批中心面板尺寸
+//    · 正文「Components › watermark」    → 水印令牌（5%–8% / -24° / 240×160）
+//    · 正文「Responsive Strategy」       → 断点令牌
+//    · 附录 A「令牌 → CSS 变量映射」     → CSS 变量命名基准（--oa-*）
+//
+//  硬约束（DESIGN.md「Agent Usage Rules」）：
+//    1) 本文件是全站唯一色值来源，业务代码禁止写死颜色 / 字号。
+//    2) 双导出：SCSS 变量（编译期，供 Element Plus 主题覆写）+
+//       CSS 变量（运行期，供组件与打印样式使用）。
+//    3) 本文件只允许在 `src/styles/index.scss` 中被 @use 一次——
+//       重复 @use 会把 `:root` 块复制进多个编译单元。
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// 1. Color · Brand & Accent（DESIGN.md › Colors › Brand & Accent）
+//    primary 使用场景白名单仅四项：主按钮 / 链接 / 焦点环 / 当前选中项
+// ---------------------------------------------------------------------------
+$oa-color-primary: #1f5ae0; // {colors.primary}
+$oa-color-primary-hover: #1749bd; // {colors.primary-hover}  悬停压暗，保证白字 ≥4.5:1
+$oa-color-primary-active: #12398f; // {colors.primary-active} 按下进一步压暗
+$oa-color-on-primary: #ffffff; // {colors.on-primary}
+$oa-color-primary-subtle: #eef3fe; // {colors.primary-subtle} 选中行 / Tab 激活底 / 信息提示条
+$oa-color-primary-border: #c4d5f8; // {colors.primary-border} 禁用主按钮底 / 选中项描边
+
+// ---------------------------------------------------------------------------
+// 2. Color · Text（DESIGN.md › Colors › Text）
+// ---------------------------------------------------------------------------
+$oa-color-ink: #14181f; // {colors.ink}           对比度 16.8:1
+$oa-color-ink-muted: #4a5563; // {colors.ink-muted}     7.8:1
+$oa-color-ink-subtle: #5f6b7a; // {colors.ink-subtle}    5.2:1（AA）
+$oa-color-ink-disabled: #aeb7c4; // {colors.ink-disabled} 约 2.0:1，仅表示"不可用"
+
+// ---------------------------------------------------------------------------
+// 3. Color · Surface（DESIGN.md › Colors › Surface）
+//    四级表面阶梯，按顺序表达层级、不跳级
+// ---------------------------------------------------------------------------
+$oa-color-canvas: #ffffff; // {colors.canvas}
+$oa-color-canvas-subtle: #f7f8fa; // {colors.canvas-subtle} 表头 / 只读字段块 / 审批意见块 / 上传区 / 行悬停
+$oa-color-surface-1: #f2f4f7; // {colors.surface-1}     分组容器 / 禁用控件底 / 头像底
+$oa-color-surface-2: #e6e9ef; // {colors.surface-2}     较重分隔 / 开关关闭轨道
+$oa-color-hairline: #e2e5ea; // {colors.hairline}       1px 默认描边
+$oa-color-hairline-strong: #c8cdd6; // {colors.hairline-strong} 悬停 / 嵌套面板 / 分组分隔
+
+// ---------------------------------------------------------------------------
+// 4. Color · Inverse（DESIGN.md › Colors › Inverse）
+//    仅用于左侧深色导航，禁止侵入业务区与 H5
+// ---------------------------------------------------------------------------
+$oa-color-inverse-canvas: #151a22; // {colors.inverse-canvas}
+$oa-color-inverse-surface-1: #1e242e; // {colors.inverse-surface-1} 选中项 / 组织切换器底
+$oa-color-inverse-surface-2: #28303c; // {colors.inverse-surface-2} 悬停态 / 二级展开
+$oa-color-inverse-ink: #f4f6f9; // {colors.inverse-ink}       14.6:1
+$oa-color-inverse-ink-muted: #9aa4b2; // {colors.inverse-ink-muted} 6.4:1
+
+// ---------------------------------------------------------------------------
+// 5. Color · Semantic（DESIGN.md › Colors › Semantic + 附录 B 状态映射）
+//    仅用于状态徽标 / 流程节点 / 风险提示 / 校验信息
+// ---------------------------------------------------------------------------
+$oa-color-success: #1f7a4d; // {colors.semantic-success}
+$oa-color-success-surface: #e6f4ec; // {colors.semantic-success-surface}
+$oa-color-warning: #9a6200; // {colors.semantic-warning}
+$oa-color-warning-surface: #fdf1dd; // {colors.semantic-warning-surface}
+$oa-color-error: #c02b25; // {colors.semantic-error}
+$oa-color-error-surface: #fbeaea; // {colors.semantic-error-surface}
+$oa-color-info: #1f5ae0; // {colors.semantic-info}（与 primary 同值：系统里"蓝"只有一个含义）
+$oa-color-info-surface: #eef3fe; // {colors.semantic-info-surface}
+$oa-color-neutral: #5b6472; // {colors.semantic-neutral}
+$oa-color-neutral-surface: #eef0f4; // {colors.semantic-neutral-surface}
+
+// ---------------------------------------------------------------------------
+// 6. Color · Overlay & Focus（DESIGN.md › Colors › Overlay & Focus）
+// ---------------------------------------------------------------------------
+$oa-color-overlay: #000000; // {colors.overlay} 实际渲染 40% alpha
+$oa-color-focus-ring: #1f5ae0; // {colors.focus-ring} 全系统不可移除
+
+// ---------------------------------------------------------------------------
+// 7. Typography（DESIGN.md › Typography › Hierarchy 表，逐行对应）
+//    字体族走系统栈，声明在令牌里，不加载任何外部字体（Known Gaps: 字体授权）
+// ---------------------------------------------------------------------------
+$oa-font-family: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC',
+  system-ui, sans-serif;
+$oa-font-family-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas,
+  monospace;
+
+// display：门户首页欢迎语、统计大标题
+$oa-font-size-display: 28px;
+$oa-font-weight-display: 600;
+$oa-line-height-display: 1.25;
+$oa-letter-spacing-display: -0.4px;
+// title-page：页面标题
+$oa-font-size-title-page: 20px;
+$oa-font-weight-title-page: 600;
+$oa-line-height-title-page: 1.3;
+$oa-letter-spacing-title-page: -0.2px;
+// title-section：卡片/面板标题
+$oa-font-size-title-section: 16px;
+$oa-font-weight-title-section: 600;
+$oa-line-height-title-section: 1.4;
+$oa-letter-spacing-title-section: 0;
+// body：正文与表单值（默认字号，不是最小值）
+$oa-font-size-body: 14px;
+$oa-font-weight-body: 400;
+$oa-line-height-body: 1.6;
+$oa-letter-spacing-body: 0;
+// body-sm：表格单元格、密集列表
+$oa-font-size-body-sm: 13px;
+$oa-font-weight-body-sm: 400;
+$oa-line-height-body-sm: 1.55;
+$oa-letter-spacing-body-sm: 0;
+// label：字段标签、Tab
+$oa-font-size-label: 13px;
+$oa-font-weight-label: 500;
+$oa-line-height-label: 1.4;
+$oa-letter-spacing-label: 0;
+// caption：时间戳、序号、徽标、水印文字
+$oa-font-size-caption: 12px;
+$oa-font-weight-caption: 400;
+$oa-line-height-caption: 1.45;
+$oa-letter-spacing-caption: 0.1px;
+// table-header：表头（微正字距）
+$oa-font-size-table-header: 13px;
+$oa-font-weight-table-header: 500;
+$oa-line-height-table-header: 1.4;
+$oa-letter-spacing-table-header: 0.2px;
+// amount：表格金额（tnum）
+$oa-font-size-amount: 14px;
+$oa-font-weight-amount: 500;
+$oa-line-height-amount: 1.4;
+$oa-letter-spacing-amount: 0;
+// amount-lg：资金审批单金额主视觉（tnum）
+$oa-font-size-amount-lg: 32px;
+$oa-font-weight-amount-lg: 600;
+$oa-line-height-amount-lg: 1.2;
+$oa-letter-spacing-amount-lg: -0.6px;
+// mono：单号、ID、日志、哈希（tnum）
+$oa-font-size-mono: 13px;
+$oa-font-weight-mono: 400;
+$oa-line-height-mono: 1.5;
+$oa-letter-spacing-mono: 0;
+// button：所有按钮文字
+$oa-font-size-button: 14px;
+$oa-font-weight-button: 500;
+$oa-line-height-button: 1.2;
+$oa-letter-spacing-button: 0;
+
+// ---------------------------------------------------------------------------
+// 8. Rounded（DESIGN.md › Shapes › Border Radius Scale）
+//    按钮恒为 4px，永不使用 pill 圆角按钮
+// ---------------------------------------------------------------------------
+$oa-radius-none: 0px; // 面板 / 表格 / 侧栏
+$oa-radius-xs: 2px; // 徽标 / 标签 / 复选框
+$oa-radius-sm: 4px; // 按钮 / 输入框 / 下拉框（默认控件圆角）
+$oa-radius-md: 6px; // 卡片 / 模态框 / 上传区 / 抽屉内容块
+$oa-radius-lg: 8px; // 大面板 / 流程设计器画布
+$oa-radius-pill: 9999px; // 开关轨道 / 胶囊标签（仅此两类）
+$oa-radius-full: 9999px; // 头像 / 流程节点圆点
+
+// ---------------------------------------------------------------------------
+// 9. Spacing & Control Size（DESIGN.md › Layout › Spacing System）
+//    基准单位 4px，全部为 4 的倍数
+// ---------------------------------------------------------------------------
+$oa-space-xxs: 4px;
+$oa-space-xs: 8px;
+$oa-space-sm: 12px;
+$oa-space-md: 16px;
+$oa-space-lg: 24px;
+$oa-space-xl: 32px;
+$oa-space-xxl: 48px;
+$oa-space-section: 64px;
+$oa-space-control: 32px; // 桌面默认控件高
+$oa-space-control-compact: 28px; // 表格内联操作 / 穿梭框
+$oa-space-control-comfortable: 40px; // 流程设计器 / 低频配置页
+$oa-space-control-h5: 44px; // H5 触控，不低于 44px
+
+// ---------------------------------------------------------------------------
+// 10. Elevation（DESIGN.md › Elevation & Depth）
+//     能靠 1px 细线与表面阶梯解决的层级，不加阴影
+// ---------------------------------------------------------------------------
+$oa-shadow-layer-0: none; // 扁平：页面 / 标题 / 正文 / 表格行
+$oa-shadow-layer-1: none; // 细线层级由 1px hairline 边框表达，无阴影
+$oa-shadow-layer-3: 0 4px 12px rgba(20, 24, 31, 0.1),
+  0 1px 3px rgba(20, 24, 31, 0.06); // 下拉 / 日期面板 / 气泡
+$oa-shadow-layer-4: 0 12px 32px rgba(20, 24, 31, 0.16); // 模态框
+$oa-shadow-drawer: -8px 0 24px rgba(20, 24, 31, 0.12); // 右侧抽屉
+$oa-shadow-focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #1f5ae0; // 键盘焦点环 :focus-visible
+
+// ---------------------------------------------------------------------------
+// 11. Panel 布局令牌（DESIGN.md › Layout › Panel 布局令牌，审批中心专用）
+// ---------------------------------------------------------------------------
+$oa-panel-nav-w: 224px; // 抽屉展开宽
+$oa-panel-nav-w-rail: 64px; // 抽屉收起宽（图标条）
+$oa-panel-list-w: 380px; // 审批列表栏宽
+$oa-panel-list-min-w: 320px; // 列表栏拖拽下限
+$oa-panel-list-item-h: 68px; // 列表项高度（两行）
+$oa-panel-detail-head-h: 56px; // 详情头部高（与顶栏同高）
+$oa-panel-action-bar-h: 60px; // 底部操作栏高（桌面与 H5 同值）
+$oa-panel-drawer-motion: 160ms; // 抽屉动效 160ms ease-out
+$oa-panel-drawer-easing: ease-out;
+
+// ---------------------------------------------------------------------------
+// 12. 水印令牌（DESIGN.md › Components › Feedback & Overlays › watermark）
+//     PRD 6.8 REQ-USER-004 / AC-44：姓名 + 工号，5%–8%，-24°，不遮挡按钮与表单值
+// ---------------------------------------------------------------------------
+$oa-watermark-opacity-min: 0.05; // 透明度下限 5%
+$oa-watermark-opacity-max: 0.08; // 透明度上限 8%
+$oa-watermark-opacity-default: 0.06; // 默认取中值
+$oa-watermark-rotate: -24deg; // 旋转角，固定不可调
+$oa-watermark-gap-x: 240px; // 平铺间距 240×160px
+$oa-watermark-gap-y: 160px;
+
+// ---------------------------------------------------------------------------
+// 13. 响应式断点（DESIGN.md › Layout › Responsive Strategy）
+// ---------------------------------------------------------------------------
+$oa-bp-mobile: 480px; // H5 布局：底部操作栏 60px 常驻，控件 44px
+$oa-bp-mobile-lg: 768px; // 单列流式；顶部栏 48px
+$oa-bp-tablet: 1024px; // 侧栏折叠为 64px；列表与详情切为两级
+$oa-bp-laptop: 1280px; // 列表栏收窄 320px；轨迹移至表单下方
+$oa-bp-desktop: 1440px; // 默认布局（列表 + 详情并置）
+$oa-bp-desktop-xl: 1680px; // 表单 8 列 + 轨迹 4 列
+$oa-h5-topbar-h: 48px; // Mobile-Lg 顶部栏高
+
+// ---------------------------------------------------------------------------
+// 14. 打印令牌（DESIGN.md › 打印规格：纸张与版心 / 打印稿专用规则）
+//     单位一律 mm / pt，不使用 px 定义纸张与边距（实现约束 1）
+// ---------------------------------------------------------------------------
+$oa-print-page-w: 210mm;
+$oa-print-page-h: 297mm;
+$oa-print-padding: 12mm 12mm 10mm; // 版心 186mm
+$oa-print-margin: 0mm; // @page margin: 0
+$oa-print-line-w: 0.35mm; // 全表 1pt 实线
+$oa-print-line-bold: 0.6mm; // 外框可加粗
+$oa-print-value-bg: #fafafa; // 写值区 3–4% 极浅灰（标签列不填色）
+$oa-print-font-body: 9.5pt; // 正文
+$oa-print-font-note: 8.5pt; // 附注
+$oa-print-font-title: 16pt; // 单据抬头（字距 2px）
+$oa-print-line-height: 1.42; // 55 行/页的实测基线
+$oa-print-footer-bottom: 6mm; // 页脚距底
+$oa-print-logo-h: 8mm; // 页脚品牌标识高
+$oa-print-font-family: 'Songti SC', 'SimSun', '宋体', serif; // 打印稿正文字体
+$oa-print-font-family-sans: 'Microsoft YaHei', 'PingFang SC', system-ui,
+  sans-serif;
+$oa-print-font-family-hand: 'Kaiti SC', 'KaiTi', 'STKaiti', '楷体', serif; // 仅屏幕预览示意
+
+// ===========================================================================
+//  CSS 变量导出（运行期）——命名遵循 DESIGN.md 附录 A
+// ===========================================================================
+:root {
+  // ---- Color · Brand ----
+  --oa-color-primary: #{$oa-color-primary};
+  --oa-color-primary-hover: #{$oa-color-primary-hover};
+  --oa-color-primary-active: #{$oa-color-primary-active};
+  --oa-color-on-primary: #{$oa-color-on-primary};
+  --oa-color-primary-subtle: #{$oa-color-primary-subtle};
+  --oa-color-primary-border: #{$oa-color-primary-border};
+
+  // ---- Color · Text ----
+  --oa-color-ink: #{$oa-color-ink};
+  --oa-color-ink-muted: #{$oa-color-ink-muted};
+  --oa-color-ink-subtle: #{$oa-color-ink-subtle};
+  --oa-color-ink-disabled: #{$oa-color-ink-disabled};
+
+  // ---- Color · Surface ----
+  --oa-color-canvas: #{$oa-color-canvas};
+  --oa-color-canvas-subtle: #{$oa-color-canvas-subtle};
+  --oa-color-surface-1: #{$oa-color-surface-1};
+  --oa-color-surface-2: #{$oa-color-surface-2};
+  --oa-color-hairline: #{$oa-color-hairline};
+  --oa-color-hairline-strong: #{$oa-color-hairline-strong};
+
+  // ---- Color · Inverse（仅侧栏）----
+  --oa-color-inverse-canvas: #{$oa-color-inverse-canvas};
+  --oa-color-inverse-surface-1: #{$oa-color-inverse-surface-1};
+  --oa-color-inverse-surface-2: #{$oa-color-inverse-surface-2};
+  --oa-color-inverse-ink: #{$oa-color-inverse-ink};
+  --oa-color-inverse-ink-muted: #{$oa-color-inverse-ink-muted};
+
+  // ---- Color · Semantic ----
+  --oa-color-success: #{$oa-color-success};
+  --oa-color-success-surface: #{$oa-color-success-surface};
+  --oa-color-warning: #{$oa-color-warning};
+  --oa-color-warning-surface: #{$oa-color-warning-surface};
+  --oa-color-error: #{$oa-color-error};
+  --oa-color-error-surface: #{$oa-color-error-surface};
+  --oa-color-info: #{$oa-color-info};
+  --oa-color-info-surface: #{$oa-color-info-surface};
+  --oa-color-neutral: #{$oa-color-neutral};
+  --oa-color-neutral-surface: #{$oa-color-neutral-surface};
+
+  // ---- Color · Overlay & Focus ----
+  --oa-color-overlay: #{$oa-color-overlay};
+  --oa-color-focus-ring: #{$oa-color-focus-ring};
+  --oa-color-overlay-40: rgba(0, 0, 0, 0.4); // 模态遮罩固定 40% 黑
+
+  // ---- Typography ----
+  --oa-font-family: #{$oa-font-family};
+  --oa-font-family-mono: #{$oa-font-family-mono};
+
+  --oa-font-display: #{$oa-font-weight-display} #{$oa-font-size-display} / #{$oa-line-height-display}
+    #{$oa-font-family};
+  --oa-font-title-page: #{$oa-font-weight-title-page} #{$oa-font-size-title-page} / #{$oa-line-height-title-page}
+    #{$oa-font-family};
+  --oa-font-title-section: #{$oa-font-weight-title-section} #{$oa-font-size-title-section} / #{$oa-line-height-title-section}
+    #{$oa-font-family};
+  --oa-font-body: #{$oa-font-weight-body} #{$oa-font-size-body} / #{$oa-line-height-body}
+    #{$oa-font-family};
+  --oa-font-body-sm: #{$oa-font-weight-body-sm} #{$oa-font-size-body-sm} / #{$oa-line-height-body-sm}
+    #{$oa-font-family};
+  --oa-font-label: #{$oa-font-weight-label} #{$oa-font-size-label} / #{$oa-line-height-label}
+    #{$oa-font-family};
+  --oa-font-caption: #{$oa-font-weight-caption} #{$oa-font-size-caption} / #{$oa-line-height-caption}
+    #{$oa-font-family};
+  --oa-font-table-header: #{$oa-font-weight-table-header} #{$oa-font-size-table-header} / #{$oa-line-height-table-header}
+    #{$oa-font-family};
+  --oa-font-amount: #{$oa-font-weight-amount} #{$oa-font-size-amount} / #{$oa-line-height-amount}
+    #{$oa-font-family};
+  --oa-font-amount-lg: #{$oa-font-weight-amount-lg} #{$oa-font-size-amount-lg} / #{$oa-line-height-amount-lg}
+    #{$oa-font-family};
+  --oa-font-mono: #{$oa-font-weight-mono} #{$oa-font-size-mono} / #{$oa-line-height-mono}
+    #{$oa-font-family-mono};
+  --oa-font-button: #{$oa-font-weight-button} #{$oa-font-size-button} / #{$oa-line-height-button}
+    #{$oa-font-family};
+
+  // ---- Rounded ----
+  --oa-radius-none: #{$oa-radius-none};
+  --oa-radius-xs: #{$oa-radius-xs};
+  --oa-radius-sm: #{$oa-radius-sm};
+  --oa-radius-md: #{$oa-radius-md};
+  --oa-radius-lg: #{$oa-radius-lg};
+  --oa-radius-pill: #{$oa-radius-pill};
+  --oa-radius-full: #{$oa-radius-full};
+
+  // ---- Spacing ----
+  --oa-space-xxs: #{$oa-space-xxs};
+  --oa-space-xs: #{$oa-space-xs};
+  --oa-space-sm: #{$oa-space-sm};
+  --oa-space-md: #{$oa-space-md};
+  --oa-space-lg: #{$oa-space-lg};
+  --oa-space-xl: #{$oa-space-xl};
+  --oa-space-xxl: #{$oa-space-xxl};
+  --oa-space-section: #{$oa-space-section};
+  --oa-space-control: #{$oa-space-control};
+  --oa-space-control-compact: #{$oa-space-control-compact};
+  --oa-space-control-comfortable: #{$oa-space-control-comfortable};
+  --oa-space-control-h5: #{$oa-space-control-h5};
+
+  // ---- Elevation ----
+  --oa-shadow-layer-3: #{$oa-shadow-layer-3};
+  --oa-shadow-layer-4: #{$oa-shadow-layer-4};
+  --oa-shadow-drawer: #{$oa-shadow-drawer};
+  --oa-shadow-focus-ring: #{$oa-shadow-focus-ring};
+
+  // ---- Panel 布局 ----
+  --oa-nav-w: #{$oa-panel-nav-w};
+  --oa-nav-w-rail: #{$oa-panel-nav-w-rail};
+  --oa-panel-list: #{$oa-panel-list-w};
+  --oa-panel-list-min: #{$oa-panel-list-min-w};
+  --oa-panel-list-item-h: #{$oa-panel-list-item-h};
+  --oa-detail-head-h: #{$oa-panel-detail-head-h};
+  --oa-action-bar-h: #{$oa-panel-action-bar-h};
+  --oa-drawer-motion: #{$oa-panel-drawer-motion};
+  --oa-drawer-easing: #{$oa-panel-drawer-easing};
+
+  // ---- 水印 ----
+  --oa-watermark-opacity-min: #{$oa-watermark-opacity-min};
+  --oa-watermark-opacity-max: #{$oa-watermark-opacity-max};
+  --oa-watermark-opacity: #{$oa-watermark-opacity-default};
+  --oa-watermark-rotate: #{$oa-watermark-rotate};
+  --oa-watermark-gap-x: #{$oa-watermark-gap-x};
+  --oa-watermark-gap-y: #{$oa-watermark-gap-y};
+
+  // ---- H5 ----
+  --oa-h5-topbar-h: #{$oa-h5-topbar-h};
+  --oa-safe-bottom: env(safe-area-inset-bottom, 0px); // 底部安全区
+
+  // ---- 打印（仅屏幕预览取用；打印态由 print-a4.scss 接管）----
+  --oa-print-page-w: #{$oa-print-page-w};
+  --oa-print-page-h: #{$oa-print-page-h};
+  --oa-print-line-w: #{$oa-print-line-w};
+  --oa-print-value-bg: #{$oa-print-value-bg};
+}

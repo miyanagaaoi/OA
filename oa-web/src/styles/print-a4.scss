@@ -1,0 +1,386 @@
+// ============================================================================
+//  oa-web · A4 打印样式
+// ----------------------------------------------------------------------------
+//  来源：`DESIGN.md`「打印规格（审批单 A4）」整节 + `DESIGN.print-a4.html`
+//        + `normify-oa/modules/oa/design/print/**`、`oa/form/print/**`
+//
+//  四条不可协商的规则（DESIGN.md「打印稿专用规则」）：
+//    1) 纸张 @page { size: A4; margin: 0 }，版心由 padding 12mm 12mm 10mm 控制；
+//       纸张与边距一律用 mm / pt，不用 px（实现约束 1）。
+//    2) 圆角全部 0px、投影完全禁止、不使用任何主题色，全部黑色。
+//    3) 正文 9.5pt / 附注 8.5pt / 抬头 16pt，不随屏幕缩放；表格全表 1pt（.35mm）实线。
+//    4) **正式 A4 打印稿的签名栏一律为空栏**（供手签）——不打印任何签名图、
+//       缩略图、姓名或时间戳；`.oa-sign-stamp` 只在屏幕预览出现，
+//       在 @media print 中被强制隐藏。
+//       空栏格式固定为 `签名：____ 年 月 日`。
+// ============================================================================
+
+@use './tokens.scss' as t;
+
+// ---------------------------------------------------------------------------
+// 纸张与版心
+// ---------------------------------------------------------------------------
+@page {
+  size: A4; // A4 纵向 210mm × 297mm
+  margin: 0; // 无边距：版心完全由内容区 padding 控制
+}
+
+.oa-print-root {
+  --oa-print-ink: #000; // 打印稿正文纯黑，黑白复印后仍须可读
+  --oa-print-line: #000;
+}
+
+// ---------------------------------------------------------------------------
+// 打印页（屏幕预览 1:1 毫米尺寸渲染，width: 210mm，与打印结果一致）
+// ---------------------------------------------------------------------------
+.oa-sheet {
+  width: t.$oa-print-page-w;
+  min-height: t.$oa-print-page-h;
+  margin: 16px auto;
+  padding: t.$oa-print-padding;
+  position: relative;
+  box-sizing: border-box;
+  background: #fff;
+  color: var(--oa-print-ink, #000);
+  font-family: t.$oa-print-font-family;
+  font-size: t.$oa-print-font-body;
+  line-height: t.$oa-print-line-height;
+  // 业务界面用细线 + 表面阶梯 + 克制用色；打印稿必须更朴素，规则不可互相套用
+  border-radius: 0; // 打印稿圆角全部 0px
+  box-shadow: 0 2px 12px rgba(20, 24, 31, 0.18); // 仅屏幕预览的纸张投影，打印态移除
+
+  & + .oa-sheet {
+    margin-top: 16px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 单据抬头：居中、加粗、16pt、字距 2px
+// ---------------------------------------------------------------------------
+.oa-print-title {
+  margin: 0 0 4mm;
+  text-align: center;
+  font-family: t.$oa-print-font-family;
+  font-size: t.$oa-print-font-title;
+  font-weight: 700;
+  letter-spacing: 2px;
+
+  .sub {
+    display: block;
+    margin-top: 1mm;
+    font-size: 8pt;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+}
+
+// 顶部信息条：左「申请编号」、右「打印人 / 打印时间」
+.oa-print-meta {
+  display: flex;
+  justify-content: space-between;
+  margin: -2mm 0 1.5mm;
+  font-size: 8pt;
+  line-height: 1.4;
+
+  .right {
+    text-align: right;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 主体表格：全表 1pt 实线、无圆角、无填色（标签列不填色）
+// ---------------------------------------------------------------------------
+.oa-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  th,
+  td {
+    border: t.$oa-print-line-w solid var(--oa-print-line, #000);
+    padding: 0.9mm 1.6mm;
+    font-size: t.$oa-print-font-body;
+    line-height: t.$oa-print-line-height;
+    vertical-align: middle;
+    word-break: break-word;
+    border-radius: 0;
+  }
+
+  th {
+    font-weight: 400;
+    text-align: center;
+    background: transparent;
+  }
+
+  // 标签列：居中、不填色
+  .lbl {
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  // 写值区：可填字段给 3–4% 极浅灰底，屏幕上可辨、打印几乎不可见
+  .val {
+    background: t.$oa-print-value-bg;
+  }
+
+  .c {
+    text-align: center;
+  }
+  .r {
+    text-align: right;
+  }
+
+  // 数字与日期：等宽字体，便于归档核对
+  .mono {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .amount {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 10.5pt;
+  }
+
+  // 附注
+  .tiny {
+    font-size: t.$oa-print-font-note;
+    line-height: 1.4;
+  }
+
+  // 分组标题行：整行合并居中
+  tr.grp td {
+    text-align: center;
+    background: transparent;
+  }
+
+  // 嵌套表（公文接收及处理的三分格，仅竖线）
+  table.inner {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    td {
+      border: 0;
+      border-left: t.$oa-print-line-w solid var(--oa-print-line, #000);
+      padding: 0.8mm 1.4mm;
+
+      &:first-child {
+        border-left: 0;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 检查框：使用文字符号 ☑ / ☐，不使用 input[type=checkbox]
+// 计划类别 / 付款归属均为布尔 checkbox，不打印 true/false
+// ---------------------------------------------------------------------------
+.oa-print-checkbox {
+  font-family: t.$oa-print-font-family-sans;
+  font-size: 9pt;
+  letter-spacing: 0;
+
+  .box {
+    margin: 0 1mm 0 3mm;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  .on::before {
+    content: '☑ ';
+  }
+
+  .off::before {
+    content: '☐ ';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 签名栏（正式打印稿一律空栏）
+//   - `.oa-sign-blank`  ：空栏本体 `签名：____ 年 月 日`
+//   - `.oa-sign-stamp`  ：屏幕预览的已签缩略图 + 时间戳，打印时强制隐藏
+// ---------------------------------------------------------------------------
+.oa-sign-blank {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 2mm;
+  font-size: 9pt;
+  color: #333;
+
+  .lbl {
+    white-space: nowrap;
+  }
+
+  .line {
+    color: #bbb;
+    letter-spacing: 0.5px;
+  }
+}
+
+.oa-sign-stamp {
+  font-family: t.$oa-print-font-family-sans;
+
+  img {
+    display: block;
+    max-height: 64px; // 签名图等比缩放，最大高度 64px
+    background: #fff;
+    border-radius: 0;
+  }
+
+  .ts {
+    font-size: 8.5pt;
+    color: #333;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 审批记录流水（子公司内部审批单版式；事项审批单复用此版式）
+//   每行三段：阶段 · 处理人/动作/时间 · 意见与附件（独占整行宽）
+// ---------------------------------------------------------------------------
+.oa-print-flow {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  td {
+    border: t.$oa-print-line-w solid var(--oa-print-line, #000);
+    padding: 0.9mm 1.6mm;
+    font-size: t.$oa-print-font-body;
+    line-height: 1.5;
+    vertical-align: top;
+    border-radius: 0;
+  }
+
+  td.stage {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  tr.grp td {
+    text-align: center;
+    font-weight: 400;
+    background: transparent;
+  }
+
+  .time,
+  .attach {
+    font-size: t.$oa-print-font-note;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 页脚：固定三栏，每页重复
+//   左「系统名 · 单据名」/ 中「单号 · 模板版本 · 生成时间」/ 右「第 X / Y 页」
+// ---------------------------------------------------------------------------
+.oa-print-footer {
+  position: absolute;
+  left: 12mm;
+  right: 12mm;
+  bottom: t.$oa-print-footer-bottom;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.2mm;
+  border-top: t.$oa-print-line-w solid #999;
+  font-family: t.$oa-print-font-family-sans;
+  font-size: 8pt;
+  color: #444;
+
+  .pnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .flogo {
+    height: t.$oa-print-logo-h;
+    width: auto;
+    display: block;
+    flex: none;
+  }
+
+  .fbrand {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 打印态：隐藏屏幕工具条与一切仅屏幕可见的元素
+// ---------------------------------------------------------------------------
+@media print {
+  html,
+  body {
+    background: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  // 打印时自动隐藏屏幕工具条
+  .oa-screen-only,
+  .oa-print-toolbar,
+  .oa-watermark-layer,
+  .el-message,
+  .el-drawer,
+  .el-overlay {
+    display: none !important;
+  }
+
+  // 打印签名栏一律空栏：屏幕预览的签名缩略图与时间戳不得进入打印样式表
+  .oa-sign-stamp {
+    display: none !important;
+  }
+
+  .oa-sheet {
+    width: t.$oa-print-page-w;
+    min-height: t.$oa-print-page-h;
+    margin: 0;
+    padding: t.$oa-print-padding;
+    box-shadow: none;
+    border-radius: 0;
+    page-break-after: always;
+    break-after: page;
+
+    &:last-of-type {
+      page-break-after: auto;
+      break-after: auto;
+    }
+  }
+
+  // 表格线与写值区底色必须照实打印
+  .oa-print-table th,
+  .oa-print-table td,
+  .oa-print-flow td {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  // 表头跨页重复；「公文接收及处理」每段整段不跨页截断
+  .oa-print-table thead {
+    display: table-header-group;
+  }
+
+  .oa-print-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 窄屏：屏幕预览时纸面等比缩为流式，不影响打印结果
+// ---------------------------------------------------------------------------
+@media screen and (max-width: t.$oa-bp-tablet) {
+  .oa-sheet {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 12px 10px;
+    box-shadow: none;
+  }
+}

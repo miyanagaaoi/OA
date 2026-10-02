@@ -1,0 +1,6 @@
+# oa-web 本地忽略（根 .gitignore 已忽略 node_modules/，此处显式兜底 + 忽略构建产物）
+node_modules/
+dist/
+*.local
+.env.*.local
+.vite/

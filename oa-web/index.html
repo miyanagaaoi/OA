@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover：启用 env(safe-area-inset-bottom)，H5 底部操作栏常驻不被 home 条压住 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- 纯静态、私有化部署：不引用任何 CDN / 外部字体（REQ-NFR-001） -->
+    <title>集团OA审批系统</title>
+    <style>
+      /* 首屏骨架：避免字体/样式加载前白闪，颜色取自 DESIGN.md tokens */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #f2f4f7;
+      }
+      #app {
+        height: 100%;
+      }
+      .boot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        font: 400 13px/1.55 "Inter", "PingFang SC", "Microsoft YaHei",
+          "Noto Sans SC", system-ui, sans-serif;
+        color: #5f6b7a;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"><div class="boot">正在加载审批中心…</div></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

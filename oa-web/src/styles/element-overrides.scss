@@ -1,0 +1,490 @@
+// ============================================================================
+//  oa-web · Element Plus 主题覆写
+// ----------------------------------------------------------------------------
+//  来源：`doc/tech-design.md` §3.1「UI 组件 Element Plus 2.x —— 定制主题对齐
+//        DESIGN.md 令牌（色值、字号、行高、圆角全部走令牌）」
+//        与 `normify-oa/modules/oa/design/token/**` 的令牌契约。
+//
+//  接入方式分两层：
+//    ① 编译期：用 `@use ... with (...)` 覆写 Element Plus 的 SCSS 变量，
+//       让它自己算出的衍生色（primary-light-3/5/7/8/9、边框、填充）都落在令牌上。
+//    ② 运行期：把 Element Plus 的 CSS 变量（--el-*）钉到 --oa-* 上，
+//       便于 H5 断点内做密度切换而不重新编译。
+//
+//  硬约束：本文件不引入任何新色值 —— 每个 `#{}` 都来自 tokens.scss。
+// ============================================================================
+
+@use './tokens.scss' as t;
+
+// ---------------------------------------------------------------------------
+// ① 编译期：覆写 Element Plus SCSS 变量
+//    仅覆写 element-plus 中带 `!default` 且语义稳定的变量；
+//    未列出的派生量（hover/active/disabled、light-N 阶梯）由 EP 自行计算。
+// ---------------------------------------------------------------------------
+@use 'element-plus/theme-chalk/src/common/var.scss' as * with (
+  $colors: (
+    'primary': (
+      'base': t.$oa-color-primary,
+    ),
+    'success': (
+      'base': t.$oa-color-success,
+    ),
+    'warning': (
+      'base': t.$oa-color-warning,
+    ),
+    'danger': (
+      'base': t.$oa-color-error,
+    ),
+    'error': (
+      'base': t.$oa-color-error,
+    ),
+    'info': (
+      'base': t.$oa-color-neutral,
+    ),
+  ),
+  $text-color: (
+    'primary': t.$oa-color-ink,
+    'regular': t.$oa-color-ink-muted,
+    'secondary': t.$oa-color-ink-subtle,
+    'placeholder': t.$oa-color-ink-disabled,
+    'disabled': t.$oa-color-ink-disabled,
+  ),
+  $border-color: (
+    '': t.$oa-color-hairline,
+    'light': t.$oa-color-hairline,
+    'lighter': t.$oa-color-hairline,
+    'extra-light': t.$oa-color-canvas-subtle,
+    'dark': t.$oa-color-hairline-strong,
+    'darker': t.$oa-color-hairline-strong,
+  ),
+  $fill-color: (
+    '': t.$oa-color-surface-1,
+    'light': t.$oa-color-canvas-subtle,
+    'lighter': t.$oa-color-canvas-subtle,
+    'extra-light': t.$oa-color-canvas-subtle,
+    'blank': t.$oa-color-canvas,
+  ),
+  $bg-color: (
+    '': t.$oa-color-canvas,
+    'page': t.$oa-color-surface-1,
+    'overlay': t.$oa-color-canvas,
+  ),
+  $border-radius: (
+    'base': t.$oa-radius-sm,
+    'small': t.$oa-radius-xs,
+    'round': t.$oa-radius-full,
+    'circle': 100%,
+  ),
+  // 注意 EP 的键是 base/medium 而非 body：base=14px 是 EP 的默认字号基准
+  $font-size: (
+    'extra-large': t.$oa-font-size-title-page,
+    'large': t.$oa-font-size-title-section,
+    'medium': t.$oa-font-size-title-section,
+    'base': t.$oa-font-size-body,
+    'small': t.$oa-font-size-label,
+    'extra-small': t.$oa-font-size-caption,
+  ),
+  // 字体族走系统栈（不加载外部字体，REQ-NFR-001）
+  $font-family: (
+    '': t.$oa-font-family,
+  ),
+  $box-shadow: (
+    '': t.$oa-shadow-layer-3,
+    'light': t.$oa-shadow-layer-3,
+    'lighter': t.$oa-shadow-layer-3,
+    'dark': t.$oa-shadow-layer-4,
+  )
+);
+
+// 引入 Element Plus 全量主题（由上面的变量配置生成）
+@use 'element-plus/theme-chalk/src/index.scss' as *;
+
+// ---------------------------------------------------------------------------
+// ② 运行期：把 Element Plus CSS 变量钉到 OA 令牌
+// ---------------------------------------------------------------------------
+:root {
+  // 品牌主色：全系统唯一强调色，仅用于主按钮 / 链接 / 焦点环 / 选中态
+  --el-color-primary: var(--oa-color-primary);
+  --el-color-primary-light-3: var(--oa-color-primary-border);
+  --el-color-primary-light-5: var(--oa-color-primary-border);
+  --el-color-primary-light-7: var(--oa-color-primary-subtle);
+  --el-color-primary-light-8: var(--oa-color-primary-subtle);
+  --el-color-primary-light-9: var(--oa-color-primary-subtle);
+  --el-color-primary-dark-2: var(--oa-color-primary-hover);
+
+  // 语义色：状态色只出现在状态徽标 / 流程节点 / 风险提示
+  --el-color-success: var(--oa-color-success);
+  --el-color-success-light-9: var(--oa-color-success-surface);
+  --el-color-warning: var(--oa-color-warning);
+  --el-color-warning-light-9: var(--oa-color-warning-surface);
+  --el-color-danger: var(--oa-color-error);
+  --el-color-danger-light-9: var(--oa-color-error-surface);
+  --el-color-error: var(--oa-color-error);
+  --el-color-error-light-9: var(--oa-color-error-surface);
+  --el-color-info: var(--oa-color-neutral);
+  --el-color-info-light-9: var(--oa-color-neutral-surface);
+
+  // 文字与描边
+  --el-text-color-primary: var(--oa-color-ink);
+  --el-text-color-regular: var(--oa-color-ink-muted);
+  --el-text-color-secondary: var(--oa-color-ink-subtle);
+  --el-text-color-placeholder: var(--oa-color-ink-disabled);
+  --el-text-color-disabled: var(--oa-color-ink-disabled);
+  --el-text-color-primary-on-primary: var(--oa-color-on-primary);
+
+  --el-border-color: var(--oa-color-hairline);
+  --el-border-color-light: var(--oa-color-hairline);
+  --el-border-color-lighter: var(--oa-color-hairline);
+  --el-border-color-extra-light: var(--oa-color-canvas-subtle);
+  --el-border-color-dark: var(--oa-color-hairline-strong);
+  --el-border-color-darker: var(--oa-color-hairline-strong);
+  --el-border-color-hover: var(--oa-color-hairline-strong);
+
+  // 表面阶梯
+  --el-bg-color: var(--oa-color-canvas);
+  --el-bg-color-page: var(--oa-color-surface-1);
+  --el-bg-color-overlay: var(--oa-color-canvas);
+  --el-fill-color: var(--oa-color-surface-1);
+  --el-fill-color-light: var(--oa-color-canvas-subtle);
+  --el-fill-color-lighter: var(--oa-color-canvas-subtle);
+  --el-fill-color-extra-light: var(--oa-color-canvas-subtle);
+  --el-fill-color-blank: var(--oa-color-canvas);
+  --el-mask-color: var(--oa-color-overlay-40);
+  --el-overlay-color-lighter: var(--oa-color-overlay-40);
+
+  // 圆角：控件 4px、卡片 6px，按钮永不用 pill
+  --el-border-radius-base: var(--oa-radius-sm);
+  --el-border-radius-small: var(--oa-radius-xs);
+  --el-border-radius-round: var(--oa-radius-full);
+
+  // 字体：全部走系统栈，不加载外部字体
+  --el-font-family: var(--oa-font-family);
+  --el-font-size-base: var(--oa-font-size-body);
+  --el-font-size-small: var(--oa-font-size-label);
+  --el-font-size-extra-small: var(--oa-font-size-caption);
+  --el-font-size-large: var(--oa-font-size-title-section);
+  --el-font-size-extra-large: var(--oa-font-size-title-page);
+
+  // 控件尺寸：桌面 32px
+  --el-component-size: var(--oa-space-control);
+  --el-component-size-small: var(--oa-space-control-compact);
+  --el-component-size-large: var(--oa-space-control-comfortable);
+
+  // 浮层阴影：仅下拉 / 模态 / 抽屉使用
+  --el-box-shadow: var(--oa-shadow-layer-3);
+  --el-box-shadow-light: var(--oa-shadow-layer-3);
+  --el-box-shadow-lighter: var(--oa-shadow-layer-3);
+  --el-box-shadow-dark: var(--oa-shadow-layer-4);
+}
+
+// ---------------------------------------------------------------------------
+// ③ 组件级对齐：把 EP 默认观感拉回 DESIGN.md 的密度与克制用色
+// ---------------------------------------------------------------------------
+
+// 按钮：高 32px、圆角 4px、字重 500；禁用主按钮 = primary-border 底 + ink-muted 字
+.el-button {
+  height: var(--oa-space-control);
+  padding: 0 var(--oa-space-md);
+  font-size: var(--oa-font-size-button);
+  font-weight: var(--oa-font-weight-button);
+  border-radius: var(--oa-radius-sm);
+
+  &.is-disabled,
+  &.is-disabled:hover,
+  &.is-disabled:focus {
+    background-color: var(--oa-color-primary-border);
+    border-color: var(--oa-color-primary-border);
+    color: var(--oa-color-ink-muted);
+  }
+
+  // 次要按钮：白底 + 1px hairline-strong + ink 文字
+  &--default:not(.is-disabled) {
+    background-color: var(--oa-color-canvas);
+    border-color: var(--oa-color-hairline-strong);
+    color: var(--oa-color-ink);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--oa-color-canvas-subtle);
+      border-color: var(--oa-color-hairline-strong);
+      color: var(--oa-color-ink);
+    }
+  }
+
+  // 危险操作优先 ghost（白底红字），避免误触红色实心按钮
+  &--danger.is-plain:not(.is-disabled) {
+    background-color: var(--oa-color-canvas);
+    border-color: var(--oa-color-error);
+    color: var(--oa-color-error);
+  }
+
+  // 表格行内操作：无边框无底色、文字用 primary、高 28px
+  &--primary.is-text,
+  &--primary.is-link {
+    color: var(--oa-color-primary);
+    padding: 0 var(--oa-space-xs);
+    height: var(--oa-space-control-compact);
+  }
+}
+
+// 输入 / 选择 / 日期：32px 高、12px 内边距、聚焦保留 2px 焦点环
+.el-input,
+.el-select,
+.el-date-editor,
+.el-input-number {
+  --el-input-height: var(--oa-space-control);
+  --el-input-border-radius: var(--oa-radius-sm);
+  --el-input-focus-border-color: var(--oa-color-primary);
+
+  .el-input__wrapper {
+    padding: 0 var(--oa-space-sm);
+    box-shadow: 0 0 0 1px var(--oa-color-hairline) inset;
+
+    &:hover {
+      box-shadow: 0 0 0 1px var(--oa-color-hairline-strong) inset;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 1px var(--oa-color-primary) inset;
+    }
+  }
+}
+
+.el-textarea {
+  --el-input-border-radius: var(--oa-radius-sm);
+
+  .el-textarea__inner {
+    min-height: 88px; // 审批意见主输入控件
+    padding: 8px 12px;
+    box-shadow: 0 0 0 1px var(--oa-color-hairline) inset;
+
+    &:hover {
+      box-shadow: 0 0 0 1px var(--oa-color-hairline-strong) inset;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 1px var(--oa-color-primary) inset;
+    }
+  }
+}
+
+// 只读字段值：canvas-subtle 底块呈现，不加边框（DESIGN.md › field-row）
+.el-input.is-disabled .el-input__wrapper,
+.el-textarea.is-disabled .el-textarea__inner {
+  background-color: var(--oa-color-canvas-subtle);
+  box-shadow: none;
+  color: var(--oa-color-ink);
+  -webkit-text-fill-color: var(--oa-color-ink);
+}
+
+.el-select.is-disabled .el-select__wrapper {
+  background-color: var(--oa-color-canvas-subtle);
+  box-shadow: none;
+  color: var(--oa-color-ink);
+}
+
+// 表格：行高 44px、表头 40px、canvas-subtle 表头、选中行 primary-subtle + 左侧 2px 指示条
+.el-table {
+  --el-table-border-color: var(--oa-color-hairline);
+  --el-table-header-bg-color: var(--oa-color-canvas-subtle);
+  --el-table-header-text-color: var(--oa-color-ink-muted);
+  --el-table-row-hover-bg-color: var(--oa-color-canvas-subtle);
+  --el-table-current-row-bg-color: var(--oa-color-primary-subtle);
+  --el-table-tr-bg-color: var(--oa-color-canvas);
+  --el-table-text-color: var(--oa-color-ink);
+  font-size: var(--oa-font-size-body-sm);
+
+  th.el-table__cell {
+    height: 40px;
+    font-size: var(--oa-font-size-table-header);
+    font-weight: var(--oa-font-weight-table-header);
+    letter-spacing: var(--oa-letter-spacing-table-header);
+  }
+
+  td.el-table__cell {
+    height: 44px;
+  }
+
+  // 紧凑模式：审计日志与明细
+  &.el-table--compact td.el-table__cell,
+  .oa-row-compact td.el-table__cell {
+    height: 36px;
+  }
+}
+
+// 金额列：tnum + 右对齐 + 两位小数
+.el-table .oa-cell-amount {
+  font-size: var(--oa-font-size-amount);
+  font-weight: var(--oa-font-weight-amount);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+// 分页：32px 高、当前页 primary 文字 + primary-subtle 底
+.el-pagination {
+  --el-pagination-button-height: var(--oa-space-control);
+  --el-pagination-font-size: var(--oa-font-size-body-sm);
+  color: var(--oa-color-ink-muted);
+
+  &.is-background .el-pager li.is-active {
+    background-color: var(--oa-color-primary-subtle);
+    color: var(--oa-color-primary);
+  }
+}
+
+// 标签与状态徽标：浅底 + 同色深字，禁止饱和填充块
+.el-tag {
+  border-radius: var(--oa-radius-xs);
+  padding: 2px 8px;
+  height: auto;
+  font-size: var(--oa-font-size-caption);
+  line-height: var(--oa-line-height-caption);
+  border-color: transparent;
+}
+
+// 对话框：圆角 6px、层级 4 阴影、内边距 24px
+.el-dialog {
+  border-radius: var(--oa-radius-md);
+  box-shadow: var(--oa-shadow-layer-4);
+  padding: 0;
+
+  .el-dialog__header {
+    padding: var(--oa-space-lg) var(--oa-space-lg) 0;
+    margin-right: 0;
+  }
+
+  .el-dialog__title {
+    font-size: var(--oa-font-size-title-page);
+    font-weight: var(--oa-font-weight-title-page);
+    color: var(--oa-color-ink);
+  }
+
+  .el-dialog__body {
+    padding: var(--oa-space-md) var(--oa-space-lg);
+    color: var(--oa-color-ink);
+  }
+
+  .el-dialog__footer {
+    padding: 0 var(--oa-space-lg) var(--oa-space-lg);
+  }
+}
+
+// 抽屉：宽 480px（日志详情 640px），层级 5 阴影，全部 0 圆角
+.el-drawer {
+  box-shadow: var(--oa-shadow-drawer);
+  border-radius: 0;
+
+  .el-drawer__header {
+    margin-bottom: 0;
+    padding: var(--oa-space-md) var(--oa-space-lg);
+    border-bottom: 1px solid var(--oa-color-hairline);
+    color: var(--oa-color-ink);
+  }
+
+  .el-drawer__body {
+    padding: var(--oa-space-lg);
+  }
+}
+
+// 消息提示：右上角 360px，白底 + 层级 3 阴影 + 左侧 3px 状态色竖条
+.el-message {
+  min-width: 360px;
+  border-radius: var(--oa-radius-sm);
+  box-shadow: var(--oa-shadow-layer-3);
+  border-color: var(--oa-color-hairline);
+
+  &.el-message--success {
+    border-left: 3px solid var(--oa-color-success);
+  }
+
+  &.el-message--warning {
+    border-left: 3px solid var(--oa-color-warning);
+  }
+
+  &.el-message--error {
+    border-left: 3px solid var(--oa-color-error);
+  }
+
+  &.el-message--info {
+    border-left: 3px solid var(--oa-color-info);
+  }
+}
+
+// 时间轴（审批轨迹）：节点四态、连接线随进度变色
+.el-timeline {
+  padding-left: 0;
+
+  .el-timeline-item__tail {
+    border-left: 2px solid var(--oa-color-hairline);
+  }
+
+  .el-timeline-item.is-done .el-timeline-item__tail {
+    border-left-color: var(--oa-color-primary);
+  }
+
+  .el-timeline-item__timestamp {
+    font-size: var(--oa-font-size-caption);
+    color: var(--oa-color-ink-subtle);
+  }
+}
+
+// 复选框 / 单选 / 开关：选中态一律 primary；开关轨道 36×20
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: var(--oa-color-primary);
+  border-color: var(--oa-color-primary);
+}
+
+.el-checkbox__inner {
+  border-radius: var(--oa-radius-xs);
+}
+
+.el-switch {
+  --el-switch-on-color: var(--oa-color-primary);
+  --el-switch-off-color: var(--oa-color-surface-2);
+  --el-switch-height: 20px;
+  --el-switch-width: 36px;
+}
+
+// 上传区：虚线框 + canvas-subtle 底 + 6px 圆角 + 24px 内边距
+.el-upload-dragger {
+  background-color: var(--oa-color-canvas-subtle);
+  border: 1px dashed var(--oa-color-hairline-strong);
+  border-radius: var(--oa-radius-md);
+  padding: var(--oa-space-lg);
+  color: var(--oa-color-ink-muted);
+
+  &:hover {
+    border-color: var(--oa-color-primary);
+    color: var(--oa-color-primary);
+  }
+}
+
+// 下拉面板：选中项 primary-subtle 底 + primary 文字
+.el-select-dropdown__item.is-selected {
+  background-color: var(--oa-color-primary-subtle);
+  color: var(--oa-color-primary);
+  font-weight: var(--oa-font-weight-label);
+}
+
+// 焦点环：键盘 Tab 可见、鼠标点击不显示；全系统不可移除
+:focus-visible {
+  outline: none;
+  box-shadow: var(--oa-shadow-focus-ring);
+  border-radius: var(--oa-radius-sm);
+}
+
+// 表单校验错误：12px 红字
+.el-form-item__error {
+  font-size: var(--oa-font-size-caption);
+  color: var(--oa-color-error);
+  padding-top: 2px;
+}
+
+// 面板 / 卡片：白底 + 1px hairline，无阴影
+.el-card {
+  border: 1px solid var(--oa-color-hairline);
+  border-radius: var(--oa-radius-md);
+  box-shadow: none;
+}
