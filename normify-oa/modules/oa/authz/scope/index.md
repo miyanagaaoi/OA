@@ -2,7 +2,6 @@
 uid: 1c2e4d34
 id: oa.authz.scope
 parent: oa.authz
-state: planned
 name: {zh: "数据域口径", en: "Data Scope Rules"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Verifiable data-scope rules (V0.4): employees see their own documents, department leaders their unit, subsidiary GM their company, chairman and admins everything; the group function department (Finance) sees its ownership categories (fund/contract/seal), cost-involving matter forms, and documents routed to or through it - matter forms without cost and without routing stay invisible. Enforced by query filtering.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.673Z"
-fingerprint: 6be246c6834b9b56d4a42d5b955150bb6a06a766a90c031fd7f3af6b4c917a6d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.694Z"
+fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
 source:
   - path: "doc/prd-0.1.md"
     line: 169

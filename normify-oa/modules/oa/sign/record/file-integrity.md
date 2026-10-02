@@ -11,9 +11,9 @@ description:
   en: >
       File integrity for signature images and attachments: private local storage, authenticated download only, upload guard of 50MB per file, 20 per batch and 50 per document including supplements, whitelist formats with executables blocked by extension and MIME, plus sha256 anti-substitution.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.797Z"
-fingerprint: 46e4a321c46840a13d096e8e27da142b33f1cd454b54e39f94e7aa84cab8326d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.789Z"
+fingerprint: cf9a7907d6428309f56722cf44e087019be611708029c433d198dc90173fc764
 source:
   - path: "doc/forms.md"
     line: 49

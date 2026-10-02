@@ -11,8 +11,8 @@ description:
   en: >
       Verifies signature hashes and log records, producing verification jobs and results as acceptance evidence for the immutability constraint, and alerts when tampering traces are found.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.657Z"
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.683Z"
 fingerprint: affe2755b0ec3d7b6adffe3259b4864634f794b5be85e144d9ec84d32aeba3d7
 source:
   - path: "doc/data-model.md"

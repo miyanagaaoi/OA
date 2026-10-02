@@ -11,9 +11,9 @@ description:
   en: >
       The detail-page watermark layer: typography.caption in ink at 5%–8% opacity, rotated -24°, tiled every 240×160px with the user's name and employee number; pointer-events and user-select are both none, and it must never cover buttons or form values (REQ-USER-004).
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.775Z"
-fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.772Z"
+fingerprint: 28e8829672cee9b922026028eb18feb80adbb9de4b7fc02f0910f372f46c48c2
 source:
   - path: "DESIGN.md"
     line: 900

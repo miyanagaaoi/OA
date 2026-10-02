@@ -2,7 +2,6 @@
 uid: 0b5a7def
 id: oa.identity.user.profile
 parent: oa.identity.user
-state: planned
 name: {zh: "人员档案与账号", en: "User Profile & Account"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       User profiles and login accounts: name, employee number (for watermarking), primary org and company, position, employment status, salted password hash and encrypted phone; phones are never stored in clear text.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.739Z"
-fingerprint: 6be246c6834b9b56d4a42d5b955150bb6a06a766a90c031fd7f3af6b4c917a6d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.743Z"
+fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
 source:
   - path: "doc/data-model.md"
     line: 59

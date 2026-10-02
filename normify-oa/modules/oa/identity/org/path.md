@@ -2,7 +2,6 @@
 uid: 0369f88d
 id: oa.identity.org.path
 parent: oa.identity.org
-state: planned
 name: {zh: "路径与层级重算", en: "Path & Depth Rebuild"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Rebuilds the materialised ancestor path (/1/12/135/), depth and sort order after a node move, and answers ancestor/descendant queries; the path unique key prevents duplicate mounting.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.728Z"
-fingerprint: 6be246c6834b9b56d4a42d5b955150bb6a06a766a90c031fd7f3af6b4c917a6d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.735Z"
+fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
 source:
   - path: "doc/data-model.md"
     line: 34

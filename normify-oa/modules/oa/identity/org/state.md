@@ -2,7 +2,6 @@
 uid: 038b1665
 id: oa.identity.org.state
 parent: oa.identity.org
-state: planned
 name: {zh: "停用与在途闸门", en: "Disable Gate & In-flight Check"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Enable/disable for org nodes: disabling requires all in-flight documents of the node to be finished first, and a disabled node can no longer be an initiator's org; the gate returns the affected in-flight list and blocks the action.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.728Z"
-fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.735Z"
+fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"
     line: 234

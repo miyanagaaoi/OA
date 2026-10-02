@@ -2,7 +2,6 @@
 uid: 4072b0d7
 id: oa.identity.session.client
 parent: oa.identity.session
-state: planned
 name: {zh: "客户端登录承载与兼容", en: "Client Login & Compatibility"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Client-side login carriage: QR-code and short-link tickets are exchanged for a session; the compatibility matrix is mainstream Chrome/Edge/Safari, and the WeChat built-in browser must at least stay crash-free and able to log in and approve.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.732Z"
-fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.738Z"
+fingerprint: 28e8829672cee9b922026028eb18feb80adbb9de4b7fc02f0910f372f46c48c2
 source:
   - path: "doc/prd-0.1.md"
     line: 413

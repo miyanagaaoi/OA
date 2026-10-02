@@ -11,8 +11,8 @@ description:
   en: >
       Defines and parses `form_schema_json`: field IDs (lower snake_case, globally unique, never reused once used), control types, lengths, required flags, defaults and linkage declarations, plus template versions and dictionary bindings. All four document types share one schema shape and the UI hardcodes no field.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.721Z"
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.729Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

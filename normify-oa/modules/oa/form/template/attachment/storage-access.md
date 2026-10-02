@@ -11,8 +11,8 @@ description:
   en: >
       Attachments live in private on-premise storage, never on the public internet; downloads must pass an authorized endpoint with no direct links; metadata lands in `flow_attachment` and files are laid out under storage/attachments/{instance_id}/{round}/{file}.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.718Z"
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.727Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

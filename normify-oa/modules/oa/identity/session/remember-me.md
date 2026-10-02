@@ -2,7 +2,6 @@
 uid: 2ec5f230
 id: oa.identity.session.remember-me
 parent: oa.identity.session
-state: planned
 name: {zh: "记住我与自动续期", en: "Remember Me & Renewal"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Remember-me keeps a user logged in for seven days with automatic renewal on each visit; without it the session dies when the browser closes. The lifetime comes from the session policy (seven days by default).
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.736Z"
-fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.741Z"
+fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"
     line: 413

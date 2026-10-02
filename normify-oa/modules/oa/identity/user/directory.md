@@ -2,7 +2,6 @@
 uid: 0b5c9de3
 id: oa.identity.user.directory
 parent: oa.identity.user
-state: planned
 name: {zh: "通讯录与手机号脱敏", en: "Directory & Phone Masking"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Directory search and member browsing: phone numbers are masked by default (138****8888) and only the owner or a system admin sees the full value; lists and search respect the caller's data scope.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.737Z"
-fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.741Z"
+fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"
     line: 184

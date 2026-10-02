@@ -2,7 +2,6 @@
 uid: 0b1f3c22
 id: oa.identity.org
 parent: oa.identity
-state: planned
 name: {zh: "组织架构", en: "Organization Tree"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       The org tree (group/company/department/section) with node type, parent, leader, enable/disable state and materialised path; disable requires all in-flight documents to be finished first.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.727Z"
-fingerprint: 6be246c6834b9b56d4a42d5b955150bb6a06a766a90c031fd7f3af6b4c917a6d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.733Z"
+fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
 source:
   - path: "doc/prd-0.1.md"
     line: 133

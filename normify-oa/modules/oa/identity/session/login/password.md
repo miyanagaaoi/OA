@@ -2,7 +2,6 @@
 uid: 23a68186
 id: oa.identity.session.login.password
 parent: oa.identity.session.login
-state: planned
 name: {zh: "密码策略与哈希校验", en: "Password Policy & Hash Verify"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Password complexity (8+ characters with letters and digits) validation, salted-hash comparison and password change; passwords and phones are encrypted at rest and never stored in clear text.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.736Z"
-fingerprint: 6be246c6834b9b56d4a42d5b955150bb6a06a766a90c031fd7f3af6b4c917a6d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.741Z"
+fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
 source:
   - path: "doc/prd-0.1.md"
     line: 525

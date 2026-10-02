@@ -11,9 +11,9 @@ description:
   en: >
       Mobile H5: browser access with responsive layout, ten to eight percent watermarks never covering buttons or values, handwritten signature on touch, remember-me sessions, and basic usability inside WeChat even though it is not a supported acceptance target.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.778Z"
-fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.774Z"
+fingerprint: 28e8829672cee9b922026028eb18feb80adbb9de4b7fc02f0910f372f46c48c2
 source:
   - path: "doc/prd-0.1.md"
     line: 413

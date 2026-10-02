@@ -2,7 +2,6 @@
 uid: 2262d962
 id: oa.identity.position.assignment
 parent: oa.identity.position
-state: planned
 name: {zh: "调岗与岗位变更", en: "Post Transfer"}
 description:
   zh: >
@@ -11,9 +10,9 @@ description:
   en: >
       Handles transfers: updates multi-post records and leader bindings and emits a post-changed event; in-flight documents keep running on their initiation snapshot and are not reassigned by a transfer.
       
-revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
-updated_at: "2026-10-02T09:24:29.729Z"
-fingerprint: 6be246c6834b9b56d4a42d5b955150bb6a06a766a90c031fd7f3af6b4c917a6d
+revision: c3342bbdedcde68c9955e4600fa972afa9b10579
+updated_at: "2026-10-02T10:35:01.736Z"
+fingerprint: 1ebf4aee4ac8648bfaec0ea0afbfecc1b3e2f5fecc0dff532be914d9e85be0f2
 source:
   - path: "doc/prd-0.1.md"
     line: 234
