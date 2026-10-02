@@ -1,16 +1,27 @@
 /**
- * oa-web · 身份域管理权限口径
+ * oa-web · 管理后台权限口径（身份域 + 权限域）
  * ----------------------------------------------------------------------------
  * 来源：
- *   · `doc/prd-0.1.md` 5.2（权限模型）、5.3（字段级限制：手机号仅本人与系统管理员可见）、
- *     6.10 REQ-ADMIN-006（系统管理员兜底权限边界，所有操作留痕）
+ *   · `doc/prd-0.1.md` 5.2（权限模型：逐级分配、**分公司流程管理员不可再向下分配权限**）、
+ *     5.3（字段级限制：手机号仅本人与系统管理员可见）、
+ *     6.10 REQ-ADMIN-003（权限配置）/ REQ-ADMIN-006（系统管理员兜底权限边界，所有操作留痕）、
+ *     6.9 REQ-LOG-004（权限变更日志，AC-59）
  *   · `doc/import-spec.md` §9.2（**主数据导出仅系统管理员**，T-11 定稿）、
- *     §7.4（影响程度=高 且未确认 → 阻断，确认动作写 sys_log）
+ *     §7.4（影响程度=高 且未确认 → 阻断，确认动作写 sys_log）、
+ *     §2.3（9 个权威角色码）
  *   · `doc/prd-0.1.md` 5.5「强制继续」唯一例外（2026-10-02 裁定：仅系统管理员 + 必填原因 + 双留痕）
  *   · `DESIGN.md` Agent Usage Rules 第 6 条「权限不可见优于不可用」
  *
- * 口径：入口与按钮**不渲染**（而非置灰）；服务端（`ForceReasonPolicy` / 数据域拦截器）仍是最终裁决方，
- * 本文件只决定「可不可见」，不承担鉴权。
+ * 口径：入口与按钮**不渲染**（而非置灰）；服务端（`ForceReasonPolicy` / 数据域拦截器 /
+ * `@PreAuthorize`）仍是最终裁决方，本文件只决定「可不可见」，不承担鉴权。
+ *
+ * 判据顺序（1.4 起）：`isSuperAdmin` → `permissions` 命中权限码（精确或前缀）→
+ * `roleCodes` 命中角色码兜底。角色码兜底仅在 `permissions` 为空（旧后端 / 未初始化权限数据）时生效，
+ * 且**不适用于禁止性规则**（如「分公司管理员不可再授权」）。
+ *
+ * 权限码风格：**一律冒号**（`域:子域:动作`），权威源是 `oa-deploy/sql/04-permissions.sql`
+ * 的 94 项种子与 `doc/data-model.md` 3.4 的示例 `flow:task:approve`；本文件里不得出现点号权限码。
+ * 「强制继续」不是权限码——后端 `ForceReasonPolicy` 判的是角色码 `admin`（见 `canForceChange`）。
  */
 import type { useUserStore } from '@/stores/user'
 
@@ -19,51 +30,218 @@ type UserStore = ReturnType<typeof useUserStore>
 /**
  * 系统管理员角色码（`doc/data-model.md` 3.1 `sys_role.code` 的权威取值）。
  *
- * <p>为什么需要它：`GET /api/v1/auth/me` 目前只下发 `roleCodes`（`permissions` / `isSuperAdmin`
- * 要等 **1.4 角色与权限树** 落地后才由 `sys_role_permission` 派生）。若只看权限码，
- * 真实后端下管理入口会**恒为 false**——即「功能好了但按钮永远不出现」。
- * 因此这里以角色码兜底；1.4 完成后应改为「权限码命中 或 系统管理员角色」并保留该兜底。
+ * <p>为什么还需要它：`GET /api/v1/auth/me` 自 1.4 起同时下发 `roleCodes`、`permissions`
+ * 与 `isSuperAdmin`。判据顺序固定为 **① `isSuperAdmin`（服务端兜底能力）→ ② `permissions`
+ * 命中权限码（真实授权，1.4 之后的主判据）→ ③ `roleCodes` 命中角色码（兜底）**。
+ *
+ * <p>保留 ③ 的理由：旧版本后端 / 未初始化 `sys_role_permission` 的环境下 `permissions`
+ * 会是空数组，只看权限码会让管理入口**恒为 false**（「功能好了但按钮永远不出现」）。
+ * 但兜底有明确边界：**「分公司管理员不可再授权」这类禁止性规则不参与兜底**
+ * （见 `canGrantRolePermission`），兜底只能用来「放宽到与角色同口径」，不能用来越过红线。
  */
 export const SYSTEM_ADMIN_ROLE = 'admin'
 
-/** 身份域权限码（后端权限字典）；服务端仍是最终裁决方 */
+/** 分公司流程管理员（PRD 5.2：可维护本公司组织与人员、本公司流程模板，**不可再向下分配权限**） */
+export const COMPANY_ADMIN_ROLE = 'company_admin'
+
+/**
+ * 身份域权限码（`sys_permission.code`，**冒号风格**）。
+ *
+ * <p>权威源：`oa-deploy/sql/04-permissions.sql`（94 项权限种子，全部 `域:子域:动作` 冒号风格）
+ *   与 `doc/data-model.md` 3.4 `sys_permission.code` 的示例 `flow:task:approve`。
+ *   **不要写点号**：点号码在这套种子里一个都不存在，写错会让入口恒不可见。
+ *
+ * <p>组织与人员是**前缀族**（`admin:org:*` / `admin:user:*`），因此判据用
+ *   `hasAnyPermission`（前缀匹配）而不是精确匹配：后端新增 `admin:org:xxx` 细项时前端不必跟着改。
+ */
 export const IDENTITY_PERMISSION = {
-  /** 组织架构与负责人维护 */
-  orgManage: 'admin.org.manage',
-  /** 人员与岗位维护 */
-  userManage: 'admin.user.manage',
-  /** 主数据导出：仅系统管理员（import-spec §9.2） */
-  userExport: 'admin.user.export',
-  /** 危险操作「强制继续」：影响清单非空时绕过阻断，必须留痕 */
-  forceChange: 'admin.identity.force',
+  /** 组织架构（前缀族）：`admin:org:tree` / `admin:org:leader` / `admin:org:position` */
+  orgPrefix: 'admin:org:',
+  /** 人员管理（前缀族）：`admin:user:profile` / `admin:user:handover` / `admin:user:import` */
+  userPrefix: 'admin:user:',
+  /** 主数据导出：**精确**码，仅系统管理员（import-spec §9.2 T-11） */
+  userExport: 'admin:user:export',
 } as const
 
 /**
+ * 权限域（authz）权限码（1.4 角色与权限树），逐条对应 `04-permissions.sql` 里
+ * `admin:role*` / `admin:authz:*` / `admin:audit:permission` 这些权限项。
+ */
+export const AUTHZ_PERMISSION = {
+  /** 角色列表与角色维护（新增/编辑/删除） */
+  roleList: 'admin:role:list',
+  /** 权限树逐级勾选：**分公司管理员不可再授权**，因此是独立权限项 */
+  roleGrant: 'admin:role:grant',
+  /** 数据域与事项类别配置（`group_category` 必须配类别） */
+  scopeConfig: 'admin:authz:scope',
+  /** 角色分配（把人挂到角色上，写 `sys_user_role`） */
+  assign: 'admin:authz:assign',
+  /** 权限变更日志（REQ-LOG-004 / AC-59） */
+  changeLog: 'admin:audit:permission',
+} as const
+
+/**
+ * **前缀匹配**判据：`permissions` 中任一权限码以给定前缀开头即命中。
+ *
+ * <p>为什么需要它：组织/人员管理在种子里被拆成多个细项（`admin:org:tree`、
+ *   `admin:org:leader`、`admin:user:import` …），入口只要「该域内任一权限」即可见；
+ *   逐条枚举会在后端新增细项时漏掉。
+ */
+export function hasAnyPermission(store: UserStore, prefixes: readonly string[]): boolean {
+  return store.permissions.some((code) => prefixes.some((prefix) => code.startsWith(prefix)))
+}
+
+/**
+ * 通用判据：**权限码优先，角色码兜底**。
+ *
+ * <p>返回 true 的两种情形：
+ *   ① `permissions` 命中任一权限码 —— 真实授权（1.4 之后的主路径）；
+ *   ② `permissions` 为空（旧后端 / 未初始化权限数据）**且** `roleCodes` 命中兜底角色码
+ *      —— 只在「真实权限一个都没取回」时才启用兜底，避免抛出的权限码被无声覆盖。
+ *
+ * <p>注意：`permissions` 非空时**不再看角色码**。若管理员在后台取消了某角色的权限，
+ * 前端必须跟着收回入口，否则会出现「后台已收权、界面还可点」的错位。
+ */
+export function hasPermissionOrRole(
+  store: UserStore,
+  permissionCodes: readonly string[],
+  fallbackRoleCodes: readonly string[] = [],
+): boolean {
+  if (store.isSuperAdmin) return true
+  // ① 真实权限码
+  if (permissionCodes.some((code) => store.hasPermission(code))) return true
+  // ② 角色码兜底：仅在没有任何真实权限数据时生效
+  if (store.permissions.length > 0) return false
+  return store.roles.some((role) => fallbackRoleCodes.includes(role.roleCode))
+}
+
+/**
  * 是否系统管理员：服务端兜底能力（`isSuperAdmin`）或角色码命中。
- * 两者取并集——前者代表服务端明确授予的兜底能力，后者是 1.4 落地前的过渡判据。
+ * 两者取并集——前者代表服务端明确授予的兜底能力，后者是权限数据缺失时的过渡判据。
  */
 export function isSystemAdmin(store: UserStore): boolean {
   return store.isSuperAdmin || store.roles.some((role) => role.roleCode === SYSTEM_ADMIN_ROLE)
 }
 
-/** 组织架构入口：系统管理员，或具备身份域管理权限 */
-export function canManageOrg(store: UserStore): boolean {
-  return isSystemAdmin(store) || store.hasPermission(IDENTITY_PERMISSION.orgManage)
+/** 是否分公司流程管理员（PRD 5.2；本文件只用于**收紧**可见性，不用于放宽） */
+export function isCompanyAdmin(store: UserStore): boolean {
+  return store.roles.some((role) => role.roleCode === COMPANY_ADMIN_ROLE)
 }
 
+/** 组织架构入口：系统管理员，或命中 `admin:org:*` 任一权限（前缀匹配） */
+export function canManageOrg(store: UserStore): boolean {
+  return isSystemAdmin(store) || hasAnyPermission(store, [IDENTITY_PERMISSION.orgPrefix])
+}
+
+/** 人员管理入口：系统管理员，或命中 `admin:user:*` 任一权限（前缀匹配） */
 export function canManageUser(store: UserStore): boolean {
-  return isSystemAdmin(store) || store.hasPermission(IDENTITY_PERMISSION.userManage)
+  return isSystemAdmin(store) || hasAnyPermission(store, [IDENTITY_PERMISSION.userPrefix])
+}
+
+/** 管理后台总览入口：系统管理员，或命中任一 `admin:*` 权限 */
+export function canEnterAdminConsole(store: UserStore): boolean {
+  return isSystemAdmin(store) || hasAnyPermission(store, ['admin:'])
+}
+
+// ---------------------------------------------------------------------------
+// 权限域（1.4 角色与权限树）
+// ----------------------------------------------------------------------------
+//  分级授权可见性（`doc/prd-0.1.md` 5.2「分公司流程管理员…**不可再向下分配权限**」）：
+//    · 角色列表/维护：系统管理员 / `admin:role:list` / `company_admin`（兜底）可见；
+//    · **权限树勾选：仅系统管理员与 `admin:role:grant` 可见——`company_admin` 不参与兜底**；
+//    · 数据域与类别：`admin:authz:scope`；角色分配（挂人）：`admin:authz:assign`；
+//    · 集团级角色（`role_scope=group`）的编辑/删除：`company_admin` 一律不可见。
+//  ⚠ 本文件**只决定「渲不渲染」**，不承担鉴权：无权限用户直接构造请求仍会被服务端 403 拒绝，
+//    服务端（`@PreAuthorize` / 权限拦截器）才是裁决方。
+// ---------------------------------------------------------------------------
+
+/** 「角色与权限」页面入口（列表页只读浏览也在内）：权限码优先，`company_admin` 兜底 */
+export function canManageRole(store: UserStore): boolean {
+  return hasPermissionOrRole(store, [AUTHZ_PERMISSION.roleList], [COMPANY_ADMIN_ROLE])
+}
+
+/**
+ * 「角色与权限」后台入口（**侧栏与路由**的判据）。
+ *
+ * <p>比 `canManageRole` 更严：**不做 `company_admin` 角色码兜底**。
+ *   侧栏与路由是「后台结构」的暴露面，按交付口径仅系统管理员（`isSuperAdmin` /
+ *   `admin` 角色码）或**显式持有** `admin:role:list` 的账号可见。
+ */
+export function canOpenRoleAdmin(store: UserStore): boolean {
+  if (isSystemAdmin(store)) return true
+  return store.hasPermission(AUTHZ_PERMISSION.roleList)
+}
+
+/** 「权限变更日志」后台入口（侧栏与路由）：`admin:audit:permission` 或系统管理员 */
+export function canOpenAuthzLogAdmin(store: UserStore): boolean {
+  if (isSystemAdmin(store)) return true
+  return store.hasPermission(AUTHZ_PERMISSION.changeLog)
+}
+
+/**
+ * 权限树 / 数据域维护入口是否可见
+ * （勾选权限树、配数据域、配类别、配组织节点范围）。
+ *
+ * <p>命中 `admin:role:grant`（权限树勾选）**或** `admin:authz:scope`（数据域与类别）即可；
+ *   两者都是 `04-permissions.sql` 里的独立权限项。
+ *
+ * <p>「分公司管理员不可再授权」是 PRD 5.2 的**禁止性**条款，因此这里**不做角色码兜底**：
+ *   `company_admin` 即使在权限数据缺失时也不可见；只有系统管理员（`isSuperAdmin` /
+ *   `admin` 角色码，见 `isSystemAdmin`）或显式持有上述权限码才可见。
+ */
+export function canGrantRolePermission(store: UserStore): boolean {
+  if (isSystemAdmin(store)) return true
+  return (
+    store.hasPermission(AUTHZ_PERMISSION.roleGrant) ||
+    store.hasPermission(AUTHZ_PERMISSION.scopeConfig)
+  )
+}
+
+/** 角色分配（挂人）入口：`admin:authz:assign`，`company_admin` 参与兜底（其可维护本公司人员） */
+export function canAssignUserRole(store: UserStore): boolean {
+  return hasPermissionOrRole(store, [AUTHZ_PERMISSION.assign], [COMPANY_ADMIN_ROLE])
+}
+
+/**
+ * 单个角色是否可编辑 / 可删除（分级可见性）。
+ *
+ * <p>规则：
+ *   · 权限数据缺失时的 `company_admin` 只能看/改**公司级**角色；
+ *   · **集团级角色（`role_scope=group`）对 `company_admin` 一律不可见**（不渲染编辑/删除入口）；
+ *   · 其余按 `canManageRole` 口径。
+ * <p>内置受保护角色（9 个权威角色码）的 `code`/`role_scope` 只读与「禁止删除」由
+ *    `RoleListView` 依 `RoleItem.builtIn` 另行拦截——那是**角色自身**的约束，与调用人是谁无关。
+ * <p>服务端才是裁决方：越权请求一律 403，前端只负责不渲染。
+ */
+export function canEditRole(
+  store: UserStore,
+  role: { roleScope: string },
+): boolean {
+  if (isSystemAdmin(store)) return true
+  if (role.roleScope === 'group' && isCompanyAdmin(store)) return false
+  return canManageRole(store)
+}
+
+/** 删除入口（与编辑同口径；内置角色由 `builtIn` 另行拦截） */
+export function canDeleteRole(store: UserStore, role: { roleScope: string }): boolean {
+  return canEditRole(store, role)
 }
 
 /** 侧栏「管理后台」分组是否需要渲染 */
 export function canEnterAdmin(store: UserStore): boolean {
-  return canManageOrg(store) || canManageUser(store)
+  return (
+    canManageOrg(store) ||
+    canManageUser(store) ||
+    canOpenRoleAdmin(store) ||
+    canOpenAuthzLogAdmin(store)
+  )
 }
 
 /**
  * 导出入口是否可见。
  * import-spec §9.2 T-11：主数据（组织/人员/负责人/岗位/角色分配）导出**仅系统管理员**；
  * 单据与金额类导出才适用「系统管理员与财务角色」，两类分组治理、互不覆盖。
+ * 权限码 `admin:user:export` 是精确码（种子里与 `admin:user:*` 并列的独立细项）。
  */
 export function canExportMasterData(store: UserStore): boolean {
   return isSystemAdmin(store) || store.hasPermission(IDENTITY_PERMISSION.userExport)
@@ -72,10 +250,12 @@ export function canExportMasterData(store: UserStore): boolean {
 /**
  * 是否可对「在途/待办非零」的阻断执行强制继续。
  *
- * <p>强制继续必须**同时**满足：系统管理员（服务端 `ForceReasonPolicy` 同口径）+ 填写原因
- * （原因随请求提交并写入 `sys_log`，同时产生运行日志 `log.warn`）。
- * 注意：满足本判据不等于服务端一定放行——最终由服务端裁决，前端只负责可见性与必填校验。
+ * <p>强制继续**不是权限码**：后端 `ForceReasonPolicy` 判的是**角色码 `admin`**
+ *   （PRD 5.5 的唯一例外：仅系统管理员 + 必填原因 + 双留痕），因此这里只认
+ *   `isSystemAdmin`（`isSuperAdmin` 或 `admin` 角色码），不去找权限码。
+ *
+ * <p>满足本判据不等于服务端一定放行——最终由服务端裁决，前端只负责可见性与必填校验。
  */
 export function canForceChange(store: UserStore): boolean {
-  return isSystemAdmin(store) || store.hasPermission(IDENTITY_PERMISSION.forceChange)
+  return isSystemAdmin(store)
 }

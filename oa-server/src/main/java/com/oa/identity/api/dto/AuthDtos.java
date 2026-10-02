@@ -1,5 +1,6 @@
 package com.oa.identity.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.List;
@@ -64,6 +65,9 @@ public final class AuthDtos {
      * @param companyId          归属公司
      * @param roleCodes          角色编码
      * @param dataScopes         数据域取值集合
+     * @param permissions        有效权限码（该用户全部角色权限的并集，字典序）
+     *                           —— 前端管理入口可见性的**唯一真实来源**，不再用角色码兜底
+     * @param isSuperAdmin       是否拥有 {@code admin} 角色（系统管理员兜底权限，REQ-ADMIN-006）
      * @param mustChangePassword 是否必须修改口令
      */
     public record MeResponse(
@@ -75,6 +79,8 @@ public final class AuthDtos {
             Long companyId,
             Set<String> roleCodes,
             Set<String> dataScopes,
+            List<String> permissions,
+            @JsonProperty("isSuperAdmin") boolean isSuperAdmin,
             boolean mustChangePassword
     ) {
     }

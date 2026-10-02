@@ -1,7 +1,7 @@
 -- ============================================================================
 -- V1 建表（27 张表；不含触发器，触发器见 db/trigger/immutable-triggers.sql）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T09:31:14.417Z
+-- 生成时间: 2026-10-02T10:53:31.319Z
 -- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）
 -- 来源: oa-deploy/sql/01-schema.sql ← doc/data-model.md
 -- 执行：Flyway 自动按版本顺序执行 V1 → V2 → V3。
@@ -11,12 +11,12 @@
 -- ============================================================================
 -- 集团OA审批系统 · 01 表结构（27 张表 + 不可篡改触发器）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T09:24:24.587Z
+-- 生成时间: 2026-10-02T10:53:31.064Z
 -- 生成工具: tools/gen-init-sql.js（请勿手工编辑本文件，改文档后重跑）
 -- 真源文档: doc/data-model.md
 --
 -- 执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。
--- 包含：建表 27 张、索引 59 个、CHECK 10 个、外键若干、不可篡改触发器 4 个。
+-- 包含：建表 28 张、索引 61 个、CHECK 10 个、外键若干、不可篡改触发器 4 个。
 -- 不可篡改：sys_log 与 flow_signature 由数据库触发器拒绝 UPDATE 与 DELETE（AC-20）；
 --           sys_thread（审批轨迹）一期由应用层只追加约束 + 审计校验保证（见 doc/data-model.md 8.1）。
 -- 注意：触发器已拆分到 db/trigger/immutable-triggers.sql，由 ImmutableTriggerInitializer 启动时幂等创建
@@ -223,6 +223,26 @@ CREATE TABLE sys_user_role (
   CONSTRAINT fk_user_role_user FOREIGN KEY (user_id) REFERENCES sys_user (id),
   CONSTRAINT fk_user_role_role FOREIGN KEY (role_id) REFERENCES sys_role (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联';
+
+-- ============================================================
+-- 3.2b 角色 × 组织节点（权限树「逐级分配」的组织维度）
+--     PRD 5.2：IT 部门在后台为每个角色勾选**可访问的组织节点**与功能菜单，支持逐级分配。
+--     与 sys_role_category 的分工：category 限定「业务线 / 事项类别」，本表限定「组织节点」。
+--     与 sys_user_role.scope_org_id 的分工：本表是**角色级**可访问范围（授权面）；
+--     后者是**某个人**持有该角色时的生效范围（分配面）；二者取交集。
+-- ============================================================
+CREATE TABLE sys_role_org_node (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  role_id    BIGINT UNSIGNED NOT NULL,
+  org_id     BIGINT UNSIGNED NOT NULL,
+  created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_by BIGINT UNSIGNED     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_role_org_node (role_id, org_id),
+  KEY idx_role_org_node_org (org_id),
+  CONSTRAINT fk_role_org_node_role FOREIGN KEY (role_id) REFERENCES sys_role (id),
+  CONSTRAINT fk_role_org_node_org  FOREIGN KEY (org_id)  REFERENCES sys_org (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色可访问的组织节点（权限树组织维度）';
 
 -- ============================================================
 -- 3.3 角色 × 类别范围（仅 data_scope = group_category 的角色需要配置）

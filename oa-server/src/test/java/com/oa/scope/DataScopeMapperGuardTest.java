@@ -41,12 +41,21 @@ import org.springframework.core.io.ClassPathResource;
  */
 class DataScopeMapperGuardTest {
 
-    /** 受控表对应的 Mapper：必须显式声明全部语句、不继承 BaseMapper。 */
+    /**
+     * 受控表对应的 Mapper：必须显式声明全部语句、不继承 BaseMapper。
+     *
+     * <p>{@code com.oa.authz.infra.SysUserRoleMapper} 与 {@code com.oa.authz.infra.AuthzOrgLookupMapper}
+     * 于阶段 1.4 加入：前者承担「某用户的角色」这一**用户数据读暴露**（JOIN 受控表 {@code sys_user}），
+     * 后者查询受控表 {@code sys_org}；两者都必须带 {@code @dataScope} 标记（见
+     * {@code com.oa.authz.scope.AuthzDataScopeMarkerTest}），因此也必须留在 BaseMapper 之外。
+     */
     private static final List<String> SCOPED_MAPPERS = List.of(
             "com.oa.identity.infra.SysUserMapper",
             "com.oa.identity.infra.SysOrgMapper",
             "com.oa.identity.infra.SysOrgLeaderMapper",
-            "com.oa.identity.infra.SysUserPositionMapper");
+            "com.oa.identity.infra.SysUserPositionMapper",
+            "com.oa.authz.infra.SysUserRoleMapper",
+            "com.oa.authz.infra.AuthzOrgLookupMapper");
 
     /** 非业务数据表（会话注册表）：整体豁免，是 BaseMapper 的唯一合法持有者。 */
     private static final String EXEMPT_MAPPER = "com.oa.identity.infra.SysUserSessionMapper";

@@ -56,23 +56,33 @@ export const demoCurrentUser: CurrentUser = {
   dataScopes: ['group_category', 'dept', 'self'],
   categories: ['fund', 'contract', 'seal_cert'],
   permissions: [
-    'portal.workbench.pending',
-    'portal.workbench.approved',
-    'portal.workbench.initiated',
-    'portal.workbench.cc',
-    'portal.detail.actions.approve',
-    'portal.detail.actions.reject',
-    'portal.detail.actions.route',
-    'audit.logs.read',
+    // 权限码**一律冒号风格**（权威源：`oa-deploy/sql/04-permissions.sql` 的 94 项种子
+    // 与 `doc/data-model.md` 3.4 的示例 `flow:task:approve`）；点号码在这套种子里不存在。
+    'portal:workbench:todo',
+    'portal:workbench:done',
+    'portal:workbench:mine',
+    'portal:workbench:cc',
+    'portal:detail:thread',
+    'flow:task:approve',
+    'flow:task:reject',
+    'flow:task:route',
+    'admin:audit:operation',
     // 阶段 1 · 1.1：管理后台（组织架构 / 人员管理）演示入口。
     // 演示账号被授予身份域管理权限，便于在无后端时打开 /admin/orgs 与 /admin/users；
-    // 但**不**授予 `admin.user.export` —— import-spec §9.2（T-11 定稿）规定
+    // 但**不**授予 `admin:user:export` —— import-spec §9.2（T-11 定稿）规定
     // 主数据导出**仅系统管理员**，导出入口应保持不可见；如需验证导出，
     // 请把本对象的 isSuperAdmin 置为 true（或由后端给系统管理员角色）。
-    'admin.console',
-    'admin.org.manage',
-    'admin.user.manage',
-    'admin.identity.force',
+    // 阶段 1 · 1.4：同时给 `admin:role:list` 与 `admin:role:grant`，便于无后端时验证
+    // 「角色与权限」页与权限树逐级勾选；**故意不给** `admin:authz:scope`、
+    // `admin:user:export`、`admin:audit:permission`，便于验证「无权限入口不渲染」。
+    'admin:org:tree',
+    'admin:org:leader',
+    'admin:org:position',
+    'admin:user:profile',
+    'admin:user:handover',
+    'admin:role:list',
+    'admin:role:grant',
+    'admin:authz:assign',
   ],
   signaturePresetReady: true,
   watermarkEnabled: true,

@@ -139,3 +139,31 @@ export function primaryPillStyle(isPrimary: boolean): IdentityPillStyle {
     ? { pillClass: 'is-approved', label: '主岗' }
     : { pillClass: 'is-closed', label: '兼岗' }
 }
+
+// ---------------------------------------------------------------------------
+// 权限域状态徽标（角色层级 / 是否内置）
+// ----------------------------------------------------------------------------
+//  口径同上：**只从 `.oa-pill` 已有的五个类里选**，不新造配色。
+//    · 集团级角色    → 作用范围最大 → info（is-processing）
+//    · 公司级角色    → 限于本公司   → neutral（is-closed）
+//    · 内置受保护角色 → 不可删改     → success（is-approved）
+//    · 自定义角色    → 可维护       → neutral（is-closed）
+// ---------------------------------------------------------------------------
+const ROLE_SCOPE_MAP: Record<'group' | 'company', IdentityPillStyle> = {
+  group: { pillClass: 'is-processing', label: '集团级' },
+  company: { pillClass: 'is-closed', label: '公司级' },
+}
+
+export function roleScopeStyle(scope: string): IdentityPillStyle {
+  return scope === 'group' ? ROLE_SCOPE_MAP.group : ROLE_SCOPE_MAP.company
+}
+
+/**
+ * 内置角色标记（`sys_role.code` 的 9 个权威取值）。
+ * `true` = 受保护：禁止删除、`code`/`role_scope` 只读（任务书硬要求 3）。
+ */
+export function roleBuiltInStyle(builtIn: boolean): IdentityPillStyle {
+  return builtIn
+    ? { pillClass: 'is-approved', label: '内置' }
+    : { pillClass: 'is-closed', label: '自定义' }
+}

@@ -14,6 +14,13 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
+import {
+  canEnterAdminConsole,
+  canManageOrg,
+  canManageUser,
+  canOpenAuthzLogAdmin,
+  canOpenRoleAdmin,
+} from '@/utils/admin'
 import { fetchWorkbenchSummary } from '@/api/task'
 import Watermark from '@/components/Watermark.vue'
 
@@ -29,24 +36,34 @@ const overlayOpen = ref(false)
 /** 是否处于 H5 断点（决定把手是切换图标条还是浮层抽屉） */
 const isMobile = ref(false)
 
+/**
+ * 审批中心导航。
+ * 权限码**逐条对应** `oa-deploy/sql/04-permissions.sql` 的 `portal:*` 种子
+ * （冒号风格 `域:子域:动作`；点号码在这套种子里不存在）。
+ */
 const navItems = [
-  { key: 'pending', label: '待我审批', path: '/task/pending', permission: 'portal.workbench.pending' },
-  { key: 'approved', label: '我已审批', path: '/task/approved', permission: 'portal.workbench.approved' },
-  { key: 'initiated', label: '我发起的', path: '/task/initiated', permission: 'portal.workbench.initiated' },
-  { key: 'cc', label: '抄送我的', path: '/task/cc', permission: 'portal.workbench.cc' },
-  { key: 'archive', label: '历史库', path: '/archive', permission: 'archive.search' },
+  { key: 'pending', label: '待我审批', path: '/task/pending', permission: 'portal:workbench:todo' },
+  { key: 'approved', label: '我已审批', path: '/task/approved', permission: 'portal:workbench:done' },
+  { key: 'initiated', label: '我发起的', path: '/task/initiated', permission: 'portal:workbench:mine' },
+  { key: 'cc', label: '抄送我的', path: '/task/cc', permission: 'portal:workbench:cc' },
+  { key: 'archive', label: '历史库', path: '/archive', permission: 'portal:archive:search' },
 ] as const
 
 /**
- * 管理后台分组（阶段 1 · 1.1）：组织架构与人员管理。
- * 口径：`admin.org.manage` / `admin.user.manage` / `admin.console`（见 `utils/admin.ts`），
- * 系统管理员兜底可见（PRD 6.10 REQ-ADMIN-006）。
+ * 管理后台分组（阶段 1 · 1.1 组织与人员；阶段 1 · 1.4 角色与权限）。
+ * 可见性判据全部取自 `utils/admin.ts`，与**路由守卫**逐条一致，避免「侧栏看得到、点进去被弹回」。
+ * 「角色与权限」「权限变更日志」两项按交付口径**仅系统管理员（或显式持有对应权限码）可见**：
+ * 分公司流程管理员看不到后台结构（PRD 5.2「不可再向下分配权限」）。
  */
-const adminNavItems = [
-  { key: 'admin-console', label: '管理后台', path: '/admin', permission: 'admin.console' },
-  { key: 'admin-orgs', label: '组织架构', path: '/admin/orgs', permission: 'admin.org.manage' },
-  { key: 'admin-users', label: '人员管理', path: '/admin/users', permission: 'admin.user.manage' },
-] as const
+type AdminGate = 'console' | 'org' | 'user' | 'role' | 'authz-log'
+
+const adminNavItems: readonly { key: string; label: string; path: string; gate: AdminGate }[] = [
+  { key: 'admin-console', label: '管理后台', path: '/admin', gate: 'console' },
+  { key: 'admin-orgs', label: '组织架构', path: '/admin/orgs', gate: 'org' },
+  { key: 'admin-users', label: '人员管理', path: '/admin/users', gate: 'user' },
+  { key: 'admin-roles', label: '角色与权限', path: '/admin/roles', gate: 'role' },
+  { key: 'admin-authz-logs', label: '权限变更日志', path: '/admin/authz-logs', gate: 'authz-log' },
+]
 
 /**
  * 权限不可见优于不可用：无权限的入口不渲染（DESIGN.md Agent Usage Rules 第 6 条）。
@@ -63,15 +80,30 @@ const visibleNavItems = computed(() => {
  * 审批中心入口空着只是体验问题，管理入口误闪会给无权限用户泄露后台结构。
  */
 const visibleAdminNavItems = computed(() => {
-  if (userStore.isSuperAdmin) return adminNavItems
-  if (userStore.permissions.length === 0) return []
-  return adminNavItems.filter((item) => userStore.hasPermission(item.permission))
+  if (!userStore.isSuperAdmin && userStore.permissions.length === 0) return []
+  return adminNavItems.filter((item) => {
+    switch (item.gate) {
+      case 'role':
+        return canOpenRoleAdmin(userStore)
+      case 'authz-log':
+        return canOpenAuthzLogAdmin(userStore)
+      case 'org':
+        return canManageOrg(userStore)
+      case 'user':
+        return canManageUser(userStore)
+      case 'console':
+      default:
+        return canEnterAdminConsole(userStore)
+    }
+  })
 })
 
 const activeKey = computed(() => {
   if (route.path.startsWith('/archive')) return 'archive'
   if (route.path.startsWith('/admin/orgs')) return 'admin-orgs'
   if (route.path.startsWith('/admin/users')) return 'admin-users'
+  if (route.path.startsWith('/admin/roles')) return 'admin-roles'
+  if (route.path.startsWith('/admin/authz-logs')) return 'admin-authz-logs'
   if (route.path.startsWith('/admin')) return 'admin-console'
   const tab = route.meta.tab as string | undefined
   if (tab) return tab

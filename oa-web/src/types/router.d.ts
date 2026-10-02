@@ -22,6 +22,6 @@ declare module 'vue-router' {
     /** 命中其中任意一个权限码即可放行（管理后台总览：多种管理权限任一即可） */
     requiredAnyPermission?: string[]
     /** 管理后台子导航分组标识，供侧栏高亮与面包屑使用 */
-    adminSection?: 'console' | 'org' | 'user'
+    adminSection?: 'console' | 'org' | 'user' | 'role' | 'authz-log'
   }
 }

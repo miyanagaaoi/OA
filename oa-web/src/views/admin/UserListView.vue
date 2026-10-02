@@ -11,6 +11,8 @@
  *     §9.1 / §9.2（导出列与模板一致；**主数据导出仅系统管理员**）
  *   · `DESIGN.md` › Data Display › table（行高 44px、首列固定、操作列右固定、
  *     行内操作最多 3 个）、Agent Usage Rules 第 5/6 条
+ *   · 阶段 1 · 1.4：行操作追加「角色」——打开 `UserRolesDrawer` 做多角色分配
+ *     （`sys_user_role`：多角色 + `scope_org_path` 生效范围 + 重复分配 409）
  *
  * 阻断口径（与后端默认行为一致，前端只做前置表达）：
  *   · 离职：名下未处理待办 > 0 → **默认阻断**（AC-12），放行条件 = 全部转办/改派/办结，
@@ -27,6 +29,7 @@ import { ElMessage } from 'element-plus'
 import StatusPill from '@/components/StatusPill.vue'
 import ImpactConfirmDialog from '@/components/ImpactConfirmDialog.vue'
 import UserPositionsDrawer from './UserPositionsDrawer.vue'
+import UserRolesDrawer from './UserRolesDrawer.vue'
 import { useOrgStore } from '@/stores/org'
 import { useUserStore } from '@/stores/user'
 import { fetchOrgSelector } from '@/api/org'
@@ -42,7 +45,7 @@ import {
   transferUser,
   updateUser,
 } from '@/api/user'
-import { canExportMasterData, canForceChange, canManageUser } from '@/utils/admin'
+import { canAssignUserRole, canExportMasterData, canForceChange, canManageUser } from '@/utils/admin'
 import { reportApiError } from '@/utils/feedback'
 import {
   RULE_HINT,
@@ -71,6 +74,12 @@ const editable = computed(() => canManageUser(userStore))
 const canForce = computed(() => canForceChange(userStore))
 /** 主数据导出仅系统管理员（import-spec §9.2 T-11）→ 入口不可见优于不可用 */
 const showExport = computed(() => canExportMasterData(userStore))
+/**
+ * 角色分配入口（阶段 1 · 1.4）：权限码 `admin:authz:assign`（角色分配是独立权限项，
+ * 权限树勾选 `admin:role:grant` 与它互不覆盖）；集团级角色是否可分配由抽屉内部
+ * 按 `canEditRole` 逐个过滤（服务端仍是裁决方）。
+ */
+const canAssignRole = computed(() => canAssignUserRole(userStore))
 
 /**
  * 编辑态可选状态：只能 `在职 ⇄ 停用`。
@@ -334,6 +343,17 @@ const positionsUser = ref<UserItem | null>(null)
 function openPositions(row: UserItem): void {
   positionsUser.value = row
   positionsVisible.value = true
+}
+
+// ---------------------------------------------------------------------------
+// 角色分配抽屉（阶段 1 · 1.4）
+// ---------------------------------------------------------------------------
+const rolesVisible = ref(false)
+const rolesUser = ref<UserItem | null>(null)
+
+function openRoles(row: UserItem): void {
+  rolesUser.value = row
+  rolesVisible.value = true
 }
 
 // ---------------------------------------------------------------------------
@@ -702,10 +722,14 @@ function pendingCell(row: unknown): string {
           </span>
         </template>
       </el-table-column>
-      <el-table-column v-if="editable" label="操作" width="220" fixed="right">
+      <el-table-column v-if="editable" label="操作" width="280" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="openEdit(asUser(row))">编辑</el-button>
           <el-button link type="primary" @click="openPositions(asUser(row))">岗位管理</el-button>
+          <!-- 角色分配（1.4）：能维护人员即可进入；集团级角色在抽屉内按分级可见性过滤 -->
+          <el-button v-if="canAssignRole" link type="primary" @click="openRoles(asUser(row))">
+            角色
+          </el-button>
           <el-dropdown trigger="click">
             <el-button link type="primary">更多</el-button>
             <template #dropdown>
@@ -956,6 +980,9 @@ function pendingCell(row: unknown): string {
 
   <!-- ==================== 岗位抽屉 ==================== -->
   <UserPositionsDrawer v-model="positionsVisible" :user="positionsUser" @changed="load" />
+
+  <!-- ==================== 角色分配抽屉（阶段 1 · 1.4） ==================== -->
+  <UserRolesDrawer v-model="rolesVisible" :user="rolesUser" @changed="load" />
 </template>
 
 <style scoped>

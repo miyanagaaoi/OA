@@ -236,6 +236,26 @@ CREATE TABLE sys_user_role (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联';
 
 -- ============================================================
+-- 3.2b 角色 × 组织节点（权限树「逐级分配」的组织维度）
+--     PRD 5.2：IT 部门在后台为每个角色勾选**可访问的组织节点**与功能菜单，支持逐级分配。
+--     与 sys_role_category 的分工：category 限定「业务线 / 事项类别」，本表限定「组织节点」。
+--     与 sys_user_role.scope_org_id 的分工：本表是**角色级**可访问范围（授权面）；
+--     后者是**某个人**持有该角色时的生效范围（分配面）；二者取交集。
+-- ============================================================
+CREATE TABLE sys_role_org_node (
+  id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  role_id    BIGINT UNSIGNED NOT NULL,
+  org_id     BIGINT UNSIGNED NOT NULL,
+  created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_by BIGINT UNSIGNED     NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_role_org_node (role_id, org_id),
+  KEY idx_role_org_node_org (org_id),
+  CONSTRAINT fk_role_org_node_role FOREIGN KEY (role_id) REFERENCES sys_role (id),
+  CONSTRAINT fk_role_org_node_org  FOREIGN KEY (org_id)  REFERENCES sys_org (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色可访问的组织节点（权限树组织维度）';
+
+-- ============================================================
 -- 3.3 角色 × 类别范围（仅 data_scope = group_category 的角色需要配置）
 --     用途已收窄：仅用于集团分管领导按分管业务线限定可见范围；
 --     不再用于"限定财务部只看某类别"（财务部数据域口径见 7.2）
@@ -908,6 +928,7 @@ DELIMITER ;
 | 8 | sys_role | 权限 | REQ-AUTH-001 |
 | 9 | sys_user_role | 权限 | REQ-AUTH-001 |
 | 10 | sys_role_category | 权限 | PRD 5.3（仅集团分管领导按业务线限定） |
+| 10b | **sys_role_org_node** | 权限 | **PRD 5.2（权限树按组织节点逐级分配；V0.4 补，DDL 见 3.2b）** |
 | 11 | sys_permission | 权限 | REQ-ADMIN-003 |
 | 12 | sys_role_permission | 权限 | REQ-ADMIN-003 |
 | 13 | sys_dict_item | 配置/字典 | REQ-ADMIN-004 / `doc/dict-seed.md` |

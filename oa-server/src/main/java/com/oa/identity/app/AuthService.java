@@ -1,5 +1,6 @@
 package com.oa.identity.app;
 
+import com.oa.authz.app.EffectivePermissionService;
 import com.oa.common.audit.AuditLogWriter;
 import com.oa.common.config.OaProperties;
 import com.oa.common.error.BizException;
@@ -17,6 +18,7 @@ import com.oa.identity.infra.SysUserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -48,10 +50,12 @@ public class AuthService {
     private final LoginAttemptGuard loginAttemptGuard;
     private final AuditLogWriter auditLogWriter;
     private final OaProperties properties;
+    private final EffectivePermissionService effectivePermissionService;
 
     public AuthService(SysUserMapper userMapper, SysLoginLogMapper loginLogMapper, SessionStore sessionStore,
                        PasswordService passwordService, LoginAttemptGuard loginAttemptGuard,
-                       AuditLogWriter auditLogWriter, OaProperties properties) {
+                       AuditLogWriter auditLogWriter, OaProperties properties,
+                       EffectivePermissionService effectivePermissionService) {
         this.userMapper = userMapper;
         this.loginLogMapper = loginLogMapper;
         this.sessionStore = sessionStore;
@@ -59,6 +63,7 @@ public class AuthService {
         this.loginAttemptGuard = loginAttemptGuard;
         this.auditLogWriter = auditLogWriter;
         this.properties = properties;
+        this.effectivePermissionService = effectivePermissionService;
     }
 
     /**
@@ -128,13 +133,19 @@ public class AuthService {
         sessionStore.revoke(rawToken, com.oa.identity.domain.SysUserSession.REASON_LOGOUT);
     }
 
-    /** 当前登录人（含角色与数据域，供前端菜单/按钮控制）。 */
+    /** 当前登录人（含角色、数据域、有效权限与超管标记，供前端菜单/按钮控制）。 */
     public AuthDtos.MeResponse me() {
         CurrentUser principal = currentPrincipal();
         Set<String> scopes = new LinkedHashSet<>();
         principal.dataScopes().forEach(scope -> scopes.add(scope.getCode()));
+        // 管理入口可见性的唯一真实来源：权限码并集（走 authz:perms:{userId} 缓存）+ isSuperAdmin。
+        // 前端不得再用角色码兜底推断——角色码只表达「是什么身份」，不表达「能做什么」。
+        Set<String> permissionSet = effectivePermissionService.permissionCodes(principal.id());
+        List<String> permissions = new ArrayList<>(permissionSet);
+        Collections.sort(permissions);
         return new AuthDtos.MeResponse(principal.id(), principal.account(), principal.name(), principal.employeeNo(),
-                principal.orgId(), principal.companyId(), principal.roleCodes(), scopes, principal.mustChangePassword());
+                principal.orgId(), principal.companyId(), principal.roleCodes(), scopes, permissions,
+                effectivePermissionService.isSuperAdmin(principal.roleCodes()), principal.mustChangePassword());
     }
 
     /**

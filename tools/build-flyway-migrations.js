@@ -68,7 +68,7 @@ function normalizeTriggers(section) {
   return statements.map((s) => s.replace(/\s*$/, '')).join('\n//\n') + '\n';
 }
 
-function analyze(schemaSql, dictSql, templateSql, triggerSql) {
+function analyze(schemaSql, dictSql, templateSql, triggerSql, permissionSql) {
   const errors = [];
   const count = (sql, re) => (sql.match(re) || []).length;
 
@@ -81,7 +81,17 @@ function analyze(schemaSql, dictSql, templateSql, triggerSql) {
   const templateInserts = count(templateSql, /^INSERT INTO/gm);
   const nodeRows = count(templateSql, /'finance_review'|'dept_leader'|'branch_leader'|'subsidiary_gm'|'group_leader'|'chairman'|'archive_register'/g);
 
-  if (tables !== 27) errors.push(`V1 schema 建表数应为 27，实际 ${tables}`);
+  const roleInserts = count(permissionSql, /INSERT INTO sys_role \(/g);
+  const permInserts = count(permissionSql, /INSERT INTO sys_permission/g);
+  const grantInserts = count(permissionSql, /INSERT INTO sys_role_permission/g);
+  const roleCodes = ['admin', 'company_admin', 'employee', 'dept_leader', 'branch_leader',
+    'subsidiary_gm', 'finance_owner', 'group_leader', 'chairman'];
+  const missingRoles = roleCodes.filter((code) => !permissionSql.includes(`'${code}'`));
+  const firstRole = permissionSql.indexOf('INSERT INTO sys_role (');
+  const firstPerm = permissionSql.indexOf('INSERT INTO sys_permission');
+  const firstGrant = permissionSql.indexOf('INSERT INTO sys_role_permission');
+
+  if (tables !== 28) errors.push(`V1 schema 建表数应为 28，实际 ${tables}`);
   if (triggersInSchema !== 0) errors.push(`V1 schema 仍包含 CREATE TRIGGER（${triggersInSchema}），Flyway 会解析失败`);
   if (delimitersInSchema !== 0) errors.push(`V1 schema 仍包含 DELIMITER（${delimitersInSchema}）`);
   if (triggers !== 4) errors.push(`触发器文件应含 4 个 CREATE TRIGGER，实际 ${triggers}`);
@@ -89,17 +99,40 @@ function analyze(schemaSql, dictSql, templateSql, triggerSql) {
   if (inserts !== 8) errors.push(`V2 字典种子 INSERT 应为 8，实际 ${inserts}`);
   if (templateInserts < 4) errors.push(`V3 模板 INSERT 应 ≥4，实际 ${templateInserts}`);
   if (nodeRows < 28) errors.push(`V3 节点行数应 ≥28，实际 ${nodeRows}`);
-  for (const [name, sql] of [['V1', schemaSql], ['V2', dictSql], ['V3', templateSql]]) {
+  if (roleInserts < 1) errors.push('V4 未播种 sys_role（缺角色时授权会静默插入 0 行）');
+  if (missingRoles.length) errors.push(`V4 缺少内置角色码：${missingRoles.join(', ')}`);
+  if (permInserts < 90) errors.push(`V4 权限项 INSERT 应 ≥90（当前 ${permInserts}）`);
+  if (grantInserts < 40) errors.push(`V4 角色授权语句应 ≥40（当前 ${grantInserts}）`);
+  if (!(firstRole >= 0 && firstRole < firstPerm && firstPerm < firstGrant)) {
+    errors.push('V4 三段顺序错误：必须「角色 → 权限树 → 角色授权」（授权段在前会 JOIN 不到角色，静默插 0 行）');
+  }
+  if (permissionSql.includes('admin.user.export') || permissionSql.includes('admin.org.manage')) {
+    errors.push('V4 出现点号风格的权限码（应为冒号风格，与前端判据逐字一致）');
+  }
+  for (const [name, sql] of [['V1', schemaSql], ['V2', dictSql], ['V3', templateSql], ['V4', permissionSql]]) {
     if (!sql.trimEnd().endsWith(';')) errors.push(`${name} 未以分号结尾`);
   }
 
-  return { errors, stats: { tables, triggers, dictInserts: inserts, templateInserts, nodeRows } };
+  return {
+    errors,
+    stats: {
+      tables,
+      triggers,
+      dictInserts: inserts,
+      templateInserts,
+      nodeRows,
+      roles: roleCodes.length - missingRoles.length,
+      permissionItems: permInserts,
+      grantStatements: grantInserts,
+    },
+  };
 }
 
 function main() {
   const schemaRaw = read(path.join(SQL_DIR, '01-schema.sql'));
   const dictRaw = read(path.join(SQL_DIR, '02-dict-seed.sql'));
   const templateRaw = read(path.join(SQL_DIR, '03-templates.sql'));
+  const permissionRaw = read(path.join(SQL_DIR, '04-permissions.sql'));
 
   const { schema, triggers } = splitSchema(schemaRaw);
   if (!triggers) {
@@ -129,6 +162,17 @@ function main() {
       ['oa-deploy/sql/03-templates.sql ← doc/templates.md / doc/forms.md'],
       ['可重复执行（ON DUPLICATE KEY UPDATE）。', '④templates.sql 末尾的自检 SELECT 已保留，便于人工核对。'],
     ) + '\n' + templateRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
+
+    'V4__permissions.sql': banner(
+      'V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 374 授权行，幂等）',
+      ['oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义）'],
+      [
+        '三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。',
+        '若角色段被移到授权段之后，授权 JOIN 不到角色会**静默插入 0 行**（表现为登录后没有菜单）——check-permission-seed.js 有顺序断言。',
+        '权限码为**冒号风格**（如 admin:user:export），与 oa-web 的前端判据逐字一致。',
+        'finance_owner / group_leader 的 data_scope=group_category，还需在 sys_role_category 配事项类别五值（本迁移不播种该表）。',
+      ],
+    ) + '\n' + permissionRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
   };
 
   const triggerFile = banner(
@@ -141,7 +185,7 @@ function main() {
     ],
   ) + '\n' + triggerSql;
 
-  const { errors, stats } = analyze(schema, files['V2__dict_seed.sql'], files['V3__templates.sql'], triggerSql);
+  const { errors, stats } = analyze(schema, files['V2__dict_seed.sql'], files['V3__templates.sql'], triggerSql, files['V4__permissions.sql']);
   const report = { ok: errors.length === 0, check: CHECK, stats, errors, files: [] };
 
   const targets = [
