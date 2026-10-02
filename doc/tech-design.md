@@ -1,6 +1,7 @@
-# 集团OA审批系统 · 技术方案（草案 V0.1）
+# 集团OA审批系统 · 技术方案 V1.0
 
-> 状态：**草案，待评审**（对应排期阶段 0 的工作项 0.1）
+> 状态：**已评审确认**（2026-10-02 评审通过；对应排期阶段 0 的工作项 0.1）
+> 定稿结论：**Java 17/21 + Spring Boot 3.2 + MyBatis-Plus + MySQL 8.0 + Redis 7 + Vue 3/TS/Element Plus + Nginx + Docker Compose**；文件走本地私有存储 + 鉴权下载，不可篡改用 MySQL 触发器兜底，打印走服务端 HTML + 浏览器 A4，定时任务用应用内调度 + Redis 锁，报表用库内聚合。决策记录见第 12 节。
 > 依据：[`prd-0.1.md`](prd-0.1.md) V0.4（61 条验收）、[`data-model.md`](data-model.md)（27 张表）、[`forms.md`](forms.md)、[`enums.md`](enums.md)、[`templates.md`](templates.md)、[`dev-plan-v0.3.md`](dev-plan-v0.3.md)、[`../DESIGN.md`](../DESIGN.md)
 > 结构基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（520 模块 / 865 API 契约）
 > 说明：PRD 第 9 章明确「技术选型不进 PRD」，因此**本文是选型的唯一出处**；第 12 节把需要拍板的项列成决策表。
@@ -58,7 +59,7 @@
 
 ## 3. 技术选型
 
-### 3.1 推荐组合（主方案）
+### 3.1 定稿组合（2026-10-02 评审确认）
 
 | 层次 | 选型 | 版本 | 选型理由 |
 | --- | --- | --- | --- |
@@ -74,7 +75,7 @@
 | 构建依赖 | Maven（离线仓库）/ npm（离线镜像） | — | **REQ-NFR-001**：交付时打包 `~/.m2` 与 node_modules 或私服 |
 | 打印 | 服务端 HTML 模板 + CSS `@page A4` + 浏览器打印 | — | 与 `DESIGN.print-a4.html` 同源；无需额外排版引擎 |
 
-### 3.2 备选方案与切换代价（供评审取舍）
+### 3.2 备选方案与切换代价（仅作记录，一期不采用）
 
 | 若团队/客户倾向 | 替换内容 | 代价 |
 | --- | --- | --- |
@@ -85,11 +86,37 @@
 | 不用 Redis | 数据库会话表 + Caffeine | 低；丧失跨实例会话与集中限流 |
 | 不用容器 | Linux 上 systemd 直装 | 低；交付与升级脚本需自研 |
 
-> **推荐**：3.1 主方案。评审只需确认「Java + MySQL + Vue」这条主轴；其余可替换项不影响文档基线。
+> **已定稿**：采用 3.1 组合（Java + MySQL + Vue 3 + Docker Compose）；3.2 的备选方案仅作为「团队或客户约束发生变化时」的迁移参考，切换代价评估见右列。
 
 ---
 
 ## 4. 模块划分（与结构基线一一对应）
+
+### 4.1 工程结构（阶段 1 落地）
+
+```
+OA/
+├── oa-server/                     # 后端：Spring Boot 3.2（Java 17/21）
+│   ├── pom.xml                    # Maven（离线仓库随交付打包）
+│   └── src/main/
+│       ├── java/com/oa/
+│       │   ├── identity/ authz/ workflow/ form/ sign/ notify/
+│       │   ├── audit/ archive/ admin/ integration/ platform/
+│       │   ├── common/            # 统一响应、异常、审计切面、数据域织入、幂等、限流
+│       │   └── OaApplication.java
+│       └── resources/
+│           ├── mapper/**/*.xml    # MyBatis 映射（数据域 WHERE 片段集中于此）
+│           ├── db/migration/      # Flyway 版本化 SQL（27 张表 + 触发器）
+│           ├── print/             # A4 打印模板（HTML + CSS @page）
+│           └── application.yml
+├── oa-web/                        # 前端：Vue 3 + TS + Vite
+│   └── src/{api,views,components,tokens,router,store,print}
+├── oa-deploy/                     # 部署：Compose + Nginx + 初始化 SQL + 配置模板
+└── doc/ normify-oa/ tools/        # 现状保持（设计与结构资料）
+```
+
+**约定**：① 每个 `com.oa.<domain>` 内部固定 `api → app → domain → infra` 四层，`domain` 不依赖 Web；② 跨领域只能调用对方的 `app` 接口；③ 数据域过滤片段只允许出现在 `resources/mapper` 与 `common` 的织入器中，**禁止在业务代码里手写绕过过滤的裸查询**（评审阻断项）。
+
 
 后端按 **13 个领域**分包，与 `normify-oa` 的 L1 模块同名，便于「结构 = 代码」双向核对：
 
@@ -269,22 +296,22 @@
 
 ---
 
-## 12. 待评审确认的决策表
+## 12. 决策记录（2026-10-02 评审确认）
 
-| # | 决策项 | 建议 | 备选 | 影响面 |
+| # | 决策项 | **结论（已确认）** | 备选（未采用） | 影响面 |
 | --- | --- | --- | --- | --- |
-| D1 | 后端语言与框架 | **Java 17/21 + Spring Boot 3.2** | .NET 8 / NestJS | 全部后端代码 |
-| D2 | 数据库 | **MySQL 8.0** | PostgreSQL 16 | DDL 与不可变约束实现 |
-| D3 | 前端框架 | **Vue 3 + TS + Element Plus** | React + Ant Design | 全部前端代码 |
-| D4 | 缓存/会话 | **Redis 7** | 数据库会话表 + Caffeine | 多设备会话、限流、调度锁 |
-| D5 | 部署形态 | **Docker Compose 单机** | systemd 直装 / K8s | 交付与升级流程 |
-| D6 | 文件存储 | **本地私有目录 + 鉴权下载** | MinIO | 备份与扩容方式 |
-| D7 | 不可变约束 | **MySQL 触发器** | 应用层 + 定时校验 | AC-20 的实现与性能 |
-| D8 | 打印实现 | **服务端 HTML + 浏览器打印** | wkhtmltopdf / 专用报表工具 | 打印验收 |
-| D9 | 定时任务 | **应用内调度 + Redis 锁** | XXL-Job | 运维复杂度 |
-| D10 | 报表实现 | **库内聚合 + 页面表格导出** | 独立 BI | P1 报表范围 |
+| D1 | 后端语言与框架 | ✅ **Java 17/21 + Spring Boot 3.2** | .NET 8 / NestJS | 全部后端代码 |
+| D2 | 数据库 | ✅ **MySQL 8.0** | PostgreSQL 16 | DDL 与不可变约束实现 |
+| D3 | 前端框架 | ✅ **Vue 3 + TypeScript + Element Plus** | React + Ant Design | 全部前端代码 |
+| D4 | 部署形态 | ✅ **Docker Compose 单机** | systemd 直装 / K8s | 交付与升级流程 |
+| D5 | 缓存/会话 | ✅ **Redis 7** | 数据库会话表 + Caffeine | 多设备会话、限流、调度锁 |
+| D6 | 文件存储 | ✅ **本地私有目录 + 鉴权下载** | MinIO | 备份与扩容方式 |
+| D7 | 不可变约束 | ✅ **MySQL 触发器**（拒 UPDATE/DELETE） | 应用层 + 定时校验 | AC-20 的实现与性能 |
+| D8 | 打印实现 | ✅ **服务端 HTML + 浏览器打印（A4）** | wkhtmltopdf / 专用报表工具 | 打印验收 |
+| D9 | 定时任务 | ✅ **应用内调度 + Redis 锁** | XXL-Job | 运维复杂度 |
+| D10 | 报表实现 | ✅ **库内聚合 + 页面表格导出** | 独立 BI | P1 报表范围 |
 
-> 待 D1–D10 确认后，本文升级为 V1.0 评审稿，并回填至 [`../README.md`](../README.md) 的「待确认的技术决策」一节。
+> 本表为技术选型的唯一权威记录；后续如需变更，走「变更申请 → 影响面评估（对照本表右列）→ 评审」流程，并在本表追加历史行（不覆盖旧结论）。
 
 ---
 

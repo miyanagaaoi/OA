@@ -23,7 +23,7 @@
 | [`doc/templates.md`](doc/templates.md) | **模板契约**：四类单据 × 7 节点配置、`form_schema_json` 结构、打印版式映射 | V0.4 |
 | [`doc/test-cases.md`](doc/test-cases.md) | **可执行验收用例**：206 条，AC-01~AC-61 全覆盖，含越权/会签/补件/闸门/打印/非功能专项 | V0.4 |
 | [`doc/dev-plan-v0.3.md`](doc/dev-plan-v0.3.md) | **开发步骤与排期**：阶段 0 + 5 阶段 23 周，工作包、决策闸门、验收门、关键路径 | 基线 |
-| [`doc/tech-design.md`](doc/tech-design.md) | **技术方案**：总体架构、选型、模块划分、关键设计、部署运维 | 草案（待评审） |
+| [`doc/tech-design.md`](doc/tech-design.md) | **技术方案**：总体架构、选型、模块划分、关键设计、部署运维、决策记录 D1–D10 | V1.0 已评审 |
 | [`DESIGN.md`](DESIGN.md) | **设计语言**：设计令牌、组件规范、A4 打印规格（Stitch DESIGN.md 格式） | V0.4 |
 | [`DESIGN.preview.html`](DESIGN.preview.html) | 全页面预览：登录 / 审批中心 / 四类表单 / 打印预览 / H5 / 审计日志 | 可打开 |
 | [`DESIGN.print-a4.html`](DESIGN.print-a4.html) | 四类单据 A4 实尺打印稿 | 可打开 |
@@ -115,9 +115,18 @@ node tools/validate-design-md.js DESIGN.md
 
 ---
 
-## 待确认的技术决策
+## 技术栈（已定稿）
 
-技术选型（语言与框架、数据库、前端框架、部署形态）见 [`doc/tech-design.md`](doc/tech-design.md) 第 12 节的决策表，**评审通过后回填至本 README**。
+| 层 | 选型 |
+| --- | --- |
+| 后端 | **Java 17/21 + Spring Boot 3.2 + MyBatis-Plus**（模块化单体，13 个领域分包） |
+| 数据库 | **MySQL 8.0**（27 张表；不可篡改用触发器兜底） |
+| 缓存/会话 | **Redis 7**（多设备会话与踢出、限流、幂等、调度锁） |
+| 前端 | **Vue 3 + TypeScript + Vite + Element Plus**（主题对齐 `DESIGN.md` 令牌） |
+| 部署 | **Nginx + Docker Compose**（单机私有化，离线镜像与离线依赖仓库交付） |
+| 其他 | 文件：本地私有存储 + 鉴权下载 ｜ 打印：服务端 HTML + 浏览器 A4 ｜ 调度：应用内调度 + Redis 锁 ｜ 报表：库内聚合 |
+
+详见 [`doc/tech-design.md`](doc/tech-design.md) V1.0（总体架构、关键设计、模块划分、决策记录 D1–D10、工程结构）。
 
 ---
 
