@@ -1,0 +1,14 @@
+# 构建产物与本地文件（不进镜像，缩小上下文、加快构建）
+target/
+*.iml
+.idea/
+.vscode/
+*.log
+.cache/
+src/test/
+
+# 本地运行数据（附件/签名图）与配置密钥
+data/
+config/
+*.env
+.env

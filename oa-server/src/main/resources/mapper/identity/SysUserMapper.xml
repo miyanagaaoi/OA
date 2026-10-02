@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  用户 Mapper —— **数据域 WHERE 片段集中在本文件**
+  ============================================================================
+  约定（doc/tech-design.md §4.1 第 ③ 条、§5.3）：
+    1) 任何查询受控表的语句，必须在 WHERE 处写标记注释：
+         /* @dataScope(table=sys_user, alias=u) */
+       该标记会被 com.oa.common.scope.DataScopeInterceptor 替换为
+       com.oa.common.scope.DataScopeSqlBuilder 的**纯函数**产物（本人 ∪ 本部门子树 ∪ 本公司 ∪ 归口部门子树）；
+    2) 标记位置必须是一个**完整布尔表达式**的位置（示例：`WHERE 1=1 AND <标记>`）。
+       若拦截器未生效，SQL 会因悬空的 AND 直接报错（fail-closed），而不是静默返回全表；
+    3) 禁止在本文件之外手写绕过过滤的裸查询 —— 受控表的 SELECT 缺少标记会被拦截器直接拒绝
+       （错误码 40303 DATA_SCOPE_MISSING，评审阻断项）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.identity.infra.SysUserMapper">
+
+  <resultMap id="SysUserResultMap" type="com.oa.identity.domain.SysUser">
+    <id property="id" column="id"/>
+    <result property="account" column="account"/>
+    <result property="name" column="name"/>
+    <result property="employeeNo" column="employee_no"/>
+    <result property="passwordHash" column="password_hash"/>
+    <result property="phone" column="phone"/>
+    <result property="email" column="email"/>
+    <result property="orgId" column="org_id"/>
+    <result property="companyId" column="company_id"/>
+    <result property="position" column="position"/>
+    <result property="status" column="status"/>
+    <result property="remark" column="remark"/>
+    <result property="lastLoginAt" column="last_login_at"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="createdBy" column="created_by"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="updatedBy" column="updated_by"/>
+    <result property="deletedAt" column="deleted_at"/>
+  </resultMap>
+
+  <!-- 通讯录分页查询：数据域过滤由标记处织入（本人 ∪ 本部门子树 ∪ 本公司 ∪ 归口部门子树） -->
+  <select id="selectDirectory" resultMap="SysUserResultMap">
+    SELECT u.id, u.account, u.name, u.employee_no, u.password_hash, u.phone, u.email,
+           u.org_id, u.company_id, u.position, u.status, u.remark,
+           u.last_login_at, u.created_at, u.created_by, u.updated_at, u.updated_by, u.deleted_at
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+    <if test="keyword != null and keyword != ''">
+      AND (u.name LIKE CONCAT('%', #{keyword}, '%') OR u.account LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY u.org_id ASC, u.id ASC
+  </select>
+
+</mapper>

@@ -1,0 +1,198 @@
+# ============================================================================
+# 集团OA审批系统 · 后端配置（环境配置层，doc/tech-design.md §7）
+# ----------------------------------------------------------------------------
+# 运行期可配置项（决议模式、闸门次数、补件上限、保留期等）由管理后台维护，不进本文件。
+# 敏感值一律用环境变量注入：OA_DB_PASSWORD / OA_REDIS_PASSWORD。
+# ============================================================================
+server:
+  port: 8080
+  shutdown: graceful
+  error:
+    # AC-41：错误信息不泄露内部细节（统一走 GlobalExceptionHandler + traceId）
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    whitelabel:
+      enabled: false
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+    session:
+      cookie:
+        http-only: true
+        secure: true
+        same-site: lax
+  tomcat:
+    threads:
+      max: 200
+
+spring:
+  application:
+    name: oa-server
+  profiles:
+    # 未显式指定 profile 时使用 dev；生产用 --spring.profiles.active=prod
+    default: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/oa?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: oa
+    password: ${OA_DB_PASSWORD:oa}
+    hikari:
+      pool-name: oaHikariPool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      max-lifetime: 1800000
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: ${OA_REDIS_PASSWORD:}
+      database: 0
+      timeout: 3s
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+  # ---------------------------------------------------------------------------
+  # Flyway：迁移脚本由主控生成（V1__schema.sql 27 表 / V2__dict_seed.sql / V3__templates.sql），
+  # 触发器不在迁移内（Flyway 不识别 mysql 客户端的 DELIMITER），由 ImmutableTriggerInitializer 幂等创建。
+  # 注意：脚本为 UTF-8，必须显式声明 encoding，否则中文注释会乱码。
+  # ---------------------------------------------------------------------------
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    encoding: UTF-8
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+    table: flyway_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+    baseline-description: baseline-existing-schema
+    validate-on-migrate: true
+    out-of-order: false
+    placeholder-replacement: false
+    clean-disabled: true
+  servlet:
+    multipart:
+      # 单文件 ≤50MB、单次 ≤20 个（REQ/§5.4）；Nginx client_max_body_size 需同步
+      max-file-size: 50MB
+      max-request-size: 1024MB
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.oa.**.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    default-statement-timeout: 30
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      table-underline: true
+      # 仅基础数据（sys_org/sys_user/sys_role/字典/模板）带 deleted_at；审批类数据一律不删除
+      logic-delete-field: deletedAt
+      logic-not-delete-value: "null"
+      logic-delete-value: "now()"
+
+# ---------------------------------------------------------------------------
+# 本工程自有配置（OaProperties）
+# ---------------------------------------------------------------------------
+oa:
+  web:
+    # 生产必须关闭（前后端同源经 Nginx 反代）
+    cors-enabled: false
+    allowed-origins:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+    permit-all:
+      - /api/v1/auth/login
+      - /api/v1/auth/password-policy
+      - /api/v1/auth/lock-status
+      - /actuator/**
+      - /error
+  session:
+    cookie-name: OA_SESSION
+    # 会话存储：redis（生产）；memory 为单测/降级预留（需自行装配 Bean）
+    store: redis
+    max-devices: 3          # 同时在线设备上限（REQ-USER-003）
+    remember-me-days: 7     # 「记住我」有效期（REQ-USER-002）
+    temporary-hours: 12     # 未勾选「记住我」= 会话级（库中仍记 12 小时兜底）
+    cookie-secure: true     # 生产 HTTPS 必须 true；dev 覆盖为 false
+    cookie-same-site: Lax
+    cookie-path: /
+    touch-interval-seconds: 300
+  scope:
+    # 归口部门（集团财务部）：优先用 id；未配置时按名称兜底查询 sys_org
+    finance-dept-id:
+    finance-dept-name: 财务部
+    finance-dept-path:
+    # 财务部「归口部门」分支默认关闭：flow_instance.owner_dept_id 恒为集团财务部，
+    # 无条件织入等于放开全部单据，与 PRD §5.3「不涉及费用且未经流转的事项单不可见」冲突
+    finance-owner-dept-branch-enabled: false
+    # 受控表的 SELECT 必须带 /* @dataScope(...) */ 标记，否则拦截（评审阻断项）
+    enforce-unmarked-select: true
+    exempt-statement-ids:
+      - com.oa.identity.infra.SysUserMapper.selectByAccount
+      - com.oa.identity.infra.SysUserMapper.selectOne
+      - com.oa.identity.infra.SysUserSessionMapper
+      - com.oa.identity.infra.SysLoginLogMapper
+      - com.oa.authz.infra.DataScopeMapper
+    tables:
+      - table: flow_instance
+        alias: i
+        kind: INSTANCE
+      - table: form_data
+        alias: f
+        kind: INSTANCE
+      - table: flow_task
+        alias: t
+        kind: INSTANCE
+      - table: flow_routing
+        alias: r
+        kind: INSTANCE
+      - table: sys_user
+        alias: u
+        kind: USER
+  security:
+    password-min-length: 8      # ≥8 位且含字母与数字（REQ-NFR-005）
+    bcrypt-strength: 12         # 文档要求 ≥10
+    login-max-failures: 5       # 连续失败 5 次
+    login-lock-minutes: 15      # 锁定 15 分钟
+    login-fail-window-minutes: 15
+  db:
+    immutable-triggers-enabled: true
+    immutable-triggers-location: classpath:db/trigger/immutable-triggers.sql
+  jackson:
+    serialize-big-decimal-as-string: true   # 金额 DECIMAL(18,2) 一律字符串，禁止浮点
+    serialize-long-as-string: true          # BIGINT UNSIGNED 主键防 JS 精度丢失
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.oa: INFO
+    org.springframework.jdbc.core: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{traceId:-}] %logger{36} - %msg%n"
