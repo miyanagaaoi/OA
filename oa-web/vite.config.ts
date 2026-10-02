@@ -39,6 +39,11 @@ export default defineConfig(({ mode }) => {
               target: proxyTarget,
               changeOrigin: true,
               secure: false,
+              // 开发期把 Origin 改写为后端自身来源：与生产（Nginx 同源反代）语义一致，
+              // 避免浏览器带 Origin 时被后端 CORS 判为 Invalid CORS request（403）。
+              // 注意：后端 application-dev.yml 的 oa.web.allowed-origins 也需包含本 dev server 端口；
+              // 两处任一生效即可，双保险避免再出现「curl 200、浏览器 403」的误判。
+              headers: { origin: proxyTarget },
             },
           }
         : undefined,

@@ -22,8 +22,17 @@ spring:
 
 oa:
   web:
-    # 本机 Vite（http://localhost:5173）跨域联调；生产必须 false
+    # 本机 Vite 跨域联调；生产必须 false（前后端同源经 Nginx 反代）
     cors-enabled: true
+    # 允许来源必须与 oa-web/vite.config.ts 的 server.port 一致（当前为 5273）。
+    # 2026-10-02 实测教训：二者不一致时，浏览器会带 Origin 头，Spring 直接返回
+    # 403 Invalid CORS request，而 curl（不带 Origin）却始终 200 —— 表现为“接口明明是好的，页面就是登不进去”。
+    allowed-origins:
+      - http://127.0.0.1:5273
+      - http://localhost:5273
+      # 兼容 Vite 默认端口（若改回 5173 仍可用）
+      - http://localhost:5173
+      - http://127.0.0.1:5173
   session:
     # 本机多为 http，Secure Cookie 会写不进去 → dev 关闭（生产必须 true）
     cookie-secure: false

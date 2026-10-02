@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理器。
@@ -87,6 +88,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoHandler(NoHandlerFoundException ex) {
+        return build(ErrorCode.NOT_FOUND, ErrorCode.NOT_FOUND.getMessage());
+    }
+
+    /**
+     * 路径不存在（Spring 6.1+ 在没有匹配 handler 时抛出的 {@link NoResourceFoundException}）。
+     *
+     * <p><b>为什么必须单独处理（2026-10-02 实战缺陷）</b>：该异常原先落到
+     * {@link #handleUnknown(Exception)} 的兜底分支，于是**任何尚未实现的接口都会返回 500 + ERROR 日志**，
+     * 既污染告警（把"未实现"误报成"服务故障"），又让前端无法区分「接口不存在（可降级/提示未实现）」
+     * 与「服务真的坏了」。现统一按 **404** 返回，且只记 DEBUG 级日志（这是可预期的正常情况）。
+     *
+     * <p>注意：本工程按「服务端强制鉴权」设计，未登录访问受保护路径会先被 {@code AuthInterceptor}
+     * 拦成 401，因此 404 只会出现在**已认证但路径确实不存在**的场景。
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResource(NoResourceFoundException ex) {
+        log.debug("路径不存在（可能尚未实现） traceId={} path={}", TraceIds.current(), ex.getResourcePath());
         return build(ErrorCode.NOT_FOUND, ErrorCode.NOT_FOUND.getMessage());
     }
 
