@@ -11,8 +11,8 @@ description:
   en: >
       Task workbench: pending, processed, initiated, CC and rejected lists with filtering by type, category, amount and date; high-density tables, monospaced right-aligned numerals and status badges as the only second colour system.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.733Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.787Z"
 fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"

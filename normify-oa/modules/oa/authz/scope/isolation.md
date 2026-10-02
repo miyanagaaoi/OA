@@ -11,8 +11,8 @@ description:
   en: >
       Subsidiary isolation and unauthorized-access blocking: out-of-scope documents never appear in lists or search, direct URL access returns a permission error rather than an empty page, and attempts are written to the security audit.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.635Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.674Z"
 fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"

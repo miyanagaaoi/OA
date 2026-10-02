@@ -11,8 +11,8 @@ description:
   en: >
       Document initiation: pick the document type, fill the template-driven form with inline validation, choose matter category and CC recipients, upload attachments, and pass pre-flight checks (empty approver sets, missing required fields, unauthorised org node) before submission.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.730Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.784Z"
 fingerprint: 877c10520a96987f02d2eb2349ebc1ee00166b72c021c7aa6829111b4e162e43
 source:
   - path: "DESIGN.md"

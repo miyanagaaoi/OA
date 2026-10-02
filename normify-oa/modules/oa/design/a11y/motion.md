@@ -11,8 +11,8 @@ description:
   en: >
       Motion stays restrained: the drawer width transitions over 160ms ease-out and overlays and toasts only fade; animations are cancelled under prefers-reduced-motion; gradients, glow, glassmorphism and coloured shadows are all banned because an approval interface does not do visual effects.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.641Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.679Z"
 fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"

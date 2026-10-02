@@ -11,8 +11,8 @@ description:
   en: >
       Passwords are stored as salted hashes and phone numbers are encrypted at rest with managed keys and a rotation procedure, while list responses keep masked values.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.717Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.768Z"
 fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"

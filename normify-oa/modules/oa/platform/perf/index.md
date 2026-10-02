@@ -11,8 +11,8 @@ description:
   en: >
       Capacity and performance targets: more than three hundred total users, eighty peak concurrent sessions and thirty approval operations per second, with list and detail pages responding within two seconds at the ninety-fifth percentile.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.714Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.764Z"
 fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"

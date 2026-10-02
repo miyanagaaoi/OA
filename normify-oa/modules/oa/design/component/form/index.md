@@ -11,8 +11,8 @@ description:
   en: >
       The form control family: input, textarea, select, date-picker, checkbox, radio, switch, upload and field-row plus the four-level organisation picker; all 32px tall with rounded.sm and a 2px focus ring kept on focus; labels are 96px right-aligned on desktop or above the control on the initiation form and H5; read-only values use a light block without a border.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.644Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.682Z"
 fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"

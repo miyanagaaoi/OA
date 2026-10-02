@@ -11,8 +11,8 @@ description:
   en: >
       A fixed three-column footer: system and document name on the left, number, template version and generation time in the middle and page N of M on the right; the on-screen tool bar hides itself when printing; the screen preview renders at true millimetre size (width 210mm) to match the printed result; the footer logo is 8mm tall.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.646Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.686Z"
 fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"

@@ -11,8 +11,8 @@ description:
   en: >
       Brand and accent values: primary, primary-hover, primary-active, primary-subtle, primary-border and on-primary, plus the group logo spec (transparent 180×147 artwork used at 28×28 in the drawer header, 44×44 on the sign-in page and 8mm tall in the print footer). The corporate blue is whitelisted to exactly four uses: primary button fill, text links, focus ring and the current selection.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.648Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.688Z"
 fingerprint: ac0ee794ab636d5631ecf55f3fe0063493d1e3cafae26bb19c1ca5c017904aea
 source:
   - path: "DESIGN.md"

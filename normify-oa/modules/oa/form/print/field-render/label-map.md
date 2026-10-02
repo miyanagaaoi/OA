@@ -11,9 +11,9 @@ description:
   en: >
       Sheets use the paper form's Chinese labels; each field carries a printLabel defaulting to the screen label. Phase-one mapping: category→事项分类, amount→申请金额/合同金额, return_status→证件归还状态, period_start/period_end→履约期限 (one merged cell), counterparty→合同签订主体（乙方）, our_company→甲方/审批单位/用印单位 (derived from the initiator's company with no new column), attachments→附送材料 plus the attachment list.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.669Z"
-fingerprint: 55b9e9a4e4cd28138ccadef569af0c2127d2c6e4f1c628f3e34e8c72c9f8dbe2
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.708Z"
+fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
     line: 366

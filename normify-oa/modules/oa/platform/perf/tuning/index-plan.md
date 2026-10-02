@@ -11,9 +11,9 @@ description:
   en: >
       Declared index plan for the hot paths: tasks by assignee and status, instance lookup by document number, routing and supplement chains.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.715Z"
-fingerprint: a5c8c53b676315cbf9ccdfb80d068b584cf8e89cdb8f4dda5c25769eecec1871
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.765Z"
+fingerprint: affe2755b0ec3d7b6adffe3259b4864634f794b5be85e144d9ec84d32aeba3d7
 source:
   - path: "doc/data-model.md"
     line: 800

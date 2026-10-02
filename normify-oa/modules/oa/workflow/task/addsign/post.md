@@ -11,8 +11,8 @@ description:
   en: >
       Add-sign after: once the original approver passes, the node is not advanced immediately - the task is handed to the added signer, whose opinion then counts towards the node result. The chain and the action are written to the audit log and trail.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.774Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.829Z"
 fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"

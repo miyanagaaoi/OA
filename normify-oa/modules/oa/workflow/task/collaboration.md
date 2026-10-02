@@ -11,8 +11,8 @@ description:
   en: >
       At the finance node the approver ticks collaborating departments; each department leader gets an independent task group with its own decision. The flow continues only after all groups finish, and any rejection returns the document to the initiator. Collaboration tasks consume no main-chain node number.
       
-revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T08:54:26.775Z"
+revision: c2ffc2b95024aef3046aa878cf334f4b21fad885
+updated_at: "2026-10-02T09:24:29.830Z"
 fingerprint: 6dd8a5326256879a451e30d488649b7c90dc47267b9befea71a5e35929383e2d
 source:
   - path: "doc/prd-0.1.md"
