@@ -16,3 +16,29 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# ---- 后端（oa-server，Maven）----
+oa-server/target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# ---- 前端（oa-web，Vite）----
+oa-web/dist/
+oa-web/node_modules/
+oa-web/.vite/
+oa-web/*.tsbuildinfo
+oa-web/.env.local
+oa-web/.env.*.local
+
+# ---- 本地运行数据（数据库、附件、签名图、日志）----
+oa-deploy/runtime/
+*.pid
+*.hprof
+
+# ---- 本地环境变量与密钥（含口令，禁止入库；模板 .env.example 保留）----
+.env
+oa-deploy/.env
+oa-deploy/nginx/certs/
+oa-deploy/backup/

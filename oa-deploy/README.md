@@ -13,7 +13,9 @@
 | `sql/01-schema.sql` | 27 张表 + 索引 + CHECK + 外键 + **不可篡改触发器**（拒 UPDATE/DELETE） | 由 `doc/data-model.md` 生成 |
 | `sql/02-dict-seed.sql` | 数据字典种子：8 个 `dict_type` / 37 项（幂等） | 由 `doc/dict-seed.md` 生成 |
 | `sql/03-templates.sql` | 四类单据的流程模板（4 条）+ 节点定义（4 × 7 = 28 条）+ `form_schema_json`（幂等） | 依据 `doc/templates.md` / `doc/forms.md` 编写 |
-| `import/*.csv` | 组织 / 人员 / 负责人 / 一人多岗 的批量导入模板（UTF-8 带 BOM，可用 Excel 直接打开） | 依据 `doc/import-spec.md` |
+| `import/*.csv` | 组织 / 人员 / 负责人 / 一人多岗 / 角色分配 的批量导入模板（UTF-8 带 BOM，可用 Excel 直接打开） | 依据 `doc/import-spec.md` |
+
+> **与应用的关系**：本目录是**交付/手工初始化**用的脚本（含触发器与自检 SELECT）。应用启动时的建库走 `oa-server/src/main/resources/db/migration/`（Flyway `V1/V2/V3`）——由 `node tools/build-flyway-migrations.js` 从本目录生成，**触发器段会拆到 `db/trigger/immutable-triggers.sql`**，因为 Flyway 不识别 mysql 客户端的 `DELIMITER` 语法（由 `ImmutableTriggerInitializer` 启动时幂等创建）。二者由 CI 校验保持一致。
 
 ---
 

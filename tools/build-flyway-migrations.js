@@ -1,0 +1,169 @@
+#!/usr/bin/env node
+/**
+ * Flyway 迁移生成器：把 oa-deploy/sql 下的「交付脚本」转成 oa-server 的迁移文件。
+ *
+ * 用法:
+ *   node tools/build-flyway-migrations.js           生成迁移文件
+ *   node tools/build-flyway-migrations.js --check   校验现有迁移与交付脚本是否一致（CI 用）
+ *
+ * 为什么需要它：
+ *   01-schema.sql 末尾的不可篡改触发器使用了 **mysql 客户端语法 `DELIMITER //`**，
+ *   而 Flyway 的 MySQL 解析器不识别 `DELIMITER`。因此这里把触发器段**整段拆出**，
+ *   写成 `db/trigger/immutable-triggers.sql`（语句以 `//` 分隔、不含 DELIMITER），
+ *   由 `ImmutableTriggerInitializer` 在应用启动时幂等创建。
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '..');
+const SQL_DIR = path.join(ROOT, 'oa-deploy', 'sql');
+const MIGRATION_DIR = path.join(ROOT, 'oa-server', 'src', 'main', 'resources', 'db', 'migration');
+const TRIGGER_DIR = path.join(ROOT, 'oa-server', 'src', 'main', 'resources', 'db', 'trigger');
+const CHECK = process.argv.includes('--check');
+
+const read = (p) => fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
+
+function banner(title, sources, notes) {
+  return [
+    '-- ============================================================================',
+    `-- ${title}`,
+    '-- ----------------------------------------------------------------------------',
+    `-- 生成时间: ${new Date().toISOString()}`,
+    '-- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）',
+    ...sources.map((s) => `-- 来源: ${s}`),
+    ...notes.map((n) => `-- ${n}`),
+    '-- ============================================================================',
+    '',
+  ].join('\n');
+}
+
+/** 把 01-schema.sql 拆成「建表部分」与「触发器部分」 */
+function splitSchema(sql) {
+  const lines = sql.split('\n');
+  const delimiterLine = lines.findIndex((l) => /^DELIMITER\s+/i.test(l.trim()));
+  if (delimiterLine < 0) return { schema: sql, triggers: null };
+
+  // 向上吞掉紧邻的注释行（那段注释属于触发器）
+  let start = delimiterLine;
+  while (start > 0 && lines[start - 1].trim().startsWith('--')) start--;
+
+  return {
+    schema: lines.slice(0, start).join('\n').trimEnd() + '\n',
+    triggers: lines.slice(start).join('\n'),
+  };
+}
+
+/** 触发器段 → 以 // 分隔的语句（去掉 DELIMITER 行） */
+function normalizeTriggers(section) {
+  const body = section
+    .split('\n')
+    .filter((l) => !/^DELIMITER\s+/i.test(l.trim()))
+    .join('\n');
+  const statements = body
+    .split('//')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0 && /CREATE TRIGGER/i.test(s));
+  return statements.map((s) => s.replace(/\s*$/, '')).join('\n//\n') + '\n';
+}
+
+function analyze(schemaSql, dictSql, templateSql, triggerSql) {
+  const errors = [];
+  const count = (sql, re) => (sql.match(re) || []).length;
+
+  const tables = count(schemaSql, /^CREATE TABLE/gm);
+  const triggersInSchema = count(schemaSql, /CREATE TRIGGER/gim);
+  const delimitersInSchema = count(schemaSql, /^DELIMITER/gim);
+  const triggers = count(triggerSql, /CREATE TRIGGER/gim);
+  const delimitersInTriggers = count(triggerSql, /^DELIMITER/gim);
+  const inserts = count(dictSql, /^INSERT INTO/gm);
+  const templateInserts = count(templateSql, /^INSERT INTO/gm);
+  const nodeRows = count(templateSql, /'finance_review'|'dept_leader'|'branch_leader'|'subsidiary_gm'|'group_leader'|'chairman'|'archive_register'/g);
+
+  if (tables !== 27) errors.push(`V1 schema 建表数应为 27，实际 ${tables}`);
+  if (triggersInSchema !== 0) errors.push(`V1 schema 仍包含 CREATE TRIGGER（${triggersInSchema}），Flyway 会解析失败`);
+  if (delimitersInSchema !== 0) errors.push(`V1 schema 仍包含 DELIMITER（${delimitersInSchema}）`);
+  if (triggers !== 4) errors.push(`触发器文件应含 4 个 CREATE TRIGGER，实际 ${triggers}`);
+  if (delimitersInTriggers !== 0) errors.push('触发器文件不应含 DELIMITER');
+  if (inserts !== 8) errors.push(`V2 字典种子 INSERT 应为 8，实际 ${inserts}`);
+  if (templateInserts < 4) errors.push(`V3 模板 INSERT 应 ≥4，实际 ${templateInserts}`);
+  if (nodeRows < 28) errors.push(`V3 节点行数应 ≥28，实际 ${nodeRows}`);
+  for (const [name, sql] of [['V1', schemaSql], ['V2', dictSql], ['V3', templateSql]]) {
+    if (!sql.trimEnd().endsWith(';')) errors.push(`${name} 未以分号结尾`);
+  }
+
+  return { errors, stats: { tables, triggers, dictInserts: inserts, templateInserts, nodeRows } };
+}
+
+function main() {
+  const schemaRaw = read(path.join(SQL_DIR, '01-schema.sql'));
+  const dictRaw = read(path.join(SQL_DIR, '02-dict-seed.sql'));
+  const templateRaw = read(path.join(SQL_DIR, '03-templates.sql'));
+
+  const { schema, triggers } = splitSchema(schemaRaw);
+  if (!triggers) {
+    console.log(JSON.stringify({ ok: false, errors: ['01-schema.sql 未找到 DELIMITER 触发器段'] }, null, 2));
+    process.exit(1);
+  }
+  const triggerSql = normalizeTriggers(triggers);
+
+  const files = {
+    'V1__schema.sql': banner(
+      'V1 建表（27 张表；不含触发器，触发器见 db/trigger/immutable-triggers.sql）',
+      ['oa-deploy/sql/01-schema.sql ← doc/data-model.md'],
+      ['执行：Flyway 自动按版本顺序执行 V1 → V2 → V3。', '字符集 utf8mb4 / 引擎 InnoDB；按文档顺序建表，外键依赖已满足。'],
+    ) + '\n' + schema.replace(
+      /^-- 注意：触发器使用 mysql 客户端语法.*$/m,
+      '-- 注意：触发器已拆分到 db/trigger/immutable-triggers.sql，由 ImmutableTriggerInitializer 启动时幂等创建',
+    ) + '\n-- （Flyway 不识别 mysql 客户端的 DELIMITER 语法，故不放在本迁移中。）\n',
+
+    'V2__dict_seed.sql': banner(
+      'V2 数据字典种子（8 个 dict_type，幂等）',
+      ['oa-deploy/sql/02-dict-seed.sql ← doc/dict-seed.md'],
+      ['可重复执行（ON DUPLICATE KEY UPDATE）。'],
+    ) + '\n' + dictRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
+
+    'V3__templates.sql': banner(
+      'V3 流程模板与表单模板（4 模板 × 7 节点 + 4 份 form_schema_json，幂等）',
+      ['oa-deploy/sql/03-templates.sql ← doc/templates.md / doc/forms.md'],
+      ['可重复执行（ON DUPLICATE KEY UPDATE）。', '④templates.sql 末尾的自检 SELECT 已保留，便于人工核对。'],
+    ) + '\n' + templateRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
+  };
+
+  const triggerFile = banner(
+    '不可篡改触发器（sys_log / flow_signature：拒绝 UPDATE 与 DELETE，AC-20）',
+    ['oa-deploy/sql/01-schema.sql 的 DELIMITER 段'],
+    [
+      '本文件不是 Flyway 迁移：由 com.oa.platform.bootstrap.ImmutableTriggerInitializer 在启动时读取，',
+      '按 "//" 切分为独立语句，逐条检查 information_schema.TRIGGERS 后**幂等创建缺失项**。',
+      '原因：Flyway 的 MySQL 解析器不识别 mysql 客户端的 DELIMITER 语法。',
+    ],
+  ) + '\n' + triggerSql;
+
+  const { errors, stats } = analyze(schema, files['V2__dict_seed.sql'], files['V3__templates.sql'], triggerSql);
+  const report = { ok: errors.length === 0, check: CHECK, stats, errors, files: [] };
+
+  const targets = [
+    ...Object.entries(files).map(([name, content]) => [path.join(MIGRATION_DIR, name), content]),
+    [path.join(TRIGGER_DIR, 'immutable-triggers.sql'), triggerFile],
+  ];
+
+  for (const [file, content] of targets) {
+    const rel = path.relative(ROOT, file).replace(/\\/g, '/');
+    const exists = fs.existsSync(file);
+    const same = exists && read(file).replace(/^-- 生成时间: .*$/m, '') === content.replace(/^-- 生成时间: .*$/m, '');
+    report.files.push({ path: rel, exists, upToDate: same, bytes: Buffer.byteLength(content, 'utf8') });
+    if (CHECK && exists && !same) errors.push(`${rel} 与交付脚本不一致（需重新生成）`);
+    if (!CHECK && !same) {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, content, 'utf8');
+    }
+  }
+
+  report.ok = errors.length === 0;
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(report.ok ? 0 : 1);
+}
+
+main();

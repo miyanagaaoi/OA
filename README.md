@@ -96,7 +96,8 @@ node tools/validate-design-md.js DESIGN.md
 | `tools/gen-init-sql.js` | 由 `data-model.md` / `dict-seed.md` **生成** `oa-deploy/sql/01-schema.sql`、`02-dict-seed.sql`（`--check` 只校验） |
 | `tools/check-ddl.js` | DDL 结构校验：表数、主键、外键目标、重复列、金额禁用浮点 |
 | `tools/check-templates-sql.js` | 模板 SQL 校验：4 模板 × 7 节点、`form_schema_json` 合法性、闸门与签名口径 |
-| `tools/check-import-csv.js` | 导入模板校验：表头、BOM、枚举、跨文件引用、工号唯一、正职唯一 |
+| `tools/check-import-csv.js` | 导入模板校验：表头、BOM、枚举、跨文件引用、工号唯一、正职唯一、角色码白名单 |
+| `tools/build-flyway-migrations.js` | 由 `oa-deploy/sql/` 生成 `oa-server` 的 Flyway 迁移（`V1/V2/V3`），并把 `DELIMITER` 触发器段拆到 `db/trigger/immutable-triggers.sql` |
 | `tools/validate-design-md.js` | `DESIGN.md` 设计规范校验 |
 
 **结构维护规则（重要）**：`normify-oa` 各模块的 `source` 指向 `doc/prd-0.1.md`、`doc/data-model.md`、`doc/forms.md`、`DESIGN.md`，且 `fingerprint` 已按这些文档实算。因此**修改这四份文档后，需要执行一次**：

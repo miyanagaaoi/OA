@@ -36,8 +36,11 @@ jobs:
       - name: 流程模板 SQL 校验（四类模板 × 7 节点 / JSON 合法 / 闸门口径）
         run: node tools/check-templates-sql.js oa-deploy/sql/03-templates.sql
 
-      - name: 导入模板校验（组织 / 人员 / 负责人 / 一人多岗）
+      - name: 导入模板校验（组织 / 人员 / 负责人 / 一人多岗 / 角色分配）
         run: node tools/check-import-csv.js oa-deploy/import
+
+      - name: Flyway 迁移与交付脚本一致性校验（触发器段拆分）
+        run: node tools/build-flyway-migrations.js --check
 
       - name: 校验汇总
         if: always()

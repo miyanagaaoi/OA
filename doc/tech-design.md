@@ -192,6 +192,9 @@ OA/
 - 前端 Canvas 手写 → PNG → 存本地私有目录；支持个人预存签名一键调用（修改留痕）；
 - `flow_signature` **只追加**：`sign_type`（手写/CA）、`signed_at`、设备指纹、IP、`hash`（**SHA-256，覆盖全部业务字段含 CA 预留字段**，字段序固定），重新签署产生新记录；
 - 不可篡改在**数据库层**兜底：MySQL 触发器拒绝对 `sys_log` / `flow_signature` / `sys_thread` 的 UPDATE 与 DELETE（迁移 PG 时改用 `REVOKE UPDATE, DELETE`），应用层再做一次只追加校验（AC-20）；
+- **落地方式（阶段 1 定稿）**：触发器正文存放于 `oa-server/src/main/resources/db/trigger/immutable-triggers.sql`（语句以 `//` 分隔），由 `com.oa.platform.bootstrap.ImmutableTriggerInitializer` 在**应用启动时幂等创建**（逐条检查 `information_schema.TRIGGERS` 后补建，可用配置关闭）。
+  **不放 Flyway 迁移的原因**：Flyway 的 MySQL 解析器不识别 mysql 客户端的 `DELIMITER` 语法；建表与字典/模板仍是 Flyway 迁移（`V1__schema.sql` / `V2__dict_seed.sql` / `V3__templates.sql`，由 `tools/build-flyway-migrations.js` 从 `oa-deploy/sql/` 生成并受 CI 校验）。
+  实际保护的只有 `sys_log` 与 `flow_signature` 两张表（与 AC-20 一致）；`sys_thread`（审批轨迹）一期由应用层只追加约束 + 审计校验保证；
 - 保留期：审计与轨迹 ≥10 年、登录日志 1 年（策略可配，配合抽样检索验证）。
 
 ### 5.6 通知与定时任务
