@@ -825,7 +825,19 @@ public class FlowEngineService {
 
     // ================================================================ 撤回 / 终止 / 抄送
 
-    /** 撤回（REQ-FLOW-009）：仅发起人、仅节点②通过前；{@code withdrawn} 为到达态，立即回草稿。 */
+    /**
+     * 撤回（REQ-FLOW-009）：仅发起人、仅节点②通过前；{@code withdrawn} 为到达态，立即回草稿。
+     *
+     * <p><b>这是第二层（引擎兜底）</b>：第一层是 {@code FlowRuntimeController#withdraw} 的入口闸门，
+     * 两处都取同一权限码 {@code FlowAction.WITHDRAW.permission()}（{@code flow:task:withdraw}），
+     * 但**各管一件事**：
+     * <ul>
+     *   <li>入口层只判权限（无该权限码 → 403，不进引擎）；</li>
+     *   <li>本层判**身份**（{@code instance.initiatorId} 本人，或系统管理员）与状态机、时间窗
+     *       （{@code withdrawAllowed}：节点②通过前）—— 删掉本层即安全回归：
+     *       「有 {@code flow:task:withdraw} 但不是发起人」会拿到别人的单。</li>
+     * </ul>
+     */
     @Transactional
     public InstanceView withdraw(Long instanceId, String reason) {
         CurrentUser actor = permissionService.requirePermission(FlowAction.WITHDRAW.label(),
@@ -911,7 +923,14 @@ public class FlowEngineService {
         return FlowInstanceService.toView(requireInstance(instanceId));
     }
 
-    /** 抄送登记（PRD §6.7 REQ-MSG-003）：只读可见、**不产生待办、不产生审批决议**。 */
+    /**
+     * 抄送登记（PRD §6.7 REQ-MSG-003）：只读可见、**不产生待办、不产生审批决议**。
+     *
+     * <p><b>这是第二层（引擎兜底）</b>：第一层是 {@code FlowRuntimeController#cc} 的入口闸门，
+     * 两处都取同一权限码 {@code FlowAction.CC.permission()}（{@code flow}）；
+     * 本层另外判**发起人身份**（{@code requireInitiatorOrAdmin}）—— 入口层放行只代表
+     * 「该账号有资格抄送」，谁能抄这张单仍由本层按 {@code instance.initiatorId} 判。
+     */
     @Transactional
     public Map<String, Object> addCc(Long instanceId, List<Long> userIds) {
         CurrentUser actor = permissionService.requirePermission(FlowAction.CC.label(),

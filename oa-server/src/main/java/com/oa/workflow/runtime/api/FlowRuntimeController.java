@@ -43,10 +43,10 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>GET</td><td>{@code /flow-opinion-rules}</td><td>意见 / 原因校验规则（驳回 ≥5 字等）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/reopen}</td><td>回到草稿（驳回/撤回后）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/resubmit}</td><td><b>重提</b>：重新解析快照与版本 → 回草稿 → 提交</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{id}/withdraw}</td><td>撤回（仅发起人；仅节点②通过前）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{id}/withdraw}</td><td>撤回（仅发起人本人或系统管理员；仅节点②通过前；<b>入口闸门 = {@code flow:task:withdraw}</b>，与引擎同源）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/terminate}</td><td>终止（系统管理员 / 集团分管领导；<b>入口闸门 = AC-49 专用判据</b>，见下）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/supplement}</td><td>提交补件（仅发起人）</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{id}/cc}</td><td>抄送登记（不产生待办、不参与决议）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{id}/cc}</td><td>抄送登记（不产生待办、不参与决议；<b>入口闸门 = {@code flow}</b>，与引擎同源）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/runtime}</td><td><b>运行态总览</b>（三层状态 + 轨迹 + 流转链 + 补件 + 抄送 + Q6 剩余）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/node-instances}</td><td>节点实例清单</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/task-list}</td><td>该单全部任务</td></tr>
@@ -57,22 +57,35 @@ import org.springframework.web.bind.annotation.RestController;
  * </table>
  *
  * <h2>两层权限（纵深防御，不要合并）</h2>
+ * <p><b>分工</b>：入口层只判**权限**（不读实例、不碰 mapper —— 拒人必须在读库之前），
+ * 引擎层判**身份 + 状态机 + 闸门**（发起人本人由引擎按 {@code instance.initiatorId} 判）。
+ * 「入口放行」只说明这个账号有资格执行该类动作，不说明这张单归他管。
  * <ol>
  *   <li><b>入口层</b>（本控制器）：
  *     <ul>
- *       <li>动作端点（{@code reopen} / {@code resubmit} / {@code withdraw} / {@code supplement} /
- *           {@code cc}）默认 {@code flow} 或 {@code admin:flow}
- *           （{@code WorkflowPermissionService#requireInitiator}）；</li>
+ *       <li>发起侧动作（{@code reopen} / {@code resubmit} / {@code supplement}）用
+ *           {@code WorkflowPermissionService#requireInitiator}（{@code flow} 或 {@code admin:flow}），
+ *           与各自引擎方法逐字同参；</li>
+ *       <li>{@code /withdraw} 用 <b>动作面权限码本身</b> {@code FlowAction.WITHDRAW.permission()}
+ *           （{@code flow:task:withdraw}）—— 与 {@code FlowEngineService#withdraw} 同源同参。
+ *           <b>不能</b>用 {@code requireInitiator}：它放行 {@code admin:flow}，
+ *           而引擎只认 {@code flow:task:withdraw}，入口比引擎宽（{@code company_admin} 会
+ *           「先过入口、再被引擎 403」）；</li>
+ *       <li>{@code /cc} 同理用 {@code FlowAction.CC.permission()}（{@code flow}），
+ *           与 {@code FlowEngineService#addCc} 同源同参；</li>
  *       <li>{@code /terminate} 用 <b>AC-49 专用闸门</b>
  *           {@code WorkflowPermissionService#requireTerminate}（系统管理员 ∪ {@code group_leader} 角色 ∪
  *           {@code flow:task:terminate} 权限）—— 因为 {@code flow} 是门户基础权限，
  *           {@code employee} 经祖先闭包也持有，不能代表「终止」的资格；</li>
  *       <li>只读视图（{@code /runtime}、{@code /node-instances}、{@code /task-list}、{@code /thread}、
- *           {@code /routing}、{@code /supplements}、{@code /cc}）**不设入口闸门**，
- *           仅靠数据域织入（域外实例一律 404）。</li>
+ *           {@code /routing}、{@code /supplements}、{@code /cc} 的 GET）**不设入口闸门**，
+ *           仅靠数据域织入（域外实例一律 404）—— 加粗粒度 {@code flow} 闸门会误伤本该可读的
+ *           {@code admin:flow} 主体。</li>
  *     </ul></li>
  *   <li><b>引擎层</b>（{@code FlowEngineService}）：动作级权限码按 {@code FlowAction.permission()} 复核，
- *       并做发起人身份、状态机、闸门计数等业务判定 —— 入口放行不等于业务放行。</li>
+ *       并做发起人身份（{@code requireInitiatorOrAdmin}）、状态机、闸门计数等业务判定 ——
+ *       入口放行不等于业务放行。**发起人身份只在引擎层判**：非发起人但持有动作权限者在引擎层被拒，
+ *       这是可接受的第二层（入口层不读实例，因此不会用 403/404 的差异泄露实例是否存在）。</li>
  * </ol>
  */
 @RestController
@@ -151,13 +164,33 @@ public class FlowRuntimeController {
                 request == null ? null : request.reason()));
     }
 
-    /** 撤回（仅发起人；仅节点②通过前；撤回后回草稿）。 */
+    /**
+     * 撤回（仅发起人本人或系统管理员；仅节点②通过前；撤回后回草稿）。
+     *
+     * <p><b>入口闸门 = 动作面权限码本身</b>（{@link FlowAction#WITHDRAW} 的
+     * {@code flow:task:withdraw}，与引擎 {@code FlowEngineService#withdraw} 同源同参），
+     * 不再是 {@code requireInitiator}（放行 {@code flow} 或 {@code admin:flow}）。
+     *
+     * <p><b>权限判定与身份判定分清</b>（两道闸门各管一件事）：
+     * <ol>
+     *   <li><b>入口层（本方法）判权限</b>：不持有 {@code flow:task:withdraw} → 403 / {@code 40301}
+     *       （{@code requiredPermissions}），请求**不进入引擎**。改前 {@code requireInitiator} 会放行
+     *       {@code admin:flow}（{@code company_admin} 正是此类：持 {@code admin:flow} 一族、
+     *       但不持 {@code flow} 与 {@code flow:task:withdraw}），而引擎只认
+     *       {@code flow:task:withdraw} —— 入口比引擎宽，该账号「先过入口、再被引擎 403」；</li>
+     *   <li><b>引擎层判身份</b>：{@code "发起人本人或系统管理员"} 的语义由
+     *       {@code FlowEngineService#withdraw} 按 {@code instance.initiatorId} + {@code isSuperAdmin} 判
+     *       （引擎侧一行未改）。「有该权限但不是发起人」者在此被拒 —— <b>可接受的第二层</b>：
+     *       入口层刻意**不读实例**，否则要么在闸门里引入数据库依赖（拒人发生在读库之后），
+     *       要么用「403 / 域外 404」的差异泄露实例是否存在。</li>
+     * </ol>
+     */
     @PostMapping("/flow-instances/{instanceId}/withdraw")
     @Audited(action = "withdraw", targetType = "instance", targetId = "#instanceId", recordArgs = true,
             recordAfter = false)
     public ApiResponse<InstanceView> withdraw(@PathVariable("instanceId") Long instanceId,
                                              @Valid @RequestBody ReasonRequest request) {
-        permissionService.requireInitiator("撤回审批单");
+        permissionService.requirePermission(FlowAction.WITHDRAW.label(), FlowAction.WITHDRAW.permission());
         return ApiResponse.success(engine.withdraw(instanceId, request.reason()));
     }
 
@@ -198,13 +231,22 @@ public class FlowRuntimeController {
                 request == null ? null : request.note()));
     }
 
-    /** 抄送登记（只读可见，不产生待办、不参与决议）。 */
+    /**
+     * 抄送登记（只读可见，不产生待办、不参与决议）。
+     *
+     * <p><b>入口闸门 = {@code FlowAction.CC.permission()} = {@code flow}</b>，与引擎
+     * {@code FlowEngineService#addCc} 同源同参。改前用 {@code requireInitiator}
+     * （放行 {@code flow} 或 {@code admin:flow}）比引擎**宽**：{@code company_admin}（持 {@code admin:flow}）
+     * 能过入口、随后被引擎按 {@code flow} 拒 —— 属「入口比引擎宽」的反向不一致，故收紧到与引擎逐字一致。
+     *
+     * <p>发起人身份（{@code requireInitiatorOrAdmin}）仍由引擎判，入口层不读实例（理由同 {@code withdraw}）。
+     */
     @PostMapping("/flow-instances/{instanceId}/cc")
     @Audited(action = "cc", targetType = "instance", targetId = "#instanceId", recordArgs = true,
             recordAfter = false)
     public ApiResponse<Map<String, Object>> cc(@PathVariable("instanceId") Long instanceId,
                                                @Valid @RequestBody CcRequest request) {
-        permissionService.requireInitiator("抄送单据");
+        permissionService.requirePermission(FlowAction.CC.label(), FlowAction.CC.permission());
         return ApiResponse.success(engine.addCc(instanceId, request.userIds()));
     }
 
