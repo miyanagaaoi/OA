@@ -67,7 +67,7 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 # 启动应用后由 Flyway 自动执行 V1 → V2 → V3 → V4
 ```
 
-期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=376`。
+期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=372`。
 
 > **生成产物是确定性的，可安全重跑**：`tools/gen-init-sql.js` 与 `tools/build-flyway-migrations.js` 的产物头部只有
 > 确定性溯源行（生成器自身 sha256 + 来源内容 sha256），**不含墙钟时间戳**，因此「同一输入 → 逐字节相同」，

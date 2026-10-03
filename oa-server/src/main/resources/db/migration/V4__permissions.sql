@@ -1,10 +1,10 @@
 -- ============================================================================
--- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 376 授权行，幂等）
+-- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 372 授权行，幂等）
 -- ----------------------------------------------------------------------------
--- 生成器: tools/build-flyway-migrations.js sha256=1a70ffc3f41d
+-- 生成器: tools/build-flyway-migrations.js sha256=1d187b7628f8
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
 -- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
--- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=841d1ef1c339
+-- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=3ee334a46173
 -- 三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。
 -- 若角色段被移到授权段之后，授权 JOIN 不到角色会**静默插入 0 行**（表现为登录后没有菜单）——check-permission-seed.js 有顺序断言。
 -- 权限码为**冒号风格**（如 admin:user:export），与 oa-web 的前端判据逐字一致。
@@ -719,9 +719,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'employee'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 dept_leader（部门/科室负责人）：33 项 =====
+-- ===== 角色 dept_leader（部门/科室负责人）：32 项 =====
 -- 范围：员工基础包 + 审批动作包
--- dept_leader 部门/科室负责人：共 33 项（第 1/5 段）
+-- dept_leader 部门/科室负责人：共 32 项（第 1/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -729,7 +729,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'dept_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- dept_leader 部门/科室负责人：共 33 项（第 2/5 段）
+-- dept_leader 部门/科室负责人：共 32 项（第 2/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -737,7 +737,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'dept_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- dept_leader 部门/科室负责人：共 33 项（第 3/5 段）
+-- dept_leader 部门/科室负责人：共 32 项（第 3/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -745,7 +745,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'dept_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- dept_leader 部门/科室负责人：共 33 项（第 4/5 段）
+-- dept_leader 部门/科室负责人：共 32 项（第 4/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -753,16 +753,8 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'dept_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- dept_leader 部门/科室负责人：共 33 项（第 5/5 段）
-INSERT INTO sys_role_permission (role_id, permission_id, created_by)
-SELECT r.id, p.id, NULL
-  FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:export')
- WHERE r.code = 'dept_leader'
-ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
-
 -- ===== 角色 branch_leader（分公司分管领导）：33 项 =====
--- 范围：员工基础包 + 审批动作包
+-- 范围：员工基础包 + 审批动作包；**导出单据**：该角色不在 PRD 附录A 矩阵的列内，按「只报告不改」保留既有授权
 -- branch_leader 分公司分管领导：共 33 项（第 1/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
@@ -803,9 +795,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'branch_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 subsidiary_gm（子公司总经理）：33 项 =====
+-- ===== 角色 subsidiary_gm（子公司总经理）：32 项 =====
 -- 范围：员工基础包 + 审批动作包
--- subsidiary_gm 子公司总经理：共 33 项（第 1/5 段）
+-- subsidiary_gm 子公司总经理：共 32 项（第 1/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -813,7 +805,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'subsidiary_gm'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- subsidiary_gm 子公司总经理：共 33 项（第 2/5 段）
+-- subsidiary_gm 子公司总经理：共 32 项（第 2/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -821,7 +813,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'subsidiary_gm'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- subsidiary_gm 子公司总经理：共 33 项（第 3/5 段）
+-- subsidiary_gm 子公司总经理：共 32 项（第 3/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -829,7 +821,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'subsidiary_gm'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- subsidiary_gm 子公司总经理：共 33 项（第 4/5 段）
+-- subsidiary_gm 子公司总经理：共 32 项（第 4/4 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -837,16 +829,8 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'subsidiary_gm'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- subsidiary_gm 子公司总经理：共 33 项（第 5/5 段）
-INSERT INTO sys_role_permission (role_id, permission_id, created_by)
-SELECT r.id, p.id, NULL
-  FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:export')
- WHERE r.code = 'subsidiary_gm'
-ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
-
 -- ===== 角色 finance_owner（集团归口（财务部）负责人）：40 项 =====
--- 范围：员工基础包 + 审批动作包 + 财务归口查看项（集团层报表查看，不含报表导出）
+-- 范围：员工基础包 + 审批动作包 + **导出单据**（附录A「导出单据」行：集团职能部门负责人 ✓）+ 财务归口查看项（集团层报表查看，不含报表导出）
 -- finance_owner 集团归口（财务部）负责人：共 40 项（第 1/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
@@ -887,9 +871,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'finance_owner'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 group_leader（集团分管领导）：41 项 =====
+-- ===== 角色 group_leader（集团分管领导）：40 项 =====
 -- 范围：员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）+ **终止流程**（AC-49 / 附录A 权限矩阵）；`portal:detail:*` 已在基础包内
--- group_leader 集团分管领导：共 41 项（第 1/6 段）
+-- group_leader 集团分管领导：共 40 项（第 1/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -897,7 +881,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 41 项（第 2/6 段）
+-- group_leader 集团分管领导：共 40 项（第 2/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -905,7 +889,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 41 项（第 3/6 段）
+-- group_leader 集团分管领导：共 40 项（第 3/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -913,7 +897,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 41 项（第 4/6 段）
+-- group_leader 集团分管领导：共 40 项（第 4/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -921,25 +905,17 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 41 项（第 5/6 段）
+-- group_leader 集团分管领导：共 40 项（第 5/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:print', 'flow:export', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog')
+  JOIN sys_permission p ON p.code IN ('flow:print', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog', 'admin:report:efficiency')
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 41 项（第 6/6 段）
-INSERT INTO sys_role_permission (role_id, permission_id, created_by)
-SELECT r.id, p.id, NULL
-  FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('admin:report:efficiency')
- WHERE r.code = 'group_leader'
-ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
-
--- ===== 角色 chairman（集团董事长）：40 项 =====
+-- ===== 角色 chairman（集团董事长）：39 项 =====
 -- 范围：员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内
--- chairman 集团董事长：共 40 项（第 1/5 段）
+-- chairman 集团董事长：共 39 项（第 1/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -947,7 +923,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'chairman'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- chairman 集团董事长：共 40 项（第 2/5 段）
+-- chairman 集团董事长：共 39 项（第 2/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -955,7 +931,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'chairman'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- chairman 集团董事长：共 40 项（第 3/5 段）
+-- chairman 集团董事长：共 39 项（第 3/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -963,7 +939,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'chairman'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- chairman 集团董事长：共 40 项（第 4/5 段）
+-- chairman 集团董事长：共 39 项（第 4/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -971,11 +947,11 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'chairman'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- chairman 集团董事长：共 40 项（第 5/5 段）
+-- chairman 集团董事长：共 39 项（第 5/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:export', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog', 'admin:report:efficiency')
+  JOIN sys_permission p ON p.code IN ('admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog', 'admin:report:efficiency')
  WHERE r.code = 'chairman'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
@@ -1017,12 +993,12 @@ SELECT perm_type, COUNT(*) AS cnt FROM sys_permission GROUP BY perm_type ORDER B
 --   admin           94 行
 --   company_admin   38 行
 --   employee        24 行
---   dept_leader     33 行
+--   dept_leader     32 行
 --   branch_leader   33 行
---   subsidiary_gm   33 行
+--   subsidiary_gm   32 行
 --   finance_owner   40 行
---   group_leader    41 行
---   chairman        40 行
+--   group_leader    40 行
+--   chairman        39 行
 SELECT r.code AS role_code, COUNT(*) AS granted
   FROM sys_role_permission rp
   JOIN sys_role r ON r.id = rp.role_id

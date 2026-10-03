@@ -61,6 +61,8 @@ class WorkflowMapperXmlTest {
                 "selectUsersByRoleCode"));
         STATEMENTS.put(DIR + "FlowInstanceMapper.xml", List.of(
                 "selectInstanceById", "selectInstances", "selectByBizNo", "countByBizNo", "countInFlightByTemplate",
+                // E 项（2026-10-04）：在途实例锁版本清单（AC-09 可见性）
+                "selectInFlightByTemplate",
                 "selectFormDataCreator", "selectFormDataFields",
                 "insertInstance", "updateSnapshot", "markSubmitted", "updateCurrentNodeSeq", "insertFormData",
                 // 2a.4 运行时进度写语句

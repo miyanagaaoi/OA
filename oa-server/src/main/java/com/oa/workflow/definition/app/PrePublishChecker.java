@@ -6,6 +6,7 @@ import com.oa.workflow.definition.domain.FlowTemplate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,21 @@ public final class PrePublishChecker {
     /** 规则 id：Q6/Q7 闸门配置取值范围（2026-10-03 裁定新增）。 */
     public static final String R_GATE = "R-GATE";
 
-    /** 规则清单（{@code GET /flow-designs/check-rules} 的权威顺序）。 */
+    /**
+     * 规则清单（{@code GET /flow-designs/check-rules} 的权威顺序）。
+     *
+     * <p><b>读序即声明序</b>：{@code R-METADATA → R-TRUNK → R-SEQ → R-NODE-CODE → R-NODE-TYPE →
+     * R-APPROVER-RULE → R-DECISION → R-THRESHOLD → R-SIGN → R-TIMEOUT → R-SKIP → R-GATE}。
+     * 该顺序既决定 {@code GET /flow-designs/check-rules} 的出参顺序，也决定
+     * {@code POST /flow-designs/{id}/pre-publish-check} 报告里 {@code checks[]} 的顺序，
+     * 设计器按它渲染「校验清单」。
+     *
+     * <p><b>为什么不是 {@code Map.copyOf}</b>（2026-10-04 修复）：{@code Map.copyOf} 返回的是
+     * {@code ImmutableCollections.MapN}，其迭代顺序由**元素哈希与内部 SALT** 决定，与插入顺序无关
+     * —— 运行期实测出参顺序为 {@code R-METADATA, R-THRESHOLD, R-SEQ, …}（同一进程内稳定、
+     * 跨进程/跨 JDK 不可复现）。改用「{@code LinkedHashMap} 保序 + {@code unmodifiableMap} 只读」
+     * 后顺序与声明逐行一致，且仍然拒绝任何写入。
+     */
     public static final Map<String, String> RULES = rules();
 
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -67,7 +82,8 @@ public final class PrePublishChecker {
         map.put(R_TIMEOUT, "超时 ≥24h；开启抄送上级时必须配置超时时长");
         map.put(R_SKIP, "跳过条件字段存在于表单模板，且仅事项审批单②可跳过");
         map.put(R_GATE, "Q6/Q7 闸门配置取值范围合法（次数 0~99 / 天数 1~365）");
-        return Map.copyOf(map);
+        // 保序只读视图：Map.copyOf 会丢插入顺序（见 RULES 的类注释），此处刻意用 LinkedHashMap
+        return Collections.unmodifiableMap(new LinkedHashMap<>(map));
     }
 
     /** 执行校验并产出报告。 */

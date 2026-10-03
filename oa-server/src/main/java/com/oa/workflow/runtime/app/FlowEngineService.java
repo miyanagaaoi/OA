@@ -157,10 +157,20 @@ public class FlowEngineService {
     /**
      * 提交（{@code draft → approving}）：建（或复位）**全部**节点实例，跳过命中跳过条件的节点，
      * 激活首个节点并为其候选人产生待办（2a.3 留下的 TODO(2a.4)）。
+     *
+     * <p><b>入口/引擎同源（2026-10-04 收敛 F）</b>：动作级闸门取
+     * {@code FlowAction.SUBMIT.permission()}（{@code flow}）——与
+     * {@code FlowRuntimeController#submit} 的入口闸门**逐字同参**。改前这里用
+     * {@code requireInitiator}（放行 {@code flow} ∪ {@code admin:flow}），比控制器入口宽，
+     * 导致「入口 ⊂ 引擎」的不对称：只持 {@code admin:flow} 的 {@code company_admin}
+     * 能过引擎第一层、再被第二层身份判定拒掉，排障时看到的是「引擎 403」而不是入口 403。
+     * <p>身份判定（{@code requireInitiatorOrAdmin}：发起人本人 ∪ 系统管理员）**一行未动** ——
+     * 入口判权限、引擎判身份与状态机，分工不变（两层都在）。
      */
     @Transactional
     public InstanceView submit(Long instanceId, String reason) {
-        CurrentUser actor = permissionService.requireInitiator(FlowAction.SUBMIT.label());
+        CurrentUser actor = permissionService.requirePermission(FlowAction.SUBMIT.label(),
+                FlowAction.SUBMIT.permission());
         FlowInstanceRow instance = requireInstance(instanceId);
         requireInitiatorOrAdmin(instance, actor);
         InstanceStatus status = InstanceStatus.of(instance.getStatus())
@@ -214,10 +224,16 @@ public class FlowEngineService {
         return FlowInstanceService.toView(requireInstance(instanceId));
     }
 
-    /** 驳回/撤回后回到草稿（清掉未完成节点与待决议任务；重提时会重建节点实例）。 */
+    /**
+     * 驳回/撤回后回到草稿（清掉未完成节点与待决议任务；重提时会重建节点实例）。
+     *
+     * <p>动作级闸门 = {@code FlowAction.REOPEN.permission()}（{@code flow}），
+     * 与 {@code FlowRuntimeController#reopen} 的入口闸门同源同参（F 项收敛，理由见 {@link #submit}）。
+     */
     @Transactional
     public InstanceView reopen(Long instanceId) {
-        CurrentUser actor = permissionService.requireInitiator(FlowAction.REOPEN.label());
+        CurrentUser actor = permissionService.requirePermission(FlowAction.REOPEN.label(),
+                FlowAction.REOPEN.permission());
         FlowInstanceRow instance = requireInstance(instanceId);
         requireInitiatorOrAdmin(instance, actor);
         InstanceStatus status = InstanceStatus.of(instance.getStatus())
@@ -238,10 +254,14 @@ public class FlowEngineService {
      *
      * <p>复用 2a.3 的 {@code FlowInstanceService#reparse}：它负责锁版本、换快照、旧快照进审计，
      * 并在空候选人时拒绝（AC-11 不因重提而放宽）。
+     *
+     * <p>动作级闸门 = {@code FlowAction.SUBMIT.permission()}（{@code flow}），与
+     * {@code FlowRuntimeController#resubmit} 的入口闸门同源同参（F 项收敛，理由见 {@link #submit}）。
      */
     @Transactional
     public InstanceView resubmit(Long instanceId, String reason) {
-        CurrentUser actor = permissionService.requireInitiator(FlowAction.SUBMIT.label());
+        CurrentUser actor = permissionService.requirePermission(FlowAction.SUBMIT.label(),
+                FlowAction.SUBMIT.permission());
         FlowInstanceRow instance = requireInstance(instanceId);
         requireInitiatorOrAdmin(instance, actor);
         InstanceStatus status = InstanceStatus.of(instance.getStatus())

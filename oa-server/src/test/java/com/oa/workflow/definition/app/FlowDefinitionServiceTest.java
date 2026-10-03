@@ -18,6 +18,7 @@ import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.GatePolicyRequest;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NewVersionRequest;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeOrderRequest;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeRequest;
+import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.PrePublishReportView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.PublishRequest;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.TemplateView;
@@ -197,10 +198,17 @@ class FlowDefinitionServiceTest {
     }
 
     @Test
-    @DisplayName("归档：published → archived（只阻止新实例；在途继续执行）")
+    @DisplayName("归档：published → archived（只阻止新实例；在途继续执行）—— 但唯一 published 一律拒绝（见 archiveRejectsOnlyPublished）")
     void archive() {
-        when(templateMapper.selectTemplateById(V1_ID)).thenReturn(FlowDefinitionFixtures.matterV1());
+        // 「唯一 published」的守卫在 FlowTemplateArchiveRestoreTest 里穷举；
+        // 这里只锁「已有其它 published 时可归档」这条正向路径，以及落库参数。
+        FlowTemplate older = FlowDefinitionFixtures.matter(V1_ID, 1, "published");
+        FlowTemplate newer = FlowDefinitionFixtures.matter(V2_ID, 2, "published");
+        when(templateMapper.selectTemplateById(V1_ID)).thenReturn(older);
+        when(templateMapper.selectByCode("matter")).thenReturn(List.of(newer, older));
+
         service.archive(V1_ID, new PublishRequest("换版"));
+
         verify(templateMapper).updateStatus(V1_ID, "archived", 1L);
     }
 
@@ -309,8 +317,7 @@ class FlowDefinitionServiceTest {
 
     @Test
     @DisplayName("新增节点：主干节点码不可重复；新增后回写 node_count")
-    void addNodeRejectsDuplicateTrunkCode() {
-        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
+    void addNodeRejectsDuplicateTrunkCode() {        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
         draft.setNodeCount(7);
         when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
         when(nodeMapper.selectByTemplateId(V2_ID)).thenReturn(new ArrayList<>(v1Nodes));
@@ -322,6 +329,168 @@ class FlowDefinitionServiceTest {
         assertThatThrownBy(() -> service.addNode(V2_ID, request))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("已存在节点码");
+    }
+
+    // ================================================================ 节点 seq 语义（B 项）
+
+    /** 非主干节点的新增请求（省略 seq；其余字段取合法最小值）。 */
+    private static NodeRequest customNodeRequest(Integer seq, String nodeCode, String decisionMode,
+                                                 String passThreshold) {
+        return new NodeRequest(seq, nodeCode, "额外节点", "cc", "initiator_pick", null,
+                decisionMode, passThreshold, null, null, "optional", 24, false, true, false, false, null);
+    }
+
+    /** 全量 PUT 请求（节点码/类型/规则按调用方给出的"当前值"回传，模拟全量覆盖）。 */
+    private static NodeRequest fullNodeRequest(Integer seq, String nodeCode, String nodeType,
+                                               String approverRule, String decisionMode,
+                                               String passThreshold) {
+        return new NodeRequest(seq, nodeCode, null, nodeType, approverRule, null,
+                decisionMode, passThreshold, null, null, "optional", 24, false, true, false, false, null);
+    }
+
+    @Test
+    @DisplayName("新增节点｜省略 seq = 追加到末尾：落库 seq = 当前最大 + 1，不再报 40008「seq 必须为正整数」")
+    void addNodeWithoutSeqAppendsToTail() {
+        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
+        when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
+        List<FlowNode> rows = new ArrayList<>(v1Nodes); // 主干 7 个：seq 1..7（模拟 flow_node 真实行）
+        // 每次读回都取库里的当前状态（服务在插入前读一次、插入后为回读视图再读一次）
+        when(nodeMapper.selectByTemplateId(V2_ID)).thenAnswer(invocation -> new ArrayList<>(rows));
+        java.util.concurrent.atomic.AtomicReference<FlowNode> inserted =
+                new java.util.concurrent.atomic.AtomicReference<>();
+        doAnswer(invocation -> {
+            FlowNode node = invocation.getArgument(0);
+            node.setId(300L);
+            inserted.set(node);
+            rows.add(node);
+            return 1;
+        }).when(nodeMapper).insertNode(any(FlowNode.class));
+
+        NodeView view = service.addNode(V2_ID, customNodeRequest(null, "extra_cc", "any", null));
+
+        assertThat(inserted.get().getSeq())
+                .as("省略 seq → 追加到末尾 = 当前最大 seq(7) + 1")
+                .isEqualTo(8);
+        assertThat(view.seq()).isEqualTo(8);
+        assertThat(view.nodeCode()).isEqualTo("extra_cc");
+        // 追加不动任何已有节点
+        verify(nodeMapper, never()).updateSeq(any(), any());
+        // node_count 按**插入后**的行数回写（改前用插入前的快照 size，会落后 1）
+        verify(templateMapper).updateNodeCount(V2_ID, 8, 1L);
+    }
+
+    @Test
+    @DisplayName("新增节点｜显式 seq = 插入到该位置：原有的 seq ≥ 插入位者顺延 1")
+    void addNodeWithExplicitSeqShiftsTail() {
+        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
+        when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
+        List<FlowNode> rows = new ArrayList<>(v1Nodes);
+        FlowNode tailNode = FlowDefinitionFixtures.custom(V2_ID, 8, "extra_cc", "额外抄送", "initiator_pick");
+        tailNode.setId(88L);
+        rows.add(tailNode);
+        when(nodeMapper.selectByTemplateId(V2_ID)).thenAnswer(invocation -> new ArrayList<>(rows));
+        doAnswer(invocation -> {
+            FlowNode node = invocation.getArgument(0);
+            node.setId(301L);
+            rows.add(node);
+            return 1;
+        }).when(nodeMapper).insertNode(any(FlowNode.class));
+
+        NodeView view = service.addNode(V2_ID, customNodeRequest(8, "extra_cc2", "any", null));
+
+        assertThat(view.seq()).isEqualTo(8);
+        // 原有的 seq=8（extra_cc）顺延到 9
+        verify(nodeMapper, org.mockito.Mockito.times(1)).updateSeq(88L, 9);
+        verify(templateMapper).updateNodeCount(V2_ID, 9, 1L);
+    }
+
+    @Test
+    @DisplayName("新增节点｜显式 seq 越界（> 当前最大 + 1）→ 400，不落库")
+    void addNodeRejectsOutOfRangeSeq() {
+        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
+        when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
+        when(nodeMapper.selectByTemplateId(V2_ID)).thenReturn(new ArrayList<>(v1Nodes));
+
+        assertThatThrownBy(() -> service.addNode(V2_ID, customNodeRequest(99, "extra_cc", "any", null)))
+                .isInstanceOf(BizException.class)
+                .hasMessageContaining("插入位置 seq 必须在 1~8 之间");
+        verify(nodeMapper, never()).insertNode(any());
+    }
+
+    // ================================================================ 三态语义（C 项）
+
+    @Test
+    @DisplayName("三态统一｜passThreshold：null = 清空、空串 = 清空、非空字面量 = 写入（decision 端点）")
+    void passThresholdThreeStatesOnDecisionEndpoint() {
+        FlowNode node = FlowDefinitionFixtures.matterNodes(V1_ID).get(3); // ④ 会签候选
+        node.setDecisionMode("all");
+        node.setPassThreshold("66%");
+        when(nodeMapper.selectNodeById(4L)).thenReturn(node);
+        // 写入口要求「可编辑」：把该版本置为草稿（真实库里改配置也必须先开草稿）
+        when(templateMapper.selectTemplateById(V1_ID))
+                .thenReturn(FlowDefinitionFixtures.matter(V1_ID, 2, "draft"));
+
+        // ① null → 清空（改前是「不改动」，与 skipCondition / approverParam 相反）
+        service.putDecision(4L, new com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeDecisionRequest(
+                "all", null, null, null));
+        assertThat(node.getPassThreshold()).isNull();
+        assertThat(node.getDecisionMode()).isEqualTo("all");
+
+        // ② 空串 → 清空（与 null 同义）
+        node.setPassThreshold("2");
+        service.putDecision(4L, new com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeDecisionRequest(
+                "all", "   ", null, null));
+        assertThat(node.getPassThreshold()).isNull();
+
+        // ③ 非空字面量 → 写入（去首尾空白）
+        service.putDecision(4L, new com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeDecisionRequest(
+                "all", " 50% ", null, null));
+        assertThat(node.getPassThreshold()).isEqualTo("50%");
+
+        // 绝对人数优先（T-07）：给了 absolute 就按它 compose，忽略字面量
+        service.putDecision(4L, new com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeDecisionRequest(
+                "all", "50%", 2, null));
+        assertThat(node.getPassThreshold()).isEqualTo("2");
+        verify(nodeMapper, org.mockito.Mockito.times(4)).updateNode(node);
+    }
+
+    @Test
+    @DisplayName("三态统一｜全量 PUT（NodeRequest）：passThreshold / skipCondition / approverParam 的 null 都表示清空")
+    void nodeRequestNullMeansClearForThreeNullableFields() {
+        FlowNode node = FlowDefinitionFixtures.matterNodes(V1_ID).get(1); // ② 可跳过
+        node.setPassThreshold("66%");
+        node.setSkipCondition("{\"field\":\"involve_cost\",\"op\":\"eq\",\"value\":false}");
+        node.setApproverParam("{\"role_code\":\"admin\"}");
+        node.setDecisionMode("all");
+        when(nodeMapper.selectNodeById(2L)).thenReturn(node);
+        when(templateMapper.selectTemplateById(V1_ID))
+                .thenReturn(FlowDefinitionFixtures.matter(V1_ID, 2, "draft"));
+
+        service.updateNode(2L, fullNodeRequest(null, "finance_review", "approve", "finance_owner",
+                "all", null));
+
+        assertThat(node.getPassThreshold()).as("passThreshold null = 清空").isNull();
+        assertThat(node.getSkipCondition()).as("skipCondition null = 清空").isNull();
+        assertThat(node.getApproverParam()).as("approverParam null = 清空").isNull();
+        verify(nodeMapper).updateNode(node);
+    }
+
+    @Test
+    @DisplayName("三态统一｜专用端点（approver-rule）：approverParam 非空对象 = 写入，null = 清空")
+    void approverRuleParamThreeStates() {
+        FlowNode node = FlowDefinitionFixtures.matterNodes(V1_ID).get(0); // ① dept_leader_upward（不要求 param）
+        when(nodeMapper.selectNodeById(1L)).thenReturn(node);
+        when(templateMapper.selectTemplateById(V1_ID))
+                .thenReturn(FlowDefinitionFixtures.matter(V1_ID, 2, "draft"));
+
+        service.putApproverRule(1L, new com.oa.workflow.definition.api.dto.FlowDefinitionDtos
+                .NodeApproverRuleRequest("dept_leader_upward",
+                com.oa.common.json.JsonText.read("{\"user_ids\":[1001]}")));
+        assertThat(node.getApproverParam()).isEqualTo("{\"user_ids\":[1001]}");
+
+        service.putApproverRule(1L, new com.oa.workflow.definition.api.dto.FlowDefinitionDtos
+                .NodeApproverRuleRequest("dept_leader_upward", null));
+        assertThat(node.getApproverParam()).as("approverParam null = 清空").isNull();
     }
 
     @Test

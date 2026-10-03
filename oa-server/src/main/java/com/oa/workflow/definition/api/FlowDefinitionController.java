@@ -5,6 +5,7 @@ import com.oa.common.audit.Audited;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.CheckRuleView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.DecisionResolveView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.GatePolicyRequest;
+import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.LockedInstanceView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NewVersionRequest;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeApproverRuleRequest;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.NodeDecisionRequest;
@@ -20,6 +21,7 @@ import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.TemplateUpdateReque
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.TemplateView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.ValidationView;
 import com.oa.workflow.definition.app.FlowDefinitionService;
+import com.oa.workflow.definition.app.TemplateLockQueryService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,9 +45,11 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>GET</td><td>{@code /flow-templates/{templateId}/nodes}</td><td>admin:flow:template</td><td>节点清单（按 seq）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-templates/{templateId}/versions}</td><td>admin:flow:template</td><td>版本历史</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-templates/{templateId}/versions/{version}}</td><td>admin:flow:template</td><td><b>按版本查询</b>（含该版本节点）</td></tr>
+ *   <tr><td>GET</td><td>{@code /flow-templates/{templateId}/locked-by}</td><td>admin:flow:template</td><td><b>在途实例锁版本</b>（AC-09 可见性；行集受调用人数据域约束）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-templates/{templateId}/versions}</td><td>admin:flow:publish</td><td>基于已发布/已归档版本开新草稿（version+1）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-templates/{templateId}/publish}</td><td>admin:flow:publish</td><td>发布（先跑发布前校验；原 published 转 archived）</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-templates/{templateId}/archive}</td><td>admin:flow:publish</td><td>归档（只阻止新实例，在途继续）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-templates/{templateId}/archive}</td><td>admin:flow:publish</td><td>归档（只阻止新实例，在途继续；<b>唯一 published 版本一律拒绝 409/40914</b>）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-templates/{templateId}/restore}</td><td>admin:flow:publish</td><td><b>恢复</b>（archived → published；已有其它 published → 409/40915；先跑发布前校验）</td></tr>
  *   <tr><td>PUT</td><td>{@code /flow-templates/{templateId}}</td><td>admin:flow:publish</td><td>草稿元数据（名称 / 表单定义 / 闸门配置）</td></tr>
  *   <tr><td>PUT</td><td>{@code /flow-templates/{templateId}/gate-policy}</td><td>admin:flow:publish</td><td><b>Q6/Q7 闸门配置</b>写入</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-templates/{templateId}/nodes}</td><td>admin:flow:publish</td><td>新增节点（可指定插入位置）</td></tr>
@@ -73,9 +77,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class FlowDefinitionController {
 
     private final FlowDefinitionService service;
+    private final TemplateLockQueryService lockQueryService;
 
-    public FlowDefinitionController(FlowDefinitionService service) {
+    public FlowDefinitionController(FlowDefinitionService service, TemplateLockQueryService lockQueryService) {
         this.service = service;
+        this.lockQueryService = lockQueryService;
     }
 
     // ================================================================ 模板查询
@@ -109,6 +115,19 @@ public class FlowDefinitionController {
         return ApiResponse.success(service.detailByVersion(templateId, version));
     }
 
+    /**
+     * 在途实例锁版本（AC-09）：该模板版本下 {@code approving} 的实例清单（业务单号 / 发起人 / 当前节点）。
+     *
+     * <p>行集在**调用人的数据域**下产生（{@code flow_instance} 的受控查询），因此「改模板影响谁」
+     * 的答案不会跨域外泄；{@code templateVersion} 缺省取该模板行自身的版本号。
+     */
+    @GetMapping("/flow-templates/{templateId}/locked-by")
+    public ApiResponse<List<LockedInstanceView>> lockedBy(
+            @PathVariable("templateId") Long templateId,
+            @RequestParam(name = "templateVersion", required = false) Integer templateVersion) {
+        return ApiResponse.success(lockQueryService.lockedBy(templateId, templateVersion));
+    }
+
     // ================================================================ 版本管理
 
     @PostMapping("/flow-templates/{templateId}/versions")
@@ -133,6 +152,21 @@ public class FlowDefinitionController {
     public ApiResponse<TemplateView> archive(@PathVariable("templateId") Long templateId,
                                              @RequestBody(required = false) PublishRequest request) {
         return ApiResponse.success(service.archive(templateId, request));
+    }
+
+    /**
+     * 恢复已归档版本（{@code archived → published}）—— 归档守卫的对称恢复路径。
+     *
+     * <p>权限与 publish / archive 同源（{@code admin:flow:publish}）；该 {@code code} 下已有
+     * 其它 {@code published} 版本时 409 / {@code 40915}。恢复同样跑发布前校验（草稿可被直接归档，
+     * 因此 archived 里可能躺着从未通过校验的配置）。
+     */
+    @PostMapping("/flow-templates/{templateId}/restore")
+    @Audited(action = "restore_template", targetType = "flow_template", targetId = "#templateId",
+            recordBefore = true, recordArgs = true)
+    public ApiResponse<TemplateView> restore(@PathVariable("templateId") Long templateId,
+                                             @RequestBody(required = false) PublishRequest request) {
+        return ApiResponse.success(service.restore(templateId, request));
     }
 
     @PutMapping("/flow-templates/{templateId}")

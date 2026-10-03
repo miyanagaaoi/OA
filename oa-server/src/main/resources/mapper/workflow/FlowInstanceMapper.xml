@@ -42,6 +42,21 @@
     <result property="createdAt" column="created_at"/>
   </resultMap>
 
+  <!-- 在途实例锁版本读模型（AC-09 可见性）：只含管理员判断影响面的最小字段集 -->
+  <resultMap id="LockedInstanceResultMap" type="com.oa.workflow.approver.infra.row.LockedInstanceRow">
+    <id property="instanceId" column="instance_id"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="templateId" column="template_id"/>
+    <result property="templateVersion" column="template_version"/>
+    <result property="status" column="status"/>
+    <result property="subStatus" column="sub_status"/>
+    <result property="initiatorId" column="initiator_id"/>
+    <result property="initiatorName" column="initiator_name"/>
+    <result property="currentNodeSeq" column="current_node_seq"/>
+    <result property="currentNodeName" column="current_node_name"/>
+    <result property="submittedAt" column="submitted_at"/>
+  </resultMap>
+
   <sql id="InstanceColumns">
     i.id, i.biz_no, i.template_id, i.template_version, i.form_data_id, i.form_type, i.category,
     i.initiator_id, i.initiator_org_id, i.initiator_company_id, i.initiator_org_path,
@@ -111,6 +126,32 @@
     <if test="templateVersion != null">
       AND i.template_version = #{templateVersion}
     </if>
+  </select>
+
+  <!--
+    AC-09 可见性：该模板（可指定版本）下**在途**（approving）的实例清单。
+    · 过滤主体恒为 flow_instance（别名 i）→ 恰好 1 个 @dataScope 标记；
+    · 在**调用人**数据域下执行（**不**包 DataScopeContext.system()）→ 域外实例查不到；
+    · LEFT JOIN sys_user 取发起人姓名、关联子查询取当前节点名，口径与 FlowTaskMapper 的
+      TaskViewColumns / selectInitiated 一致（sys_user 只是标注，过滤主体仍是 flow_instance）。
+  -->
+  <select id="selectInFlightByTemplate" resultMap="LockedInstanceResultMap">
+    SELECT i.id AS instance_id, i.biz_no, i.template_id, i.template_version, i.status, i.sub_status,
+           i.initiator_id, u.name AS initiator_name, i.current_node_seq,
+           (SELECT n2.node_name FROM flow_node_instance n2
+             WHERE n2.instance_id = i.id AND n2.node_seq = i.current_node_seq
+             ORDER BY n2.id ASC LIMIT 1) AS current_node_name,
+           DATE_FORMAT(IFNULL(i.submitted_at, i.created_at), '%Y-%m-%d %H:%i:%s') AS submitted_at
+    FROM flow_instance i
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.template_id = #{templateId}
+      AND i.status = 'approving'
+    <if test="templateVersion != null">
+      AND i.template_version = #{templateVersion}
+    </if>
+    ORDER BY i.id DESC
   </select>
 
   <select id="selectFormDataCreator" resultType="java.lang.Long">

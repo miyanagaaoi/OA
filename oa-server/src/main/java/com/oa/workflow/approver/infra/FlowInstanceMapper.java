@@ -2,6 +2,7 @@ package com.oa.workflow.approver.infra;
 
 import com.oa.workflow.approver.infra.row.FlowInstanceRow;
 import com.oa.workflow.approver.infra.row.FormDataRow;
+import com.oa.workflow.approver.infra.row.LockedInstanceRow;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -51,6 +52,18 @@ public interface FlowInstanceMapper {
     /** 该模板（可指定版本）下**在途**（{@code approving}）的实例数。 */
     int countInFlightByTemplate(@Param("templateId") Long templateId,
                                 @Param("templateVersion") Integer templateVersion);
+
+    /**
+     * 该模板（可指定版本）下**在途**（{@code approving}）的实例清单 ——
+     * {@code GET /flow-templates/{id}/locked-by}（AC-09「哪些在途实例锁着这个版本」）。
+     *
+     * <p><b>数据域**必须**生效</b>：本语句与 {@code selectInstances} 同为 API 出参读，
+     * 带 {@code /* @dataScope(table=flow_instance, alias=i) *}{@code /} 标记且在**调用人**的数据域下执行
+     * —— 域外实例直接查不到（返回行里不含它们），而不是报错、也不是系统口径全量。
+     * 因此**不能**被 {@code DataScopeContext.system()} 包裹（那是引擎内部读的用法）。
+     */
+    List<LockedInstanceRow> selectInFlightByTemplate(@Param("templateId") Long templateId,
+                                                     @Param("templateVersion") Integer templateVersion);
 
     // ------------------------------------------------------------------ 写
 

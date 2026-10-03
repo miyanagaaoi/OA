@@ -234,16 +234,8 @@ public class FlowDefinitionService {
         CurrentUser operator = permissionService.requirePublish();
         FlowTemplate template = requireTemplate(templateId);
         TemplateVersionPolicy.assertEditable(template);
-
         List<FlowNode> nodes = nodeMapper.selectByTemplateId(templateId);
-        List<DefinitionProblem> problems = NodeDefinitionValidator.violations(template, nodes);
-        if (!problems.isEmpty()) {
-            String message = String.join("；", problems.stream().map(DefinitionProblem::describe).toList());
-            throw new BizException(ErrorCode.FLOW_DEFINITION_INVALID,
-                    "发布被拒绝（发布前校验未通过）：" + message)
-                    .withDetail("templateId", templateId)
-                    .withDetail("problems", problems.stream().map(DefinitionProblem::describe).toList());
-        }
+        assertPublishable(template, nodes);
 
         templateMapper.archiveOtherPublished(template.getCode(), templateId, operator.id());
         templateMapper.updateNodeCount(templateId, nodes.size(), operator.id());
@@ -255,17 +247,119 @@ public class FlowDefinitionService {
         return toView(requireTemplate(templateId));
     }
 
-    /** 归档版本：只阻止**新实例**使用，在途实例继续执行（templates.md V-05）。 */
+    /**
+     * 归档版本：只阻止**新实例**使用，在途实例继续执行（templates.md V-05）。
+     *
+     * <h2>两道前置守卫（2026-10-04 补，A 项）</h2>
+     * <ol>
+     *   <li><b>状态合法性（与 publish 同级）</b>：入口权限同为 {@code admin:flow:publish}，
+     *       状态一律经 {@link TemplateVersionPolicy#requireKnownStatus} 判定（三值之外 400）。
+     *       {@code draft} <b>刻意仍可归档</b>：这是我们自己的 40907 文案给出的「放弃草稿」路径
+     *       （「请先发布**或归档**该草稿」），且 {@code newVersion} 拒绝基于草稿开新版本 ——
+     *       若在此禁掉，草稿将既不能发布也不能丢弃（没有删除模板的接口），属把守卫做成死锁。
+     *       {@code archived} 幂等返回当前视图（不重复写库、不重复审计）。</li>
+     *   <li><b>唯一 published 守卫</b>：目标版本若是该 {@code code} 下**唯一**的 {@code published}
+     *       版本 → 409 / {@code 40914}，「请先发布新版本再归档旧版本」。理由：归档它 = 该单据类型
+     *       **无法发起新单据**（§3.3 / V-05），而 §4.3 禁止删除已产生的模板版本、{@code draft}
+     *       也不能当复用源，唯一出路是「开新草稿 → 发布」。改前这里直接 200，运行期已误触发过
+     *       一次（只能靠上述救援路径恢复）。</li>
+     * </ol>
+     *
+     * <p>恢复路径（二选一，本实现选前者）：{@code POST /flow-templates/{id}/restore}
+     * （{@link #restore}）；另一条「允许把 archived 直接 publish」的语义会与 publish 的
+     * 「上线一个草稿」重叠（发布前校验对一个冻结版本无意义、归档联动也会被牵连），故不采用。
+     */
     @Transactional
     public TemplateView archive(Long templateId, PublishRequest request) {
         CurrentUser operator = permissionService.requirePublish();
         FlowTemplate template = requireTemplate(templateId);
-        if (template.statusEnum() == TemplateStatus.ARCHIVED) {
+        TemplateStatus status = TemplateVersionPolicy.requireKnownStatus(template);
+        if (status == TemplateStatus.ARCHIVED) {
             return toView(template);
         }
+        if (status == TemplateStatus.PUBLISHED) {
+            FlowTemplate other = TemplateVersionPolicy.otherPublished(
+                    templateMapper.selectByCode(template.getCode()), templateId);
+            if (other == null) {
+                throw new BizException(ErrorCode.FLOW_LAST_PUBLISHED_ARCHIVE_DENIED,
+                        "模板 " + template.getCode() + " v" + template.getVersion()
+                                + " 是该单据类型唯一的已发布版本，归档后该类单据将无法发起新单据；"
+                                + "请先发布新版本再归档旧版本（POST /flow-templates/" + templateId
+                                + "/versions → /publish）")
+                        .withDetail("templateId", templateId)
+                        .withDetail("code", template.getCode())
+                        .withDetail("version", template.getVersion())
+                        .withDetail("suggestedAction", "publish_new_version_then_archive");
+            }
+        }
         templateMapper.updateStatus(templateId, TemplateStatus.ARCHIVED.code(), operator.id());
-        log.info("流程模板归档：operator={} code={} v{} templateId={} reason={}（在途实例继续执行）",
-                operator.account(), template.getCode(), template.getVersion(), templateId,
+        log.info("流程模板归档：operator={} code={} v{} templateId={} from={} reason={}（在途实例继续执行）",
+                operator.account(), template.getCode(), template.getVersion(), templateId, status.code(),
+                request == null ? null : request.reason());
+        return toView(requireTemplate(templateId));
+    }
+
+    /**
+     * 恢复已归档版本（{@code POST /flow-templates/{id}/restore}）：{@code archived → published}。
+     *
+     * <p>这是 {@link #archive} 唯一 published 守卫的**对称恢复路径**（2026-10-04 补）：误归档一个
+     * 版本后，除「开新草稿 → 发布」之外，管理员还能把该版本本身重新置为 {@code published}。
+     *
+     * <h2>为什么选 restore，而不是「允许重新发布一个已归档版本」</h2>
+     * <ol>
+     *   <li><b>语义单一</b>：publish 的前置是「草稿 + 发布前校验 + 归档同 code 的原 published」，
+     *       把冻结的 archived 塞进 publish 会让「发布前校验一个不可编辑的版本」成为空转，
+     *       也会让归档联动（{@code archiveOtherPublished}）指向一个不该被它动的版本；</li>
+     *   <li><b>可审计</b>：审计动作分别是 {@code publish_template} 与 {@code restore_template}，
+     *       排障时能一眼区分「上线新版本」与「把误归档的版本恢复」。</li>
+     * </ol>
+     *
+     * <h2>守卫</h2>
+     * <ol>
+     *   <li>只有 {@code archived} 可恢复：{@code draft} / {@code published} → 409（40906 / 幂等语义）；
+     *       目标已是 {@code published} 时直接返回当前视图（幂等）；</li>
+     *   <li>该 {@code code} 下已有别的 {@code published} 版本 → 409 / {@code 40915}
+     *       （§3.3「同一 code 最多一个 published」），并提示改走「开新版本」；</li>
+     *   <li><b>恢复也要过发布前校验</b>：草稿可以被直接归档（见 {@link #archive} 守卫①），
+     *       因此 archived 里可能躺着从未通过校验的配置 —— 恢复 = 重新上线，必须与被恢复版本的
+     *       实际配置一起校验，否则等于绕过 R-* 全套规则。</li>
+     * </ol>
+     *
+     * <p>恢复**不改版本号、不改配置**（V-08：版本号不得复用/跳号；V-01 的「不修改历史行」针对
+     * 节点与表单等**配置内容**，本条只翻转 {@code status} 一列，并按既有口径刷新 {@code published_at}）。
+     */
+    @Transactional
+    public TemplateView restore(Long templateId, PublishRequest request) {
+        CurrentUser operator = permissionService.requirePublish();
+        FlowTemplate template = requireTemplate(templateId);
+        TemplateStatus status = TemplateVersionPolicy.requireKnownStatus(template);
+        if (status == TemplateStatus.PUBLISHED) {
+            return toView(template);
+        }
+        if (status != TemplateStatus.ARCHIVED) {
+            throw new BizException(ErrorCode.FLOW_DEFINITION_IMMUTABLE,
+                    "只有已归档（archived）版本可以恢复为已发布；模板 " + template.getCode() + " v"
+                            + template.getVersion() + " 当前状态为 " + status.code())
+                    .withDetail("templateId", templateId)
+                    .withDetail("status", status.code());
+        }
+        FlowTemplate other = TemplateVersionPolicy.otherPublished(
+                templateMapper.selectByCode(template.getCode()), templateId);
+        if (other != null) {
+            throw new BizException(ErrorCode.FLOW_RESTORE_CONFLICT,
+                    "单据类型「" + template.getCode() + "」已有已发布版本 v" + other.getVersion()
+                            + "（id=" + other.getId() + "），不能同时存在两个已发布版本；"
+                            + "如需让 v" + template.getVersion() + " 的配置生效，请基于它开新版本后发布")
+                    .withDetail("templateId", templateId)
+                    .withDetail("code", template.getCode())
+                    .withDetail("publishedTemplateId", other.getId())
+                    .withDetail("publishedVersion", other.getVersion());
+        }
+        assertPublishable(template, nodeMapper.selectByTemplateId(templateId));
+
+        templateMapper.updateNodeCount(templateId, nodeMapper.countByTemplateId(templateId), operator.id());
+        templateMapper.updateStatus(templateId, TemplateStatus.PUBLISHED.code(), operator.id());
+        log.info("流程模板恢复：operator={} code={} v{} templateId={} reason={}（archived → published，版本号与配置不变）",                operator.account(), template.getCode(), template.getVersion(), templateId,
                 request == null ? null : request.reason());
         return toView(requireTemplate(templateId));
     }
@@ -312,7 +406,22 @@ public class FlowDefinitionService {
 
     // ================================================================ 节点增删改
 
-    /** 新增节点（草稿可写；主干节点码不可重复）。 */
+    /**
+     * 新增节点（草稿可写；主干节点码不可重复）。
+     *
+     * <p><b>seq 的两态语义</b>（2026-10-04 修复「省略即追加」不可达）：
+     * <ul>
+     *   <li><b>显式给出 seq</b> → 插入到该位置，原有的「seq ≥ insertAt」的节点顺延 1（{@link #shiftForInsert}）；</li>
+     *   <li><b>省略 seq（{@code null}）</b> → <b>追加到末尾</b>，落库 seq = 当前最大 seq + 1；
+     *       主干节点码除外：其 seq 恒为 enums.md §2 的固定值（{@link NodeCode#seq()}）。</li>
+     * </ul>
+     *
+     * <p>默认值必须在 {@link NodeDefinitionValidator#assertNode} **之前**算出来写回节点：
+     * 该校验的 R-SEQ 判据是「seq 必须为正整数」，而 {@code applyRequest} 只对**主干节点码**
+     * 补默认 seq —— 省略 seq 的非主干节点此前会带着 {@code null} 进校验，稳定得到 40008
+     * （错误文案「seq 必须为正整数」），使 {@code insertAt = seq == null ? size + 1 : seq}
+     * 这条「省略即追加」的语义成为**不可达代码**。
+     */
     @Transactional
     public NodeView addNode(Long templateId, NodeRequest request) {
         CurrentUser operator = permissionService.requirePublish();
@@ -331,16 +440,23 @@ public class FlowDefinitionService {
         FlowNode node = new FlowNode();
         node.setTemplateId(templateId);
         applyRequest(node, request, existing);
+        // 省略 seq（非主干节点）= 追加到末尾：默认值在校验之前落到节点上（见方法注释）
+        int appendSeq = maxSeq(existing) + 1;
+        if (node.getSeq() == null) {
+            node.setSeq(appendSeq);
+        }
         NodeDefinitionValidator.assertNode(node, template);
 
-        int insertAt = request.seq() == null ? existing.size() + 1 : request.seq();
-        if (insertAt < 1 || insertAt > existing.size() + 1) {
+        int insertAt = node.getSeq();
+        // 上界：seq 连续时 maxSeq + 1 恒等于 size + 1（删节点后由 renumber 补洞，R-SEQ 也要求连续）
+        if (insertAt < 1 || insertAt > appendSeq) {
             throw new BizException(ErrorCode.FLOW_DEFINITION_INVALID,
-                    "插入位置 seq 必须在 1~" + (existing.size() + 1) + " 之间，实际 " + insertAt);
+                    "插入位置 seq 必须在 1~" + appendSeq + " 之间，实际 " + insertAt);
         }
         List<FlowNode> ordered = NodeDefinitionValidator.ordered(existing);
         shiftForInsert(ordered, insertAt, node);
-        templateMapper.updateNodeCount(templateId, ordered.size(), operator.id());
+        // 节点数按**插入后**的行数回写（ordered 是插入前的快照，别拿它的 size —— 那会让 node_count 落后 1）
+        templateMapper.updateNodeCount(templateId, existing.size() + 1, operator.id());
         log.info("流程节点新增：operator={} templateId={} seq={} code={}", operator.account(), templateId,
                 node.getSeq(), node.getNodeCode());
         return toView(findNodeByTemplateAndSeq(templateId, node.getSeq()), template);
@@ -617,8 +733,25 @@ public class FlowDefinitionService {
 
     // ================================================================ 内部
 
-    private FlowTemplate requireTemplate(Long templateId) {
-        if (templateId == null) {
+    /**
+     * 「能否上线」的**唯一**判据：{@link NodeDefinitionValidator} 全量校验（与写接口即时校验同一套规则）。
+     *
+     * <p>两个调用点：{@link #publish}（上线草稿）与 {@link #restore}（把已归档版本重新上线）。
+     * 二者都不信任 {@code /pre-publish-check} 的缓存结果 —— 校验在**同一事务内**重跑，避免 TOCTOU。
+     */
+    private static void assertPublishable(FlowTemplate template, List<FlowNode> nodes) {
+        List<DefinitionProblem> problems = NodeDefinitionValidator.violations(template, nodes);
+        if (problems.isEmpty()) {
+            return;
+        }
+        throw new BizException(ErrorCode.FLOW_DEFINITION_INVALID,
+                "发布被拒绝（发布前校验未通过）："
+                        + String.join("；", problems.stream().map(DefinitionProblem::describe).toList()))
+                .withDetail("templateId", template == null ? null : template.getId())
+                .withDetail("problems", problems.stream().map(DefinitionProblem::describe).toList());
+    }
+
+    private FlowTemplate requireTemplate(Long templateId) {        if (templateId == null) {
             throw new BizException(ErrorCode.PARAM_INVALID, "templateId 不能为空");
         }
         FlowTemplate template = templateMapper.selectTemplateById(templateId);
@@ -657,6 +790,19 @@ public class FlowDefinitionService {
         throw BizException.notFound("流程节点 seq=" + seq);
     }
 
+    /** 现有节点的最大 seq（空模板返回 0）——「省略 seq = 追加到末尾」的默认值来源。 */
+    private static int maxSeq(List<FlowNode> nodes) {
+        int max = 0;
+        if (nodes != null) {
+            for (FlowNode node : nodes) {
+                if (node != null && node.getSeq() != null) {
+                    max = Math.max(max, node.getSeq());
+                }
+            }
+        }
+        return max;
+    }
+
     /** 插入前的顺延：从尾部往前挪，避开 {@code uk_flow_node_seq} 冲突。 */
     private void shiftForInsert(List<FlowNode> ordered, int insertAt, FlowNode inserting) {
         List<FlowNode> tail = new ArrayList<>();
@@ -690,7 +836,17 @@ public class FlowDefinitionService {
         }
     }
 
-    /** 把请求映射到节点实体（未给出的字段按「保持原值」；PUT 显式传 null 表示清空）。 */
+    /**
+     * 把请求映射到节点实体。
+     *
+     * <p><b>可空语义（2026-10-04 统一：三处「可空 = 清空」）</b>：{@code approverParam} /
+     * {@code skipCondition} / {@code passThreshold} 三个字段的 {@code null} 一律表示**清空**
+     * （落库 {@code NULL}），与 {@code NodeSkipConditionRequest} / {@code NodeApproverRuleRequest}
+     * 两个专用 PUT 端点同口径 —— 不再出现「全量 PUT 省略 = 保持、专用 PUT 省略 = 清空」的错位。
+     * 其余标量字段（{@code name} / {@code nodeType} / {@code signPolicy} / {@code timeoutHours} /
+     * 三个开关）保持「{@code null} = 不改动」：它们的空值没有独立含义（与列上的
+     * {@code NOT NULL DEFAULT} 一致），改语义会误伤既有调用方。
+     */
     private void applyRequest(FlowNode node, NodeRequest request, List<FlowNode> siblings) {
         if (request.nodeCode() != null) {
             node.setNodeCode(request.nodeCode().trim().toLowerCase(java.util.Locale.ROOT));
@@ -704,9 +860,8 @@ public class FlowDefinitionService {
         if (request.approverRule() != null) {
             node.setApproverRule(request.approverRule().trim().toLowerCase(java.util.Locale.ROOT));
         }
-        if (request.approverParam() != null) {
-            node.setApproverParam(request.approverParam().isNull() ? null : JsonText.write(request.approverParam()));
-        }
+        node.setApproverParam(request.approverParam() == null || request.approverParam().isNull()
+                ? null : JsonText.write(request.approverParam()));
         applyDecision(node, new NodeDecisionRequest(request.decisionMode(), request.passThreshold(),
                 request.thresholdAbsolute(), request.thresholdPercent()));
         if (request.signPolicy() != null) {
@@ -727,9 +882,9 @@ public class FlowDefinitionService {
         if (request.allowRoute() != null) {
             node.setAllowRoute(request.allowRoute());
         }
-        if (request.skipCondition() != null) {
-            node.setSkipCondition(request.skipCondition().isNull() ? null : JsonText.write(request.skipCondition()));
-        }
+        // 可空 = 清空（与 approverParam / passThreshold 逐字一致，见 applyRequest 的注释）
+        node.setSkipCondition(request.skipCondition() == null || request.skipCondition().isNull()
+                ? null : JsonText.write(request.skipCondition()));
         if (request.seq() != null && NodeCode.of(node.getNodeCode()).isEmpty()) {
             // 非主干节点允许直接改 seq（主干节点由 updateNode 提前拦下）
             node.setSeq(request.seq());
@@ -767,7 +922,21 @@ public class FlowDefinitionService {
         }
     }
 
-    /** 决议模式与阈值：{@code thresholdAbsolute} 优先于 {@code thresholdPercent}（templates.md T-07）。 */
+    /**
+     * 决议模式与阈值：{@code thresholdAbsolute} 优先于 {@code thresholdPercent}（templates.md T-07）。
+     *
+     * <p><b>{@code passThreshold} 的三态（2026-10-04 统一为「null = 清空」）</b>——逐字与
+     * {@code NodeDecisionRequest#passThreshold} 的 DTO 注释一致：
+     * <ol>
+     *   <li>{@code null}（字段省略或显式 JSON {@code null}）→ <b>清空</b>（落库 {@code NULL}）；</li>
+     *   <li>空串 / 全空白串 → <b>清空</b>（与 {@code null} 同义，兼容改前按空串清空的调用方）；</li>
+     *   <li>非空字面量（{@code "2"} / {@code "50%"}）→ <b>写入</b>该字面量（去首尾空白）。</li>
+     * </ol>
+     * 改前是「{@code null} = 不改动、空串 = 清空」，与同族的 {@code skipCondition} / {@code approverParam}
+     * 「{@code null} = 清空」相反 —— 前端只能靠「不配置就传空串」绕过（见
+     * {@code oa-web/src/views/admin/FlowNodeConfigPanel.vue} 的注释），本方法统一为后者。
+     * {@code thresholdAbsolute} / {@code thresholdPercent} 任一非空时优先走 compose 分支，不受本条影响。
+     */
     private void applyDecision(FlowNode node, NodeDecisionRequest request) {
         if (request == null) {
             return;
@@ -777,13 +946,14 @@ public class FlowDefinitionService {
         }
         boolean hasAbsolute = request.thresholdAbsolute() != null;
         boolean hasPercent = request.thresholdPercent() != null;
-        boolean hasLiteral = request.passThreshold() != null;
         if (hasAbsolute || hasPercent) {
             ThresholdPolicy.Composed composed = ThresholdPolicy.compose(request.thresholdAbsolute(),
                     request.thresholdPercent());
             node.setPassThreshold(composed.value());
-        } else if (hasLiteral) {
-            node.setPassThreshold(request.passThreshold().isBlank() ? null : request.passThreshold().trim());
+        } else if (request.passThreshold() == null || request.passThreshold().isBlank()) {
+            node.setPassThreshold(null);
+        } else {
+            node.setPassThreshold(request.passThreshold().trim());
         }
     }
 

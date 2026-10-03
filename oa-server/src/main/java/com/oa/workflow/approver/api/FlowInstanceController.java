@@ -15,6 +15,7 @@ import com.oa.workflow.approver.app.ApproverPrecheckService;
 import com.oa.workflow.approver.app.FlowInstanceService;
 import com.oa.workflow.approver.domain.ApproverSnapshot;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
+import com.oa.workflow.runtime.domain.FlowAction;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>POST</td><td>{@code /flow-instances/precheck}</td><td><b>发起前预检</b>（只读干跑）：逐节点解析候选人，任一为空即 {@code allowed=false} 并给出节点/规则/缺配</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/precheck/rules}</td><td>预检规则清单（已实现项与后续工作包负责项都显式列出）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances}</td><td>建草稿实例：预检通过 → <b>锁定模板版本</b> → 固化审批人快照</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{instanceId}/submit}</td><td>提交（{@code draft → approving}；仅此一条迁移，其余属 2a.4）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{instanceId}/submit}</td><td>提交（{@code draft → approving}）；<b>入口闸门 = {@code FlowAction.SUBMIT.permission()} = {@code flow}</b>（与引擎同源，2a.4 收敛）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances}</td><td>实例列表（按模板 / 版本 / 状态 / 发起人过滤；数据域过滤）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{instanceId}}</td><td>实例详情（含快照）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{instanceId}/approver-snapshot}</td><td>读取作为运行时权威数据的快照（数据域过滤）</td></tr>
@@ -94,12 +95,26 @@ public class FlowInstanceController {
         return ApiResponse.success(instanceService.create(request, principal));
     }
 
-    /** 提交（草稿 → 审批中；建节点实例 + 首个节点待办由运行时引擎完成）。 */
+    /**
+     * 提交（草稿 → 审批中；建节点实例 + 首个节点待办由运行时引擎完成）。
+     *
+     * <p><b>入口闸门 = {@code FlowAction.SUBMIT.permission()}（{@code flow}）</b>（F 项收敛，2026-10-04）：
+     * 引擎 {@code FlowEngineService#submit} 取的是同一个动作码，因此本入口与引擎**同源同参**
+     * —— 改前这里用 {@code requireInitiator}（{@code flow} ∪ {@code admin:flow}），
+     * 比引擎宽：只持 {@code admin:flow} 的自定义角色能过入口、随后被引擎 403。
+     * <p>发起人身份（{@code requireInitiatorOrAdmin}）仍由引擎判，入口不读实例
+     * （口径与 {@code /reopen} / {@code /resubmit} / {@code /supplement} 一致）。
+     *
+     * <p><b>刻意保留的一道宽口</b>：{@code POST /flow-instances}（<b>建草稿</b>）仍用
+     * {@code requireInitiator} —— 「发起」不是 {@link FlowAction} 里的动作（动作面从 {@code submit} 起），
+     * 且 PRD 附录A「发起审批」行对 8 列全部为 ✓；若日后要把 {@code admin:flow} 从发起侧也拿掉，
+     * 属于产品口径变更（会同时影响 {@code company_admin} 一类角色），不在本轮收敛范围。
+     */
     @PostMapping("/{instanceId}/submit")
     @Audited(action = "submit", targetType = "instance", targetId = "#instanceId", recordArgs = true)
     public ApiResponse<InstanceView> submit(@PathVariable("instanceId") Long instanceId,
                                             @Valid @RequestBody SubmitRequest request) {
-        permissionService.requireInitiator("提交审批单");
+        permissionService.requirePermission(FlowAction.SUBMIT.label(), FlowAction.SUBMIT.permission());
         return ApiResponse.success(engineService.submit(instanceId, request.reason()));
     }
 

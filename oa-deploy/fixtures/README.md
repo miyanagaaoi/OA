@@ -104,7 +104,7 @@ oa-deploy\runtime\start-local.cmd
 
 期望（与 `oa-deploy/LOCAL-DEV.md` §5 的自检清单一致）：
 
-- `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 376`、`flow_template = 4`
+- `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 372`、`flow_template = 4`
 - `sys_org ≥ 13`（含 5 个 `RT-*`）、`sys_user.dev_* = 7`、`sys_user.mtx_* = 5`
 - `sys_org_leader` 上 ①–⑥ 全部可解析 ⇒ 四类单据 precheck `allowed=true`
 - `information_schema.TRIGGERS`（schema `oa`）**= 4**，且 `UPDATE sys_log WHERE id=1` 报错

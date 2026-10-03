@@ -11,7 +11,9 @@ import java.util.List;
  * {@code /flow-designs/**}）。
  *
  * <p>字段命名与 {@code doc/templates.md} §1 的配置表逐列对应；入参的「可空 = 清空」语义
- * 用于 PUT 全量覆盖（与 {@code 04-permissions} 的 PUT 语义一致）。
+ * 用于 PUT 全量覆盖（与 {@code 04-permissions} 的 PUT 语义一致）—— 适用字段仅限
+ * {@code passThreshold} / {@code skipCondition} / {@code approverParam} 三个「有独立空值含义」的字段，
+ * 逐个的三态写在各自的 record 注释里（2026-10-04 统一为 {@code null} = 清空）。
  */
 public final class FlowDefinitionDtos {
 
@@ -134,17 +136,38 @@ public final class FlowDefinitionDtos {
 
     // ================================================================ 节点写
 
-    /** 节点写入请求（新增 / 全量更新共用；PUT 语义 = 传 null 即清空）。 */
+    /**
+     * 节点写入请求（新增 / 全量更新共用）。
+     *
+     * <p><b>可空语义（2026-10-04 统一）</b>：三个「可空 = 清空」的字段
+     * —— {@code passThreshold} / {@code skipCondition} / {@code approverParam}
+     * —— 省略（{@code null}）即**清空**对应列，与两个专用 PUT 端点
+     * （{@code PUT /flow-nodes/{id}/decision|skip-condition|approver-rule}）逐字同口径；
+     * 其余标量字段省略 = 保持原值（见 {@code FlowDefinitionService#applyRequest}）。
+     *
+     * <p><b>{@code seq} 的两态</b>：显式给出 → 插入到该位置并顺延后续节点；
+     * 省略 → **追加到末尾**（落库 = 当前最大 seq + 1）。
+     */
     public record NodeRequest(
+            /** 插入位置；省略 = 追加到末尾（seq = 当前最大 + 1）；主干节点码恒用其固定 seq。 */
             Integer seq,
             @NotBlank(message = "node_code 不能为空")
             @Size(max = 32, message = "node_code 不得超过 32 字符") String nodeCode,
             @Size(max = 50, message = "节点名称不得超过 50 字符") String name,
             String nodeType,
             @NotBlank(message = "approver_rule 不能为空") String approverRule,
+            /** 解析规则参数；{@code null} = 清空（与 {@code skipCondition} / {@code passThreshold} 一致）。 */
             JsonNode approverParam,
             String decisionMode,
-            /** 阈值字面量（"2" / "50%"）；与 thresholdAbsolute/thresholdPercent 三选一。 */
+            /**
+             * 阈值字面量（{@code "2"} / {@code "50%"}）——<b>三态，逐字</b>：
+             * <ol>
+             *   <li>{@code null}（省略或显式 JSON {@code null}）→ <b>清空</b>（落 {@code NULL}）；</li>
+             *   <li>空串 / 全空白串 → <b>清空</b>（与 {@code null} 同义）；</li>
+             *   <li>非空字面量 → <b>写入</b>（去首尾空白）。</li>
+             * </ol>
+             * {@code thresholdAbsolute} / {@code thresholdPercent} 任一非空时优先走它们（T-07）。
+             */
             String passThreshold,
             /** 绝对人数阈值（与 percent 同时给出时**绝对人数优先**，templates.md T-07）。 */
             Integer thresholdAbsolute,
@@ -155,6 +178,7 @@ public final class FlowDefinitionDtos {
             Boolean allowAddSign,
             Boolean allowJump,
             Boolean allowRoute,
+            /** 跳过条件；{@code null} = 清空（与 {@code approverParam} / {@code passThreshold} 一致）。 */
             JsonNode skipCondition
     ) {
     }
@@ -163,9 +187,25 @@ public final class FlowDefinitionDtos {
     public record NodeOrderRequest(List<Long> nodeIds) {
     }
 
-    /** 决议模式写入请求。 */
+    /**
+     * 决议模式写入请求（{@code PUT /flow-nodes/{id}/decision}）。
+     *
+     * <p>{@code passThreshold} 的三态与 {@code NodeRequest#passThreshold} <b>逐字一致</b>
+     * （{@code null} = 清空 / 空串 = 清空 / 非空字面量 = 写入）；改前本端点是
+     * 「{@code null} = 不改动、空串 = 清空」，是唯一与同族字段相反的入口（2026-10-04 统一）。
+     * 若只想改决议模式而保留阈值，请**显式回传**当前阈值字面量（前端已如此下发）。
+     */
     public record NodeDecisionRequest(
             String decisionMode,
+            /**
+             * 阈值字面量（{@code "2"} / {@code "50%"}）——<b>三态，逐字</b>：
+             * <ol>
+             *   <li>{@code null}（省略或显式 JSON {@code null}）→ <b>清空</b>（落 {@code NULL}）；</li>
+             *   <li>空串 / 全空白串 → <b>清空</b>（与 {@code null} 同义）；</li>
+             *   <li>非空字面量 → <b>写入</b>（去首尾空白）。</li>
+             * </ol>
+             * {@code thresholdAbsolute} / {@code thresholdPercent} 任一非空时优先走它们（T-07）。
+             */
             String passThreshold,
             Integer thresholdAbsolute,
             Integer thresholdPercent
@@ -196,11 +236,16 @@ public final class FlowDefinitionDtos {
     ) {
     }
 
-    /** 跳过条件写入请求（{@code null} = 清空）。 */
+    /** 跳过条件写入请求（{@code null} = 清空；与 {@code NodeRequest#skipCondition} 逐字一致）。 */
     public record NodeSkipConditionRequest(JsonNode skipCondition) {
     }
 
-    /** 解析规则写入请求。 */
+    /**
+     * 解析规则写入请求。
+     *
+     * <p>{@code approverRule} 必填；{@code approverParam} 的 {@code null} = <b>清空</b>
+     * （与 {@code skipCondition} / {@code passThreshold} 同口径）。
+     */
     public record NodeApproverRuleRequest(String approverRule, JsonNode approverParam) {
     }
 
@@ -232,7 +277,30 @@ public final class FlowDefinitionDtos {
     public record CheckRuleView(String rule, String title) {
     }
 
-    /** 在途实例锁版本视图（{@code GET /flow-templates/{id}/locked-by}）—— 便于管理员确认「改模板不影响谁」。 */
-    public record LockedInstanceView(Long instanceId, String bizNo, Integer templateVersion, String status) {
+    /**
+     * 在途实例锁版本视图（{@code GET /flow-templates/{id}/locked-by}）—— 便于管理员确认「改模板不影响谁」
+     * （AC-09：「哪些在途实例锁着这个版本」）。
+     *
+     * <p><b>可见性</b>：行集在**调用人数据域**下产生（{@code flow_instance} 的 SELECT 带
+     * {@code @dataScope} 标记、Mapper 不继承 {@code BaseMapper}）—— 域外实例根本不出现在结果里，
+     * 而不是返回后再过滤。前 4 个字段是原契约（{@code oa-web} 的 {@code WireLockedInstanceView}），
+     * 后 5 个为 2026-10-04 补齐（纯追加，旧调用方不受影响）。
+     */
+    public record LockedInstanceView(
+            Long instanceId,
+            String bizNo,
+            Integer templateVersion,
+            String status,
+            /** 发起人 id（数据域内的单据才有行）。 */
+            Long initiatorId,
+            /** 发起人姓名（{@code sys_user.name}；用户已删除时为 {@code null}）。 */
+            String initiatorName,
+            /** 当前节点序号（实例主状态 {@code approving} 时的当前节点）。 */
+            Integer currentNodeSeq,
+            /** 当前节点名（取该实例当前 seq 的节点实例名；节点实例缺失时为 {@code null}）。 */
+            String currentNodeName,
+            /** 发起（首次提交）时间，格式 {@code yyyy-MM-dd HH:mm:ss}；未提交时取创建时间。 */
+            String submittedAt
+    ) {
     }
 }

@@ -1,7 +1,7 @@
 -- ============================================================================
 -- V1 建表（27 张表；不含触发器，触发器见 db/trigger/immutable-triggers.sql）
 -- ----------------------------------------------------------------------------
--- 生成器: tools/build-flyway-migrations.js sha256=1a70ffc3f41d
+-- 生成器: tools/build-flyway-migrations.js sha256=1d187b7628f8
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
 -- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
 -- 来源: oa-deploy/sql/01-schema.sql ← doc/data-model.md sha256=d690e736aed2

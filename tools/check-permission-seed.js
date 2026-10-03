@@ -101,6 +101,17 @@ const GROUP_REPORT_EXPORT = 'admin:report:export';
 const TERMINATE_ROLES = ['admin', 'group_leader'];
 const TERMINATE_CODE = 'flow:task:terminate';
 
+/**
+ * **导出单据**（`flow:export`）的授权口径：PRD 附录A 权限矩阵「导出单据」行
+ * （`doc/prd-0.1.md` 第 759 行）为「系统管理员 ✓ / 集团职能部门负责人 ✓ / 其余 6 列 -」，
+ * 同页第 768 行的 V0.4 口径变更为「导出权限 = 系统管理员 + 财务角色」。
+ * 矩阵里的「集团职能部门负责人」= 本工程的 `finance_owner`，故持有人**必须含** `admin` 与
+ * `finance_owner`；`branch_leader` **不在矩阵的 8 列内**，无法据文档判定 → 允许持有（只报告不改）。
+ */
+const FLOW_EXPORT_CODE = 'flow:export';
+const FLOW_EXPORT_REQUIRED_ROLES = ['admin', 'finance_owner'];
+const FLOW_EXPORT_TOLERATED_ROLES = ['branch_leader'];
+
 /** 仅 `admin` 可持有的权限项（改派 / 主数据导出 / 权限树勾选 / 报表导出） */
 const ADMIN_ONLY_CODES = [
   'flow:task:reassign',
@@ -572,6 +583,25 @@ function check(text, errors, warnings) {
     }
   }
 
+  // --- 9d3：导出单据（flow:export）持有人口径（PRD 附录A 第 759 行） --------------
+  if (!byCode.has(FLOW_EXPORT_CODE)) {
+    errors.push(`导出权限在权限树中不存在：${FLOW_EXPORT_CODE}`);
+  } else {
+    for (const role of ROLE_WHITELIST) {
+      const held = (grantedByRole.get(role) || new Set()).has(FLOW_EXPORT_CODE);
+      if (FLOW_EXPORT_REQUIRED_ROLES.includes(role) && !held) {
+        errors.push(`角色缺少导出权限：${role} -> ${FLOW_EXPORT_CODE}`
+          + '（PRD 附录A 权限矩阵「导出单据」行：系统管理员 ✓ / 集团职能部门负责人 ✓）');
+      }
+      if (held && !FLOW_EXPORT_REQUIRED_ROLES.includes(role)
+          && !FLOW_EXPORT_TOLERATED_ROLES.includes(role)) {
+        errors.push(`导出权限被下放给非授权角色：${role} -> ${FLOW_EXPORT_CODE}`
+          + '（附录A「导出单据」行：仅系统管理员与集团职能部门负责人 ✓；'
+          + `${FLOW_EXPORT_TOLERATED_ROLES.join('/')} 不在矩阵列内，另行报告）`);
+      }
+    }
+  }
+
   // --- 9e：祖先闭包（PermissionTreePolicy.requireAncestorClosed 同口径） -------
   // 「父节点未授予时子节点不得单独授予」——服务端对违规集合一律 400，故种子必须同口径。
   for (const [role, set] of grantedByRole) {
@@ -617,6 +647,18 @@ function check(text, errors, warnings) {
     );
   }
 
+  const flowExportHolders = ROLE_WHITELIST.filter((role) =>
+    (grantedByRole.get(role) || new Set()).has(FLOW_EXPORT_CODE));
+  // 只报告不改：不在矩阵列内的角色若持有导出权限，给出可核对的清单（等产品裁定）
+  const flowExportOutOfMatrix = flowExportHolders.filter(
+    (role) => !FLOW_EXPORT_REQUIRED_ROLES.includes(role));
+  if (flowExportOutOfMatrix.length) {
+    warnings.push(
+      `${FLOW_EXPORT_CODE}（导出单据）持有人含**不在 PRD 附录A 矩阵列内**的角色：`
+      + `${flowExportOutOfMatrix.join(', ')} —— 矩阵无此列，按「只报告不改」保留授权，等产品裁定`,
+    );
+  }
+
   const stats = {
     rolesSeeded: roles.length,
     roleCodes: ROLE_WHITELIST.filter((c) => roleByCode.has(c)),
@@ -636,6 +678,10 @@ function check(text, errors, warnings) {
     terminateRoles: TERMINATE_ROLES,
     terminateHolders: ROLE_WHITELIST.filter((role) =>
       (grantedByRole.get(role) || new Set()).has(TERMINATE_CODE)),
+    flowExportRequiredRoles: FLOW_EXPORT_REQUIRED_ROLES,
+    flowExportToleratedRoles: FLOW_EXPORT_TOLERATED_ROLES,
+    flowExportHolders,
+    flowExportOutOfMatrix,
     sectionOrder: {
       firstRoleInsert: marks.firstRole,
       firstPermissionInsert: marks.firstPermission,

@@ -137,6 +137,23 @@ public enum ErrorCode {
     FLOW_NODE_RETURN_LIMIT_EXCEEDED(40912, "该节点被回退次数已达上限", 409),
     /** 409：同一节点补件次数已达上限（≤1，REQ-FLOW-023）。 */
     FLOW_SUPPLEMENT_PER_NODE_LIMIT(40913, "该节点已请求过补件，不能再请求", 409),
+    /**
+     * 409：<b>归档守卫</b>——目标版本是该 {@code code} 下**唯一**的 {@code published} 版本
+     * （templates.md §3.3「同一 code 下最多一个 published」+ §4.3「不得删除已产生的模板版本」）。
+     *
+     * <p>归档它 = 该单据类型**无法发起新单据**，且历史版本不可删、草稿也不能基于它开
+     * （{@code draft} 不是可复用源），只能靠「开新草稿 → 发布」救回 —— 一次误点即造成
+     * 停服级故障，因此必须前置拒绝。恢复路径见 {@code FLOW_RESTORE_CONFLICT} 与
+     * {@code POST /flow-templates/{id}/restore}。
+     */
+    FLOW_LAST_PUBLISHED_ARCHIVE_DENIED(40914,
+            "该版本是此单据类型唯一的已发布版本，归档后该单据类型将无法发起新单据；请先发布新版本再归档旧版本", 409),
+    /**
+     * 409：<b>恢复冲突</b>——该 {@code code} 下**已存在** {@code published} 版本，
+     * 不能再把另一个 {@code archived} 版本恢复为 {@code published}（templates.md §3.3 唯一性）。
+     */
+    FLOW_RESTORE_CONFLICT(40915,
+            "该单据类型已有已发布版本，无需也无法恢复此历史版本；如需让它的配置生效，请基于它开新版本后发布", 409),
 
     // ---------- 429 ----------
     TOO_MANY_REQUESTS(42901, "请求过于频繁，请稍后重试", 429),

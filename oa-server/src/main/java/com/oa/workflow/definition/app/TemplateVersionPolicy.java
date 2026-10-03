@@ -55,8 +55,29 @@ public final class TemplateVersionPolicy {
         }
     }
 
-    // ================================================================ 版本号
+    /**
+     * 状态合法性（**只读判定**，不要求可编辑）：{@code draft} / {@code published} / {@code archived}
+     * 三者之外一律 400。
+     *
+     * <p>与 {@link #assertEditable} 是**同级**但不同用途的两条守卫：写配置的入口要求「可编辑」，
+     * 而发布 / 归档 / 恢复三个状态迁移入口只要求「是已知状态」—— 迁移本身必须能作用于
+     * 只读版本（{@code published} / {@code archived}），否则归档与恢复都无从谈起。
+     */
+    public static TemplateStatus requireKnownStatus(FlowTemplate template) {
+        if (template == null) {
+            throw BizException.notFound("流程模板");
+        }
+        TemplateStatus status = template.statusEnum();
+        if (status == null) {
+            throw new BizException(ErrorCode.FLOW_DEFINITION_INVALID,
+                    "模板状态非法（draft / published / archived）：" + template.getStatus())
+                    .withDetail("templateId", template.getId())
+                    .withDetail("status", template.getStatus());
+        }
+        return status;
+    }
 
+    // ================================================================ 版本号
     /** 下一个版本号 = 现有最大版本 + 1（V-08：不得跳号、不得复用）。 */
     public static int nextVersion(List<FlowTemplate> sameCode) {
         int max = 0;
@@ -111,6 +132,23 @@ public final class TemplateVersionPolicy {
         result.sort(Comparator.comparing(FlowTemplate::getVersion,
                 Comparator.nullsLast(Comparator.reverseOrder())));
         return result;
+    }
+
+    /**
+     * 同一 {@code code} 下**除 {@code excludeId} 之外**的 {@code published} 版本（没有则 {@code null}）。
+     *
+     * <p>归档守卫的判据：返回 {@code null} 说明目标版本是该单据类型**唯一**的可发起版本，
+     * 归档它会让该类单据无法发起新实例（§3.3 / §4.3 / V-05 的反面）。
+     */
+    public static FlowTemplate otherPublished(List<FlowTemplate> sameCode, Long excludeId) {
+        if (sameCode == null) {
+            return null;
+        }
+        return sameCode.stream()
+                .filter(item -> item != null && item.statusEnum() == TemplateStatus.PUBLISHED)
+                .filter(item -> excludeId == null || !excludeId.equals(item.getId()))
+                .findFirst()
+                .orElse(null);
     }
 
     // ================================================================ 在途锁版本

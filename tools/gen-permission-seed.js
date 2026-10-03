@@ -316,7 +316,14 @@ const EMPLOYEE_ACTIONS = [
   'flow:task:withdraw',
 ];
 
-/** 审批人动作包（6 个审批角色共有）；不含 改派 / 撤回 / 终止（终止仅 `group_leader` 追加，见 `GROUP_LEADER_TERMINATE`） */
+/**
+ * 审批人动作包（6 个审批角色共有）；不含 改派 / 撤回 / 终止（终止仅 `group_leader` 追加，见 `GROUP_LEADER_TERMINATE`）。
+ *
+ * **`flow:export` 不在本包内**（2026-10-04 修正「多授」）：PRD 附录A 权限矩阵（`doc/prd-0.1.md`
+ * 第 759 行「导出单据」行）的口径是**系统管理员 ✓ / 集团职能部门负责人 ✓ / 其余 6 列 -**，
+ * 而该码原先随本包被授予了 6 个审批角色（部门负责人 / 分公司分管领导 / 子公司总经理 /
+ * 集团分管领导 / 集团董事长 / 集团职能部门负责人）。持有人的权威清单见 `FLOW_EXPORT`。
+ */
 const APPROVER_ACTIONS = [
   'flow',
   'flow:task:approve',
@@ -327,8 +334,35 @@ const APPROVER_ACTIONS = [
   'flow:task:rollback',
   'flow:supplement:request',
   'flow:print',
-  'flow:export',
 ];
+
+/**
+ * `flow:export`（导出单据）的**持有人口径**（PRD 附录A 为真源）。
+ *
+ * **取证**：`doc/prd-0.1.md` 附录A 权限矩阵第 759 行「导出单据」行——
+ * 系统管理员 ✓ / 分公司管理员 - / 普通员工 - / 部门负责人 - / 子公司总经理 - /
+ * **集团职能部门负责人 ✓（V0.4 新增）** / 集团分管领导 - / 集团董事长 -；
+ * 同页第 768 行的 V0.4 口径变更说明：「导出权限由『仅系统管理员』扩展为
+ * **『系统管理员 + 财务角色』**」。矩阵里的「集团职能部门负责人」即本工程的
+ * `finance_owner`（财务归口角色，见 `ROLE_GRANTS` 的 scope），故**保留** `admin` 与
+ * `finance_owner` 两个持有人，其余 5 个内置角色**移除**该码。
+ *
+ * **为什么移除是安全的**：`flow:export` 在 `oa-server` / `oa-web` **零消费者**
+ * （全仓仅权限种子与权限树出现该码；真正的导出强制点是 `ExportFieldPolicy` 的**角色**判定
+ * —— 系统管理员 ∪ 财务角色，与矩阵同口径），因此本项只让「授权面」回到文档口径。
+ *
+ * **`branch_leader` 为什么保留**：它**不在矩阵的 8 列里**（分公司分管领导这一列在附录A 中不存在），
+ * 无法据文档判定「该给还是不该给」，因此**只报告不改**（保留既有授权，等产品裁定后再动）。
+ * 这条口径由 `check-permission-seed.js` 的 9d3 断言正向锁定：持有人必须**含**
+ * `{admin, finance_owner}`，且**不得**出现除 `branch_leader` 之外的非矩阵角色。
+ */
+const FLOW_EXPORT = 'flow:export';
+
+/** `flow:export` **必须**持有的角色（PRD 附录A「导出单据」行：系统管理员 ✓ / 集团职能部门负责人 ✓）。 */
+const FLOW_EXPORT_REQUIRED_ROLES = ['admin', 'finance_owner'];
+
+/** `flow:export` **允许**持有但不在矩阵列内的角色（只报告不改：等产品裁定）。 */
+const FLOW_EXPORT_TOLERATED_ROLES = ['branch_leader'];
 
 /** 集团层报表查看包：报表菜单 + 6 个查看项，**不含** `admin:report:export`（报表导出仅 admin） */
 const GROUP_REPORT_VIEW = ['admin:report:*'];
@@ -402,8 +436,9 @@ const ROLE_GRANTS = [
   {
     role: 'branch_leader',
     roleName: ROLE_NAMES.branch_leader,
-    scope: '员工基础包 + 审批动作包',
-    include: [...APPROVER_BASE],
+    scope: '员工基础包 + 审批动作包；**导出单据**：该角色不在 PRD 附录A 矩阵的列内，按「只报告不改」保留既有授权',
+    // `branch_leader`（分公司分管领导）不在权限矩阵的 8 列内 → 无法据文档判定，保留既有授权并报告
+    include: [...APPROVER_BASE, FLOW_EXPORT],
     exclude: [],
   },
   {
@@ -416,9 +451,10 @@ const ROLE_GRANTS = [
   {
     role: 'finance_owner',
     roleName: ROLE_NAMES.finance_owner,
-    scope: '员工基础包 + 审批动作包 + 财务归口查看项（集团层报表查看，不含报表导出）',
-    // `portal:workbench:*` 已在门户基础包里，此处显式写出以对齐任务口径（展开后自动去重）
-    include: [...APPROVER_BASE, 'portal:workbench:*', ...GROUP_REPORT_VIEW],
+    scope: '员工基础包 + 审批动作包 + **导出单据**（附录A「导出单据」行：集团职能部门负责人 ✓）+ 财务归口查看项（集团层报表查看，不含报表导出）',
+    // `portal:workbench:*` 已在门户基础包里，此处显式写出以对齐任务口径（展开后自动去重）；
+    // `flow:export` 见 FLOW_EXPORT 的取证（附录A「导出单据」行 + 第 768 行 V0.4 口径变更）
+    include: [...APPROVER_BASE, FLOW_EXPORT, 'portal:workbench:*', ...GROUP_REPORT_VIEW],
     exclude: [...GROUP_REPORT_VIEW_EXCLUDE],
   },
   {
@@ -1168,6 +1204,25 @@ function main() {
     }
   }
 
+  // `flow:export`（导出单据）：持有人口径见 FLOW_EXPORT 的取证。
+  //   必须持有 = {admin, finance_owner}；允许持有 = 上述 + {branch_leader}（不在矩阵列内 → 只报告不改）。
+  if (!byCode.has(FLOW_EXPORT)) {
+    errors.push(`FLOW_EXPORT 引用了未定义的权限码：${FLOW_EXPORT}`);
+  } else {
+    for (const g of grants) {
+      const held = g.codes.includes(FLOW_EXPORT);
+      const required = FLOW_EXPORT_REQUIRED_ROLES.includes(g.role);
+      const tolerated = FLOW_EXPORT_TOLERATED_ROLES.includes(g.role);
+      if (required && !held) {
+        errors.push(`角色缺少导出权限：${g.role} -> ${FLOW_EXPORT}（PRD 附录A 权限矩阵「导出单据」行）`);
+      }
+      if (held && !required && !tolerated) {
+        errors.push(`导出权限被下放给非授权角色：${g.role} -> ${FLOW_EXPORT}`
+          + `（附录A「导出单据」行：仅系统管理员与集团职能部门负责人 ✓；${FLOW_EXPORT_TOLERATED_ROLES.join('/')} 不在矩阵列内，另行报告）`);
+      }
+    }
+  }
+
   const depthCache = new Map();
   const parentOf = new Map(rows.map((r) => [r.code, r.parentCode]));
   const depthDistribution = {};
@@ -1194,6 +1249,9 @@ function main() {
     }, {}),
     adminOnlyCodes: ADMIN_ONLY_CODES,
     groupLeaderOnlyCodes: GROUP_LEADER_TERMINATE,
+    flowExportRequiredRoles: FLOW_EXPORT_REQUIRED_ROLES,
+    flowExportToleratedRoles: FLOW_EXPORT_TOLERATED_ROLES,
+    flowExportHolders: grants.filter((g) => g.codes.includes(FLOW_EXPORT)).map((g) => g.role),
   };
 
   if (errors.length) {
