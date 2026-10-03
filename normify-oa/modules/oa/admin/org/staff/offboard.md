@@ -11,8 +11,8 @@ description:
   en: >
       Before resignation, surface the number of unhandled tasks and force transfer or reassignment first; after resignation the user is excluded from new approver resolution while in-flight documents stay with their snapshot approvers.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.633Z"
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.531Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

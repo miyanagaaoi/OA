@@ -11,9 +11,9 @@ description:
   en: >
       Maintain primary and deputy org leaders (multiple leaders and multiple posts per person), optionally bound to a matter category as the single authoritative source for approver resolution; a vacancy affects the initiate-time block check.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.639Z"
-fingerprint: 45de2030cdb84b6b065d6ae29d070a0561de3211039af1703055f01a49a9f2e4
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.533Z"
+fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
     line: 88

@@ -14,7 +14,9 @@ import java.util.Objects;
  * <p>持久化落点：{@code flow_template} 的 5 个可空列
  * （{@code max_return_count} / {@code max_supplement_count} /
  * {@code supplement_deadline_days} / {@code supplement_deadline_type} / {@code on_supplement_timeout}），
- * 由 Flyway {@code V5__flow_gate_policy.sql} 追加（**纯新增列，不改动任何既有列**）。
+ * 真源为 {@code doc/data-model.md} §4.1（随 Flyway {@code V1__schema.sql} 建列），
+ * 种子默认值见 {@code oa-deploy/sql/03-templates.sql} → {@code V3__templates.sql}。
+ * 历史：曾由手写迁移 {@code V5__flow_gate_policy.sql} 追加；列并入 V1 后该迁移已删除。
  *
  * <h2>取值语义</h2>
  * <ul>

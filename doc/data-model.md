@@ -342,14 +342,26 @@ CREATE TABLE flow_template (
   node_count        INT          NOT NULL DEFAULT 0,
   form_schema_json  JSON             NULL COMMENT '表单字段定义（驱动渲染；见 doc/forms.md）',
   published_at      DATETIME         NULL,
+  max_return_count         INT          NULL COMMENT 'Q6 全单回退次数上限（NULL 或 0 = 不限；1..99）。键名与语义见 templates.md §1.7',
+  max_supplement_count     INT          NULL COMMENT 'Q6 全单补件次数上限（NULL 或 0 = 不限；1..99）。键名与语义见 templates.md §1.7',
+  supplement_deadline_days INT          NULL COMMENT 'Q7 补件时限天数（NULL = 不设时限；1..365；0 与负数一律拒绝，不设时限请留空）',
+  supplement_deadline_type VARCHAR(16)  NULL COMMENT 'Q7 补件时限口径：calendar 自然日 / working 工作日（给了天数但未给口径时按 working）',
+  on_supplement_timeout    VARCHAR(16)  NULL COMMENT 'Q7 补件超时处理：notify 仅提醒（默认，与 V0.4「超时仅催办」一致）/ auto_pass 自动通过 / auto_return 自动退回',
   created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_by        BIGINT UNSIGNED     NULL,
   updated_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   updated_by        BIGINT UNSIGNED     NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uk_flow_template (code, version),
-  KEY idx_flow_template_status (code, status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程模板（按版本累积，不覆盖历史）';
+  KEY idx_flow_template_status (code, status),
+  CONSTRAINT chk_flow_template_gates CHECK (
+    (max_return_count         IS NULL OR max_return_count         BETWEEN 0 AND 99)   AND
+    (max_supplement_count     IS NULL OR max_supplement_count     BETWEEN 0 AND 99)   AND
+    (supplement_deadline_days IS NULL OR supplement_deadline_days BETWEEN 1 AND 365)  AND
+    (supplement_deadline_type IS NULL OR supplement_deadline_type IN ('calendar','working')) AND
+    (on_supplement_timeout    IS NULL OR on_supplement_timeout    IN ('notify','auto_pass','auto_return'))
+  )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程模板（按版本累积，不覆盖历史；末 5 列为 Q6/Q7 模板级闸门配置，种子取 V0.4 默认值 5 / 3 / 3 / working / notify）';
 
 -- ============================================================
 -- 4.2 流程节点定义

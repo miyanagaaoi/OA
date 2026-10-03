@@ -69,7 +69,7 @@
 
 - **超时默认值（V0.4 定稿，T-01）**：**② = 48h**，其余节点（①③④⑤⑥⑦）**= 24h**；后台可改，最小 24h；超时**仅催办**，不自动跳过、不升级。
 - **协同子任务组**：挂在 seq = 2 之下，`approver_rule = collab_dept_leader`，每个协同部门一组独立任务、**每个协同部门一条站内信**；任一组驳回则单据驳回。
-- **⑦ 参数**：`approver_param = {"role_code": "finance_clerk"}`（财务部内勤角色，见 `enums.md` E-02）。⑦ **默认「仅登记不审批」**（T-03）：`sign_policy = none`、`decision_mode` / `pass_threshold` 为 `NULL`（登记节点无决议），**不产生审批决议、不计入审批时长与效率统计**，仅写 `sys_thread` 留痕（`action = archive_register`）；可按模板配置改为需审批。
+- **⑦ 参数**：`approver_param = {"role_code": "admin"}`。**一期由系统管理员承担归档登记**（`doc/prd-0.1.md` §6.3 的业务口径是「财务部内勤」，但 `sys_role` 的内置角色恰为 **REQ-ADMIN-003 的 9 个**，其中不含「财务部内勤 / 档案管理员」，`doc/enums.md` E-02 记的 `finance_clerk` **不是受保护角色集里的一员**——引用它会让四类单据的预检全部因 ⑦ 空候选人被拦（AC-11）；新增第 10 个角色会破坏 9 角色口径，故一期改用已有的 `admin`）；**二期如引入档案管理员角色再改**。⑦ **默认「仅登记不审批」**（T-03）：`sign_policy = none`、`decision_mode` / `pass_threshold` 为 `NULL`（登记节点无决议），**不产生审批决议、不计入审批时长与效率统计**，仅写 `sys_thread` 留痕（`action = archive_register`）；可按模板配置改为需审批。
 - **二次确认口径**：即便②被跳过，`flow_instance` 的归口部门字段仍为财务部，统计与审计口径不变。
 
 ### 1.2 资金审批单（`template.code = fund`）
@@ -251,7 +251,7 @@
       "name": "归档登记",
       "node_type": "archive",
       "approver_rule": "designated",
-      "approver_param": { "role_code": "finance_clerk" },
+      "approver_param": { "role_code": "admin" },
       "decision_mode": null,
       "pass_threshold": null,
       "sign_policy": "none",

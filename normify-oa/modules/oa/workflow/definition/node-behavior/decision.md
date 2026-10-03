@@ -6,14 +6,14 @@ state: planned
 name: {zh: "决议模式与通过阈值", en: "Decision Mode & Pass Threshold"}
 description:
   zh: >
-      decision_mode（any 或签，默认 / all 会签 / sequence 依次审批）与 pass_threshold（"50%" 百分比或 "2" 绝对人数，两者同时存在时绝对人数优先）的写入与解析；会签节点必须显式定义驳回即终止或驳回即回退（REQ-FLOW-002）。
+      decision_mode（any 或签，默认 / all 会签 / sequence 依次审批）与 pass_threshold（"50%" 百分比或 "2" 绝对人数，两者同时存在时绝对人数优先）的写入与解析；驳回后的去向**一期固定为「回到发起人」，不做节点级配置**（会签/协同任务中任一人驳回即该节点驳回；节点级驳回去向属二期，见 doc/prd-0.1.md §5.4）。
       
   en: >
-      Writes and resolves decision_mode (any-sign default / countersign / sequential) and pass_threshold (percentage such as "50%" or absolute such as "2"; absolute wins when both are set). A countersign node must explicitly declare reject-terminate or reject-return (REQ-FLOW-002).
+      Writes and resolves decision_mode (any-sign default / countersign / sequential) and pass_threshold (percentage such as "50%" or absolute such as "2"; absolute wins when both are set). The post-rejection destination is fixed to "back to the initiator" in phase 1, with no per-node configuration (any one rejection in a countersign/collaboration task rejects that node; per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4).
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.794Z"
-fingerprint: 45de2030cdb84b6b065d6ae29d070a0561de3211039af1703055f01a49a9f2e4
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.694Z"
+fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 218

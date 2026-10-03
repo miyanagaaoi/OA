@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -286,7 +287,11 @@ public class OrgService {
         org.setStatus(status.code());
         org.setRemark(request.remark());
         org.setCreatedBy(operator);
-        // path 依赖自增 id：先以临时唯一 path 落库（同一事务内不可见），拿到 id 后立即回填真实 path
+        // path 依赖自增 id：先以临时唯一 path 落库（同一事务内对外不可见），拿到 id 后立即回填真实 path。
+        // 临时 path 必须**全局唯一**：`sys_org.path` 上有唯一键 uk_sys_org_path，而「不同父节点下同名组织」
+        // 可以并发创建（import-spec §3.2：同父同名也允许，仅告警），若临时段取自 name/parentId 会撞唯一键报 500。
+        // 事务回滚即整体丢弃，不会残留任何 /pending- 前缀行（见 create 的 @Transactional(rollbackFor=Exception.class)）。
+        org.setPath(temporaryPath());
         orgMapper.insertOrg(org);
 
         String path = OrgHierarchy.childPath(parentPath, org.getId());
@@ -714,6 +719,21 @@ public class OrgService {
         if (orgMapper.countSiblingName(parentId, name, excludeId) > 0) {
             log.warn("同父节点下已存在同名组织（仅提示，不阻断）：parentId={} name={}", parentId, name);
         }
+    }
+
+    /**
+     * 落库用的**临时 path**（仅在同一事务内短暂存在，回填真实 path 前对外不可见）。
+     *
+     * <p>为什么必须是随机串而不是「运算符 + 序号」（{@code OrgImportStrategy} 的写法在并发下会撞唯一键）：
+     * <ul>
+     *   <li>{@code sys_org.path} 有唯一键 {@code uk_sys_org_path}，两个并发请求取到同一序号即
+     *       {@code DuplicateKeyException}（500）——「不同父节点下同名组织并发创建」是合法业务；
+     *   <li>前缀 {@code pending-} 与真实 path（纯数字段 {@code /1/12/135/}）在字符集上不可能冲突；
+     *   <li>长度固定 42 &lt; {@link #MAX_PATH_LENGTH}，不会触碰 {@code VARCHAR(255)} 列宽。
+     * </ul>
+     */
+    private static String temporaryPath() {
+        return "/pending-" + UUID.randomUUID().toString().replace("-", "") + "/";
     }
 
     /** 自身 + 祖先链（根 → 自身）。 */

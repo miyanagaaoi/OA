@@ -139,7 +139,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | `org_path` | 被绑定负责人的组织 | **是** | 必须是 `org.csv` 中已存在的路径 | 必须存在 | `sys_org_leader.org_id`（解析为 id） | 权威来源在 `sys_org_leader`，`sys_org.leader_id` 仅冗余 |
 | `user_account` | 负责人登录名 | **是** | 必须是 `user.csv` 中已存在的账号 | 必须存在；**不得为 `离职` 人员** | `sys_org_leader.user_id`（解析为 id） | 一人可在多个组织任负责人（一人多岗，PRD 5.1） |
-| `leader_type` | 负责人类型 | **是** | 枚举：`正职` / `副职` | 值必须在上列；**同一组织同一业务线只能有一个正职**，副职不限 | `sys_org_leader.leader_type` ← `正职=primary` / `副职=deputy` | 审批人解析取「正职」；`data-model.md` 默认值 `primary`；口径见 §4.4（T-09 已定稿） |
+| `leader_type` | 负责人类型 | **是** | 枚举：`正职` / `副职` | 值必须在上列；**同一组织同一业务线只能有一个正职**，副职不限 | `sys_org_leader.leader_type` ← `正职=primary` / `副职=deputy` | 审批人解析**只按 `leader_type`**：**总经理 = 公司正职（`primary`）**、**分公司分管领导 = 公司副职（`deputy`）**；`category`（业务线）按 E-LEAD-008 只能绑在集团层节点，**仅用于集团层业务线绑定的审批人解析**（集团分管领导 `group_leader`），公司层不适用。`data-model.md` 默认值 `primary`；口径见 §4.4（T-09 已定稿） |
 | `sort` | 排序号 | **是** | 0–9999 整数；留空按 0 | 整数校验 | `sys_org_leader.sort_no` | PRD 7.1 概览写 `sort`，DDL 实际列名 `sort_no`（以 `data-model.md` 为准） |
 | `business_line` | 分管业务线（= 事项类别） | 否（**仅集团层填**） | 枚举（事项类别五值中文标签）：`经营` / `经济` / `行政` / `人力` / `投资` | 值必须在上列；**仅当 `org_path` 的 `org_type=集团` 时允许填写**，其余组织填写即报错 | `sys_org_leader.category` ← `经营=business` / `经济=economy` / `行政=admin` / `人力=hr` / `投资=invest` | 依据 PRD 5.1「集团层指定分管领导，**按业务线绑定**」与 5.4「集团分管领导按事项类别匹配」；**业务线直接复用 `enums.md` §10.1 的事项类别五值，不新增枚举**（T-06 已定稿）。口径：**财务分管领导在系统中等同于「经济」类分管领导**（Q10 后五个事项类别统一归口财务部） |
 | `remark` | 备注 | 否 | ≤255 字符 | 仅长度校验（校验器 `E-LEAD-010`） | **落库**到 `sys_org_leader.remark`（`VARCHAR(255) NULL`） | T-07 已确认：`remark` 列已落地 |
@@ -271,6 +271,8 @@
 | `E-LEAD-020` | **数据域越权（fail-closed）**：该行 `org_path` 的组织，或 `user_account` 所属人员归属的公司，**不在导入人的数据域内** → **整批拒绝** | error |
 
 > **「一级部门/科室只能有一个正职」的判定口径（T-09 已定稿）**：以 **`org_path` + `business_line` 为分组键**，每组至多 1 条 `leader_type=正职`；`business_line` 留空视为同一组。因此「集团」节点可同时存在「经济线正职」与「经营线正职」（PRD 5.1 按业务线绑定分管领导），但同一业务线内不得出现两个正职。
+>
+> **审批人解析与本表的对应（消除旧措辞与实现的冲突）**：一期可用的区分维度只有 `leader_type`（`category` 按 E-LEAD-008 只能绑在**集团层**节点，`duty_title` 按 T-08 本期不开放），故公司层的自洽映射为：**总经理 = 公司正职（`primary`）**、**分公司分管领导 = 公司副职（`deputy`）**（`branch_leader` 规则据此取发起人所属公司的**副职**负责人，见 `BranchLeaderRule`）；**`category` 只用于集团层业务线绑定的审批人解析**（`group_leader`），公司层不适用。旧措辞「审批人解析取『正职』」仅适用于**部门/科室**层（`dept_leader`），不适用于公司层。
 
 ### 4.5 岗位级（`user_position.csv`）
 

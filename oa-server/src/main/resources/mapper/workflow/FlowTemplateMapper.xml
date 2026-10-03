@@ -32,7 +32,10 @@
     <result property="createdBy" column="created_by"/>
     <result property="updatedAt" column="updated_at"/>
     <result property="updatedBy" column="updated_by"/>
-    <!-- Q6 / Q7 闸门配置（Flyway V5__flow_gate_policy.sql 追加的 5 个可空列） -->
+    <!-- Q6 / Q7 闸门配置：列定义见 doc/data-model.md §4.1（随 Flyway V1__schema.sql 建列），
+         种子默认值见 oa-deploy/sql/03-templates.sql → V3__templates.sql。
+         历史：曾由手写迁移 V5__flow_gate_policy.sql 追加；列进入 V1 后该迁移已删除
+         （否则全新库上重复加列会报 1060 Duplicate column name）。 -->
     <result property="maxReturnCount" column="max_return_count"/>
     <result property="maxSupplementCount" column="max_supplement_count"/>
     <result property="supplementDeadlineDays" column="supplement_deadline_days"/>

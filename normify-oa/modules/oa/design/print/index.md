@@ -11,8 +11,8 @@ description:
   en: >
       Print specification: paper size and type area, rules that differ from the screen UI, the structural elements shared by group-level sheets, the different structure of the subsidiary internal approval sheet, headers and footers, and the measured 297mm page height constraint.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.698Z"
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.568Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -11,8 +11,8 @@ description:
   en: >
       Document detail: field values, attachments by round, approval trail timeline, routing chain and supplement history, with the approval action bar (approve/reject/route/rollback/supplement/transfer/add-sign) and the name-plus-employee-ID watermark.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.766Z"
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.634Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

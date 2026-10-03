@@ -11,8 +11,8 @@ description:
   en: >
       H5 clickable elements are at least 44px (44px controls and a persistent 60px bottom bar padded for the safe-area inset); the watermark never covers the action area; lists become card lists; the desktop 32px controls and 44px rows must not be carried over unchanged, because the H5 control token is the floor.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.692Z"
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.564Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

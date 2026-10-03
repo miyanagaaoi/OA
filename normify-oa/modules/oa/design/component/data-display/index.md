@@ -11,8 +11,8 @@ description:
   en: >
       The data display family: table as the default list form, status-pill badges, tag labels, workflow-step nodes, pagination, tabs and the empty state; the first question for any list is whether it can be a table, with only H5 and card-style portals excepted.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.693Z"
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.564Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

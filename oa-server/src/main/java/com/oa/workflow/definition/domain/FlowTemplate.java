@@ -31,7 +31,7 @@ public class FlowTemplate {
     private LocalDateTime updatedAt;
     private Long updatedBy;
 
-    // ---- Q6 / Q7 闸门配置（Flyway V5 追加的 5 个可空列）----
+    // ---- Q6 / Q7 闸门配置（列定义见 doc/data-model.md §4.1，随 Flyway V1 建列）----
     private Integer maxReturnCount;
     private Integer maxSupplementCount;
     private Integer supplementDeadlineDays;

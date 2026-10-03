@@ -1,7 +1,7 @@
 -- ============================================================================
 -- V1 建表（27 张表；不含触发器，触发器见 db/trigger/immutable-triggers.sql）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T11:13:46.230Z
+-- 生成时间: 2026-10-03T01:50:35.306Z
 -- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）
 -- 来源: oa-deploy/sql/01-schema.sql ← doc/data-model.md
 -- 执行：Flyway 自动按版本顺序执行 V1 → V2 → V3。
@@ -11,12 +11,12 @@
 -- ============================================================================
 -- 集团OA审批系统 · 01 表结构（27 张表 + 不可篡改触发器）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T11:13:46.094Z
+-- 生成时间: 2026-10-03T01:49:53.119Z
 -- 生成工具: tools/gen-init-sql.js（请勿手工编辑本文件，改文档后重跑）
 -- 真源文档: doc/data-model.md
 --
 -- 执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。
--- 包含：建表 28 张、索引 61 个、CHECK 10 个、外键若干、不可篡改触发器 4 个。
+-- 包含：建表 28 张、索引 61 个、CHECK 11 个、外键若干、不可篡改触发器 4 个。
 -- 不可篡改：sys_log 与 flow_signature 由数据库触发器拒绝 UPDATE 与 DELETE（AC-20）；
 --           sys_thread（审批轨迹）一期由应用层只追加约束 + 审计校验保证（见 doc/data-model.md 8.1）。
 -- 注意：触发器已拆分到 db/trigger/immutable-triggers.sql，由 ImmutableTriggerInitializer 启动时幂等创建
@@ -325,14 +325,26 @@ CREATE TABLE flow_template (
   node_count        INT          NOT NULL DEFAULT 0,
   form_schema_json  JSON             NULL COMMENT '表单字段定义（驱动渲染；见 doc/forms.md）',
   published_at      DATETIME         NULL,
+  max_return_count         INT          NULL COMMENT 'Q6 全单回退次数上限（NULL 或 0 = 不限；1..99）。键名与语义见 templates.md §1.7',
+  max_supplement_count     INT          NULL COMMENT 'Q6 全单补件次数上限（NULL 或 0 = 不限；1..99）。键名与语义见 templates.md §1.7',
+  supplement_deadline_days INT          NULL COMMENT 'Q7 补件时限天数（NULL = 不设时限；1..365；0 与负数一律拒绝，不设时限请留空）',
+  supplement_deadline_type VARCHAR(16)  NULL COMMENT 'Q7 补件时限口径：calendar 自然日 / working 工作日（给了天数但未给口径时按 working）',
+  on_supplement_timeout    VARCHAR(16)  NULL COMMENT 'Q7 补件超时处理：notify 仅提醒（默认，与 V0.4「超时仅催办」一致）/ auto_pass 自动通过 / auto_return 自动退回',
   created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_by        BIGINT UNSIGNED     NULL,
   updated_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   updated_by        BIGINT UNSIGNED     NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uk_flow_template (code, version),
-  KEY idx_flow_template_status (code, status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程模板（按版本累积，不覆盖历史）';
+  KEY idx_flow_template_status (code, status),
+  CONSTRAINT chk_flow_template_gates CHECK (
+    (max_return_count         IS NULL OR max_return_count         BETWEEN 0 AND 99)   AND
+    (max_supplement_count     IS NULL OR max_supplement_count     BETWEEN 0 AND 99)   AND
+    (supplement_deadline_days IS NULL OR supplement_deadline_days BETWEEN 1 AND 365)  AND
+    (supplement_deadline_type IS NULL OR supplement_deadline_type IN ('calendar','working')) AND
+    (on_supplement_timeout    IS NULL OR on_supplement_timeout    IN ('notify','auto_pass','auto_return'))
+  )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程模板（按版本累积，不覆盖历史；末 5 列为 Q6/Q7 模板级闸门配置，种子取 V0.4 默认值 5 / 3 / 3 / working / notify）';
 
 -- ============================================================
 -- 4.2 流程节点定义

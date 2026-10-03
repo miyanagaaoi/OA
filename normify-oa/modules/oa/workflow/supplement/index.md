@@ -11,9 +11,9 @@ description:
   en: >
       Supplement requests: the instance pauses in a pending-supplement sub-status, only attachments and a supplement note may be written, submission returns to the requesting node (not the start), supplements do not count as rejections, limits are once per node and three per document with a three-working-day deadline.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.811Z"
-fingerprint: 45de2030cdb84b6b065d6ae29d070a0561de3211039af1703055f01a49a9f2e4
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.714Z"
+fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 328

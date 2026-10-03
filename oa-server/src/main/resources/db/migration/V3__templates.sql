@@ -1,7 +1,7 @@
 -- ============================================================================
 -- V3 流程模板与表单模板（4 模板 × 7 节点 + 4 份 form_schema_json，幂等）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T09:31:03.026Z
+-- 生成时间: 2026-10-03T01:50:35.307Z
 -- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）
 -- 来源: oa-deploy/sql/03-templates.sql ← doc/templates.md / doc/forms.md
 -- 可重复执行（ON DUPLICATE KEY UPDATE）。
@@ -17,7 +17,9 @@
 -- 1.1 事项审批单（code = matter，form_type = matter）· 9 个字段
 --     依据：templates.md §2.4（最小可用完整示例）、forms.md §2
 -- ---------------------------------------------------------------------------
-INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at)
+INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at,
+                           max_return_count, max_supplement_count, supplement_deadline_days,
+                           supplement_deadline_type, on_supplement_timeout)
 VALUES (
   'matter', '事项审批单流程', 'matter', 1, 'published', 7,
   '{
@@ -42,19 +44,26 @@ VALUES (
     {"code": "attachments", "label": "附件", "printLabel": "附送材料", "printVisible": true, "type": "files", "required": false, "rules": [{"type": "filePolicy", "maxSizeMb": 50, "maxCount": 20, "allowExt": ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "jpg", "jpeg", "png", "heic", "wps", "zip", "rar", "7z"], "denyExt": ["exe", "bat", "cmd", "js", "vbs", "ps1", "dll", "msi", "scr"], "message": "附件仅支持 pdf/doc/docx/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/wps/zip/rar/7z，单个文件不超过 50MB；heic 转 jpg 预览、wps 请下载查看"}], "maxLength": 0, "readonlyAfterSubmit": false}
   ]
 }',
-  '2026-07-09 10:00:00'
+  '2026-07-09 10:00:00',
+  5, 3, 3, 'working', 'notify'
 )
 ON DUPLICATE KEY UPDATE
   name = VALUES(name), form_type = VALUES(form_type), status = VALUES(status),
   node_count = VALUES(node_count), form_schema_json = VALUES(form_schema_json),
-  published_at = VALUES(published_at);
+  published_at = VALUES(published_at),
+  max_return_count = VALUES(max_return_count), max_supplement_count = VALUES(max_supplement_count),
+  supplement_deadline_days = VALUES(supplement_deadline_days),
+  supplement_deadline_type = VALUES(supplement_deadline_type),
+  on_supplement_timeout = VALUES(on_supplement_timeout);
 
 -- ---------------------------------------------------------------------------
 -- 1.2 资金审批单（code = fund，form_type = fund）· 12 个字段
 --     依据：forms.md §3；plan_category / payment_belong 为布尔 checkbox（非字典项，
 --     选项写在字段项 options 中，见 dict-seed.md §6–§7；一期只存不用）
 -- ---------------------------------------------------------------------------
-INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at)
+INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at,
+                           max_return_count, max_supplement_count, supplement_deadline_days,
+                           supplement_deadline_type, on_supplement_timeout)
 VALUES (
   'fund', '资金审批单流程', 'fund', 1, 'published', 7,
   '{
@@ -82,19 +91,26 @@ VALUES (
     {"code": "attachments", "label": "附件", "printLabel": "附送材料", "printVisible": true, "type": "files", "required": true, "rules": [{"type": "filePolicy", "maxSizeMb": 50, "maxCount": 20, "allowExt": ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "jpg", "jpeg", "png", "heic", "wps", "zip", "rar", "7z"], "denyExt": ["exe", "bat", "cmd", "js", "vbs", "ps1", "dll", "msi", "scr"], "message": "附件仅支持 pdf/doc/docx/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/wps/zip/rar/7z，单个文件不超过 50MB；heic 转 jpg 预览、wps 请下载查看"}], "maxLength": 0, "readonlyAfterSubmit": false}
   ]
 }',
-  '2026-07-09 10:00:00'
+  '2026-07-09 10:00:00',
+  5, 3, 3, 'working', 'notify'
 )
 ON DUPLICATE KEY UPDATE
   name = VALUES(name), form_type = VALUES(form_type), status = VALUES(status),
   node_count = VALUES(node_count), form_schema_json = VALUES(form_schema_json),
-  published_at = VALUES(published_at);
+  published_at = VALUES(published_at),
+  max_return_count = VALUES(max_return_count), max_supplement_count = VALUES(max_supplement_count),
+  supplement_deadline_days = VALUES(supplement_deadline_days),
+  supplement_deadline_type = VALUES(supplement_deadline_type),
+  on_supplement_timeout = VALUES(on_supplement_timeout);
 
 -- ---------------------------------------------------------------------------
 -- 1.3 合同审批单（code = contract，form_type = contract）· 14 个字段
 --     依据：forms.md §4；other_review_depts 的字典类型为 review_dept_other
 --     （字段 code 与字典类型是两个命名空间，见 dict-seed.md §0.5）
 -- ---------------------------------------------------------------------------
-INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at)
+INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at,
+                           max_return_count, max_supplement_count, supplement_deadline_days,
+                           supplement_deadline_type, on_supplement_timeout)
 VALUES (
   'contract', '合同审批单流程', 'contract', 1, 'published', 7,
   '{
@@ -125,19 +141,26 @@ VALUES (
     {"code": "counterparty_docs", "label": "对方资质附件", "printLabel": "对方资质材料", "printVisible": true, "type": "files", "required": false, "rules": [{"type": "filePolicy", "maxSizeMb": 50, "maxCount": 20, "allowExt": ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "jpg", "jpeg", "png", "heic", "wps", "zip", "rar", "7z"], "denyExt": ["exe", "bat", "cmd", "js", "vbs", "ps1", "dll", "msi", "scr"], "message": "附件仅支持 pdf/doc/docx/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/wps/zip/rar/7z，单个文件不超过 50MB；heic 转 jpg 预览、wps 请下载查看"}], "maxLength": 0, "readonlyAfterSubmit": false}
   ]
 }',
-  '2026-07-09 10:00:00'
+  '2026-07-09 10:00:00',
+  5, 3, 3, 'working', 'notify'
 )
 ON DUPLICATE KEY UPDATE
   name = VALUES(name), form_type = VALUES(form_type), status = VALUES(status),
   node_count = VALUES(node_count), form_schema_json = VALUES(form_schema_json),
-  published_at = VALUES(published_at);
+  published_at = VALUES(published_at),
+  max_return_count = VALUES(max_return_count), max_supplement_count = VALUES(max_supplement_count),
+  supplement_deadline_days = VALUES(supplement_deadline_days),
+  supplement_deadline_type = VALUES(supplement_deadline_type),
+  on_supplement_timeout = VALUES(on_supplement_timeout);
 
 -- ---------------------------------------------------------------------------
 -- 1.4 印鉴证照审批单（code = seal，form_type = seal）· 12 个字段
 --     依据：forms.md §5；return_status / return_date 是三态读写模型的唯一例外
 --     （审批中仅发起人与节点⑦可改）→ readonlyAfterSubmit = false
 -- ---------------------------------------------------------------------------
-INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at)
+INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json, published_at,
+                           max_return_count, max_supplement_count, supplement_deadline_days,
+                           supplement_deadline_type, on_supplement_timeout)
 VALUES (
   'seal', '印鉴证照审批单流程', 'seal', 1, 'published', 7,
   '{
@@ -166,12 +189,17 @@ VALUES (
     {"code": "attachments", "label": "附件", "printLabel": "附送材料", "printVisible": true, "type": "files", "required": false, "rules": [{"type": "filePolicy", "maxSizeMb": 50, "maxCount": 20, "allowExt": ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "jpg", "jpeg", "png", "heic", "wps", "zip", "rar", "7z"], "denyExt": ["exe", "bat", "cmd", "js", "vbs", "ps1", "dll", "msi", "scr"], "message": "附件仅支持 pdf/doc/docx/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/wps/zip/rar/7z，单个文件不超过 50MB；heic 转 jpg 预览、wps 请下载查看"}], "maxLength": 0, "readonlyAfterSubmit": false}
   ]
 }',
-  '2026-07-09 10:00:00'
+  '2026-07-09 10:00:00',
+  5, 3, 3, 'working', 'notify'
 )
 ON DUPLICATE KEY UPDATE
   name = VALUES(name), form_type = VALUES(form_type), status = VALUES(status),
   node_count = VALUES(node_count), form_schema_json = VALUES(form_schema_json),
-  published_at = VALUES(published_at);
+  published_at = VALUES(published_at),
+  max_return_count = VALUES(max_return_count), max_supplement_count = VALUES(max_supplement_count),
+  supplement_deadline_days = VALUES(supplement_deadline_days),
+  supplement_deadline_type = VALUES(supplement_deadline_type),
+  on_supplement_timeout = VALUES(on_supplement_timeout);
 
 -- =============================================================================
 -- 2. 流程节点（flow_node）：4 个模板 × 7 节点 = 28 行
@@ -192,7 +220,7 @@ VALUES
 ((SELECT id FROM flow_template WHERE code='matter' AND version=1), 4, 'subsidiary_gm', '子公司总经理', 'approve', 'subsidiary_gm', NULL, 'any', NULL, 'optional', 24, 0, 1, 0, 0, NULL),
 ((SELECT id FROM flow_template WHERE code='matter' AND version=1), 5, 'group_leader', '集团分管领导', 'approve', 'group_leader', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
 ((SELECT id FROM flow_template WHERE code='matter' AND version=1), 6, 'chairman', '集团董事长', 'approve', 'chairman', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
-((SELECT id FROM flow_template WHERE code='matter' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"finance_clerk"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
+((SELECT id FROM flow_template WHERE code='matter' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"admin"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
 ON DUPLICATE KEY UPDATE
   node_code = VALUES(node_code), name = VALUES(name), node_type = VALUES(node_type),
   approver_rule = VALUES(approver_rule), approver_param = VALUES(approver_param),
@@ -213,7 +241,7 @@ VALUES
 ((SELECT id FROM flow_template WHERE code='fund' AND version=1), 4, 'subsidiary_gm', '子公司总经理', 'approve', 'subsidiary_gm', NULL, 'any', NULL, 'optional', 24, 0, 1, 0, 0, NULL),
 ((SELECT id FROM flow_template WHERE code='fund' AND version=1), 5, 'group_leader', '集团分管领导', 'approve', 'group_leader', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
 ((SELECT id FROM flow_template WHERE code='fund' AND version=1), 6, 'chairman', '集团董事长', 'approve', 'chairman', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
-((SELECT id FROM flow_template WHERE code='fund' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"finance_clerk"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
+((SELECT id FROM flow_template WHERE code='fund' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"admin"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
 ON DUPLICATE KEY UPDATE
   node_code = VALUES(node_code), name = VALUES(name), node_type = VALUES(node_type),
   approver_rule = VALUES(approver_rule), approver_param = VALUES(approver_param),
@@ -234,7 +262,7 @@ VALUES
 ((SELECT id FROM flow_template WHERE code='contract' AND version=1), 4, 'subsidiary_gm', '子公司总经理', 'approve', 'subsidiary_gm', NULL, 'any', NULL, 'optional', 24, 0, 1, 0, 0, NULL),
 ((SELECT id FROM flow_template WHERE code='contract' AND version=1), 5, 'group_leader', '集团分管领导', 'approve', 'group_leader', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
 ((SELECT id FROM flow_template WHERE code='contract' AND version=1), 6, 'chairman', '集团董事长', 'approve', 'chairman', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
-((SELECT id FROM flow_template WHERE code='contract' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"finance_clerk"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
+((SELECT id FROM flow_template WHERE code='contract' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"admin"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
 ON DUPLICATE KEY UPDATE
   node_code = VALUES(node_code), name = VALUES(name), node_type = VALUES(node_type),
   approver_rule = VALUES(approver_rule), approver_param = VALUES(approver_param),
@@ -256,7 +284,7 @@ VALUES
 ((SELECT id FROM flow_template WHERE code='seal' AND version=1), 4, 'subsidiary_gm', '子公司总经理', 'approve', 'subsidiary_gm', NULL, 'any', NULL, 'optional', 24, 0, 1, 0, 0, NULL),
 ((SELECT id FROM flow_template WHERE code='seal' AND version=1), 5, 'group_leader', '集团分管领导', 'approve', 'group_leader', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
 ((SELECT id FROM flow_template WHERE code='seal' AND version=1), 6, 'chairman', '集团董事长', 'approve', 'chairman', NULL, 'any', NULL, 'required', 24, 0, 1, 0, 1, NULL),
-((SELECT id FROM flow_template WHERE code='seal' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"finance_clerk"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
+((SELECT id FROM flow_template WHERE code='seal' AND version=1), 7, 'archive_register', '归档登记', 'archive', 'designated', '{"role_code":"admin"}', NULL, NULL, 'none', 24, 0, 0, 0, 0, NULL)
 ON DUPLICATE KEY UPDATE
   node_code = VALUES(node_code), name = VALUES(name), node_type = VALUES(node_type),
   approver_rule = VALUES(approver_rule), approver_param = VALUES(approver_param),
@@ -269,9 +297,13 @@ ON DUPLICATE KEY UPDATE
 -- =============================================================================
 -- 3. 执行后自检 SQL（只读，不修改数据）
 -- =============================================================================
--- 3.1 模板：应返回 4 行，node_count 全为 7，schema_valid 全为 1
+-- 3.1 模板：应返回 4 行，node_count 全为 7，schema_valid 全为 1；
+--     末 5 列为 Q6/Q7 模板级闸门配置（种子取 V0.4 默认值 5 / 3 / 3 / working / notify，
+--     与 templates.md §1.6 的 template 对象逐键一致）
 SELECT code, version, status, node_count, JSON_VALID(form_schema_json) AS schema_valid,
        JSON_UNQUOTE(JSON_EXTRACT(form_schema_json, '$.schema_version')) AS schema_version,
+       max_return_count, max_supplement_count, supplement_deadline_days,
+       supplement_deadline_type, on_supplement_timeout,
        published_at
 FROM flow_template
 ORDER BY code;

@@ -11,9 +11,9 @@ description:
   en: >
       Three stages of archive migration: batch planning, whole-document execution and result verification, so a document moves together with its trail and signatures.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.651Z"
-fingerprint: 7241121ccd161ffddfd3e9166a1a5bc6bd672932d1333daa0959b62334d40745
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.539Z"
+fingerprint: 1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75
 source:
   - path: "doc/data-model.md"
     line: 822

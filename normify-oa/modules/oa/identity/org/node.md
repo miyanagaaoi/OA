@@ -10,9 +10,9 @@ description:
   en: >
       Maintains the four-level org nodes (group/company/department/section): name, type, parent, sort and soft delete; path and depth are written here and underpin user affiliation, leader binding and data scope.
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.729Z"
-fingerprint: 45de2030cdb84b6b065d6ae29d070a0561de3211039af1703055f01a49a9f2e4
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.600Z"
+fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
     line: 34

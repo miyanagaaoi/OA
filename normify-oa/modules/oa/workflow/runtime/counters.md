@@ -11,9 +11,9 @@ description:
   en: >
       Atomic maintenance and gates for the three runtime counters: routing_count (routing+return, cap 5), supplement_count (cap 3) and returned_count (cap 2 per node); once a limit is reached the operation is refused with a hint to use reject or terminate and the refusal is written to the audit log (REQ-FLOW-021/022/023/024, AC-23).
       
-revision: d5b96030fa491b789a78f1772859bcc23cb95a78
-updated_at: "2026-10-03T01:41:29.807Z"
-fingerprint: 45de2030cdb84b6b065d6ae29d070a0561de3211039af1703055f01a49a9f2e4
+revision: 112ab0a1d46779714029044fc8e0b46627804f30
+updated_at: "2026-10-03T01:51:21.709Z"
+fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 335

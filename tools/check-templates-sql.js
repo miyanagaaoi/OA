@@ -344,6 +344,29 @@ function main() {
       err('TEMPLATE_PUBLISHED_AT', `${code}.published_at 不得为空`, ctx);
     }
 
+    // Q6 / Q7 模板级闸门配置（templates.md §1.7 的 5 个键；列定义见 data-model.md §4.1）
+    // 种子必须写 V0.4 定稿默认值 —— 默认行为不变，且不允许再靠手写迁移补默认值。
+    const GATE_DEFAULTS = [
+      ['max_return_count', 5],
+      ['max_supplement_count', 3],
+      ['supplement_deadline_days', 3],
+      ['supplement_deadline_type', 'working'],
+      ['on_supplement_timeout', 'notify'],
+    ];
+    for (const [key, want] of GATE_DEFAULTS) {
+      const token = row[key];
+      if (!token) {
+        err('TEMPLATE_GATE_MISSING',
+          `${code}: flow_template 种子缺少闸门配置列 ${key}（templates.md §1.7 / data-model.md §4.1）`, ctx);
+        continue;
+      }
+      const got = token.kind === 'string' || token.kind === 'number' ? token.value : token.raw;
+      if (got !== want) {
+        err('TEMPLATE_GATE_DEFAULT',
+          `${code}.${key} 应为 V0.4 定稿默认值 ${JSON.stringify(want)}，实际 ${JSON.stringify(got)}`, ctx);
+      }
+    }
+
     const formType = row.form_type && row.form_type.kind === 'string' ? row.form_type.value : null;
     if (formType !== code) err('TEMPLATE_FORM_TYPE', `${code}.form_type 应为 ${code}，实际 ${formType}`, ctx);
 
@@ -529,8 +552,10 @@ function main() {
         if (row.pass_threshold.kind !== 'null') {
           err('NODE_ARCHIVE_THRESHOLD', `${code} seq=7: pass_threshold 必须为 NULL，实际 ${row.pass_threshold.raw}`, ctx);
         }
-        if (!/finance_clerk/.test(row.approver_param.raw || '')) {
-          err('NODE_ARCHIVE_PARAM', `${code} seq=7: approver_param 应包含 {"role_code":"finance_clerk"}`, ctx);
+        if (!/"role_code"\s*:\s*"admin"/.test(row.approver_param.raw || '')) {
+          err('NODE_ARCHIVE_PARAM',
+            `${code} seq=7: approver_param 应为 {"role_code":"admin"}（一期由系统管理员承担归档登记；`
+            + 'sys_role 恰为 REQ-ADMIN-003 的 9 个内置角色，无 finance_clerk / 档案管理员，见 templates.md §1.1）', ctx);
         }
       } else {
         const dm = row.decision_mode.kind === 'string' ? row.decision_mode.value : null;

@@ -15,7 +15,8 @@ import java.util.Optional;
  * <h2>口径约定（对全部实现生效）</h2>
  * <ul>
  *   <li><b>正职 vs 副职</b>：{@link #primaryLeaders(Long)} 只返回
- *       {@code leader_type='primary' AND category IS NULL}（import-spec §4.4「审批人解析取正职」）；
+ *       {@code leader_type='primary' AND category IS NULL}（import-spec §4.4：部门/科室层审批人解析取正职；
+ *       公司层则「总经理=正职、分公司分管领导=副职」）；
  *       {@link #deputyLeaders(Long)} 只返回 {@code leader_type='deputy'}（③分公司分管领导的解析源）；</li>
  *   <li><b>业务线分管领导</b>：{@link #categoryLeaders(Long, String)} 的 {@code category} 非空，
  *       且按 import-spec E-LEAD-008 只可能绑在集团层节点上；</li>
