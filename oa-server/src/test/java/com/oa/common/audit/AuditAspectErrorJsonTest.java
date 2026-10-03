@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
@@ -196,5 +197,105 @@ class AuditAspectErrorJsonTest {
         String afterJson = captor.getValue().afterJson();
         assertStrictJson(afterJson);
         assertThat(afterJson).contains("\"truncated\":true").hasSizeLessThan(4200);
+    }
+
+    /**
+     * 超长返回体的 {@code preview} <b>不得在代理对中间截断</b>。
+     *
+     * <h2>回归背景</h2>
+     * <p>旧实现直接 {@code json.substring(0, 4000 - 80)}：截断点若落在某个**增补平面字符**
+     * （emoji / 生僻字，UTF-16 占两个 {@code char}）的高位与低位之间，预览就以**孤立高代理**结尾 ——
+     * JDBC 把该字符编码成 {@code ?}（字符被换掉），且 {@code preview} 不再是原文的逐字符前缀。
+     * 属低风险但非零：任何把 emoji 放进返回体的接口都可能命中。
+     *
+     * <h2>为什么这样写</h2>
+     * <p>不把「3920」这类内部常量抄进测试：先用**纯 ASCII 探针**量出实际截断点，再据此把 emoji 的
+     * 高代理**精确摆到该位置**，并先断言「朴素截断确实会切断代理对」—— 否则用例可能空跑而不自知。
+     */
+    @Test
+    @DisplayName("超长返回体：preview 避开代理对（emoji / 增补平面字符不留孤立代理），且仍是合法 JSON")
+    void oversizedPreviewNeverSplitsSurrogatePair() throws Throwable {
+        // ① 纯 ASCII 探针：量出内部截断点（ASCII 输入下 preview 长度 == 截断点，不会触发回退）
+        String asciiJson = afterJsonOf(Map.of("blob", "a".repeat(9000)));
+        assertStrictJson(asciiJson);
+        int boundary = previewText(asciiJson).length();
+        assertThat(boundary).as("超长返回体必须退化为 truncated 包装").isPositive().isLessThan(4000);
+
+        // ② 序列化后的形状是 {"blob":"…"}：量出 payload 在 JSON 里的起点，才能把高代理摆到 boundary-1
+        int prefix = new ObjectMapper().writeValueAsString(Map.of("blob", "a")).indexOf('a');
+        assertThat(prefix).isPositive();
+
+        String emoji = "😀";                       // U+1F600 —— UTF-16 是 D83D DE00（一对代理）
+        String payload = "a".repeat(boundary - prefix - 1) + emoji + "b".repeat(200);
+        String naiveJson = new ObjectMapper().writeValueAsString(Map.of("blob", payload));
+        assertThat(Character.isHighSurrogate(naiveJson.charAt(boundary - 1)))
+                .as("测试前提：朴素截断点必须落在 emoji 的高代理之后，否则本用例覆盖不到缺陷")
+                .isTrue();
+
+        // ③ 真实路径：末位是高代理 ⇒ 回退一位（宁可少一个字符，也不写出孤立代理）
+        String afterJson = afterJsonOf(Map.of("blob", payload));
+        assertStrictJson(afterJson);
+        String preview = previewText(afterJson);
+        assertThat(preview)
+                .as("回退一位后 preview 恰好比朴素截断点少一个字符")
+                .hasSize(boundary - 1);
+        assertThat(preview).as("emoji 整体不应出现在预览里（高低位不得被拆开）").doesNotContain(emoji);
+        assertThat(preview.charAt(preview.length() - 1)).isEqualTo('a');
+        assertThat(hasUnpairedSurrogate(preview)).as("preview 不得以孤立代理字符结尾").isFalse();
+
+        // ④ 混合样本（多组 emoji + U+1D11E 音乐符号）：任何位置都不得留下孤立代理
+        String mixed = "x".repeat(boundary - prefix - 40) + emoji.repeat(20) + "𝄞".repeat(20) + "y".repeat(500);
+        String rawMixed = new ObjectMapper().writeValueAsString(Map.of("blob", mixed));
+        String mixedJson = afterJsonOf(Map.of("blob", mixed));
+        assertStrictJson(mixedJson);
+        String mixedPreview = previewText(mixedJson);
+        assertThat(hasUnpairedSurrogate(mixedPreview)).as("混合增补平面字符样本同样不得留下孤立代理").isFalse();
+        // 预览是**转义后的** JSON 前缀：去掉包装引号的转义后，必须逐字符等于原文前缀
+        String unescaped = mixedPreview.replace("\\\"", "\"");
+        assertThat(unescaped).isEqualTo(rawMixed.substring(0, unescaped.length()));
+    }
+
+    // ================================================================ 代理对相关工具
+
+    /** 跑一次正常路径（{@code ok}）的审计写入，取回 {@code after_json}。 */
+    private static String afterJsonOf(Object result) throws Throwable {
+        AuditLogWriter writer = mock(AuditLogWriter.class);
+        AuditAspect aspect = aspect(writer);
+
+        MethodSignature signature = mock(MethodSignature.class);
+        when(signature.getParameterNames()).thenReturn(new String[]{"id"});
+        ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
+        when(joinPoint.getSignature()).thenReturn(signature);
+        when(joinPoint.getArgs()).thenReturn(new Object[]{7L});
+        when(joinPoint.proceed()).thenReturn(result);
+
+        aspect.around(joinPoint, auditedOf("ok"));
+
+        ArgumentCaptor<AuditLogWriter.AuditRecord> captor = ArgumentCaptor.forClass(AuditLogWriter.AuditRecord.class);
+        verify(writer).append(captor.capture());
+        return captor.getValue().afterJson();
+    }
+
+    /** 取出 {@code {"truncated":true,…,"preview":"…"}} 里的 preview 文本。 */
+    private static String previewText(String afterJson) throws Exception {
+        JsonNode node = new ObjectMapper().readTree(afterJson).path("preview");
+        assertThat(node.isTextual()).as("超长返回体必须带 preview 字符串").isTrue();
+        return node.asText();
+    }
+
+    /** 是否存在**孤立代理**（高代理后不跟低代理，或出现无高位配对的低代理）。 */
+    private static boolean hasUnpairedSurrogate(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            char ch = value.charAt(i);
+            if (Character.isHighSurrogate(ch)) {
+                if (i + 1 >= value.length() || !Character.isLowSurrogate(value.charAt(i + 1))) {
+                    return true;
+                }
+                i++;                       // 合法的代理对：整对跳过
+            } else if (Character.isLowSurrogate(ch)) {
+                return true;               // 低代理前面没有高位
+            }
+        }
+        return false;
     }
 }

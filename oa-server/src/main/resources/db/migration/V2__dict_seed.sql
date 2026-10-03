@@ -4,7 +4,7 @@
 -- 生成器: tools/build-flyway-migrations.js sha256=1d187b7628f8
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
 -- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
--- 来源: oa-deploy/sql/02-dict-seed.sql ← doc/dict-seed.md sha256=330ec818ea46
+-- 来源: oa-deploy/sql/02-dict-seed.sql ← doc/dict-seed.md sha256=01d7dc9de964
 -- 可重复执行（ON DUPLICATE KEY UPDATE）。
 -- ============================================================================
 

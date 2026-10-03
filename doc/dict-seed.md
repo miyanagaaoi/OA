@@ -367,7 +367,7 @@ ON DUPLICATE KEY UPDATE item_name = VALUES(item_name), item_name_en = VALUES(ite
 | 实例状态 / 子状态 / 节点实例状态 / 任务状态 | **枚举** | 代码常量 + `CHECK` | 否 | `enums.md` §4–§6 |
 | 流转动作 `route / rollback / back_home` | **枚举** | 代码常量 + `CHECK` | 否 | `enums.md` §7 |
 | 消息类型（8 个） | **枚举** | 代码常量 | 否 | `enums.md` §8 |
-| 审批轨迹动作（13 + 3 个） | **枚举** | 代码常量 | 否 | `enums.md` §9 |
+| 审批轨迹动作（13 + 4 个） | **枚举** | 代码常量 | 否 | `enums.md` §9 |
 | 单据类型 `matter / fund / contract / seal` | **枚举** | 代码常量 | 否 | `enums.md` §10.2 |
 | 字段类型（14 种） | **枚举** | 代码常量 | 否 | `enums.md` §11 |
 | 日志类别（5 类） | **枚举** | 代码常量 | 否 | `enums.md` §13 |

@@ -214,12 +214,22 @@ public class AuditAspect {
      * <p>现在的口径：长度在阈值内原样返回；超长时返回
      * {@code {"truncated":true,"length":N,"preview":"…"}} —— 预览字符串本身按**字符**截断并做 JSON 转义，
      * 因此永远都是合法 JSON。
+     *
+     * <p><b>代理对安全</b>：截断点若落在**代理对中间**（末位是高代理 {@code U+D800–U+DBFF}、低位在原文里），
+     * 预览就会以**孤立代理字符**结尾 —— JDBC 编码成 {@code ?}（字符被换掉），且 {@code preview} 与原文
+     * 前缀不再逐字符相同。故末位是高代理时**回退一位**（见
+     * {@code AuditAspectErrorJsonTest#oversizedPreviewNeverSplitsSurrogatePair}）。
      */
     private String truncateJson(String json, int max) {
         if (json == null || json.length() <= max) {
             return json;
         }
-        String preview = escapeForJsonString(json.substring(0, Math.max(max - 80, 0)));
+        int end = Math.max(max - 80, 0);
+        if (end > 0 && Character.isHighSurrogate(json.charAt(end - 1))) {
+            // 高位在预览内、低位被切掉 → 写出的是孤立代理字符：回退一位，宁可少一个字符
+            end--;
+        }
+        String preview = escapeForJsonString(json.substring(0, end));
         return "{\"truncated\":true,\"length\":" + json.length() + ",\"preview\":\"" + preview + "\"}";
     }
 

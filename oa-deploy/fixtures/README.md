@@ -16,7 +16,7 @@
 | 1 | [`10-dev-orgs.sql`](10-dev-orgs.sql) | 四级演示组织（集团 → 2 家公司 → 部门 → 科室）+ 集团财务部 + 被弄丢的 `RT-*` 样例组织 |
 | 2 | [`20-dev-people.sql`](20-dev-people.sql) | 演示人员（各角色样本）+ 一人多岗 + **负责人链**（四类单据 precheck 跑到 `allowed=true` 的必要条件） |
 | 3 | [`30-dev-roles.sql`](30-dev-roles.sql) | 演示账号 → 9 个内置角色（覆盖矩阵测试需要的 `company_admin` / `dept_leader` / `group_leader` / `employee`） |
-| 4 | [`40-authz-matrix.sql`](40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链 + **`sys_user.id=1` 的系统管理员占位行**） |
+| 4 | [`40-authz-matrix.sql`](40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链 + **`sys_user.id=1` 的系统管理员占位行**（**不持任何角色**，见 §3）） |
 | 5 | [`50-trigger-fixture.sql`](50-trigger-fixture.sql) | AC-20 不可篡改触发器验收夹具（`sys_log` / `flow_signature` 的 id=1 行） |
 | 6 | [`99-verify.sql`](99-verify.sql) | **只读**断言：关键行数逐条 PASS/FAIL |
 | — | [`90-dev-admin.md`](90-dev-admin.md) | **不是 SQL**：如何生成 BCrypt 哈希并插入 `admin`（口令由使用者自定，**仓库里不出现任何可用口令**） |
@@ -54,7 +54,7 @@ foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-auth
 | `10-dev-orgs.sql` | 显式主键 + `INSERT ... ON DUPLICATE KEY UPDATE` | `sys_org.PRIMARY KEY (id)`、`uk_sys_org_path (path)` |
 | `20-dev-people.sql` | 同上 + `INSERT ... ON DUPLICATE KEY UPDATE`（**刻意不更新 `password_hash`**）；子行按 `account` 反查 `user_id`；负责人链为**直接 upsert** | `sys_user.PRIMARY KEY (id)`、`uk_sys_user_account (account)`；`sys_user_position.uk_user_org (user_id, org_id)`；`sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category_key)`（`category_key` 是 `IFNULL(category,'')` 的**生成列**，NULL 与 NULL 视为同一组 → 可安全 upsert） |
 | `30-dev-roles.sql` | `INSERT ... SELECT ... WHERE r.code = ?` + `ON DUPLICATE KEY UPDATE` | `sys_user_role.uk_sys_user_role (user_id, role_id, scope_org_key)`（`scope_org_id` 为 NULL 时按 0 参与） |
-| `40-authz-matrix.sql` | 与 `10`/`20`/`30` 相同的显式主键 + `ON DUPLICATE KEY UPDATE`；`matrix_admin`（`sys_user.id=1`）用 `INSERT ... SELECT ... WHERE NOT EXISTS` **只补空缺** | 同上 + `sys_user.PRIMARY KEY (id)` |
+| `40-authz-matrix.sql` | 与 `10`/`20`/`30` 相同的显式主键 + `ON DUPLICATE KEY UPDATE`；`matrix_admin`（`sys_user.id=1`）用 `INSERT ... SELECT ... WHERE NOT EXISTS` **只补空缺**；角色授予**只走 `account='admin'`**（**只 INSERT/UPDATE、从不 DELETE** ⇒ 收敛不撤销老库里 id=1 已获得的角色） | 同上 + `sys_user.PRIMARY KEY (id)` |
 | `50-trigger-fixture.sql` | `INSERT ... SELECT ... WHERE NOT EXISTS (...)` | `sys_log.id`、`form_data.uk_form_data_biz_no`、`flow_instance.uk_flow_instance_biz_no`、`flow_signature.id` |
 
 **保留 id 段**（本目录约定，其它种子/脚本请避开）：
@@ -80,6 +80,25 @@ foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-auth
 > 重置库后夹具不再提供该行 → 这两个用例立刻变红。故由 `40-authz-matrix.sql` 用
 > `matrix_admin`（占位哈希、不可登录）**确定性地占住 id=1**；若 id=1 已被占用（例如你手工建的
 > 真实 admin 就在 id=1），该语句整条跳过，绝不覆盖既有行的账号与口令。
+>
+> ⚠️ **占位行不持任何角色（2026-10-04 收敛）**：上面那条硬依赖只要求 id=1 **这一行存在**——
+> 两个集成测试的**数据域与角色上下文都在进程内合成**（各自私有的 `authenticate(...)` 直接构造
+> `CurrentUser` + `DataScopeContext`），**从不回读 `sys_user_role`**，因此该行有没有角色都不影响任何断言。
+> 相反，让它持有 `admin` 角色有害：节点⑦（`archive_register`，`approver_param = {"role_code":"admin"}`，
+> 定义见 `oa-deploy/sql/03-templates.sql`）是**按角色解析候选人**的 —— 占位行有角色时 ⑦ 会解析出
+> `[1(matrix_admin), <真实 admin>]`，待办落在**不可登录**的 id=1 上，演示/验收必须先以系统管理员
+> 「改派」才能继续，属夹具自造的人工障碍。故本文件的 admin 角色授予已收敛为**只匹配 `account = 'admin'`**
+> （真实可登录管理员，由 [`90-dev-admin.md`](90-dev-admin.md) 创建）；收敛后 ⑦ 只解析到该账号。
+> 自检（期望恰好一行，且 `account = 'admin'`）：
+>
+> ```sql
+> SELECT ur.user_id, u.account FROM sys_user_role ur
+>   JOIN sys_role r ON r.id = ur.role_id JOIN sys_user u ON u.id = ur.user_id
+>  WHERE r.code = 'admin';
+> ```
+>
+> 夹具只 INSERT/UPDATE、**从不 DELETE**，所以**老库需重置库**才会看到收敛效果（重置不会丢失任何东西：
+> 本目录就是「重置后恢复可演示」的真源）。
 >
 > ⚠️ **`sys_org_leader` 的归属约定**：`org_id ∈ {1, 12, 135, 138, 150}` 的负责人行由
 > `20-dev-people.sql` 独占（其它脚本/手工操作请挂到别的组织节点上）。

@@ -4,6 +4,8 @@
 --  用途：为 5 个内置角色各造 1 个可测用户与一条四级组织链，并**占住 sys_user.id=1**
 --        （两个 MySQL 集成测试把合成当前登录人写成 userId=1，要求该行真实存在），
 --        供 AuthzMatrixMySqlIntegrationTest / AuthzMatrixHttpIT 反复执行（幂等）。
+--        **占位行不持有任何角色**（2026-10-04 收敛，理由见文末「角色分配」）——
+--        否则节点⑦按 `role_code='admin'` 会把待办解析到不可登录的 id=1 上。
 --  执行：见 ./README.md「执行顺序」。
 --  说明：手机号为**明文**，用于验证 1.7 的「历史明文一次性迁移」；
 --        迁移后本文件重放会把它们写回明文（夹具可重复执行，不影响密文口径验证）。
@@ -91,14 +93,23 @@ INSERT INTO sys_user_role (user_id, role_id, scope_org_id, remark)
 SELECT 205, r.id, NULL, '矩阵夹具' FROM sys_role r WHERE r.code = 'employee'
 ON DUPLICATE KEY UPDATE remark = VALUES(remark);
 
--- 系统管理员也纳入矩阵：确保 GROUP_ALL 口径确实无过滤。
---   ① **id=1**（上一步的占位行，或历史环境里 id=1 的真实 admin —— 两者都覆盖）；
---   ② 按 account='admin' 命中的真实管理员（新环境里 admin 往往不是 id=1）。
-INSERT INTO sys_user_role (user_id, role_id, scope_org_id, remark)
-SELECT u.id, r.id, NULL, '矩阵夹具' FROM sys_user u JOIN sys_role r ON r.code = 'admin'
-WHERE u.id = 1
-ON DUPLICATE KEY UPDATE remark = VALUES(remark);
-
+-- 系统管理员也纳入矩阵：确保 GROUP_ALL 口径确实无过滤 —— **只授予可登录的真实管理员**
+-- （`account = 'admin'`，本机由 90-dev-admin.md 建）。
+--
+-- 占位行 `sys_user.id = 1`（`matrix_admin`，占位哈希、**不可登录**）**刻意不授予任何角色**
+-- （2026-10-04 收敛，此前有一条 `WHERE u.id = 1` 的 admin 授权）：
+--   · 它的存在理由是「两个 MySQL 集成测试把合成的当前登录人写成 userId = 1，要求该行真实存在」。
+--     那两个测试的**数据域与角色上下文都在进程内合成**（各自私有的 `authenticate(...)` 直接构造
+--     `CurrentUser` + `DataScopeContext`），**从不回读 `sys_user_role`** —— 因此该行**有没有角色
+--     都不影响任何断言**（见 AuthzMatrixMySqlIntegrationTest:167/314、DataScopeMySqlIntegrationTest:103）。
+--   · 而节点⑦（`archive_register`，`approver_param = {"role_code":"admin"}`）是**按角色解析候选人**的：
+--     占位行一旦持有 admin 角色，⑦ 就解析出 `[1(matrix_admin), <真实 admin>]`，待办落在**不可登录**的
+--     id=1 上 —— 演示与验收必须先以系统管理员「改派」才能继续。那是夹具自己制造的人工障碍。
+--     收敛后 ⑦ 只解析到真实可登录的 `account='admin'`。
+--   · 授权**只收敛到可登录账号**，与「占位行必须存在」这条硬依赖**互不冲突**：两件事由本文件分别满足。
+--
+-- 幂等提示：本夹具只 INSERT/UPDATE、**从不 DELETE**，因此这次收敛**不会撤销**任何既有环境里
+-- id=1 已经获得的角色（老库需要重置库才会看到收敛效果）。
 INSERT INTO sys_user_role (user_id, role_id, scope_org_id, remark)
 SELECT u.id, r.id, NULL, '矩阵夹具' FROM sys_user u JOIN sys_role r ON r.code = 'admin'
 WHERE u.account = 'admin'
