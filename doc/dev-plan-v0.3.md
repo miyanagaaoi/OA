@@ -1,7 +1,7 @@
 # 集团OA审批系统 · 开发步骤与排期（基线 V0.3）
 
 > 依据：[`prd-0.1.md`](prd-0.1.md) 第 11 章里程碑 + 第 3 章范围 + 第 9 章可配置项 + 附录 D 未决问题；
-> 规模基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（520 个计划态模块 / 865 条 API 契约 / 528 条依赖箭头，深度 6 段）。
+> 规模基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（527 个计划态模块 / 879 条 API 契约 / 539 条依赖箭头，深度 6 段）。
 > 口径：阶段周期沿用 PRD 第 11 章（4 + 8 + 4 + 4 + 3 = **23 周**）；本文件把它拆成可分配的工作包、决策闸门与验收门。
 
 ---
@@ -14,8 +14,8 @@
 | 团队假设 | 后端 2 人、前端 2 人、测试 1 人、产品/设计 1 人（部分投入）、运维 0.5 人；可按比例缩放 |
 | 技术栈 | **未定**（PRD 第 9 章明确技术选型不进 PRD）→ 阶段 0 必须先出技术方案 |
 | 既有系统 | 无 OA/ERP，无历史数据迁移，仅需初始化 300+ 人员的组织与账号 |
-| 结构基线 | 单树 `oa`，13 个一级领域：identity 30 / authz 23 / workflow 80 / form 101 / sign 24 / notify 21 / audit 19 / archive 15 / admin 65 / portal 39 / integration 27 / platform 26 / design 49（模块数） |
-| 规模感 | 520 模块 ÷ 23 周 ≈ **22 模块/周**（仅供估算，非产能承诺；实际以叶子 API 数与联调量为准） |
+| 结构基线 | 单树 `oa`，13 个一级领域：identity 34 / authz 24 / workflow 80 / form 102 / sign 24 / notify 21 / audit 19 / archive 15 / admin 66 / portal 39 / integration 27 / platform 26 / design 49（各领域子树模块数，合计 526 + 根模块 `oa` = 527） |
+| 规模感 | 527 模块 ÷ 23 周 ≈ **23 模块/周**（仅供估算，非产能承诺；实际以叶子 API 数与联调量为准） |
 
 **三条不可动摇的技术口径**（PRD 已定，属于设计约束而非实现选择）：
 
@@ -213,7 +213,7 @@
 
 ## 10. 每阶段完成的定义（DoD，统一口径）
 
-1. 对应模块的 API 契约与实现一致（结构基线已给出 865 条契约，落地后 `normify_module_refresh(activate)` 转 active）；
+1. 对应模块的 API 契约与实现一致（结构基线已给出 879 条契约，落地后 `normify_module_refresh(activate)` 转 active）；
 2. 单元/集成测试通过，阶段验收用例（AC 编号）全绿；
 3. 越权与边界用例随阶段执行（不是最后补测）；
 4. 文档同步：字段变更走 `forms.md` 版本、表变更走 `data-model.md`、规则变更同步 PRD 与设计规范；

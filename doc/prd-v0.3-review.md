@@ -66,7 +66,7 @@
 | `data-model.md` | **27 张表**；`submitted_note` 唯一；新增表/列齐全；表内无重复列 |
 | `test-cases.md` | 217 条用例（ID 唯一）；**AC 覆盖 61/61**；追溯表 61 行 |
 | `DESIGN.md` | `validate-design-md` **errors 0** |
-| 结构基线 | `normify_validate` **0 error** → build → render：520 模块 / 865 API / 142 层渲染数据 |
+| 结构基线 | `normify_validate` **0 error** → build → render：527 模块 / 879 API / 142 层渲染数据 |
 | 命名统一 | `plan_category`、`other_review_depts`（字典 `review_dept_other`）、`business`、`archive_register`、`pending_supplement`、`active`/`waiting_supplement`/`rolled_back`/`supplement_requested`/`auto_closed` 全项目一致 |
 
 **业务裁定执行**（2026-10-02）：合同类型不拆「购销」并以 PRD 8.2 合同系统集成为后续对齐口径；付款方式保留「银行转账」且不新增「委托付款」；保留「证照借用」、不新增「开户许可证」；节点⑦默认「仅登记不审批」；超时（②48h、其余 24h）/加签/自由跳转默认关闭按建议值；附件白名单放行 `wps` 与 `heic`；审计与轨迹保留期 ≥10 年。

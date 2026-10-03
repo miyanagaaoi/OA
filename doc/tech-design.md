@@ -3,7 +3,7 @@
 > 状态：**已评审确认**（2026-10-02 评审通过；对应排期阶段 0 的工作项 0.1）
 > 定稿结论：**Java 17/21 + Spring Boot 3.2 + MyBatis-Plus + MySQL 8.0 + Redis 7 + Vue 3/TS/Element Plus + Nginx + Docker Compose**；文件走本地私有存储 + 鉴权下载，不可篡改用 MySQL 触发器兜底，打印走服务端 HTML + 浏览器 A4，定时任务用应用内调度 + Redis 锁，报表用库内聚合。决策记录见第 12 节。
 > 依据：[`prd-0.1.md`](prd-0.1.md) V0.4（61 条验收）、[`data-model.md`](data-model.md)（27 张表）、[`forms.md`](forms.md)、[`enums.md`](enums.md)、[`templates.md`](templates.md)、[`dev-plan-v0.3.md`](dev-plan-v0.3.md)、[`../DESIGN.md`](../DESIGN.md)
-> 结构基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（520 模块 / 865 API 契约）
+> 结构基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（527 模块 / 879 API 契约）
 > 说明：PRD 第 9 章明确「技术选型不进 PRD」，因此**本文是选型的唯一出处**；第 12 节把需要拍板的项列成决策表。
 
 ---
@@ -281,7 +281,7 @@ OA/
 | 触发器实现不可篡改在 MySQL 上的性能 | 写入变慢 | 仅对日志类表加触发器；插入路径无额外索引；压测复核 |
 | 打印版式与实单偏差 | 验收不通过 | 设计稿与实单扫描件逐字段核对 + 打印目视用例；版式变更走 `print-mapping` 评审 |
 | 文件存储单点 | 附件损坏 | 本地卷 + 每日备份覆盖文件目录；`sha256` 校验；下载鉴权 |
-| 单人维护面过大（520 模块） | 交付慢 | 按 13 领域并行分包开发（结构基线已给出边界与 API 契约），每阶段 DoD 卡口 |
+| 单人维护面过大（527 模块） | 交付慢 | 按 13 领域并行分包开发（结构基线已给出边界与 API 契约），每阶段 DoD 卡口 |
 
 ---
 

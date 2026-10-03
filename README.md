@@ -39,9 +39,9 @@
 
 | 指标 | 数值 |
 | --- | --- |
-| 模块 | **520**（容器 142 / 叶子 378），最大深度 6 段 |
-| API 契约 | **865**（http 692 / file 75 / kafka 30 / mysql 26 / rpc 10 / redis 6） |
-| 依赖箭头 | **528**（单树跨分支，无悬空、无环） |
+| 模块 | **527**（容器 142 / 叶子 385），最大深度 6 段 |
+| API 契约 | **879**（http 698 / file 98 / kafka 30 / mysql 26 / rpc 21 / redis 6） |
+| 依赖箭头 | **539**（单树跨分支，无悬空、无环） |
 | 渲染数据 | **142** 层（每层含阅读顺序与导语） |
 | 生命周期 | 全部 `state: planned`（代码未落地），`revision` 指向 `0c43a9d` |
 
@@ -84,7 +84,7 @@ node tools/validate-design-md.js DESIGN.md
 ```
 ├── DESIGN.md / DESIGN.preview.html / DESIGN.print-a4.html   # 设计规范与预览稿
 ├── doc/                                                      # 需求、模型、字典、模板、用例、排期、技术方案
-├── normify-oa/                                               # 架构结构基线（520 模块 + 渲染数据 + 产物）
+├── normify-oa/                                               # 架构结构基线（527 模块 + 渲染数据 + 产物）
 ├── oa-server/                                                # 后端工程（Spring Boot 3.2 / Java 21，已含 Flyway 迁移）
 ├── oa-web/                                                   # 前端工程（Vue 3 + TS + Vite + Element Plus）
 ├── oa-deploy/                                                # 交付物：初始化 SQL、导入模板、Compose/Nginx、环境清单

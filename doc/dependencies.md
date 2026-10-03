@@ -141,7 +141,7 @@ CI 侧（`.github/workflows/docs-ci.yml`）用 `actions/setup-node@v4`（Node 20
 
 ## 6. DSH 插件依赖
 
-> 本项目的**结构基线**（`normify-oa/`，520 模块 / 865 API / 142 渲染层）与大量校验、子代理协作都依赖 DSH 及其插件。以下为实测版本。
+> 本项目的**结构基线**（`normify-oa/`，527 模块 / 879 API / 142 渲染层）与大量校验、子代理协作都依赖 DSH 及其插件。以下为实测版本。
 
 ### 6.1 DSH 运行时
 
@@ -174,7 +174,7 @@ CI 侧（`.github/workflows/docs-ci.yml`）用 `actions/setup-node@v4`（Node 20
 | 声明的 peerDependencies | `@deepseek-ai/cordis >=4.0.0-rc <5`（实测 4.0.4 ✅）；`@deepseek-ai/dsh-tools` 与 `@deepseek-ai/dsh-skill` 均 `>=0.1.5-rc.2 <0.2.0`（实测 0.2.0-rc.2 ⚠️ **高于声明上界**） |
 | 提供的工具 | 22 个 `normify_*` 工具：`project_init` / `module_{upsert,batch,patch,get,list,move,delete,promote,refresh}` / `validate` / `build` / `render` / `layout_{get,upsert,delete}` / `deps_find` / `fingerprint` / `search` / `sync` / `outline` / `policy_{get,upsert}` / `change_{open,update,close,list}` / `tree_list` / `help` |
 | 提供的技能 | `normify-gen`（分析仓库 → 生成/更新结构树） |
-| 本项目产出 | `normify-oa/`：520 模块 / 865 API 契约 / 528 依赖箭头 / 142 渲染层；`tree.json`、`outline.md`、`api-index.json`、`receipt.json`、`normify.html` |
+| 本项目产出 | `normify-oa/`：527 模块 / 879 API 契约 / 539 依赖箭头 / 142 渲染层；`tree.json`、`outline.md`、`api-index.json`、`receipt.json`、`normify.html` |
 
 > ⚠️ **依赖声明与实测环境不一致（已知项）**：插件声明 `dsh <0.2.0`，而本机为 **0.2.0-rc.2**。实际使用正常（本项目全部结构操作、校验、构建、渲染均成功），但升级 DSH 或插件前应先确认该区间，避免"版本在声明外"带来的隐性风险。这是当前唯一一处**声明范围与实际不匹配**的依赖。
 
