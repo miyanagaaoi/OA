@@ -11,8 +11,8 @@ description:
   en: >
       Create and maintain user profiles: unique account, salted password hash, encrypted phone, employee number for watermarks, owning org and company; supports password reset and employment-status changes.
       
-revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
-updated_at: "2026-10-03T02:20:07.540Z"
+revision: e3b34a3c59417096ade647fab4261b06f6b605e2
+updated_at: "2026-10-03T02:30:28.624Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"

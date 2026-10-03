@@ -11,8 +11,8 @@ description:
   en: >
       A 4px base unit with spacing tokens xxs 4px through section 64px, plus control sizes: control 32px for desktop, control-compact 28px inside tables, control-comfortable 40px for the flow designer and control-h5 44px as the H5 touch minimum; common combinations are 24px card padding, 8px between field rows and 12px horizontal table cell padding.
       
-revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
-updated_at: "2026-10-03T02:20:07.625Z"
+revision: e3b34a3c59417096ade647fab4261b06f6b605e2
+updated_at: "2026-10-03T02:30:28.687Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

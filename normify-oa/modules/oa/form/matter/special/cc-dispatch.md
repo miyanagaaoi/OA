@@ -11,8 +11,8 @@ description:
   en: >
       CC users (≤20, from the directory, de-duplicated) are persisted at submission and receive CC notices; they can view the document but get no todo and take no part in the decision.
       
-revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
-updated_at: "2026-10-03T02:20:07.637Z"
+revision: e3b34a3c59417096ade647fab4261b06f6b605e2
+updated_at: "2026-10-03T02:30:28.702Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

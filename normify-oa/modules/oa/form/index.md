@@ -11,8 +11,8 @@ description:
   en: >
       Four approval document types (matter/fund/contract/seal) on one form-template engine: field dictionary, three-state write model, shared validation, attachment limits, amount rules, dictionary options, and A4 print layout.
       
-revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
-updated_at: "2026-10-03T02:20:07.635Z"
+revision: e3b34a3c59417096ade647fab4261b06f6b605e2
+updated_at: "2026-10-03T02:30:28.699Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"

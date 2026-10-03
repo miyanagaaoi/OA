@@ -11,8 +11,8 @@ description:
   en: >
       Configuration changes (org, user, dictionary, flow template) produce before/after JSON snapshots when logged; writes without both snapshots are rejected so every change is reconstructable.
       
-revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
-updated_at: "2026-10-03T02:20:07.569Z"
+revision: e3b34a3c59417096ade647fab4261b06f6b605e2
+updated_at: "2026-10-03T02:30:28.652Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"

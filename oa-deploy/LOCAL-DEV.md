@@ -56,6 +56,13 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 
 期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=374`。
 
+> **生成产物是确定性的，可安全重跑**：`tools/gen-init-sql.js` 与 `tools/build-flyway-migrations.js` 的产物头部只有
+> 确定性溯源行（生成器自身 sha256 + 来源内容 sha256），**不含墙钟时间戳**，因此「同一输入 → 逐字节相同」，
+> 重跑生成器不会改变 `V1~V4` 的字节，也就不会引起 Flyway checksum 漂移。
+> 但**一旦产物内容真的变了**（改了文档 / 改了迁移），已建库上的 checksum 与历史不一致，
+> `validate-on-migrate: true` 下启动会报 `Migration checksum mismatch` —— 此时**需重置库**（重跑上面的 DROP/CREATE + 引导数据），
+> 或对可接受的本地库执行 `flyway repair` 重写历史 checksum。
+
 ## 5. 启动后自检清单（5 分钟）
 
 | # | 命令 / 操作 | 期望 |
@@ -87,4 +94,5 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 | 浏览器登录 `403 Invalid CORS request`，而 curl 正常 | dev 允许来源与 Vite 实际端口不一致（历史：允许 5173，实际 5273）。`application-dev.yml` 的 `oa.web.allowed-origins` 必须与 `oa-web/vite.config.ts` 的 `server.port` 对齐；Vite 代理同时把 `Origin` 改写为后端自身来源（与生产同源反代一致） |
 | 接口 500 且日志 `No value specified for parameter 1` | 数据域拦截器织入带参片段后**丢掉了原有参数映射**。现实现为「在原 BoundSql 上原位插入 `Mode.IN` 映射」，并有 `DataScopeParameterBindingTest` 等 11 条测试守着 |
 | 删除 Flyway 迁移后应用仍报 `1060 Duplicate column name` | Maven **不会清理** `oa-server/target/classes/db/migration/` 下的陈旧副本，而 `spring-boot:run` 用的正是 `target/classes` → **新旧迁移混跑**（被删的迁移会继续执行）。删迁移后必须 `mvn clean`，或手工删掉该目录下的副本 |
+| 重跑生成器后启动报 `Migration checksum mismatch` | 产物内容变了（文档/迁移/生成器改动）→ 已建库里的历史 checksum 失效。生成产物本身**确定性可安全重跑**（无时间戳）；内容真变时按 §4 重置库，或本地库执行 `flyway repair` |
 | 同父节点下重名组织被允许（仅日志提示，不阻断）→ 期望「重名被拒」是**误解** | **这是预期行为**：唯一性由 `sys_org.path`（id 路径 `/1/12/135/`）保证；业务键 `org_path`（名称路径）在同父同名时**只告警不阻断**（[`import-spec.md`](../doc/import-spec.md) §3.2、`OrgService#warnSiblingName`）。判重请看 `path`，不要看 `name` |

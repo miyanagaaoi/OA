@@ -1,9 +1,10 @@
 -- ============================================================================
 -- 不可篡改触发器（sys_log / flow_signature：拒绝 UPDATE 与 DELETE，AC-20）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T11:39:31.267Z
--- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）
--- 来源: oa-deploy/sql/01-schema.sql 的 DELIMITER 段
+-- 生成器: tools/build-flyway-migrations.js sha256=194ee2f2e8ab
+-- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
+-- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
+-- 来源: oa-deploy/sql/01-schema.sql 的 DELIMITER 段 sha256=a29755201381
 -- 本文件不是 Flyway 迁移：由 com.oa.platform.bootstrap.ImmutableTriggerInitializer 在启动时读取，
 -- 按「单独成行的双斜杠」切分为独立语句，逐条检查 information_schema.TRIGGERS 后 **幂等创建缺失项**。
 -- 注意：本文件的注释里**不要出现字面量的双斜杠**（历史上曾因此误切、吞掉一条 CREATE TRIGGER，

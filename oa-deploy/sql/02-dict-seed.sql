@@ -1,9 +1,10 @@
 -- ============================================================================
 -- 集团OA审批系统 · 02 数据字典种子（8 个 dict_type）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-03T01:49:53.121Z
--- 生成工具: tools/gen-init-sql.js（请勿手工编辑本文件，改文档后重跑）
--- 真源文档: doc/dict-seed.md
+-- 生成器: tools/gen-init-sql.js sha256=4ff51bba65ea
+-- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（可安全重跑生成器）。
+-- 请勿手工编辑本文件：改文档后重跑本脚本。
+-- 真源文档: doc/dict-seed.md sha256=3b050db60e61
 --
 -- 执行顺序：在 01-schema.sql 之后执行；可重复执行（幂等）。
 -- 覆盖：cert_type / contract_type / group_dept / matter_category / payment_method / return_status / review_dept_other / seal_type，共 37 项。

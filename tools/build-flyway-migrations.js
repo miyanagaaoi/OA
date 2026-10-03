@@ -11,9 +11,15 @@
  *   而 Flyway 的 MySQL 解析器不识别 `DELIMITER`。因此这里把触发器段**整段拆出**，
  *   写成 `db/trigger/immutable-triggers.sql`（语句以 `//` 分隔、不含 DELIMITER），
  *   由 `ImmutableTriggerInitializer` 在应用启动时幂等创建。
+ *
+ * 确定性（重要）：产物头部**不含墙钟时间戳**，只有确定性的溯源行（生成器自身 sha256 + 每个来源
+ * 交付脚本的内容 sha256）。因此「同一输入 → 逐字节相同」，重跑生成器是幂等的：V1..V4 的
+ * Flyway checksum 稳定，`validate-on-migrate: true` 下不会因重跑生成器而报 Migration checksum
+ * mismatch（历史上头部的时间戳每次重跑都变，导致校验和漂移、必须重置库才能启动）。
  */
 'use strict';
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -22,21 +28,36 @@ const SQL_DIR = path.join(ROOT, 'oa-deploy', 'sql');
 const MIGRATION_DIR = path.join(ROOT, 'oa-server', 'src', 'main', 'resources', 'db', 'migration');
 const TRIGGER_DIR = path.join(ROOT, 'oa-server', 'src', 'main', 'resources', 'db', 'trigger');
 const CHECK = process.argv.includes('--check');
+const GEN_REL = 'tools/build-flyway-migrations.js';
 
 const read = (p) => fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
+
+/** 内容 sha256 前 12 位（确定性溯源指纹；不参与任何密钥用途） */
+function sha12(text) {
+  return crypto.createHash('sha256').update(text, 'utf8').digest('hex').slice(0, 12);
+}
+
+/** 生成器自身的 sha256 前 12 位：生成器一改，五个产物头部即变，会被 --check 捕获 */
+const GEN_SHA = sha12(read(__filename));
 
 function banner(title, sources, notes) {
   return [
     '-- ============================================================================',
     `-- ${title}`,
     '-- ----------------------------------------------------------------------------',
-    `-- 生成时间: ${new Date().toISOString()}`,
-    '-- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）',
-    ...sources.map((s) => `-- 来源: ${s}`),
+    `-- 生成器: ${GEN_REL} sha256=${GEN_SHA}`,
+    '-- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。',
+    '-- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。',
+    ...sources.map((s) => `-- 来源: ${s.label} sha256=${s.sha}`),
     ...notes.map((n) => `-- ${n}`),
     '-- ============================================================================',
     '',
   ].join('\n');
+}
+
+/** 交付脚本 → {label, sha} 溯源条目 */
+function source(label, absPath) {
+  return { label, sha: sha12(read(absPath)) };
 }
 
 /** 把 01-schema.sql 拆成「建表部分」与「触发器部分」 */
@@ -144,7 +165,7 @@ function main() {
   const files = {
     'V1__schema.sql': banner(
       'V1 建表（27 张表；不含触发器，触发器见 db/trigger/immutable-triggers.sql）',
-      ['oa-deploy/sql/01-schema.sql ← doc/data-model.md'],
+      [source('oa-deploy/sql/01-schema.sql ← doc/data-model.md', path.join(SQL_DIR, '01-schema.sql'))],
       ['执行：Flyway 自动按版本顺序执行 V1 → V2 → V3。', '字符集 utf8mb4 / 引擎 InnoDB；按文档顺序建表，外键依赖已满足。'],
     ) + '\n' + schema.replace(
       /^-- 注意：触发器使用 mysql 客户端语法.*$/m,
@@ -153,19 +174,19 @@ function main() {
 
     'V2__dict_seed.sql': banner(
       'V2 数据字典种子（8 个 dict_type，幂等）',
-      ['oa-deploy/sql/02-dict-seed.sql ← doc/dict-seed.md'],
+      [source('oa-deploy/sql/02-dict-seed.sql ← doc/dict-seed.md', path.join(SQL_DIR, '02-dict-seed.sql'))],
       ['可重复执行（ON DUPLICATE KEY UPDATE）。'],
     ) + '\n' + dictRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
 
     'V3__templates.sql': banner(
       'V3 流程模板与表单模板（4 模板 × 7 节点 + 4 份 form_schema_json，幂等）',
-      ['oa-deploy/sql/03-templates.sql ← doc/templates.md / doc/forms.md'],
+      [source('oa-deploy/sql/03-templates.sql ← doc/templates.md / doc/forms.md', path.join(SQL_DIR, '03-templates.sql'))],
       ['可重复执行（ON DUPLICATE KEY UPDATE）。', '④templates.sql 末尾的自检 SELECT 已保留，便于人工核对。'],
     ) + '\n' + templateRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
 
     'V4__permissions.sql': banner(
       'V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 374 授权行，幂等）',
-      ['oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义）'],
+      [source('oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义）', path.join(SQL_DIR, '04-permissions.sql'))],
       [
         '三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。',
         '若角色段被移到授权段之后，授权 JOIN 不到角色会**静默插入 0 行**（表现为登录后没有菜单）——check-permission-seed.js 有顺序断言。',
@@ -177,7 +198,7 @@ function main() {
 
   const triggerFile = banner(
     '不可篡改触发器（sys_log / flow_signature：拒绝 UPDATE 与 DELETE，AC-20）',
-    ['oa-deploy/sql/01-schema.sql 的 DELIMITER 段'],
+    [source('oa-deploy/sql/01-schema.sql 的 DELIMITER 段', path.join(SQL_DIR, '01-schema.sql'))],
     [
       '本文件不是 Flyway 迁移：由 com.oa.platform.bootstrap.ImmutableTriggerInitializer 在启动时读取，',
       '按「单独成行的双斜杠」切分为独立语句，逐条检查 information_schema.TRIGGERS 后 **幂等创建缺失项**。',
@@ -198,8 +219,15 @@ function main() {
   for (const [file, content] of targets) {
     const rel = path.relative(ROOT, file).replace(/\\/g, '/');
     const exists = fs.existsSync(file);
-    const same = exists && read(file).replace(/^-- 生成时间: .*$/m, '') === content.replace(/^-- 生成时间: .*$/m, '');
-    report.files.push({ path: rel, exists, upToDate: same, bytes: Buffer.byteLength(content, 'utf8') });
+    // 精确比较（不再对「生成时间」行做归一化抹平）：产物已确定，磁盘 == 生成结果 才是 upToDate
+    const same = exists && read(file) === content;
+    report.files.push({
+      path: rel,
+      exists,
+      upToDate: same,
+      bytes: Buffer.byteLength(content, 'utf8'),
+      sha256: crypto.createHash('sha256').update(content, 'utf8').digest('hex'),
+    });
     if (CHECK && exists && !same) errors.push(`${rel} 与交付脚本不一致（需重新生成）`);
     if (!CHECK && !same) {
       fs.mkdirSync(path.dirname(file), { recursive: true });

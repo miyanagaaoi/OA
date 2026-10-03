@@ -9,15 +9,39 @@
  * 设计原则：**文档是唯一真源**。本脚本把 doc/data-model.md 与 doc/dict-seed.md 中的
  * ```sql 代码块按文档顺序原样抽取并拼接，不做任何改写，保证 SQL 与评审过的文档逐字一致。
  * 修改表结构请改文档，然后重跑本脚本。
+ *
+ * 确定性（重要）：产物头部**不含墙钟时间戳**，只有确定性的溯源行（生成器自身 sha256 + 真源文档内容
+ * sha256）。因此「同一输入 → 逐字节相同」，重跑生成器是幂等的；产物进入 Flyway V1..V4 后
+ * checksum 稳定，`validate-on-migrate` 不会因重跑生成器而报 Migration checksum mismatch。
  */
 'use strict';
 
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'oa-deploy', 'sql');
 const CHECK_ONLY = process.argv.includes('--check');
+const GEN_REL = 'tools/gen-init-sql.js';
+
+/** 内容 sha256 前 12 位（确定性溯源指纹；不参与任何密钥用途） */
+function sha12(buf) {
+  return crypto.createHash('sha256').update(buf).digest('hex').slice(0, 12);
+}
+
+/** 完整 sha256（用于报告里的产物指纹对照） */
+function sha256hex(text) {
+  return crypto.createHash('sha256').update(text, 'utf8').digest('hex');
+}
+
+/** 生成器自身的 sha256 前 12 位：生成器一改，产物头部即变，可被 --check 捕获 */
+const GEN_SHA = sha12(fs.readFileSync(__filename));
+
+/** 真源文档的溯源指纹（读原始字节，保证「源变了产物就变、源没变产物字节一致」） */
+function sourceFingerprint(relPath) {
+  return { path: relPath, sha: sha12(fs.readFileSync(path.join(ROOT, relPath))) };
+}
 
 const DICT_WHITELIST = [
   'matter_category',
@@ -37,14 +61,14 @@ function extractSqlBlocks(mdPath) {
 }
 
 function banner(title, sources, notes) {
-  const stamp = new Date().toISOString();
   const lines = [
     '-- ============================================================================',
     `-- ${title}`,
     '-- ----------------------------------------------------------------------------',
-    `-- 生成时间: ${stamp}`,
-    '-- 生成工具: tools/gen-init-sql.js（请勿手工编辑本文件，改文档后重跑）',
-    ...sources.map((s) => `-- 真源文档: ${s}`),
+    `-- 生成器: ${GEN_REL} sha256=${GEN_SHA}`,
+    '-- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（可安全重跑生成器）。',
+    '-- 请勿手工编辑本文件：改文档后重跑本脚本。',
+    ...sources.map((s) => `-- 真源文档: ${s.path} sha256=${s.sha}`),
     '--',
     ...notes.map((n) => `-- ${n}`),
     '-- ============================================================================',
@@ -163,7 +187,7 @@ function main() {
   const schemaContent =
     banner(
       '集团OA审批系统 · 01 表结构（27 张表 + 不可篡改触发器）',
-      ['doc/data-model.md'],
+      [sourceFingerprint('doc/data-model.md')],
       [
         '执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。',
         `包含：建表 ${schema.tables.size} 张、索引 ${schema.indexes} 个、CHECK ${schema.checks} 个、外键若干、不可篡改触发器 ${schema.triggers} 个。`,
@@ -185,7 +209,7 @@ function main() {
   const dictContent =
     banner(
       '集团OA审批系统 · 02 数据字典种子（8 个 dict_type）',
-      ['doc/dict-seed.md'],
+      [sourceFingerprint('doc/dict-seed.md')],
       [
         '执行顺序：在 01-schema.sql 之后执行；可重复执行（幂等）。',
         '覆盖：' + dict.dictTypes.join(' / ') + `，共 ${dict.rows} 项。`,
@@ -193,12 +217,23 @@ function main() {
       ],
     ) + '\n' + dictSql + '\n';
 
-  for (const [file, content] of [[schemaOut, schemaContent], [dictOut, dictContent]]) {
+  const targets = [[schemaOut, schemaContent], [dictOut, dictContent]];
+  for (const [file, content] of targets) {
+    const rel = path.relative(ROOT, file).replace(/\\/g, '/');
+    const exists = fs.existsSync(file);
+    // 精确比较（不存在任何「时间戳归一」）：产物确定，磁盘 == 生成结果 才是 upToDate
+    const upToDate = exists && fs.readFileSync(file, 'utf8') === content;
     report.files.push({
-      path: path.relative(ROOT, file).replace(/\\/g, '/'),
+      path: rel,
+      exists,
+      upToDate,
       bytes: Buffer.byteLength(content, 'utf8'),
       lines: content.split(/\r?\n/).length,
+      sha256: sha256hex(content),
     });
+    if (CHECK_ONLY && !upToDate) {
+      report.errors.push(`${rel} 与生成结果不一致（需重新运行 node ${GEN_REL}）`);
+    }
   }
 
   report.schema = {
@@ -212,8 +247,11 @@ function main() {
 
   if (!CHECK_ONLY && report.ok) {
     fs.mkdirSync(OUT_DIR, { recursive: true });
-    fs.writeFileSync(schemaOut, schemaContent, 'utf8');
-    fs.writeFileSync(dictOut, dictContent, 'utf8');
+    for (const [file, content] of targets) {
+      if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== content) {
+        fs.writeFileSync(file, content, 'utf8');
+      }
+    }
   }
 
   console.log(JSON.stringify(report, null, 2));

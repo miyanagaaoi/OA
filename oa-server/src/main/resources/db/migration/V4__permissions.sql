@@ -1,9 +1,10 @@
 -- ============================================================================
 -- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 374 授权行，幂等）
 -- ----------------------------------------------------------------------------
--- 生成时间: 2026-10-02T10:51:54.777Z
--- 生成工具: tools/build-flyway-migrations.js（请勿手工编辑；改 oa-deploy/sql 或文档后重跑）
--- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义）
+-- 生成器: tools/build-flyway-migrations.js sha256=194ee2f2e8ab
+-- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
+-- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
+-- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=36e33617be65
 -- 三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。
 -- 若角色段被移到授权段之后，授权 JOIN 不到角色会**静默插入 0 行**（表现为登录后没有菜单）——check-permission-seed.js 有顺序断言。
 -- 权限码为**冒号风格**（如 admin:user:export），与 oa-web 的前端判据逐字一致。
