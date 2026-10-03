@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  流程节点 Mapper（flow_node）—— 配置数据，**刻意不带 @dataScope 标记**
+  ============================================================================
+  口径同 FlowTemplateMapper.xml：flow_node 未登记为数据域受控表，
+  加标记会被错误地按调用人的单据可见范围裁剪模板配置。
+  访问控制由 WorkflowPermissionService（admin:flow:node）承担。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.definition.infra.FlowNodeMapper">
+
+  <resultMap id="FlowNodeResultMap" type="com.oa.workflow.definition.domain.FlowNode">
+    <id property="id" column="id"/>
+    <result property="templateId" column="template_id"/>
+    <result property="seq" column="seq"/>
+    <result property="nodeCode" column="node_code"/>
+    <result property="name" column="name"/>
+    <result property="nodeType" column="node_type"/>
+    <result property="approverRule" column="approver_rule"/>
+    <result property="approverParam" column="approver_param"/>
+    <result property="decisionMode" column="decision_mode"/>
+    <result property="passThreshold" column="pass_threshold"/>
+    <result property="signPolicy" column="sign_policy"/>
+    <result property="timeoutHours" column="timeout_hours"/>
+    <result property="timeoutCcSuperior" column="timeout_cc_superior"/>
+    <result property="allowAddSign" column="allow_add_sign"/>
+    <result property="allowJump" column="allow_jump"/>
+    <result property="allowRoute" column="allow_route"/>
+    <result property="skipCondition" column="skip_condition"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <sql id="NodeColumns">
+    n.id, n.template_id, n.seq, n.node_code, n.name, n.node_type, n.approver_rule, n.approver_param,
+    n.decision_mode, n.pass_threshold, n.sign_policy, n.timeout_hours, n.timeout_cc_superior,
+    n.allow_add_sign, n.allow_jump, n.allow_route, n.skip_condition, n.created_at, n.updated_at
+  </sql>
+
+  <select id="selectByTemplateId" resultMap="FlowNodeResultMap">
+    SELECT <include refid="NodeColumns"/>
+    FROM flow_node n
+    WHERE n.template_id = #{templateId}
+    ORDER BY n.seq ASC, n.id ASC
+  </select>
+
+  <select id="selectByTemplateIds" resultMap="FlowNodeResultMap">
+    SELECT <include refid="NodeColumns"/>
+    FROM flow_node n
+    WHERE n.template_id IN
+    <foreach collection="templateIds" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    ORDER BY n.template_id ASC, n.seq ASC, n.id ASC
+  </select>
+
+  <select id="selectNodeById" resultMap="FlowNodeResultMap">
+    SELECT <include refid="NodeColumns"/>
+    FROM flow_node n
+    WHERE n.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="countByTemplateId" resultType="int">
+    SELECT COUNT(1) FROM flow_node n WHERE n.template_id = #{templateId}
+  </select>
+
+  <select id="countByTemplateAndCode" resultType="int">
+    SELECT COUNT(1) FROM flow_node n
+    WHERE n.template_id = #{templateId}
+      AND n.node_code = #{nodeCode}
+    <if test="excludeId != null">
+      AND n.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insertNode" parameterType="com.oa.workflow.definition.domain.FlowNode"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_node (template_id, seq, node_code, name, node_type, approver_rule, approver_param,
+                           decision_mode, pass_threshold, sign_policy, timeout_hours, timeout_cc_superior,
+                           allow_add_sign, allow_jump, allow_route, skip_condition)
+    VALUES (#{templateId}, #{seq}, #{nodeCode}, #{name}, IFNULL(#{nodeType}, 'approve'),
+            #{approverRule}, #{approverParam}, #{decisionMode}, #{passThreshold},
+            IFNULL(#{signPolicy}, 'optional'), #{timeoutHours}, IFNULL(#{timeoutCcSuperior}, 0),
+            IFNULL(#{allowAddSign}, 1), IFNULL(#{allowJump}, 0), IFNULL(#{allowRoute}, 0), #{skipCondition})
+  </insert>
+
+  <update id="updateNode" parameterType="com.oa.workflow.definition.domain.FlowNode">
+    UPDATE flow_node
+    SET seq = #{seq},
+        node_code = #{nodeCode},
+        name = #{name},
+        node_type = #{nodeType},
+        approver_rule = #{approverRule},
+        approver_param = #{approverParam},
+        decision_mode = #{decisionMode},
+        pass_threshold = #{passThreshold},
+        sign_policy = #{signPolicy},
+        timeout_hours = #{timeoutHours},
+        timeout_cc_superior = IFNULL(#{timeoutCcSuperior}, 0),
+        allow_add_sign = IFNULL(#{allowAddSign}, 1),
+        allow_jump = IFNULL(#{allowJump}, 0),
+        allow_route = IFNULL(#{allowRoute}, 0),
+        skip_condition = #{skipCondition},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateSeq">
+    UPDATE flow_node SET seq = #{seq}, updated_at = NOW() WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM flow_node WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteByTemplateId">
+    DELETE FROM flow_node WHERE template_id = #{templateId}
+  </delete>
+
+  <!--
+    开新版本时克隆节点：seq / node_code / 行为配置逐字复制，
+    保证「新版本 v2 的初始配置 == v1」，管理员只改差异项（templates.md §4.1 第 4 步）。
+  -->
+  <insert id="cloneNodes">
+    INSERT INTO flow_node (template_id, seq, node_code, name, node_type, approver_rule, approver_param,
+                           decision_mode, pass_threshold, sign_policy, timeout_hours, timeout_cc_superior,
+                           allow_add_sign, allow_jump, allow_route, skip_condition)
+    SELECT #{toTemplateId}, n.seq, n.node_code, n.name, n.node_type, n.approver_rule, n.approver_param,
+           n.decision_mode, n.pass_threshold, n.sign_policy, n.timeout_hours, n.timeout_cc_superior,
+           n.allow_add_sign, n.allow_jump, n.allow_route, n.skip_condition
+    FROM flow_node n
+    WHERE n.template_id = #{fromTemplateId}
+    ORDER BY n.seq ASC
+  </insert>
+
+</mapper>

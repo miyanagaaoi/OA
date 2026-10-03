@@ -10,9 +10,9 @@ description:
   en: >
       Password complexity (8+ characters with letters and digits) validation, salted-hash comparison and password change; passwords and phones are encrypted at rest and never stored in clear text.
       
-revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
-updated_at: "2026-10-03T01:05:54.724Z"
-fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
+revision: d5b96030fa491b789a78f1772859bcc23cb95a78
+updated_at: "2026-10-03T01:41:29.738Z"
+fingerprint: 45de2030cdb84b6b065d6ae29d070a0561de3211039af1703055f01a49a9f2e4
 source:
   - path: "doc/prd-0.1.md"
     line: 525

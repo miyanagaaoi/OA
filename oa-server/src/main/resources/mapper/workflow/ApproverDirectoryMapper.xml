@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  审批人解析目录 Mapper（sys_org / sys_org_leader / sys_user）
+  ============================================================================
+  受控表纪律（同 mapper/identity/*.xml）：
+    · 每条 SELECT **恰好 1 个** /* @dataScope(table=..., alias=...) */ 标记，
+      位置在 WHERE 1 = 1 之后，可容纳完整布尔表达式；
+    · 标记指向「承担过滤语义」的那张表：
+        - 按组织过滤            → table=sys_org        alias=o
+        - 按负责人绑定过滤      → table=sys_org_leader alias=ol
+        - 按人 / 角色过滤       → table=sys_user       alias=u
+    · 调用方 JdbcApproverDirectory 一律包裹 DataScopeContext.system()
+      （发起时的审批人解析属系统口径：发起人的数据域不能决定财务部负责人是否存在），
+      因此片段退化为 1=1；若有人误在业务上下文直接调用本 Mapper，
+      数据域片段会照常生效（fail-safe 方向：宁可少取人 → 触发空候选人拦截）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.approver.infra.ApproverDirectoryMapper">
+
+  <resultMap id="OrgRowResultMap" type="com.oa.workflow.approver.infra.row.OrgRow">
+    <id property="id" column="id"/>
+    <result property="parentId" column="parent_id"/>
+    <result property="orgType" column="org_type"/>
+    <result property="name" column="name"/>
+    <result property="path" column="path"/>
+    <result property="depth" column="depth"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <resultMap id="CandidateRowResultMap" type="com.oa.workflow.approver.infra.row.CandidateRow">
+    <id property="userId" column="user_id"/>
+    <result property="name" column="name"/>
+    <result property="account" column="account"/>
+    <result property="employeeNo" column="employee_no"/>
+    <result property="orgId" column="org_id"/>
+    <result property="orgName" column="org_name"/>
+    <result property="orgPath" column="org_path"/>
+    <result property="companyId" column="company_id"/>
+    <result property="position" column="position"/>
+    <result property="userStatus" column="user_status"/>
+  </resultMap>
+
+  <sql id="OrgColumns">
+    o.id, o.parent_id, o.org_type, o.name, o.path, o.depth, o.status
+  </sql>
+
+  <!-- 候选人列：姓名 / 工号 / 组织（快照「姓名+工号+组织」的固化源），一律剔除离职与逻辑删除 -->
+  <sql id="CandidateColumns">
+    u.id AS user_id, u.name, u.account, u.employee_no, u.org_id, o.name AS org_name, o.path AS org_path,
+    u.company_id, u.position, u.status AS user_status
+  </sql>
+
+  <select id="selectOrg" resultMap="OrgRowResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.id = #{orgId}
+      AND o.deleted_at IS NULL
+    LIMIT 1
+  </select>
+
+  <select id="selectOrgByName" resultMap="OrgRowResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.name = #{name}
+      AND o.deleted_at IS NULL
+    ORDER BY o.id ASC
+    LIMIT 1
+  </select>
+
+  <select id="selectOrgsByType" resultMap="OrgRowResultMap">
+    SELECT <include refid="OrgColumns"/>
+    FROM sys_org o
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org, alias=o) */
+      AND o.org_type = #{orgType}
+      AND o.deleted_at IS NULL
+    ORDER BY o.id ASC
+  </select>
+
+  <!-- 正职：leader_type='primary' AND category IS NULL（import-spec §4.4「审批人解析取正职」的普通负责人组） -->
+  <select id="selectPrimaryLeaders" resultMap="CandidateRowResultMap">
+    SELECT <include refid="CandidateColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_user u ON u.id = l.user_id AND u.deleted_at IS NULL
+    LEFT JOIN sys_org o ON o.id = u.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.org_id = #{orgId}
+      AND l.leader_type = 'primary'
+      AND l.category IS NULL
+      AND u.status &lt;&gt; 'resigned'
+    ORDER BY l.sort_no ASC, l.id ASC
+  </select>
+
+  <!-- 副职：③分公司分管领导的解析源（口径与冲突见 BranchLeaderRule 的类注释） -->
+  <select id="selectDeputyLeaders" resultMap="CandidateRowResultMap">
+    SELECT <include refid="CandidateColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_user u ON u.id = l.user_id AND u.deleted_at IS NULL
+    LEFT JOIN sys_org o ON o.id = u.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.org_id = #{orgId}
+      AND l.leader_type = 'deputy'
+      AND l.category IS NULL
+      AND u.status &lt;&gt; 'resigned'
+    ORDER BY l.sort_no ASC, l.id ASC
+  </select>
+
+  <!-- 业务线正职：仅集团层可绑（import-spec E-LEAD-008） -->
+  <select id="selectCategoryLeaders" resultMap="CandidateRowResultMap">
+    SELECT <include refid="CandidateColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_user u ON u.id = l.user_id AND u.deleted_at IS NULL
+    LEFT JOIN sys_org o ON o.id = u.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+      AND l.org_id = #{orgId}
+      AND l.category = #{category}
+      AND l.leader_type = 'primary'
+      AND u.status &lt;&gt; 'resigned'
+    ORDER BY l.sort_no ASC, l.id ASC
+  </select>
+
+  <select id="selectUser" resultMap="CandidateRowResultMap">
+    SELECT <include refid="CandidateColumns"/>
+    FROM sys_user u
+    LEFT JOIN sys_org o ON o.id = u.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.id = #{userId}
+      AND u.deleted_at IS NULL
+    LIMIT 1
+  </select>
+
+  <select id="selectUsers" resultMap="CandidateRowResultMap">
+    SELECT <include refid="CandidateColumns"/>
+    FROM sys_user u
+    LEFT JOIN sys_org o ON o.id = u.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+      AND u.id IN
+    <foreach collection="ids" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    ORDER BY u.id ASC
+  </select>
+
+  <!-- 角色成员（designated 的 role_code 参数）：过滤主体是「人」，故标记指向 sys_user -->
+  <select id="selectUsersByRoleCode" resultMap="CandidateRowResultMap">
+    SELECT <include refid="CandidateColumns"/>
+    FROM sys_user u
+    JOIN sys_user_role ur ON ur.user_id = u.id
+    JOIN sys_role r ON r.id = ur.role_id AND r.deleted_at IS NULL
+    LEFT JOIN sys_org o ON o.id = u.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND r.code = #{roleCode}
+      AND u.deleted_at IS NULL
+      AND u.status = 'active'
+    ORDER BY u.id ASC
+  </select>
+
+</mapper>

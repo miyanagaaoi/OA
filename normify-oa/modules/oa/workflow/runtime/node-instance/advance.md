@@ -11,9 +11,9 @@ description:
   en: >
       Advances to the next node after approval (marking skip_condition hits as skipped and continuing), returns to the previous completed node for re-review (the previous node's returned_count+1, automatically returning here afterwards, at most twice per node, REQ-FLOW-021) and creates tasks for the newly entered node.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.783Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: d5b96030fa491b789a78f1772859bcc23cb95a78
+updated_at: "2026-10-03T01:41:29.809Z"
+fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
     line: 500

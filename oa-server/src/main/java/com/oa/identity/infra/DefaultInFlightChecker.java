@@ -1,102 +1,222 @@
 package com.oa.identity.infra;
 
+import com.oa.common.scope.DataScopeContext;
 import com.oa.identity.app.InFlightChecker;
+import com.oa.identity.infra.row.InFlightItemRow;
+import com.oa.identity.infra.row.PendingTaskRow;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 在途/待办检查的**缺省实现**：恒返回 0 / 空清单（流程表尚未落地的阶段）。
+ * 在途/待办检查的**真实实现**（阶段 2a.3 把桩变成真实查询）。
  *
- * <h2>接入点（阶段 2 待接入，务必按此实现）</h2>
+ * <h2>判定口径（与 {@link InFlightChecker} 的接口注释、PRD §5.5、AC-11/AC-12 逐条一致）</h2>
  * <ol>
- *   <li><b>组织口径</b> {@code checkOrgSubtree(orgPathPrefix)}：按 {@code sys_org.path} 前缀匹配
- *       该节点**整棵子树**下的在途单据——
- *       {@code flow_instance.status = 'approving'}（必要时含 {@code sub_status = 'pending_supplement'}）
- *       且（{@code initiator_org_path LIKE :prefix} 或 {@code current_dept_id IN (子树 id)})；
- *       返回单号列表（{@code biz_no}）。依据 doc/import-spec.md §8.2「该组织节点（含其整棵子树，
- *       按 sys_org.path 前缀匹配）下的在途单据数」。</li>
- *   <li><b>人员口径</b> {@code checkUser(userId)}：{@code flow_task.assignee_id = ? AND status = 'pending'}
- *       的任务数，加上 {@code flow_node_instance.status = 'active'} 且候选人为该用户的活动节点数
- *       （doc/import-spec.md §8.1）。</li>
- *   <li><b>待办清单</b> {@code pendingTasksOf(userId)}：join {@code flow_instance} 取 {@code biz_no}
- *       与节点名，供「工作交接」清单使用。</li>
- *   <li><b>影响清单明细</b> {@code inFlightItems(userId)} / {@code orgInFlightItems(orgPathPrefix)}：
- *       同上一并 join {@code flow_instance} / {@code flow_task} / {@code form_template}，
- *       取「单据类型 formType / 发起人 initiatorName / 当前节点 currentNodeName / 状态 status」
- *       （import-spec §7.2 影响清单八列），供
- *       {@code GET /users/{id}/in-flight-check} 与 {@code GET /orgs/{id}/in-flight-check}；
- *       <b>与数量口径共用同一套过滤条件</b>，不得另写第二套判定逻辑。</li>
+ *   <li><b>在途单据</b> = {@code flow_instance.status = 'approving'}
+ *       （待补件期间主状态仍是 {@code approving}，见 doc/enums.md §4，因此天然包含在内）；</li>
+ *   <li><b>组织口径</b>（{@link #checkOrgSubtree}）：按 {@code sys_org.path} 前缀匹配
+ *       {@code flow_instance.initiator_org_path}（发起人组织快照）<b>或</b>
+ *       {@code current_dept_id} 落在子树内 —— 覆盖「发起人在该子树」与「单据当前流转到该子树」两种在途形态
+ *       （依据 doc/import-spec.md §8.2「该组织节点（含其整棵子树）下的在途单据数」）；</li>
+ *   <li><b>人员口径</b>（{@link #checkUser}）：{@code flow_task.assignee_id = ? AND status = 'pending'}
+ *       的任务数（doc/import-spec.md §8.1「名下未处理待办」）。
+ *       <b>活动节点候选口径未接入</b>：{@code flow_node_instance.approver_ids_json} 的结构
+ *       由 2a.4 运行时状态机定义（本工作包不猜测其形状），因此这里**只按待办任务**计数；
+ *       2a.4 落地后在此追加一条「本人在活动节点候选内」的查询即可，判定语义不变
+ *       （见类尾的 TODO(2a.4)）；</li>
+ *   <li><b>明细口径</b>（{@link #inFlightItems} / {@link #orgInFlightItems}）与数量口径
+ *       **共用同一套过滤条件**（同一 Mapper 的相邻语句），不另写第二套判定逻辑。</li>
  * </ol>
  *
- * <p><b>实现时必须遵守的框架约束</b>（否则会被 fail-closed 拦截或越权）：
- * <ul>
- *   <li>{@code flow_instance} / {@code flow_task} 已在 {@code oa.scope.tables} 登记为受控表，
- *       新写的 SELECT **必须**带 {@code /* @dataScope(table=..., alias=...) *}{@code /} 标记；</li>
- *   <li>这是「离职/停用前的影响面检查」，语义上是**系统口径**的统计查询（不能因为调用人的数据域
- *       而漏算在途单据），因此实现方应显式使用 {@code DataScopeContext.system()} 包裹该查询，
- *       并在注释里写明「此处按系统口径统计，仅用于影响面提示与拦截，不用于授权判定」；</li>
- *   <li>替换方式：新增一个 {@code @Primary} 的 {@link InFlightChecker} 实现即可，
- *       身份侧调用方（{@code OrgService} / {@code UserService}）无需改动。</li>
- * </ul>
+ * <h2>为什么一律使用系统口径</h2>
+ * <p>这是「离职/停用前的影响面检查」：不能因为调用人（管理员）自己的数据域而漏算在途单据，
+ * 否则补偿控制失效（PRD §5.5 明确「否则快照会导致单据永久卡死」）。
+ * 因此所有查询都包在 {@link DataScopeContext#system()} 里，
+ * 由 {@link InFlightQueryMapper} 的 {@code @dataScope} 标记退化为 {@code 1=1}。
+ * <b>这不是数据域旁路</b>：这些结果只用于「是否阻断操作」的提示与判定，不产生任何读取暴露
+ * （出参只有单号、类型、节点名、状态，不含单据正文）。
+ *
+ * <p>系统管理员可用 {@code force=true} + 必填理由覆盖阻断（AC-52 双留痕），
+ * 该授权在控制器由 {@code ForceReasonPolicy} 把关，本类**不做**角色判断
+ * （口径与 {@code InFlightGuard} 一致：一处判定，避免分叉）。
  */
 @Component
 public class DefaultInFlightChecker implements InFlightChecker {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultInFlightChecker.class);
 
+    /** 文案与影响清单里最多列举的单号数（与 {@code InFlightGuard} 的展示上限对齐）。 */
+    private static final int MAX_BIZ_NO = 20;
+
+    /** 影响清单最多返回的行数（防止一次拉爆响应体）。 */
+    private static final int MAX_ITEMS = 200;
+
+    private final InFlightQueryMapper mapper;
+
+    public DefaultInFlightChecker(InFlightQueryMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    // ================================================================ 数量口径
+
     @Override
     public InFlightSummary checkOrgSubtree(String orgPathPrefix) {
-        if (log.isDebugEnabled()) {
-            log.debug("在途检查（缺省桩，恒返回 0）：orgPathPrefix={}；接入点见 DefaultInFlightChecker 类注释", orgPathPrefix);
+        String prefix = normalizePrefix(orgPathPrefix);
+        if (prefix == null) {
+            log.warn("在途检查缺少组织路径前缀，按「无在途」返回（调用方应传 sys_org.path）");
+            return InFlightSummary.none();
         }
-        return InFlightSummary.none();
+        return systemScope(() -> {
+            int count = mapper.countOrgInFlight(prefix);
+            if (count == 0) {
+                return InFlightSummary.none();
+            }
+            List<String> bizNos = mapper.selectOrgInFlightBizNos(prefix, MAX_BIZ_NO);
+            if (log.isDebugEnabled()) {
+                log.debug("在途检查（真实查询）：orgPathPrefix={} 在途单据={} 单号={}", prefix, count, bizNos);
+            }
+            return new InFlightSummary(count, 0, bizNos);
+        });
     }
 
     @Override
     public InFlightSummary checkUser(Long userId) {
-        if (log.isDebugEnabled()) {
-            log.debug("待办检查（缺省桩，恒返回 0）：userId={}；接入点见 DefaultInFlightChecker 类注释", userId);
+        if (userId == null) {
+            return InFlightSummary.none();
         }
-        return InFlightSummary.none();
+        return systemScope(() -> {
+            int pending = mapper.countUserPendingTasks(userId);
+            if (pending == 0) {
+                return InFlightSummary.none();
+            }
+            List<String> bizNos = mapper.selectUserPendingBizNos(userId, MAX_BIZ_NO);
+            if (log.isDebugEnabled()) {
+                log.debug("待办检查（真实查询）：userId={} 待办={} 单号={}", userId, pending, bizNos);
+            }
+            // 人员口径的 inFlightInstances 计 0（避免与 pendingTasks 重复计数导致 total 翻倍）
+            return new InFlightSummary(0, pending, bizNos);
+        });
     }
+
+    // ================================================================ 清单口径
 
     @Override
     public List<PendingTask> pendingTasksOf(Long userId) {
-        return List.of();
+        if (userId == null) {
+            return List.of();
+        }
+        return systemScope(() -> {
+            List<PendingTask> tasks = new ArrayList<>();
+            for (PendingTaskRow row : mapper.selectUserPendingTasks(userId, MAX_ITEMS)) {
+                tasks.add(new PendingTask(row.getTaskId(), row.getBizNo(), row.getNodeName(), row.getCreatedAt()));
+            }
+            return tasks;
+        });
     }
 
-    /**
-     * 人员影响清单：流程表未落地 → **空清单**（调用方据此回 0 条，而不是 null）。
-     *
-     * <p>接入点：{@code flow_task t JOIN flow_instance i ON i.id = t.instance_id
-     * LEFT JOIN form_template ft ON ft.id = i.template_id}，
-     * 过滤 {@code t.assignee_id = ? AND t.status = 'pending'}，
-     * 取 {@code i.id, i.biz_no, ft.form_type, t.node_name, i.initiator_name, t.node_name, t.status}；
-     * 语句必须带 {@code @dataScope} 标记（受控表 {@code flow_task}/{@code flow_instance}）。
-     */
     @Override
     public List<InFlightItem> inFlightItems(Long userId) {
-        if (log.isDebugEnabled()) {
-            log.debug("人员影响清单（缺省桩，返回空清单）：userId={}；接入点见本类类注释第 4 条", userId);
+        if (userId == null) {
+            return List.of();
         }
-        return List.of();
+        return systemScope(() -> toItems(mapper.selectUserInFlightItems(userId, MAX_ITEMS)));
+    }
+
+    @Override
+    public List<InFlightItem> orgInFlightItems(String orgPathPrefix) {
+        String prefix = normalizePrefix(orgPathPrefix);
+        if (prefix == null) {
+            return List.of();
+        }
+        return systemScope(() -> toItems(mapper.selectOrgInFlightItems(prefix, MAX_ITEMS)));
     }
 
     /**
-     * 组织影响清单：流程表未落地 → **空清单**。
+     * 批量待办数（列表页的 {@code pendingTaskCount}）：**一条 SQL** 而非逐行回退。
      *
-     * <p>接入点：{@code flow_instance i} 按 {@code i.initiator_org_path LIKE :prefix}
-     * （或子树 id 集合）过滤 {@code i.status = 'approving'}，
-     * 取 {@code i.id, i.biz_no, ft.form_type, i.initiator_name, i.current_node_name}；
-     * 与 {@link #checkOrgSubtree(String)} 共用同一套过滤条件。
+     * <p>已从接口默认实现（逐条 {@code checkUser}）覆盖为分组计数，消除 N+1。
      */
     @Override
-    public List<InFlightItem> orgInFlightItems(String orgPathPrefix) {
-        if (log.isDebugEnabled()) {
-            log.debug("组织影响清单（缺省桩，返回空清单）：orgPathPrefix={}；接入点见本类类注释第 4 条", orgPathPrefix);
+    public Map<Long, Integer> pendingTaskCounts(Collection<Long> userIds) {
+        Map<Long, Integer> result = new LinkedHashMap<>();
+        if (userIds == null || userIds.isEmpty()) {
+            return result;
         }
-        return List.of();
+        List<Long> ids = new ArrayList<>();
+        for (Long id : userIds) {
+            if (id != null && !ids.contains(id)) {
+                ids.add(id);
+            }
+        }
+        if (ids.isEmpty()) {
+            return result;
+        }
+        return systemScope(() -> {
+            Map<Long, Integer> counts = new LinkedHashMap<>();
+            for (PendingTaskRow row : mapper.selectPendingTaskCounts(ids)) {
+                if (row != null && row.getAssigneeId() != null) {
+                    counts.put(row.getAssigneeId(), row.getTotal() == null ? 0 : row.getTotal());
+                }
+            }
+            // 未命中的用户补 0（调用方约定「未命中按 0 处理」，这里显式给出更省事）
+            for (Long id : ids) {
+                result.put(id, counts.getOrDefault(id, 0));
+            }
+            return result;
+        });
+    }
+
+    // ================================================================ 内部
+
+    /** 组织路径前缀归一：{@code /1/12} → {@code /1/12/}；空值返回 {@code null}。 */
+    static String normalizePrefix(String orgPathPrefix) {
+        if (orgPathPrefix == null || orgPathPrefix.isBlank()) {
+            return null;
+        }
+        String value = orgPathPrefix.trim();
+        if (!value.startsWith("/")) {
+            value = "/" + value;
+        }
+        if (!value.endsWith("/")) {
+            value = value + "/";
+        }
+        return value;
+    }
+
+    private static List<InFlightItem> toItems(List<InFlightItemRow> rows) {
+        List<InFlightItem> items = new ArrayList<>();
+        if (rows == null) {
+            return items;
+        }
+        for (InFlightItemRow row : rows) {
+            if (row == null) {
+                continue;
+            }
+            items.add(new InFlightItem(row.getInstanceId(), row.getBizNo(), row.getFormType(),
+                    row.getNodeName(), row.getInitiatorName(), row.getCurrentNodeName(), row.getStatus()));
+        }
+        return items;
+    }
+
+    /** 影响面查询一律走系统口径（详见类注释「为什么一律使用系统口径」）。 */
+    private <T> T systemScope(Supplier<T> action) {
+        DataScopeContext previous = DataScopeContext.current();
+        DataScopeContext.set(DataScopeContext.system());
+        try {
+            return action.get();
+        } finally {
+            if (previous == null) {
+                DataScopeContext.clear();
+            } else {
+                DataScopeContext.set(previous);
+            }
+        }
     }
 }

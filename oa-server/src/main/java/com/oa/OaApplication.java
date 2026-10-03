@@ -18,7 +18,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @MapperScan({
         "com.oa.identity.infra",
         "com.oa.authz.infra",
-        "com.oa.common.audit"
+        "com.oa.common.audit",
+        // 阶段 2a.2 / 2a.3：流程定义与审批人解析（模板 / 节点 / 实例 / 目录查询）
+        "com.oa.workflow.definition.infra",
+        "com.oa.workflow.approver.infra"
 })
 public class OaApplication {
 

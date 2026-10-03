@@ -11,8 +11,8 @@ description:
   en: >
       Seal type `seal_type` (select, required, values per 6.4), copy count `seal_count` (number, integer 1–999, default 1, required unless the type is certificate borrow) and external flag `is_external` (boolean, required, default no; yes raises the purpose minimum length).
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.693Z"
+revision: d5b96030fa491b789a78f1772859bcc23cb95a78
+updated_at: "2026-10-03T01:41:29.722Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  流程模板 Mapper（flow_template）—— 配置数据，**刻意不带 @dataScope 标记**
+  ============================================================================
+  为什么没有标记（与 SysOrgMapper 等受控表 Mapper 相反）：
+    · flow_template 未登记为数据域受控表（application.yml 的 oa.scope.tables 与实体注解都没有它）；
+    · DataScopeInterceptor 只在 SQL 命中受控表正则时要求标记，因此本文件既不会被
+      fail-closed 拒绝（40303），也**不应该**加标记 —— 加了会被替换成「实例类数据域片段」，
+      按调用人的单据可见范围去裁剪**流程模板**，属于错误织入（同一单据类型的不同管理员
+      会看到不同的模板版本集合，配置面直接崩坏）；
+    · 访问控制由 WorkflowPermissionService（admin:flow:template / admin:flow:node /
+      admin:flow:publish）承担，见 FlowConfigPermission。
+  口径由 com.oa.workflow.definition.WorkflowMapperXmlTest 正向断言：
+    ① 本文件不得出现 "@dataScope("；② flow_template / flow_node 不得出现在受控表清单里。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.definition.infra.FlowTemplateMapper">
+
+  <resultMap id="FlowTemplateResultMap" type="com.oa.workflow.definition.domain.FlowTemplate">
+    <id property="id" column="id"/>
+    <result property="code" column="code"/>
+    <result property="name" column="name"/>
+    <result property="formType" column="form_type"/>
+    <result property="version" column="version"/>
+    <result property="status" column="status"/>
+    <result property="nodeCount" column="node_count"/>
+    <result property="formSchemaJson" column="form_schema_json"/>
+    <result property="publishedAt" column="published_at"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="createdBy" column="created_by"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="updatedBy" column="updated_by"/>
+    <!-- Q6 / Q7 闸门配置（Flyway V5__flow_gate_policy.sql 追加的 5 个可空列） -->
+    <result property="maxReturnCount" column="max_return_count"/>
+    <result property="maxSupplementCount" column="max_supplement_count"/>
+    <result property="supplementDeadlineDays" column="supplement_deadline_days"/>
+    <result property="supplementDeadlineType" column="supplement_deadline_type"/>
+    <result property="onSupplementTimeout" column="on_supplement_timeout"/>
+  </resultMap>
+
+  <sql id="TemplateColumns">
+    t.id, t.code, t.name, t.form_type, t.version, t.status, t.node_count, t.form_schema_json,
+    t.published_at, t.created_at, t.created_by, t.updated_at, t.updated_by,
+    t.max_return_count, t.max_supplement_count, t.supplement_deadline_days,
+    t.supplement_deadline_type, t.on_supplement_timeout
+  </sql>
+
+  <select id="selectByCode" resultMap="FlowTemplateResultMap">
+    SELECT <include refid="TemplateColumns"/>
+    FROM flow_template t
+    WHERE t.code = #{code}
+    ORDER BY t.version DESC, t.id DESC
+  </select>
+
+  <select id="selectByCodeAndStatus" resultMap="FlowTemplateResultMap">
+    SELECT <include refid="TemplateColumns"/>
+    FROM flow_template t
+    WHERE t.code = #{code} AND t.status = #{status}
+    ORDER BY t.version DESC, t.id DESC
+  </select>
+
+  <select id="selectTemplates" resultMap="FlowTemplateResultMap">
+    SELECT <include refid="TemplateColumns"/>
+    FROM flow_template t
+    WHERE 1 = 1
+    <if test="code != null and code != ''">
+      AND t.code = #{code}
+    </if>
+    <if test="formType != null and formType != ''">
+      AND t.form_type = #{formType}
+    </if>
+    <if test="status != null and status != ''">
+      AND t.status = #{status}
+    </if>
+    ORDER BY t.code ASC, t.version DESC, t.id DESC
+  </select>
+
+  <select id="selectTemplateById" resultMap="FlowTemplateResultMap">
+    SELECT <include refid="TemplateColumns"/>
+    FROM flow_template t
+    WHERE t.id = #{id}
+    LIMIT 1
+  </select>
+
+  <!-- 在途锁版本的读取口径：实例只认发起时写入的 (code, version)（templates.md V-02） -->
+  <select id="selectByCodeAndVersion" resultMap="FlowTemplateResultMap">
+    SELECT <include refid="TemplateColumns"/>
+    FROM flow_template t
+    WHERE t.code = #{code} AND t.version = #{version}
+    LIMIT 1
+  </select>
+
+  <select id="selectMaxVersion" resultType="java.lang.Integer">
+    SELECT MAX(t.version) FROM flow_template t WHERE t.code = #{code}
+  </select>
+
+  <!-- ============================== 写（写语句不需要 @dataScope 标记） ============================== -->
+
+  <insert id="insertTemplate" parameterType="com.oa.workflow.definition.domain.FlowTemplate"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json,
+                               max_return_count, max_supplement_count, supplement_deadline_days,
+                               supplement_deadline_type, on_supplement_timeout,
+                               created_by, updated_by)
+    VALUES (#{code}, #{name}, #{formType}, #{version}, #{status}, IFNULL(#{nodeCount}, 0), #{formSchemaJson},
+            #{maxReturnCount}, #{maxSupplementCount}, #{supplementDeadlineDays},
+            #{supplementDeadlineType}, #{onSupplementTimeout},
+            #{createdBy}, #{createdBy})
+  </insert>
+
+  <update id="updateDraft" parameterType="com.oa.workflow.definition.domain.FlowTemplate">
+    UPDATE flow_template
+    SET name = #{name},
+        form_schema_json = #{formSchemaJson},
+        node_count = IFNULL(#{nodeCount}, node_count),
+        max_return_count = #{maxReturnCount},
+        max_supplement_count = #{maxSupplementCount},
+        supplement_deadline_days = #{supplementDeadlineDays},
+        supplement_deadline_type = #{supplementDeadlineType},
+        on_supplement_timeout = #{onSupplementTimeout},
+        updated_by = #{updatedBy},
+        updated_at = NOW()
+    WHERE id = #{id} AND status = 'draft'
+  </update>
+
+  <update id="updateStatus">
+    UPDATE flow_template
+    SET status = #{status},
+        published_at = CASE WHEN #{status} = 'published' THEN NOW() ELSE published_at END,
+        updated_by = #{updatedBy},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="archiveOtherPublished">
+    UPDATE flow_template
+    SET status = 'archived', updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE code = #{code} AND status = 'published' AND id &lt;&gt; #{excludeId}
+  </update>
+
+  <update id="updateNodeCount">
+    UPDATE flow_template
+    SET node_count = #{nodeCount}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+</mapper>

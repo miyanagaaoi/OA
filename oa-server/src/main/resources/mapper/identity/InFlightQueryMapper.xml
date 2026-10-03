@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  在途 / 待办真实查询（flow_instance / flow_task / sys_org）
+  ============================================================================
+  用途：组织停用前的「清空在途」与员工离职/停用前的「清空待办」补偿控制
+        （PRD §5.5、AC-11、AC-12、import-spec §8.1/§8.2）。
+  口径（与 DefaultInFlightChecker 的类注释逐条一致）：
+    · 「在途」= flow_instance.status = 'approving'（含 sub_status = 'pending_supplement'，
+       因为待补件期间主状态仍是 approving，见 doc/enums.md §4）；
+    · 组织口径按 sys_org.path 前缀匹配「发起人组织路径」∪「当前承接部门」；
+    · 人员口径按 flow_task.status = 'pending'（名下未处理待办）；
+    · 调用方一律 DataScopeContext.system()：这是影响面统计，不能因调用人的数据域漏算。
+  受控表标记：每条 SELECT 恰好 1 个，指向 flow_instance（别名 i，过滤主体）。
+      语句内 JOIN 的 sys_user / sys_org 只作展示与子树展开，不另加标记。
+  ============================================================================
+-->
+<mapper namespace="com.oa.identity.infra.InFlightQueryMapper">
+
+  <resultMap id="InFlightItemResultMap" type="com.oa.identity.infra.row.InFlightItemRow">
+    <id property="instanceId" column="instance_id"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="formType" column="form_type"/>
+    <result property="nodeName" column="node_name"/>
+    <result property="initiatorName" column="initiator_name"/>
+    <result property="currentNodeName" column="current_node_name"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <resultMap id="PendingTaskResultMap" type="com.oa.identity.infra.row.PendingTaskRow">
+    <id property="taskId" column="task_id"/>
+    <result property="assigneeId" column="assignee_id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="nodeName" column="node_name"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="total" column="total"/>
+  </resultMap>
+
+  <select id="countOrgInFlight" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.status = 'approving'
+      AND (i.initiator_org_path LIKE CONCAT(#{orgPathPrefix}, '%')
+           OR i.current_dept_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE CONCAT(#{orgPathPrefix}, '%')))
+  </select>
+
+  <select id="selectOrgInFlightItems" resultMap="InFlightItemResultMap">
+    SELECT i.id AS instance_id, i.biz_no, i.form_type,
+           NULL AS node_name,
+           u.name AS initiator_name,
+           (SELECT ni.node_name FROM flow_node_instance ni
+             WHERE ni.instance_id = i.id AND ni.node_seq = i.current_node_seq LIMIT 1) AS current_node_name,
+           i.status
+    FROM flow_instance i
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.status = 'approving'
+      AND (i.initiator_org_path LIKE CONCAT(#{orgPathPrefix}, '%')
+           OR i.current_dept_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE CONCAT(#{orgPathPrefix}, '%')))
+    ORDER BY i.id DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectOrgInFlightBizNos" resultType="java.lang.String">
+    SELECT i.biz_no
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.status = 'approving'
+      AND (i.initiator_org_path LIKE CONCAT(#{orgPathPrefix}, '%')
+           OR i.current_dept_id IN (SELECT so.id FROM sys_org so WHERE so.path LIKE CONCAT(#{orgPathPrefix}, '%')))
+    ORDER BY i.id DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="countUserPendingTasks" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_task t
+    JOIN flow_instance i ON i.id = t.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND t.assignee_id = #{userId}
+      AND t.status = 'pending'
+  </select>
+
+  <select id="selectPendingTaskCounts" resultMap="PendingTaskResultMap">
+    SELECT t.assignee_id AS assignee_id, COUNT(1) AS total
+    FROM flow_task t
+    JOIN flow_instance i ON i.id = t.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND t.status = 'pending'
+      AND t.assignee_id IN
+    <foreach collection="userIds" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    GROUP BY t.assignee_id
+  </select>
+
+  <select id="selectUserPendingTasks" resultMap="PendingTaskResultMap">
+    SELECT t.id AS task_id, t.assignee_id, t.instance_id, i.biz_no,
+           ni.node_name AS node_name, DATE_FORMAT(t.created_at, '%Y-%m-%d %H:%i:%s') AS created_at
+    FROM flow_task t
+    JOIN flow_instance i ON i.id = t.instance_id
+    LEFT JOIN flow_node_instance ni ON ni.id = t.node_instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND t.assignee_id = #{userId}
+      AND t.status = 'pending'
+    ORDER BY t.id DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectUserPendingBizNos" resultType="java.lang.String">
+    SELECT DISTINCT i.biz_no
+    FROM flow_task t
+    JOIN flow_instance i ON i.id = t.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND t.assignee_id = #{userId}
+      AND t.status = 'pending'
+    ORDER BY i.biz_no DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectUserInFlightItems" resultMap="InFlightItemResultMap">
+    SELECT i.id AS instance_id, i.biz_no, i.form_type,
+           ni.node_name AS node_name,
+           u.name AS initiator_name,
+           (SELECT n2.node_name FROM flow_node_instance n2
+             WHERE n2.instance_id = i.id AND n2.node_seq = i.current_node_seq LIMIT 1) AS current_node_name,
+           t.status
+    FROM flow_task t
+    JOIN flow_instance i ON i.id = t.instance_id
+    LEFT JOIN flow_node_instance ni ON ni.id = t.node_instance_id
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND t.assignee_id = #{userId}
+      AND t.status = 'pending'
+      AND i.status = 'approving'
+    ORDER BY i.id DESC
+    LIMIT #{limit}
+  </select>
+
+</mapper>

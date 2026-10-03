@@ -24,6 +24,7 @@ public class OaProperties {
     private final Identity identity = new Identity();
     private final Watermark watermark = new Watermark();
     private final Authz authz = new Authz();
+    private final Workflow workflow = new Workflow();
 
     public Web getWeb() {
         return web;
@@ -55,6 +56,60 @@ public class OaProperties {
 
     public Watermark getWatermark() {
         return watermark;
+    }
+
+    public Workflow getWorkflow() {
+        return workflow;
+    }
+
+    /**
+     * 流程引擎（阶段 2a）。
+     *
+     * <p>注意分层：**运行期可配置项**（决议模式、Q6/Q7 闸门次数与补件时限等）由
+     * 管理后台按模板维护（落在 {@code flow_template} 的闸门列上，见 doc/templates.md §1.7），
+     * **不进本类**；本类只放「引擎行为开关」这类环境级配置。
+     */
+    public static class Workflow {
+
+        private final Approver approver = new Approver();
+
+        public Approver getApprover() {
+            return approver;
+        }
+
+        /** 审批人解析相关。 */
+        public static class Approver {
+
+            /**
+             * 是否允许「同一人连续担任多个串行节点审批人时自动合并」。
+             *
+             * <p><b>默认 false</b>：doc/prd-0.1.md §5.4 与 doc/enums.md §3 共同约束第 4 条
+             * 明确「默认逐节点分别审批（不做连续节点自动合并），如需合并由流程设计器显式配置」。
+             * 文档没有给出「设计器显式配置」的落点（{@code flow_template}/{@code flow_node}
+             * 都没有该列），因此本开关是**系统级**配置，并按「待决策项」交付：
+             * 若业务确认要「按模板/按节点勾选」，需新增配置列。
+             */
+            private boolean mergeConsecutiveNodes = false;
+
+            /** 单次解析最多输出的候选人条数（防御性上限，避免异常配置把快照撑爆）。 */
+            private int maxCandidatesPerNode = 200;
+
+            public boolean isMergeConsecutiveNodes() {
+                return mergeConsecutiveNodes;
+            }
+
+            public void setMergeConsecutiveNodes(boolean mergeConsecutiveNodes) {
+                this.mergeConsecutiveNodes = mergeConsecutiveNodes;
+            }
+
+            public int getMaxCandidatesPerNode() {
+                return maxCandidatesPerNode;
+            }
+
+            public void setMaxCandidatesPerNode(int maxCandidatesPerNode) {
+                this.maxCandidatesPerNode = maxCandidatesPerNode;
+            }
+        }
     }
 
     public Authz getAuthz() {

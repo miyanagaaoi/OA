@@ -55,7 +55,17 @@ class DataScopeMapperGuardTest {
             "com.oa.identity.infra.SysOrgLeaderMapper",
             "com.oa.identity.infra.SysUserPositionMapper",
             "com.oa.authz.infra.SysUserRoleMapper",
-            "com.oa.authz.infra.AuthzOrgLookupMapper");
+            "com.oa.authz.infra.AuthzOrgLookupMapper",
+            // 阶段 2a.3：在途/待办真实查询（flow_instance / flow_task 受控表）
+            "com.oa.identity.infra.InFlightQueryMapper",
+            // 阶段 2a.3：审批人解析目录（sys_org / sys_org_leader / sys_user）
+            "com.oa.workflow.approver.infra.ApproverDirectoryMapper",
+            // 阶段 2a.3：流程实例与表单数据（flow_instance / form_data）
+            "com.oa.workflow.approver.infra.FlowInstanceMapper",
+            // 阶段 2a.2：配置数据（flow_template / flow_node **不是**受控表，但保持同一纪律：
+            // 不继承 BaseMapper、只走显式语句，避免后人误用 MP 注入的无标记语句读到业务表）
+            "com.oa.workflow.definition.infra.FlowTemplateMapper",
+            "com.oa.workflow.definition.infra.FlowNodeMapper");
 
     /** 非业务数据表（会话注册表）：整体豁免，是 BaseMapper 的唯一合法持有者。 */
     private static final String EXEMPT_MAPPER = "com.oa.identity.infra.SysUserSessionMapper";

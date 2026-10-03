@@ -11,8 +11,8 @@ description:
   en: >
       Dictionaries for the fund form's two paper-form fields: plan category (in-plan/out-of-plan, defaulting to in-plan) and payment belong (current month/year/prior years, defaulting to current month); phase one stores the values only, with the dictionaries feeding print and display.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.677Z"
+revision: d5b96030fa491b789a78f1772859bcc23cb95a78
+updated_at: "2026-10-03T01:41:29.708Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

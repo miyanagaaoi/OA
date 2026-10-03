@@ -11,8 +11,8 @@ description:
   en: >
       Full-width light header band for each field group: canvas-subtle fill, 32px tall, typography.label, 12px left padding, rounded.xs; bands are collapsible and expanded by default; collapsing is purely visual and never changes what is submitted or validated.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.746Z"
+revision: d5b96030fa491b789a78f1772859bcc23cb95a78
+updated_at: "2026-10-03T01:41:29.775Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

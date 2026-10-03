@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  流程实例 Mapper（flow_instance / form_data）
+  ============================================================================
+  受控表纪律：
+    · flow_instance / form_data 均在 oa.scope.tables 中登记（kind=INSTANCE），
+      每条 SELECT **恰好 1 个** /* @dataScope(table=..., alias=...) */ 标记；
+    · **API 出参读**（selectInstanceById / selectList / selectByBizNo / selectFormDataCreator）
+      在调用人数据域下执行 → 域外查询不到，按 404 处理；
+    · **引擎内部读**（countByBizNo / countInFlightByTemplate）由 FlowInstanceService
+      包裹 DataScopeContext.system() → 片段退化为 1=1，得到全库口径；
+    · 写语句（insert/update）不需要标记（拦截器只约束 SELECT）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.approver.infra.FlowInstanceMapper">
+
+  <resultMap id="FlowInstanceResultMap" type="com.oa.workflow.approver.infra.row.FlowInstanceRow">
+    <id property="id" column="id"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="templateId" column="template_id"/>
+    <result property="templateVersion" column="template_version"/>
+    <result property="formDataId" column="form_data_id"/>
+    <result property="formType" column="form_type"/>
+    <result property="category" column="category"/>
+    <result property="initiatorId" column="initiator_id"/>
+    <result property="initiatorOrgId" column="initiator_org_id"/>
+    <result property="initiatorCompanyId" column="initiator_company_id"/>
+    <result property="initiatorOrgPath" column="initiator_org_path"/>
+    <result property="approverSnapshotJson" column="approver_snapshot_json"/>
+    <result property="status" column="status"/>
+    <result property="subStatus" column="sub_status"/>
+    <result property="currentNodeSeq" column="current_node_seq"/>
+    <result property="currentDeptId" column="current_dept_id"/>
+    <result property="ownerDeptId" column="owner_dept_id"/>
+    <result property="routingSeq" column="routing_seq"/>
+    <result property="routingCount" column="routing_count"/>
+    <result property="supplementCount" column="supplement_count"/>
+    <result property="submittedAt" column="submitted_at"/>
+    <result property="finishedAt" column="finished_at"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <sql id="InstanceColumns">
+    i.id, i.biz_no, i.template_id, i.template_version, i.form_data_id, i.form_type, i.category,
+    i.initiator_id, i.initiator_org_id, i.initiator_company_id, i.initiator_org_path,
+    i.approver_snapshot_json, i.status, i.sub_status, i.current_node_seq, i.current_dept_id,
+    i.owner_dept_id, i.routing_seq, i.routing_count, i.supplement_count, i.submitted_at,
+    i.finished_at, i.created_at
+  </sql>
+
+  <select id="selectInstanceById" resultMap="FlowInstanceResultMap">
+    SELECT <include refid="InstanceColumns"/>
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectInstances" resultMap="FlowInstanceResultMap">
+    SELECT <include refid="InstanceColumns"/>
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+    <if test="templateId != null">
+      AND i.template_id = #{templateId}
+    </if>
+    <if test="templateVersion != null">
+      AND i.template_version = #{templateVersion}
+    </if>
+    <if test="status != null and status != ''">
+      AND i.status = #{status}
+    </if>
+    <if test="initiatorId != null">
+      AND i.initiator_id = #{initiatorId}
+    </if>
+    ORDER BY i.id DESC
+    <if test="limit != null">
+      LIMIT #{limit}
+    </if>
+  </select>
+
+  <select id="selectByBizNo" resultMap="FlowInstanceResultMap">
+    SELECT <include refid="InstanceColumns"/>
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.biz_no = #{bizNo}
+    LIMIT 1
+  </select>
+
+  <!-- 单号唯一性（全局口径；调用方在 DataScopeContext.system() 下执行） -->
+  <select id="countByBizNo" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.biz_no = #{bizNo}
+  </select>
+
+  <!-- 该模板（可指定版本）下在途实例数：AC-09「改模板不影响在途」的可观测口径 -->
+  <select id="countInFlightByTemplate" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.template_id = #{templateId}
+      AND i.status = 'approving'
+    <if test="templateVersion != null">
+      AND i.template_version = #{templateVersion}
+    </if>
+  </select>
+
+  <select id="selectFormDataCreator" resultType="java.lang.Long">
+    SELECT f.creator_id
+    FROM form_data f
+    WHERE 1 = 1
+      AND /* @dataScope(table=form_data, alias=f) */
+      AND f.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectFormDataFields" resultType="java.lang.String">
+    SELECT f.fields_json
+    FROM form_data f
+    WHERE 1 = 1
+      AND /* @dataScope(table=form_data, alias=f) */
+      AND f.id = #{id}
+    LIMIT 1
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insertInstance" parameterType="com.oa.workflow.approver.infra.row.FlowInstanceRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_instance (biz_no, template_id, template_version, form_data_id, form_type, category,
+                               initiator_id, initiator_org_id, initiator_company_id, initiator_org_path,
+                               approver_snapshot_json, status, current_node_seq, owner_dept_id,
+                               routing_seq, routing_count, supplement_count)
+    VALUES (#{bizNo}, #{templateId}, #{templateVersion}, #{formDataId}, #{formType}, #{category},
+            #{initiatorId}, #{initiatorOrgId}, #{initiatorCompanyId}, #{initiatorOrgPath},
+            #{approverSnapshotJson}, IFNULL(#{status}, 'draft'), #{currentNodeSeq}, #{ownerDeptId},
+            0, 0, 0)
+  </insert>
+
+  <update id="updateSnapshot">
+    UPDATE flow_instance
+    SET approver_snapshot_json = #{approverSnapshotJson},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 草稿 → 审批中：本工作包只做这一条迁移；其余迁移属 2a.4 运行时状态机 -->
+  <update id="markSubmitted">
+    UPDATE flow_instance
+    SET status = 'approving',
+        current_node_seq = #{currentNodeSeq},
+        submitted_at = IFNULL(submitted_at, NOW()),
+        updated_at = NOW()
+    WHERE id = #{id} AND status = 'draft'
+  </update>
+
+  <update id="updateCurrentNodeSeq">
+    UPDATE flow_instance
+    SET current_node_seq = #{currentNodeSeq}, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <insert id="insertFormData" parameterType="com.oa.workflow.approver.infra.row.FormDataRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO form_data (biz_no, form_type, fields_json, schema_version, creator_id)
+    VALUES (#{bizNo}, #{formType}, IFNULL(#{fieldsJson}, '{}'), IFNULL(#{schemaVersion}, 1), #{creatorId})
+  </insert>
+
+</mapper>

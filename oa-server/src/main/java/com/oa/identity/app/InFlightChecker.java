@@ -10,15 +10,18 @@ import java.util.Map;
  *
  * <p>存在意义（施工要求第 3 条 + AC-11/AC-12）：组织停用与人员离职前必须确认
  * 「该节点子树下无在途单据」「该人名下无待处理待办」，否则按 {@code oa.identity.block-on-inflight}
- * 拒绝或仅告警。但流程表（{@code flow_instance} / {@code flow_task} / {@code flow_node_instance}）
- * 在阶段 1 **尚无完整实现**，因此本能力以端口形式隔离：
+ * 拒绝或仅告警。流程表（{@code flow_instance} / {@code flow_task}）在阶段 1 尚无实现，
+ * 因此本能力先以端口形式隔离：
  *
  * <ul>
  *   <li>接口在本包（{@code com.oa.identity.app}），只暴露身份领域需要的最小语义；</li>
- *   <li>缺省实现 {@code com.oa.identity.infra.DefaultInFlightChecker} **恒返回 0 / 空清单**，
- *       并在类注释中写明接入点；</li>
- *   <li>阶段 2 接入流程模块时，新实现只需 {@code @Primary}（或替换 Bean）即可，
- *       身份侧调用方（{@code OrgService} / {@code UserService}）**无需改动**。</li>
+ *   <li><b>阶段 2a.3 起，实现已经是真实查询</b>：
+ *       {@code com.oa.identity.infra.DefaultInFlightChecker} 走
+ *       {@code InFlightQueryMapper}（带 {@code @dataScope} 标记）按
+ *       {@code flow_instance.status='approving'} 与 {@code flow_task.status='pending'} 计数，
+ *       并在 {@code DataScopeContext.system()} 下执行（影响面统计不能因调用人数据域漏算）；</li>
+ *   <li>替换方式不变：新增一个 {@code @Primary} 实现即可，
+ *       身份侧调用方（{@code OrgService} / {@code UserService}）无需改动。</li>
  * </ul>
  *
  * <p><b>一条端口、多处复用</b>（施工要求第 3 条「复用同一端口，不要新造第二套检查逻辑」）：
@@ -30,12 +33,15 @@ import java.util.Map;
  *   <li>列表页口径：{@link #pendingTaskCounts}（批量，避免逐行 N+1）。</li>
  * </ol>
  *
- * <p><b>接入点（阶段 2 待接入）</b>：见 {@code DefaultInFlightChecker} 的类注释——
+ * <p><b>实现要点（阶段 2a.3 已落地）</b>：
  * 组织口径按 {@code sys_org.path} 前缀匹配 {@code flow_instance.initiator_org_path} /
  * {@code current_dept_id}，人员口径按 {@code flow_task.assignee_id = ? AND status = 'pending'}。
  * 这些查询属于**流程域受控表**（{@code flow_instance}/{@code flow_task} 已在
- * {@code oa.scope.tables} 登记），实现时必须带 {@code /* @dataScope(...) *}{@code /} 标记，
- * 且必须显式使用 {@code DataScopeContext.system()}（后台口径）或按调用人数据域过滤，二选一都要写清。
+ * {@code oa.scope.tables} 登记），实现带 {@code /* @dataScope(...) *}{@code /} 标记，
+ * 并显式使用 {@code DataScopeContext.system()}（后台口径）。
+ * <p>{@code TODO(2a.4)}：人员口径追加「本人在活动节点候选内」
+ * （{@code flow_node_instance.status='active'} 且 {@code approver_ids_json} 含本人）——
+ * 该列的结构由 2a.4 运行时状态机定义，本工作包不猜测其形状。
  */
 public interface InFlightChecker {
 

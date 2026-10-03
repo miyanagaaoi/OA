@@ -52,7 +52,7 @@
 | 超时规则 | **仅催办**（站内信 + 邮件），**不自动跳过、不自动升级**；最小可配置 24h。**V0.4 定稿默认值：② = 48h，其余节点（①③④⑤⑥⑦）= 24h**（后台可改，见 §0 T-01） |
 | 超时抄送上级 | `timeout_cc_superior` **默认 0（不抄送）**；需要抄送审批人上级时逐节点置 1（DDL 已有该列；`test-cases.md` TC-MSG-005 验证置 1 的效果） |
 | 自由跳转 | **V0.4 定稿默认值：全部节点 `allow_jump = false`**（关闭）；仅管理员显式开启的节点可用，且必须填写原因并计入审计日志与审批轨迹（见 §0 T-08） |
-| 闸门 | 流转 + 回退总次数 ≤5；同一节点被回退 ≤2；回到本部门连续 ≤2（不计入总次数）；补件同节点 ≤1 / 全单 ≤3 |
+| 闸门 | 流转 + 回退总次数 ≤5；同一节点被回退 ≤2；回到本部门连续 ≤2（不计入总次数）；补件同节点 ≤1 / 全单 ≤3。**2026-10-03 复议**：其中「全单」两项（≤5 / ≤3）改为**模板级可配置项**，上列数值降级为默认值 —— 键位、取值范围与校验见 **§1.7**；节点级三项（≤2 / ≤2 / ≤1）仍按本节执行 |
 | 模板版本 | 四类单据各自独立模板，`flow_template.code` = 单据类型码，起始 `version = 1` |
 
 ### 1.1 事项审批单（`template.code = matter`）
@@ -141,7 +141,12 @@
     "form_type": "matter",
     "version": 1,
     "status": "draft",
-    "node_count": 7
+    "node_count": 7,
+    "max_return_count": 5,
+    "max_supplement_count": 3,
+    "supplement_deadline_days": 3,
+    "supplement_deadline_type": "working",
+    "on_supplement_timeout": "notify"
   },
   "nodes": [
     {
@@ -263,8 +268,36 @@
 **其他三类模板的差异**：仅把 seq = 2 节点的 `skip_condition` 改为 `null`，`template.code` / `name` / `form_type` 改为对应单据类型；其余节点配置**逐字相同**。
 
 > **本段 JSON 的定稿要点（V0.4）**：① `timeout_hours` 按 T-01 定稿——**② = 48，其余节点 = 24**；② seq = 7 的 `decision_mode` 与 `pass_threshold` 均为 **`null`**（登记节点无决议，见 B-01）；③ `allow_route` 仅 ②⑤⑥ 为 `true`；④ 全部节点 `allow_jump = false`（T-08）；⑤ ⑦ 的留痕动作在轨迹中记为 `archive_register`。
+> **2026-10-03 补充（Q6/Q7 复议）**：`template` 对象新增 5 个**闸门配置键**（`max_return_count` / `max_supplement_count` / `supplement_deadline_days` / `supplement_deadline_type` / `on_supplement_timeout`），语义与取值范围见 §1.7；上面 JSON 中的取值为 **V0.4 定稿默认值**（即默认行为不变）。
 
 **协同子任务组的存储**：不新增 `flow_node` 行。运行时在 `flow_node_instance` 中新增 `node_seq = 2` + 不同 `dept_id` 的行（唯一键 `(instance_id, node_seq, dept_id)`），`approver_ids_json` 存该协同部门负责人快照；**每个协同部门一条 `collaboration` 站内信**。
+
+---
+
+### 1.7 Q6 / Q7 闸门配置项（**2026-10-03 产品裁定：两者均为可配置项**）
+
+> **裁定原文**：Q6（流转 / 回退 / 补件的**次数上限**）与 Q7（补件**时限与超时处理**）由「固定值」改为「**可自定义，当作配置项**」。
+> 因此 §1.0「闸门」行与 §0 T-01 中的数值**降级为默认值**；配置落点为**模板级**（`flow_template`，见 `data-model.md` §4.1 的 5 个可空列）。
+> **为什么只做模板级**：这两项都是「**全单累计**」语义（`flow_instance.routing_count` / `supplement_count` 即实例级计数），
+> 而非节点级；节点级的时间维度已由 `flow_node.timeout_hours` 承担（T-01）。节点级覆盖会引入文档未裁定的优先级规则，故本期不做。
+
+| 键（JSON / 列名） | 类型 | 默认值（未配置／0） | 取值范围 | 语义 |
+| --- | --- | --- | --- | --- |
+| `max_return_count` | int / NULL | **NULL = 不限**（种子模板写 5，即 V0.4 默认值） | `0` 或 `NULL` = 不限；`1..99` | 全单**回退**次数上限（`flow_instance.routing_count` 口径见 `data-model.md` §5.1；`0` 与 `NULL` 等价 = 不限） |
+| `max_supplement_count` | int / NULL | **NULL = 不限**（种子模板写 3） | `0` 或 `NULL` = 不限；`1..99` | 全单**补件**次数上限（原「全单补件 ≤3」） |
+| `supplement_deadline_days` | int / NULL | **NULL = 不设时限**（种子模板写 3） | `NULL` 或 `1..365`（`0` / 负数**一律拒绝**：不设时限请留空） | 补件时限天数 |
+| `supplement_deadline_type` | enum / VARCHAR(16) | `working`（给了天数但未给口径时按工作日） | `calendar` 自然日 / `working` 工作日 | 时限口径（法定节假日排班属阶段 3） |
+| `on_supplement_timeout` | enum / VARCHAR(16) | `notify`（**与 V0.4「超时仅催办」逐字一致，默认行为不变**） | `notify` 仅提醒 / `auto_pass` 自动通过 / `auto_return` 自动退回 | 补件超时处理策略 |
+
+**校验（发布前 dry-run 必检，见 §4.1 第 5 步）**：次数 `0..99`（负数与 >99 拒绝）、天数 `1..365`（`0`/负数拒绝）、两个枚举必须在值域内；
+另有一条**提示项**（不阻止发布）：配了 `supplement_deadline_type` 却没配 `supplement_deadline_days` → 提示「不设时限，口径不生效」。
+
+**实现边界（本期只做配置面）**：
+- 已完成：**配置 + 校验 + 持久化 + 读回 + 接口**（`PUT /api/v1/flow-templates/{template_id}/gate-policy`，读回随模板详情/列表下发）；
+- **未实现**（有显式 TODO）：真正的**计数判定**属 2a.4 运行时状态机（`TODO(2a.4): 按 max_return_count / max_supplement_count 判定`）；
+  **超时触发与调度**属 2b / 阶段 3（`TODO(阶段3): 按 supplement_deadline_days/type 与 on_supplement_timeout 调度`）。
+- 与 §1.0「闸门」行的关系：`≤5 / ≤2 / ≤2 / ≤1 / ≤3` 中，`≤5`（全单）与 `≤3`（全单补件）由本表两项配置承担；
+  `≤2`（同节点被回退）、`≤2`（连续回到本部门）、`≤1`（同节点补件）是**动作/节点级**常量，仍按 §1.0 执行（如需配置化须另立裁定）。
 
 ---
 

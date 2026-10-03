@@ -34,6 +34,16 @@ public enum ErrorCode {
     IMPORT_VALIDATION_FAILED(40005, "批量导入校验未通过，整批已拒绝（错误零落库）", 400),
     /** 400：导入文件本身不可用（缺文件 / 非 UTF-8 BOM / 表头不符，import-spec §4.1）。 */
     IMPORT_FILE_INVALID(40006, "导入文件不合法（编码/表头/行结构，见 import-spec §4.1）", 400),
+    /**
+     * 400：**发起前拦截**——任一节点解析出的候选人集合为空（REQ-FLOW-012 / AC-11 / AC-19）。
+     *
+     * <p>文案必须自带「哪个节点、命中哪条规则、缺什么配置」（{@code BizException} 的 details
+     * 不进 HTTP 响应体，故清单必须写进 message，口径同 {@code InFlightGuard}）。
+     * <b>绝不允许静默跳过该节点</b>：静默跳过会让单据绕过审批，属严重内控缺陷。
+     */
+    APPROVER_RESOLUTION_BLOCKED(40007, "发起被拒绝：存在节点无有效审批人", 400),
+    /** 400：模板/节点配置非法（顺序不连续、阈值非法、超时 <24h、必填节点缺失等）。 */
+    FLOW_DEFINITION_INVALID(40008, "流程模板或节点配置非法，已拒绝", 400),
 
     // ---------- 401 认证 ----------
     /** 401：未登录、或会话 Cookie 缺失/已撤销。 */
@@ -85,6 +95,16 @@ public enum ErrorCode {
     SESSION_LIMIT_REACHED(40904, "同时在线设备已达上限，最早的会话已被踢出", 409),
     /** 409：同一时刻只允许一个导入任务（import-spec §6.4 分布式锁 {@code oa:import:org_user}）。 */
     IMPORT_IN_PROGRESS(40905, "已有导入任务进行中，请等待其结束后重试", 409),
+    /**
+     * 409：模板版本不可写（templates.md §3.3 状态机 / §4.3 禁止事项）。
+     *
+     * <p>{@code published} / {@code archived} 版本**只读**：改配置必须
+     * {@code POST /flow-templates/{id}/versions} 开新草稿版本，
+     * 直接改会让在途单据的渲染与审批结果不可复现。
+     */
+    FLOW_DEFINITION_IMMUTABLE(40906, "该模板版本为已发布/已归档状态，只读；如需变更请基于它发布新版本", 409),
+    /** 409：同一 {@code code} 下已存在草稿版本（templates.md §3.3 同一 code 仅一个可编辑草稿）。 */
+    FLOW_DRAFT_ALREADY_EXISTS(40907, "该单据类型已存在草稿版本，请先发布该草稿后再新增版本", 409),
 
     // ---------- 429 ----------
     TOO_MANY_REQUESTS(42901, "请求过于频繁，请稍后重试", 429),
