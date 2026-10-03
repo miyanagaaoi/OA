@@ -5,14 +5,18 @@
  *   · 字段类型 → 控件映射（14 种，`doc/enums.md` §11）；
  *   · 值的三态归一（读取 / 编辑 / 提交），**金额全程字符串、绝不经 `Number`**；
  *   · 三态只读原因（`doc/forms.md` §1.2 / §5 / §7）；
- *   · 服务端校验报告 → 逐字段错误索引；`40011` 的 message 文本还原（结构化明细不可得时的降级）；
+ *   · 服务端校验报告 → 逐字段错误索引；`40011` 的 `details.errors[]`（结构化，**首选**）
+ *     与 message 文本还原（老响应 / 其它码的降级路径）；
+ *   · `user` / `org` 选择器的多值归一与数量上限（模板 `rules[pickerLimit]`，缺省回落 20）；
  *   · 发起前预检拦截项 → 可读文案。
  *
  * 真源：
  *   · `doc/enums.md` §11（14 种字段类型）、§10.2（四类 form_type）
- *   · `doc/forms.md` §1.2（三态读写）、§1.5（金额 `DECIMAL(18,2)`、禁浮点）、§5（印鉴单例外）
- *   · `doc/templates.md` §2.2（字段项结构）、§2.5（未知键 40308 / 状态白名单 40304）
- *   · 后端：`FormFieldType` / `FormWritePolicy` / `FormValidationReport` / `AmountText`
+ *   · `doc/forms.md` §1.2（三态读写）、§1.5（金额 `DECIMAL(18,2)`、禁浮点）、§2（`cc_users` ≤20 人）、
+ *     §5（印鉴单例外）
+ *   · `doc/templates.md` §2.2（字段项结构）、§2.3（`rules[pickerLimit]`）、§2.5（未知键 40308 / 状态白名单 40304）
+ *   · 后端：`FormFieldType` / `FormWritePolicy` / `FormValidationReport` / `AmountText` /
+ *     `FormPayloadValidator`（`pickerLimit` / `pickerValue` / `canonicalizePickers`）
  */
 import type {
   FormDocType,
@@ -28,6 +32,7 @@ import type {
   FormControlKind,
   FlowPrecheckBlocker,
 } from '@/types/form'
+import type { ApiErrorDetails, ApiFieldErrorDetail } from '@/types/api'
 
 // ================================================================ 常量
 
@@ -103,6 +108,26 @@ export const SEAL_RETURN_FIELD_CODES: readonly string[] = ['return_status', 'ret
 /** 后端「未登记字段」规则名（`FormValidationReport` 里 40308 / 干跑都用到） */
 export const RULE_UNKNOWN_FIELD = 'unknownField'
 
+/** 选择器数量上限的规则名（`doc/templates.md` §2.3 `rules[pickerLimit]`） */
+export const PICKER_LIMIT_RULE = 'pickerLimit'
+
+/** 选择器元素存在性校验的规则名（`FormPayloadValidator.RULE_PICKER_VALUE`） */
+export const RULE_PICKER_VALUE = 'pickerValue'
+
+/** 选择器数量上限的规则名（`FormPayloadValidator.RULE_PICKER_LIMIT`） */
+export const RULE_PICKER_LIMIT = 'pickerLimit'
+
+/**
+ * `user` / `org` 选择器的**默认**数量上限，与后端 `FormPayloadValidator.PICKER_MAX_DEFAULT`
+ * 同值（`doc/forms.md` §2 `cc_users` 行「≤20 人」）。
+ *
+ * ⚠ 为什么前端用「默认值」而不是模板里声明的 `max`：schema 出参的 `rules` 是**规则类型名清单**
+ * （后端 `FormFieldDef#view()` 只 put `rule.type`），模板声明的 `max` 与 `message` **不在出参里**。
+ * 因此当 `rules` 含 `pickerLimit` 时，UI 只能按 20 兜底并把「以服务端为准」讲清楚
+ * （见 {@link resolvePickerLimit} 的 `maxUnknownFromTemplate`）。
+ */
+export const PICKER_LIMIT_DEFAULT = 20
+
 /** 附件上传接口属阶段 2b.7 —— 本轮的显式「待接入」文案（**不伪造上传**） */
 export const ATTACHMENT_PENDING_HINT =
   '附件上传接口属阶段 2b.7（尚未交付），本页只展示已落库的附件元数据，不提供上传入口。'
@@ -177,6 +202,91 @@ export function asBool(value: FormJsonValue | undefined): boolean {
     return normalized === 'true' || normalized === '1' || normalized === 'yes'
   }
   return false
+}
+
+// ================================================================ user / org 选择器（多值）
+
+/**
+ * 人员 / 组织字段的元素清单：**trim + 去空 + 去重（保序）**。
+ *
+ * 与后端 `FormPayloadValidator#pickerElements` / `FormDataService#canonicalizePickers`
+ * 同口径：重复选同一个人不该把用户顶到上限外，也不该产生两遍存在性报错。
+ * **单值形态返回单元素清单**（历史草稿里存的是字符串，读法不变）。
+ */
+export function normalizePickerValues(value: FormJsonValue | undefined): string[] {
+  const unique: string[] = []
+  for (const raw of asTextList(value)) {
+    const item = raw.trim()
+    if (item === '' || unique.includes(item)) continue
+    unique.push(item)
+  }
+  return unique
+}
+
+/** 选择器上限判定结果（UI 用；服务端 `pickerLimit` 仍是裁决方） */
+export interface PickerLimit {
+  /** UI 侧上限；`0` = 本字段不限制（非 user / org） */
+  max: number
+  /** 上限来源：`template`（模板声明了 `pickerLimit`）/ `default`（后端默认回落）/ `none` */
+  source: 'template' | 'default' | 'none'
+  /** 面向用户的提示（含「服务端仍是裁决方」） */
+  hint: string
+  /**
+   * 模板声明了 `pickerLimit`，但 schema 出参只回规则类型名、**不回 `max`**，
+   * 因此 UI 用的是默认 20；此时界面必须写明「以服务端为准」而不是假装知道确切上限。
+   */
+  maxUnknownFromTemplate: boolean
+}
+
+/** 字段是否属于人员 / 组织选择器（按类型判，不依赖字段码命名） */
+export function isPickerField(field: Pick<FormField, 'control' | 'type'>): boolean {
+  return field.control === 'user' || field.control === 'org' || field.type === 'user' || field.type === 'org'
+}
+
+/**
+ * 人员 / 组织字段的多选上限（`rules[pickerLimit]`；后端缺省回落 20）。
+ *
+ * <p>判定顺序与后端 `FormPayloadValidator#validatePickerLimit` 一致：模板声明 → 缺省 20；
+ * 非 `user` / `org` 字段**不判**（返回 `max = 0`，界面不做限制，保持既有行为）。
+ */
+export function resolvePickerLimit(field: Pick<FormField, 'control' | 'type' | 'rules'>): PickerLimit {
+  if (!isPickerField(field)) {
+    return { max: 0, source: 'none', hint: '', maxUnknownFromTemplate: false }
+  }
+  const declared = (field.rules ?? []).includes(PICKER_LIMIT_RULE)
+  const unit = field.control === 'org' || field.type === 'org' ? '个' : '人'
+  const hint = declared
+    ? `最多 ${PICKER_LIMIT_DEFAULT} ${unit}（模板声明了 rules[pickerLimit]；具体上限由服务端裁决，` +
+      '重复选择自动去重）'
+    : `最多 ${PICKER_LIMIT_DEFAULT} ${unit}（服务端默认上限 pickerLimit，重复选择自动去重）`
+  return {
+    max: PICKER_LIMIT_DEFAULT,
+    source: declared ? 'template' : 'default',
+    hint,
+    maxUnknownFromTemplate: declared,
+  }
+}
+
+/** 选择数量是否超限（`limit.max <= 0` = 不限制；按去重后的条数计，与服务端同口径） */
+export function exceedsPickerLimit(
+  values: readonly string[],
+  limit: Pick<PickerLimit, 'max'>,
+): boolean {
+  return limit.max > 0 && values.length > limit.max
+}
+
+/**
+ * 手填 id 的输入 → 元素清单（通讯录 / 组织选择器不可用时的降级路径）。
+ *
+ * 分隔符支持中英文逗号、顿号、分号与空白：降级路径里用户是从别处**抄 id** 过来的，
+ * 只认逗号会让他们反复猜格式。
+ */
+export function parsePickerInput(raw: string): string[] {
+  return normalizePickerValues(
+    (raw ?? '')
+      .split(/[,，、;；\s]+/)
+      .filter((item) => item.trim() !== ''),
+  )
 }
 
 // ================================================================ 金额（字符串定点，绝不用 Number）
@@ -288,7 +398,8 @@ export function checkAmountText(raw: string, unitHint = '元'): AmountCheck {
  * 按字段类型归一**提交值**（返回 `undefined` = 该键不提交，后端 `merge` 语义为「不动」）。
  *
  * 归一口径逐条对齐后端 `FormPayloadValidator#typeMatches`：
- *   · `TEXT/TEXTAREA/TAG/DATE/SELECT/USER/ORG` → `CharSequence`（字符串）；
+ *   · `TEXT/TEXTAREA/TAG/DATE/SELECT` → `CharSequence`（字符串）；
+ *   · `USER/ORG` → `CharSequence | Collection`（**多值上送数组**，服务端再去重保序并逐个判存在性）；
  *   · `NUMBER/AMOUNT` → `Number | CharSequence` —— **一律字符串**（禁浮点）；
  *   · `BOOLEAN` → 布尔；
  *   · `MULTISELECT/FILES/FILE/DATERANGE` → 集合。
@@ -314,9 +425,12 @@ export function toSubmitValue(
     case 'attachment':
       return isEmptyFormValue(value) ? null : asTextList(value).filter((item) => item !== '')
     case 'user':
-    case 'org':
-      // 后端 typeMatches 把 user/org 归为 CharSequence（单选），与渲染器一致
-      return isEmptyFormValue(value) ? null : asInputText(value).trim()
+    case 'org': {
+      // 多值：一律上送**数组**（本地先按服务端口径去重保序，服务端仍会兜底一次）。
+      // 空 → null（清空该键），不回空串：空串在服务端会被当成「一个元素」去做存在性判定。
+      const list = normalizePickerValues(value)
+      return list.length === 0 ? null : list
+    }
     default:
       return isEmptyFormValue(value) ? null : asDisplayText(value)
   }
@@ -385,22 +499,24 @@ export interface AmountWriteVerdict {
   writable: boolean
   /** 面向用户的判定文案（可写时也给，用于解释「为什么这个框能填」） */
   reason: string
-  /** 与服务端 `amountPolicy` 不一致时的披露（一致时为空串） */
+  /** 兜底提示（可写时给出「以服务端 40306 为准」；只读时为空串） */
   note: string
 }
 
 /**
- * 金额字段是否可写（**角色维度**，与单据状态正交，PRD §5.3）。
+ * 金额字段是否可写（PRD §5.3）。
  *
- * <p>判定顺序：**① 角色码（系统管理员 / 财务负责人）→ ② 服务端 `amountPolicy.writable`**。
+ * <p><b>判定顺序</b>：**① 服务端 `amountPolicy.writable`（权威）→ ② 角色码兜底**。
  *
- * <p><b>为什么角色码在前</b>：写路径的裁决点是 `FormFieldWriteGuard → AmountFieldPolicy`
- * （`admin` ∪ `finance_owner`；实测系统管理员写 `amount` 返回 200 且落库成功）。而**读**路径的
- * `GET /forms/{formType}/field-groups` 目前用 `amountPolicyOf(null)` 计算 `amountPolicy`
- * （`FormRuleController` 传 null principal），于是它对**任何**账号都返回 `writable=false` ——
- * 若前端以它为主判据，系统管理员与财务负责人会被误判成只读，界面上的金额框根本填不了
- * （即「发起页金额框填不了」的成因之一）。因此前端以**角色码**为准，
- * 并在两者不一致时把服务端的值如实披露出来（`note`）。
+ * <p>2026-10-04（后端 7c409ea）起 `GET /forms/{formType}/field-groups` 的 `amountPolicy`
+ * 改为**按当前登录主体**计算（`FormRuleController` 注入 `FormFieldWriteGuard`），
+ * 实测 admin / finance_owner → `writable:true`，employee → `false`，与写路径（40306）同结论。
+ * 因此前端不再需要「角色码优先 + 披露不一致」的那套绕行逻辑：
+ * 服务端下发了就以它为准（**删除**此前「服务端 amountPolicy 与角色口径不一致」的披露文案）。
+ *
+ * <p>只在**取不到** `amountPolicy`（字段分组接口失败 / 实例页静默降级为 `null`）时，
+ * 才回落到角色码判定 —— 否则一次网络抖动就会把 admin 的金额框锁死，
+ * 那正是此前「发起页金额框填不了」的成因。回落时明确写出该判据来自本地角色码。
  *
  * <p>⚠ 前端只决定「渲不渲染 / 放不放行」：越权写入仍由服务端按 403/40306 拒绝。
  */
@@ -411,20 +527,29 @@ export function resolveAmountWrite(
   const roleWritable =
     subject != null &&
     (subject.isSuperAdmin || subject.roleCodes.some((role) => AMOUNT_WRITABLE_ROLES.includes(role)))
-  const serverWritable = serverPolicy?.writable === true
+  /** 兜底提示：前端放行不等于一定能写（服务端 40306 仍是裁决方） */
+  const serverFallbackNote = '能否写入以服务端 40306 为准（前端置灰只是提示，不是边界）。'
+
+  if (serverPolicy != null) {
+    return serverPolicy.writable
+      ? {
+          writable: true,
+          reason: '服务端下发 amountPolicy.writable=true（按当前登录主体计算，与写路径 40306 同结论）',
+          note: serverFallbackNote,
+        }
+      : {
+          writable: false,
+          reason: `服务端下发 amountPolicy.writable=false：金额对当前主体只读（可写角色：${AMOUNT_WRITABLE_ROLES.join(' / ')}；PRD §5.3）`,
+          note: '',
+        }
+  }
 
   if (roleWritable) {
     return {
       writable: true,
-      reason: `当前角色可写金额（${AMOUNT_WRITABLE_ROLES.join(' / ')}；PRD §5.3）`,
-      note: serverWritable
-        ? ''
-        : '注意：`GET /forms/{formType}/field-groups` 返回的 amountPolicy.writable=false 与角色口径不一致' +
-          '（后端以 null principal 计算该字段），已按角色口径放行；能否写入以服务端 40306 为准。',
+      reason: `未取到服务端 amountPolicy，按本地角色码兜底放行（${AMOUNT_WRITABLE_ROLES.join(' / ')}；PRD §5.3）`,
+      note: `服务端字段分组接口未返回 amountPolicy，已按角色码放行；${serverFallbackNote}`,
     }
-  }
-  if (serverWritable) {
-    return { writable: true, reason: '服务端下发 amountPolicy.writable=true', note: '' }
   }
   return {
     writable: false,
@@ -627,16 +752,70 @@ export function toValidationReport(wire: {
   }
 }
 
+/**
+ * `40011` 响应体里的**结构化**逐字段明细（`details.errors[]`）→ 本域报告。
+ *
+ * <p>服务端 `FormValidationReport#issueViews()` 是干跑 `report.issues[]` 与 40011
+ * `details.errors[]` 的**唯一生产者**，两者同源同形；因此这条路径产出的报告与干跑
+ * 200 出参的报告可直接互换（`parsedFromMessage=false`）。
+ *
+ * <p>返回 `null` 表示「响应里没有可用的结构化明细」（老响应 / 其它错误码 / 形状未知），
+ * 调用方此时**必须**回落到 {@link parseValidationMessage} 的文本还原，不能把错误吞掉。
+ */
+export function validationReportFromDetails(
+  details: ApiErrorDetails | null | undefined,
+): FormValidationReport | null {
+  const raw = details?.errors
+  if (!Array.isArray(raw)) return null
+  const issues: FormFieldIssue[] = []
+  for (const item of raw) {
+    if (item === null || typeof item !== 'object') continue
+    const record = item as ApiFieldErrorDetail
+    const field = typeof record.field === 'string' ? record.field : ''
+    const message = typeof record.message === 'string' ? record.message : ''
+    if (field === '' && message === '') continue
+    issues.push({
+      field,
+      label: typeof record.label === 'string' ? record.label : '',
+      rule: typeof record.rule === 'string' ? record.rule : '',
+      message,
+    })
+  }
+  if (issues.length === 0) return null
+  return {
+    passed: false,
+    issueCount: issues.length,
+    issues,
+    parsedFromMessage: false,
+    unrestored: '',
+  }
+}
+
 /** 报告 → 逐字段错误索引（渲染器据此把错误挂到对应控件上） */
 export function buildIssueIndex(report: FormValidationReport | null): Record<string, FormFieldIssue[]> {
   const index: Record<string, FormFieldIssue[]> = {}
   if (!report) return index
   for (const issue of report.issues) {
-    const key = issue.field || '__unbound__'
+    const key = issue.field || UNBOUND_ISSUE_KEY
     if (!index[key]) index[key] = []
     index[key].push(issue)
   }
   return index
+}
+
+/**
+ * `buildIssueIndex` 里**没有字段码**的那些条目（`field` 为空）的键。
+ *
+ * 服务端逐字段明细总带字段码；`field` 为空的只可能来自 message 文本还原
+ * （`parseValidationMessage` 的兜底路径）或整单级拒绝。它们**必须**进「整单错误区」——
+ * 挂在 `__unbound__` 而渲染器只读 `errors[field.code]`，等于把错误静默丢掉。
+ */
+export const UNBOUND_ISSUE_KEY = '__unbound__'
+
+/** 报告里无法归到具体字段的文案（整单错误区用） */
+export function unboundIssueMessages(report: FormValidationReport | null): string[] {
+  const list = buildIssueIndex(report)[UNBOUND_ISSUE_KEY] ?? []
+  return list.map((issue) => issue.message || issue.label || issue.field).filter((message) => message !== '')
 }
 
 /** 逐字段错误的第一条文案（挂到控件下方） */
@@ -647,17 +826,17 @@ export function firstIssueMessage(report: FormValidationReport | null, fieldCode
 }
 
 /**
- * `40011`（`FORM_VALIDATION_FAILED`）的 message 文本还原。
+ * `40011`（`FORM_VALIDATION_FAILED`）的 message 文本还原 —— **降级路径**。
  *
- * <p><b>为什么需要它</b>：后端 `GlobalExceptionHandler` 只透出 `message`，
- * `BizException#withDetail("errors", …)` 的结构化清单**不进 HTTP 响应体**
- * （`doc/tech-design.md` §5.5 / AC-41）。而 `FormValidationReport#summary()` 的文案形如
+ * <p><b>首选路径已改变</b>（2026-10-04，后端 7c409ea）：40011 的响应体现在带
+ * `details.errors[]`（`{field,label,rule,message}`，与干跑 `report.issues[]` 同源），
+ * 因此正常情况用 {@link validationReportFromDetails} 即可。
+ *
+ * <p>本函数只在**结构化明细不可得**时使用：老响应（未部署该版本的服务端）、
+ * 其它错误码、或 `details` 形状未知。`FormValidationReport#summary()` 的文案形如
  * `表单字段校验未通过（3 项）：title（事项标题）：请填写事项标题；…`，
- * 字段码与原因都在文本里，因此前端做**尽力还原**：
+ * 字段码与原因都在文本里，因此做**尽力还原**：
  * 能定位到字段的挂到该字段上，定位不到的放进 `unrestored` 原样展示（不丢信息）。
- *
- * <p>首选路径仍是干跑接口（`POST /forms/instances/{id}/validate`）200 出参里的结构化 `report`；
- * 本函数只在写入路径（`PUT draft`）被 40011 拒绝时兜底。
  */
 export function parseValidationMessage(message: string): FormValidationReport {
   const text = (message ?? '').trim()
@@ -705,7 +884,7 @@ export function parseValidationMessage(message: string): FormValidationReport {
 export const FORM_ERROR_HINT: Record<number, string> = {
   40007: '发起前预检拦截：存在节点解析不出有效审批人 —— 请先补齐组织负责人等配置（清单见下方逐条拦截项）',
   40009: '驳回意见不足 5 个字（REQ-FLOW-013 / AC-50），请补足后重试',
-  40011: '表单服务端二次校验未通过：下方按字段列出了全部不合格项（不是只报第一个）',
+  40011: '表单服务端二次校验未通过：下方按字段列出了全部不合格项（明细取自响应的 details.errors[]，与干跑接口同源）',
   40301: '当前账号没有该操作所需的权限码（服务端仍是裁决方）',
   40304: '三态白名单拒绝写入：该字段在当前单据状态下不可写',
   40306: '金额字段对非财务类角色只读（PRD §5.3）—— 与单据状态无关，草稿态同样拒绝',
@@ -724,6 +903,39 @@ export function errorHint(code: number | string | null | undefined): string {
   const numeric = typeof code === 'string' ? Number(code) : code
   if (numeric === null || numeric === undefined || !Number.isFinite(numeric)) return ''
   return FORM_ERROR_HINT[numeric as number] ?? ''
+}
+
+/**
+ * 服务端校验规则名 → 中文短标签（报告面板里 `issue.rule` 的展示用）。
+ *
+ * <p>后端在 `rule` 里回的是**规则类型名**（`FormPayloadValidator` 的 `RULE_*`）；
+ * 直接把 `pickerLimit` 这类英文码丢给用户等于没解释。未登记的规则**原样回显**（不猜）。
+ */
+export const FORM_RULE_LABEL: Record<string, string> = {
+  required: '必填',
+  unknownField: '未登记字段',
+  typeMismatch: '类型不匹配',
+  pickerValue: '通讯录/组织存在性',
+  pickerLimit: '选择数量上限',
+  amountRange: '金额区间',
+  numberRange: '数字区间',
+  maxLength: '长度上限',
+  minLength: '长度下限',
+  pattern: '格式',
+  inDict: '字典取值',
+  unique: '唯一性',
+  conditionalRequired: '条件必填',
+  conditionalMinLength: '条件长度下限',
+  dateNotBefore: '不早于指定日期',
+  dateNotBeforeField: '日期先后关系',
+  filePolicy: '附件策略',
+}
+
+/** 规则名 → 中文标签（未登记原样回显） */
+export function formRuleLabel(rule: string | null | undefined): string {
+  const code = (rule ?? '').trim()
+  if (code === '') return ''
+  return FORM_RULE_LABEL[code] ?? code
 }
 
 /** 预检拦截项 → 一行可读文案（节点 / 规则 / 缺什么配置） */

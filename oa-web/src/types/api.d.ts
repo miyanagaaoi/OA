@@ -18,6 +18,38 @@ export interface ApiEnvelope<T> {
   data?: T
   /** 追踪 ID：使审计记录能回溯到原始请求（gateway/error） */
   traceId?: string
+  /**
+   * 结构化错误明细（**仅错误响应、且错误码显式声明时才出现**；`null` 时服务端整键省略）。
+   *
+   * 服务端 `BizException#withPublicDetail` 逐键显式声明可对外内容，
+   * 因此成功体与未声明明细的错误体形状**一个字节未变** —— 老解析逻辑不受影响。
+   */
+  details?: ApiErrorDetails
+}
+
+/**
+ * 表单二次校验的逐字段明细（`40011` 的 `details.errors[]`）。
+ *
+ * 与干跑接口 `POST /forms/{formType}/validate` 出参的 `report.issues[]` **同源同形**
+ * （服务端同一个 `FormValidationReport#issueViews()`），因此前端不再需要从
+ * `「字段码（标签）：原因」` 的 message 文本里尽力还原。
+ */
+export interface ApiFieldErrorDetail {
+  field: string
+  label?: string
+  rule?: string
+  message: string
+}
+
+/**
+ * 可对外错误明细容器。
+ *
+ * 目前只有 `errors` 一个已登记键；保留未知键以便服务端追加新明细时前端**不崩**
+ * （未知键由调用方按需读取，不得假设其形状）。
+ */
+export interface ApiErrorDetails {
+  errors?: ApiFieldErrorDetail[]
+  [key: string]: unknown
 }
 
 export interface ApiErrorPayload {
@@ -25,6 +57,7 @@ export interface ApiErrorPayload {
   message: string
   traceId?: string
   httpStatus?: number
+  details?: ApiErrorDetails
 }
 
 // ---------------------------------------------------------------------------

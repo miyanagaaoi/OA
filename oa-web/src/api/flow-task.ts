@@ -21,13 +21,15 @@
  * ── 实例级动作 ─────────────────────────────────────────────────────────────
  *   POST   .../{id}/reopen | resubmit | withdraw | terminate | supplement | cc
  * ── 任务列表与任务级动作 ───────────────────────────────────────────────────
- *   GET    /api/v1/flow-tasks/todo | done | initiated             读（分页）
+ *   GET    /api/v1/flow-tasks/todo | done | initiated | cc      读（分页 + **同一套筛选**）
  *   POST   /api/v1/flow-tasks/{taskId}/approve | reject | rollback | route | back-home | jump
  *          | add-sign | supplement-request | transfer | reassign | archive-register
  *
- * ⚠ **抄送我的列表没有接口**（`FlowTaskController` 只有 todo/done/initiated 三个列表；
- *   `flow_instance_cc` 只能在**单实例**维度通过 `/{id}/cc` 读）。本文件因此**不伪造**
- *   `listCcTasks()`；页面如实标注「待实现」。
+ * **2026-10-04（后端 7c409ea）起**：
+ *   · 新增 `GET /flow-tasks/cc`（抄送我的一览）→ {@link listCcTasks}；
+ *   · 四个列表统一支持 `keyword / formType / status / dateFrom / dateTo`（**SQL 层过滤**，
+ *     `total` 是筛选后的总数）→ {@link FlowListFilter}；
+ *   · `TaskListItemView` 末位追加 `title`（关键字筛选要能命中标题）。
  *
  * 两条实现约定：
  *   1. **映射层承担 `Long` → string**，并负责把 `PageResult.total`（后端 `long` → JSON 字符串）
@@ -38,6 +40,7 @@ import { get, post, type OaRequestConfig } from './http'
 import type {
   WireActionResult,
   WireActionCatalogView,
+  WireCcListItemView,
   WireCcView,
   WireFlowInstanceListQuery,
   WireGateView,
@@ -47,6 +50,7 @@ import type {
   WirePageResult,
   WireRoutingView,
   WireSupplementView,
+  WireTaskListQuery,
   WireTaskListItemView,
   WireTaskView,
   WireThreadView,
@@ -56,9 +60,11 @@ import type {
   FlowActionResult,
   FlowApproverSnapshot,
   FlowCcItem,
+  FlowCcListItem,
   FlowCreateInstancePayload,
   FlowGate,
   FlowInstance,
+  FlowListFilter,
   FlowNodeInstance,
   FlowPage,
   FlowPrecheckPayload,
@@ -240,6 +246,29 @@ function toListItem(wire: WireTaskListItemView): FlowTaskListItem {
     currentNodeSeq: nullableNum(wire.currentNodeSeq),
     instanceStatus: text(wire.instanceStatus),
     subStatus: nullableText(wire.subStatus),
+    title: text(wire.title),
+  }
+}
+
+/** 抄送列表项归一（`GET /flow-tasks/cc`） */
+function toCcListItem(wire: WireCcListItemView): FlowCcListItem {
+  return {
+    ccId: sid(wire.ccId),
+    instanceId: sid(wire.instanceId),
+    bizNo: text(wire.bizNo),
+    formType: text(wire.formType),
+    category: text(wire.category),
+    title: text(wire.title),
+    initiatorId: nullableId(wire.initiatorId),
+    initiatorName: text(wire.initiatorName),
+    instanceCreatedAt: nullableText(wire.instanceCreatedAt),
+    currentNodeSeq: nullableNum(wire.currentNodeSeq),
+    instanceStatus: text(wire.instanceStatus),
+    subStatus: nullableText(wire.subStatus),
+    ccCreatedAt: nullableText(wire.ccCreatedAt),
+    ccSource: text(wire.ccSource),
+    readAt: nullableText(wire.readAt),
+    read: wire.read === true,
   }
 }
 
@@ -253,28 +282,92 @@ function toPage(wire: WirePageResult<WireTaskListItemView> | null | undefined): 
   }
 }
 
-/** 待我审批（`pending` 且我是处理人；分页 + 数据域） */
-export async function listTodoTasks(page = 1, size = 20): Promise<FlowPage<FlowTaskListItem>> {
+/** 抄送分页壳归一（壳形状与任务列表一致，条目类型不同） */
+function toCcPage(wire: WirePageResult<WireCcListItemView> | null | undefined): FlowPage<FlowCcListItem> {
+  return {
+    items: (wire?.items ?? []).map(toCcListItem),
+    total: toCount(wire?.total, 0),
+    page: num(wire?.page, 1),
+    size: num(wire?.size, 20),
+  }
+}
+
+/**
+ * 筛选参数 → 请求参数（**空串不发送**）。
+ *
+ * <p>为什么在映射层做：`TaskListFilter#of` 把空白串归一为「不筛」，但下发送一个空串
+ * 仍然会走一遍服务端校验；更重要的是让「没填」与「填了空」在网络上**没有区别**，
+ * 避免「筛选区看起来填了、实际没生效」这类错觉。
+ */
+function listParams(page: number, size: number, filter?: FlowListFilter): WireTaskListQuery {
+  const params: WireTaskListQuery = { page, size }
+  const keyword = (filter?.keyword ?? '').trim()
+  const formType = (filter?.formType ?? '').trim()
+  const status = (filter?.status ?? '').trim()
+  const dateFrom = (filter?.dateFrom ?? '').trim()
+  const dateTo = (filter?.dateTo ?? '').trim()
+  if (keyword !== '') params.keyword = keyword
+  if (formType !== '') params.formType = formType
+  if (status !== '') params.status = status
+  if (dateFrom !== '') params.dateFrom = dateFrom
+  if (dateTo !== '') params.dateTo = dateTo
+  return params
+}
+
+/** 待我审批（`pending` 且我是处理人；分页 + 数据域 + 筛选） */
+export async function listTodoTasks(
+  page = 1,
+  size = 20,
+  filter?: FlowListFilter,
+): Promise<FlowPage<FlowTaskListItem>> {
   const wire = await fget<WirePageResult<WireTaskListItemView>>('/flow-tasks/todo', {
-    params: { page, size },
+    params: listParams(page, size, filter),
   })
   return toPage(wire)
 }
 
-/** 我已审批（我处理过的任务） */
-export async function listDoneTasks(page = 1, size = 20): Promise<FlowPage<FlowTaskListItem>> {
+/** 我已审批（我处理过的任务；分页 + 数据域 + 筛选） */
+export async function listDoneTasks(
+  page = 1,
+  size = 20,
+  filter?: FlowListFilter,
+): Promise<FlowPage<FlowTaskListItem>> {
   const wire = await fget<WirePageResult<WireTaskListItemView>>('/flow-tasks/done', {
-    params: { page, size },
+    params: listParams(page, size, filter),
   })
   return toPage(wire)
 }
 
-/** 我发起的 */
-export async function listInitiatedTasks(page = 1, size = 20): Promise<FlowPage<FlowTaskListItem>> {
+/** 我发起的（分页 + 数据域 + 筛选） */
+export async function listInitiatedTasks(
+  page = 1,
+  size = 20,
+  filter?: FlowListFilter,
+): Promise<FlowPage<FlowTaskListItem>> {
   const wire = await fget<WirePageResult<WireTaskListItemView>>('/flow-tasks/initiated', {
-    params: { page, size },
+    params: listParams(page, size, filter),
   })
   return toPage(wire)
+}
+
+/**
+ * **抄送我的一览**（`GET /flow-tasks/cc`，2026-10-04 新增）。
+ *
+ * <p>数据源 `flow_cc ⋈ flow_instance`；「抄送人 = 本人」由服务端显式过滤，再叠加单据数据域标记
+ * （域外 fail-closed）。抄送**只读可见、不产生待办**：因此没有任务维度字段，
+ * 出参是七项单据信息 + `readAt` / `read`。
+ *
+ * <p>与 `listInstanceCc()`（**单实例**维度读抄送清单）不是一回事：后者用于详情页展示某单抄送给了谁。
+ */
+export async function listCcTasks(
+  page = 1,
+  size = 20,
+  filter?: FlowListFilter,
+): Promise<FlowPage<FlowCcListItem>> {
+  const wire = await fget<WirePageResult<WireCcListItemView>>('/flow-tasks/cc', {
+    params: listParams(page, size, filter),
+  })
+  return toCcPage(wire)
 }
 
 // ================================================================ 实例详情与运行态
@@ -536,8 +629,8 @@ export async function listInstanceSupplements(instanceId: string): Promise<FlowS
 /**
  * 抄送记录（**单实例维度**）。
  *
- * ⚠ 「抄送我的」**列表**接口不存在（后端只有 todo/done/initiated 三个列表）；
- * 本函数只读**指定单据**的抄送清单，用于详情页展示。
+ * <p>用途是详情页展示「这单抄送给了谁」；「抄送我的一览」是另一个接口
+ * （{@link listCcTasks}，`GET /flow-tasks/cc`），两者维度不同、不要互相替代。
  */
 export async function listInstanceCc(instanceId: string): Promise<FlowCcItem[]> {
   const wire = await fget<WireCcView[]>(`/flow-instances/${encodeURIComponent(instanceId)}/cc`)
@@ -570,8 +663,9 @@ function toBlocker(wire: {
 /**
  * 发起前预检（**只读干跑**）：逐节点解析候选人，任一为空即 `allowed=false`。
  *
- * `allowed=false` 时服务端会以 `40007`（`APPROVER_RESOLUTION_BLOCKED`）拦在 `POST /flow-instances`；
- * 前端在此**提前**呈现「哪个节点、命中哪条规则、缺什么配置」（AC-11 / AC-19）。
+ * `allowed=false` 时服务端会以 `40007`（`APPROVER_RESOLUTION_BLOCKED`）拦在
+ * **`POST /flow-instances/{id}/submit`**（2026-10-04 起；建草稿**不再**预检）；
+ * 前端在提交前调用本接口**提前**呈现「哪个节点、命中哪条规则、缺什么配置」（AC-11 / AC-19）。
  */
 export async function precheckFlowInstance(payload: FlowPrecheckPayload): Promise<FlowPrecheckReport> {
   const wire = await fpost<{
@@ -633,7 +727,11 @@ export async function precheckFlowInstance(payload: FlowPrecheckPayload): Promis
 }
 
 /**
- * 建草稿实例：预检通过 → **锁定模板版本** → 固化审批人快照。
+ * 建草稿实例：锁定模板版本 → 固化审批人快照（**不在这一步做发起前预检**）。
+ *
+ * <p>2026-10-04 起（后端 7c409ea）建草稿**不再**因「空候选人」回 40007（仅 WARN 留痕）：
+ * 预检移到 `POST /flow-instances/{id}/submit` 之前（`prepareSubmitSnapshot`），拦截即零落库。
+ * 因此「保存草稿」是安全的中间态，用户可以先存、再去补组织负责人等配置。
  *
  * `fields` 与 `formValues` 传**同一份值**：后端 `CreateInstanceRequest` 两个键都有，
  * 前端不依赖它读哪一个（纯追加/实现细节不该成为契约）。

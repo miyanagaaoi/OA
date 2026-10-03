@@ -16,14 +16,29 @@
  *   3. **附件如实标注「待接入」**：阶段 2b.7 才有上传接口，本组件只展示已落库的附件元数据，
  *      **不伪造上传入口**。
  *
- * `user` / `org` 是**单值**控件：后端 `FormPayloadValidator#typeMatches` 对
- * `USER` / `ORG` 只接受 `CharSequence`（实测数组形态回 `typeMismatch`），
- * 与 `doc/forms.md` 的「≤20 人」存在口径差 —— 界面按**当前服务端契约**渲染并在下方标注，
- * 多值入口请走「抄送」动作（`POST /flow-instances/{id}/cc`）。
+ * `user` / `org` 是**多值**控件（2026-10-04 后端 7c409ea 起）：
+ * 服务端 `FormPayloadValidator#typeMatches` 对 `USER` / `ORG` 同时接受单值与数组，
+ * 落库前按**去重保序**规范化（`canonicalizePickers`），并按 `rules[pickerLimit]` 计数量
+ * ——模板未声明时回落 20（`doc/forms.md` §2 `cc_users` 行「≤20 人」）。
+ * 因此界面用多选，提交时一律上送**数组**；元素存在性（`pickerValue`）与数量上限（`pickerLimit`）
+ * 由服务端逐条裁决。单值历史数据的读法不变（`asTextList` 把字符串当单元素清单）。
  */
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { FormField, FormJsonValue, FormOption } from '@/types/form'
-import { ATTACHMENT_PENDING_HINT, asBool, asDisplayText, asInputText, asTextList, checkAmountText, normalizeAmountInput, padAmountScale } from '@/utils/form-rules'
+import {
+  ATTACHMENT_PENDING_HINT,
+  asBool,
+  asDisplayText,
+  asInputText,
+  asTextList,
+  checkAmountText,
+  exceedsPickerLimit,
+  normalizeAmountInput,
+  normalizePickerValues,
+  padAmountScale,
+  parsePickerInput,
+  resolvePickerLimit,
+} from '@/utils/form-rules'
 
 const props = defineProps<{
   field: FormField
@@ -40,7 +55,7 @@ const props = defineProps<{
   optionsLoading: boolean
   /** 金额字段对当前角色是否可写（`utils/form-rules.ts#resolveAmountWrite`；与状态正交） */
   amountWritable: boolean
-  /** 金额判定说明（可写/只读都能解释清楚；含与服务端 amountPolicy 不一致时的披露） */
+  /** 金额判定说明（可写/只读都能解释清楚；可写时给「以服务端 40306 为准」的兜底提示） */
   amountNote: string
   /** 通讯录候选人（`user` 字段） */
   userOptions: FormOption[]
@@ -73,8 +88,49 @@ const amountHint = computed(() => {
   if (amountCheck.value.message) return amountCheck.value.message
   return '定点两位小数（DECIMAL(18,2)），不支持千分位/科学计数；提交时按字符串上送，绝不经浮点'
 })
-/** 角色判定的补充披露（服务端 amountPolicy 与角色口径不一致时给用户一个解释） */
+/** 角色判定的补充披露（**已删除**与服务端 amountPolicy 的不一致披露：后端已按当前主体计算） */
 const amountRoleNote = computed(() => (props.amountWritable ? props.amountNote : ''))
+
+// ---------------------------------------------------------------------------
+// 人员 / 组织选择器（多值）
+// ---------------------------------------------------------------------------
+/** 多选上限（模板 `rules[pickerLimit]`；后端未声明时回落 20，与服务端同口径） */
+const pickerLimit = computed(() => resolvePickerLimit(props.field))
+/** 归一后的已选元素（trim + 去空 + 去重保序，与服务端 `canonicalizePickers` 同口径） */
+const pickerValues = computed(() => normalizePickerValues(props.modelValue))
+/** 是否已超出上限（选择器本身有 multiple-limit；手填路径与历史超限数据仍会命中） */
+const pickerOver = computed(() => exceedsPickerLimit(pickerValues.value, pickerLimit.value))
+
+/**
+ * 手填文本（通讯录 / 组织选择器不可用时的降级路径）。
+ *
+ * **为什么不直接显示 `pickerValues.join(', ')`**：那样每敲一个分隔符就会立刻被归一掉
+ * （输入 `304,` → 解析成 `['304']` → 文本回退成 `304`），用户根本敲不出第二个 id。
+ * 因此这里保留一份**原始文本**，只在「外部值与自己解析的结果不一致」时才回填
+ * （例如服务端读了别的值、或字段被清空）。
+ */
+const pickerDraft = ref(pickerValues.value.join(', '))
+
+watch(
+  () => props.modelValue,
+  () => {
+    const parsedSelf = parsePickerInput(pickerDraft.value)
+    if (parsedSelf.join('\u0000') !== pickerValues.value.join('\u0000')) {
+      pickerDraft.value = pickerValues.value.join(', ')
+    }
+  },
+)
+
+/** 选择器回传：去重保序后上送**数组**（服务端仍会兜底一次） */
+function onPickerSelect(value: string[]): void {
+  update(normalizePickerValues(value))
+}
+
+/** 手填回传：按逗号/顿号/空白切分（降级路径），保留原始文本以免打断输入，同时归一为数组 */
+function onPickerText(raw: string): void {
+  pickerDraft.value = raw
+  update(parsePickerInput(raw))
+}
 
 /** 附件已落库的元数据（`{fileName,fileSize}`；上传接口未交付，只读展示） */
 interface AttachmentMeta {
@@ -285,63 +341,77 @@ function onBoolean(value: string | number | boolean): void {
       />
     </div>
 
-    <!-- 人员（单值：后端 typeMatches 只接受 CharSequence；多值走「抄送」动作） -->
+    <!-- 人员（多值：服务端接受数组并按去重保序规范化；上限 pickerLimit，缺省 20） -->
     <template v-else-if="field.control === 'user'">
       <el-select
         v-if="!pickerUnavailable"
         class="full"
-        :model-value="selectValue"
-        :disabled="disabled"
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
         filterable
         clearable
-        placeholder="从通讯录选择人员"
-        @update:model-value="(value: string) => update(value ?? '')"
+        :multiple-limit="pickerLimit.max"
+        :model-value="pickerValues"
+        :disabled="disabled"
+        placeholder="从通讯录选择人员（可多选）"
+        @update:model-value="onPickerSelect"
       >
         <el-option v-for="option in userOptions" :key="option.value" :label="option.label" :value="option.value" />
       </el-select>
       <el-input
         v-else
-        :model-value="textValue"
+        :model-value="pickerDraft"
         :disabled="disabled"
-        placeholder="通讯录不可用，请填写用户 id"
-        @update:model-value="(value: string) => update(value)"
+        placeholder="通讯录不可用，请填写用户 id（多个用逗号分隔）"
+        @update:model-value="onPickerText"
       />
       <p class="hint capability">
-        <b>多值（≤20 人）待后端支持</b>，当前请用抄送。
-        现状：服务端 `FormPayloadValidator#typeMatches` 对 user 字段只接受单值 CharSequence，
-        数组形态会回 `typeMismatch`（doc/forms.md 的「≤20 人」口径待后端补齐）；
-        需要多人知会时请走「抄送」动作（`POST /flow-instances/{id}/cc`，抄送只读可见、不产生待办）。
+        <b>支持多值</b>：{{ pickerLimit.hint }}；提交时按数组上送，由服务端去重并逐个校验
+        「是否在职人员」（rule=<code>pickerValue</code>）。
+      </p>
+      <p v-if="pickerOver" class="hint is-error">
+        已选 {{ pickerValues.length }} 个，超过上限 {{ pickerLimit.max }}；请删掉多余的，
+        否则服务端按 rule=<code>pickerLimit</code> 拒绝整单。
       </p>
     </template>
 
-    <!-- 组织（单值，同 user 的口径说明） -->
+    <!-- 组织（多值，口径同 user；单位是「个组织节点」） -->
     <template v-else-if="field.control === 'org'">
       <el-select
         v-if="!pickerUnavailable"
         class="full"
-        :model-value="selectValue"
-        :disabled="disabled"
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
         filterable
         clearable
-        placeholder="选择组织节点"
-        @update:model-value="(value: string) => update(value ?? '')"
+        :multiple-limit="pickerLimit.max"
+        :model-value="pickerValues"
+        :disabled="disabled"
+        placeholder="选择组织节点（可多选）"
+        @update:model-value="onPickerSelect"
       >
         <el-option v-for="option in orgOptions" :key="option.value" :label="option.label" :value="option.value" />
       </el-select>
       <el-input
         v-else
-        :model-value="textValue"
+        :model-value="pickerDraft"
         :disabled="disabled"
-        placeholder="组织选择器不可用，请填写组织 id 或约定符号"
-        @update:model-value="(value: string) => update(value)"
+        placeholder="组织选择器不可用，请填写组织 id（多个用逗号分隔）"
+        @update:model-value="onPickerText"
       />
       <p class="hint capability">
-        <b>多值组织选择待后端支持</b>，当前为单值。
-        现状：服务端 `FormPayloadValidator#typeMatches` 对 org 字段只接受单值 CharSequence（同 user）。
+        <b>支持多值</b>：{{ pickerLimit.hint }}；提交时按数组上送，由服务端去重并逐个校验
+        「是否为有效组织节点」（rule=<code>pickerValue</code>）。
+      </p>
+      <p v-if="pickerOver" class="hint is-error">
+        已选 {{ pickerValues.length }} 个，超过上限 {{ pickerLimit.max }}；请删掉多余的，
+        否则服务端按 rule=<code>pickerLimit</code> 拒绝整单。
       </p>
       <p class="hint">
-        单值组织 id；模板默认值里的符号型占位（如 <code>initiator_company</code>）是界面预填指令，
-        服务端不会据此写库（doc/templates.md §2.2 扩展键说明）。
+        组织 id 可多值；模板默认值里的符号型占位（如 <code>initiator_company</code>）是界面预填指令，
+        服务端不会据此写库（doc/templates.md §2.2 扩展键说明），也不能作为提交取值。
       </p>
     </template>
 

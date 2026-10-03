@@ -11,7 +11,7 @@
  *     /task/pending           待我审批（默认落地页）
  *     /task/approved          我已审批
  *     /task/initiated         我发起的
- *     /task/cc                抄送我的（**接口未实现**，页面如实标注「待实现」）
+ *     /task/cc                抄送我的（`GET /flow-tasks/cc`；已读/未读 + 点击进详情）
  *     /archive                历史库（满 3 年归档，只读、可按单号检索）
  *     /form/new/:formType      发起单据（阶段 2b：schema 驱动表单页，四类共用）
  *     /form/instance/:instanceId  继续填单 / 补件 / 重提（实例锁定版本 schema）

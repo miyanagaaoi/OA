@@ -16,12 +16,13 @@
  *   · `doc/enums.md` §8（三层状态）、§9（**17 值**轨迹动作，2026-10-04 由 16 值加入
  *     `return_register` 归还登记）
  *   · `doc/prd-0.1.md` §6.3/§6.4（主干链与流转回退）、§6.6（驳回/补件）、AC-49（终止）
- *   · `doc/prd-0.1.md` §6.3/§6.4（主干链与流转回退）、§6.6（驳回/补件）、AC-49（终止）
  *   · `doc/templates.md` §1.7（Q6/Q7 闸门）、§1.8（撤回窗口）、T-08（自由跳转一期全关）
+ *   · `oa-server` `com.oa.workflow.task.domain.TaskListFilter`（列表**同一套筛选**的合法取值清单）
  */
 import type {
   ActionAvailability,
   ActionCatalogItem,
+  FlowCcListItem,
   FlowInstance,
   FlowRuntime,
   FlowSnapshotNode,
@@ -634,6 +635,169 @@ export function safePage(page: number | null | undefined, totalPages: number): n
   const current = Math.max(1, Math.trunc(Number(page ?? 1)) || 1)
   if (totalPages <= 0) return 1
   return Math.min(current, totalPages)
+}
+
+// ================================================================ 列表筛选与行视图
+
+/**
+ * 单据状态筛选的可选值（**服务端合法取值清单**，`TaskListFilter` 白名单）。
+ *
+ * 与 `INSTANCE_STATUS_LABEL` 同源，额外加上子状态 `pending_supplement`
+ * （后端 `SubStatus` 白名单里的唯一值，落在 `i.sub_status`）。
+ * 用它的原因：`status` 取值非法时服务端回 400 / `40001`，界面只能在合法集合里选，
+ * 从源头上不给用户「填一个必被拒的值」的机会。
+ */
+export const LIST_STATUS_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
+  ...Object.entries(INSTANCE_STATUS_LABEL).map(([value, label]) => ({ value, label })),
+  { value: 'pending_supplement', label: SUB_STATUS_LABEL.pending_supplement ?? '待补件（子状态）' },
+]
+
+/** 筛选项的草稿（界面上的输入；空串 = 不筛） */
+export interface ListFilterDraft {
+  keyword: string
+  formType: string
+  status: string
+  dateFrom: string
+  dateTo: string
+}
+
+/** 空筛选（「重置」的落点） */
+export function emptyListFilterDraft(): ListFilterDraft {
+  return { keyword: '', formType: '', status: '', dateFrom: '', dateTo: '' }
+}
+
+/**
+ * 日期区间是否**反了**（`dateFrom > dateTo`）。
+ *
+ * 服务端对反区间回 400 / `40001`（`TaskListFilter#of`），前端先判一次是为了
+ * **不让用户发出一个必被拒的请求**，并且把原因写在筛选区里（而不是弹一个 toast 说参数不合法）。
+ */
+export function isDateRangeReversed(dateFrom: string, dateTo: string): boolean {
+  const from = (dateFrom ?? '').trim()
+  const to = (dateTo ?? '').trim()
+  if (from === '' || to === '') return false
+  return from > to
+}
+
+/**
+ * 筛选草稿 → 请求筛选（trim + 空串归一为 `null`；**不做任何「只筛当前页」的本地过滤**）。
+ *
+ * 过滤一律交给服务端 SQL：本地过滤会让 `total` 与列表内容不一致（用户看到「共 N 条」却只有 3 行）。
+ */
+export function normalizeListFilter(draft: ListFilterDraft): {
+  keyword: string | null
+  formType: string | null
+  status: string | null
+  dateFrom: string | null
+  dateTo: string | null
+} {
+  const trim = (value: string): string | null => {
+    const text = (value ?? '').trim()
+    return text === '' ? null : text
+  }
+  return {
+    keyword: trim(draft.keyword),
+    formType: trim(draft.formType),
+    status: trim(draft.status),
+    dateFrom: trim(draft.dateFrom),
+    dateTo: trim(draft.dateTo),
+  }
+}
+
+/** 已生效的筛选条件条数（用于「筛选（N）」的角标与「重置」可用性） */
+export function activeFilterCount(draft: ListFilterDraft): number {
+  const normalized = normalizeListFilter(draft)
+  return [normalized.keyword, normalized.formType, normalized.status, normalized.dateFrom, normalized.dateTo].filter(
+    (value) => value !== null,
+  ).length
+}
+
+/**
+ * 列表行的**统一视图模型**。
+ *
+ * <p>为什么把「待办/已办/我发起的」与「抄送我的」两种出参先归一到同一形状：
+ * 四个列表在同一个表格里渲染，模板里塞 `v-if` 分支读两套字段名，
+ * 早晚会出现「抄送页少了一列」这类只在某个 Tab 才暴露的缺陷。
+ */
+export interface FlowListRow {
+  /** 行键（`instanceId` + `taskId`/`ccId`，避免同一单多行时 key 冲突） */
+  key: string
+  instanceId: string
+  bizNo: string
+  formType: string
+  /** 标题（关键字筛选命中的那一列；四类单据标题字段码一致） */
+  title: string
+  nodeSeq: number | null
+  nodeName: string
+  taskId: string
+  taskStatus: string
+  taskStatusLabel: string
+  addSignType: string
+  initiatorName: string
+  instanceStatus: string
+  subStatus: string | null
+  /** 主时间列（任务列表 = 办结/创建时间；抄送页 = 抄送时间） */
+  time: string | null
+  /** 抄送页专用：是否已读（任务列表恒为 `null`，不参与渲染） */
+  read: boolean | null
+  readAt: string | null
+  /** 抄送页专用：单据发起时间 */
+  instanceCreatedAt: string | null
+}
+
+/** 任务列表项（待办 / 已办 / 我发起的）→ 行视图 */
+export function taskListRow(item: FlowTaskListItem): FlowListRow {
+  return {
+    key: `${item.instanceId}-${item.taskId}`,
+    instanceId: item.instanceId,
+    bizNo: item.bizNo,
+    formType: item.formType,
+    title: item.title ?? '',
+    nodeSeq: item.currentNodeSeq ?? item.nodeSeq,
+    nodeName: item.nodeName,
+    taskId: item.taskId,
+    taskStatus: item.taskStatus,
+    taskStatusLabel: item.taskStatusLabel,
+    addSignType: item.addSignType,
+    initiatorName: item.initiatorName,
+    instanceStatus: item.instanceStatus,
+    subStatus: item.subStatus,
+    time: item.decidedAt ?? item.taskCreatedAt,
+    read: null,
+    readAt: null,
+    instanceCreatedAt: null,
+  }
+}
+
+/** 抄送列表项 → 行视图（七项出参 + 已读/未读） */
+export function ccListRow(item: FlowCcListItem): FlowListRow {
+  return {
+    key: `${item.instanceId}-${item.ccId}`,
+    instanceId: item.instanceId,
+    bizNo: item.bizNo,
+    formType: item.formType,
+    title: item.title,
+    nodeSeq: item.currentNodeSeq,
+    nodeName: '',
+    taskId: '',
+    taskStatus: '',
+    taskStatusLabel: '',
+    addSignType: '',
+    initiatorName: item.initiatorName,
+    instanceStatus: item.instanceStatus,
+    subStatus: item.subStatus,
+    time: item.ccCreatedAt,
+    read: item.read,
+    readAt: item.readAt,
+    instanceCreatedAt: item.instanceCreatedAt,
+  }
+}
+
+/** 抄送已读状态的中文文案（未读 = 抄送人尚未打开过该单详情） */
+export function ccReadLabel(read: boolean | null | undefined, readAt: string | null | undefined): string {
+  if (read === null || read === undefined) return ''
+  if (read) return readAt ? `已读 ${readAt}` : '已读'
+  return '未读'
 }
 
 // ================================================================ 动作的入参规格

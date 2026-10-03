@@ -239,9 +239,10 @@ export interface FormFieldIssue {
  *
  * 来源有两条，`api/form.ts` 会统一成同一形状：
  *   ① 干跑接口 200 出参里的 `report`（结构化，**首选**）；
- *   ② `40011` 错误响应的 message（后端 `BizException#details` 不进响应体，
- *      只有 `<字段码>（<标签>）：<原因>` 这样的文本）→ 由 `utils/form-rules.ts`
- *      的 `parseValidationMessage()` 还原成逐字段条目。
+ *   ② `40011` 错误响应 —— **首选** `details.errors[]`（后端 2026-10-04 起随响应体下发，
+ *      与 ① 的 `issues[]` 同源同形，见 `utils/form-rules.ts#validationReportFromDetails`）；
+ *      仅在明细缺失（老响应 / 其它码）时才由 `parseValidationMessage()` 从 message 文本
+ *      还原成逐字段条目（此时 `parsedFromMessage=true`）。
  */
 export interface FormValidationReport {
   passed: boolean

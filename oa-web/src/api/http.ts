@@ -13,6 +13,8 @@
  *   4. traceId 透出：每个响应都记下 traceId，出错时随提示一起展示
  *   5. 会话 Cookie：withCredentials = true（HttpOnly，前端不读 token）
  *   6. 幂等：写操作带 Idempotency-Key（gateway/idempotency）
+ *   7. 结构化错误明细：响应体的 `details`（当前唯一已登记键是 40011 的 `errors[]`）
+ *      随 `ApiError#details` 透出；缺失时调用方仍走 message 文本兜底
  */
 import axios, {
   AxiosError,
@@ -22,13 +24,22 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios'
 import { ElMessage } from 'element-plus'
-import type { ApiEnvelope, ApiErrorPayload } from '@/types/api'
+import type { ApiEnvelope, ApiErrorDetails, ApiErrorPayload } from '@/types/api'
 
 /** 统一业务错误：调用方可按 code 分支，也可读 traceId 报障 */
 export class ApiError extends Error {
   readonly code: number | string
   readonly traceId?: string
   readonly httpStatus?: number
+  /**
+   * 服务端声明的**结构化**错误明细（当前唯一已登记键是 `errors`，`40011` 表单二次校验）。
+   *
+   * <p>为什么必须带上：`40011` 此前只有一个把全部逐字段文案拼在一起的长 message，
+   * 前端得靠正则从文本里还原字段码；现在服务端把 `FormValidationReport#issueViews()`
+   * 原样放进 `details.errors[]`（与干跑 `report.issues[]` 同源），前端可以直接逐字段挂载。
+   * `details` 缺失（老响应 / 其它错误码）时**必须**保留文本兜底路径。
+   */
+  readonly details?: ApiErrorDetails
 
   constructor(payload: ApiErrorPayload) {
     super(payload.message)
@@ -36,6 +47,7 @@ export class ApiError extends Error {
     this.code = payload.code
     this.traceId = payload.traceId
     this.httpStatus = payload.httpStatus
+    this.details = payload.details
   }
 
   toPayload(): ApiErrorPayload {
@@ -44,6 +56,7 @@ export class ApiError extends Error {
       message: this.message,
       traceId: this.traceId,
       httpStatus: this.httpStatus,
+      details: this.details,
     }
   }
 }
@@ -175,6 +188,7 @@ http.interceptors.response.use(
       message: env.message || '请求失败',
       traceId: env.traceId || lastTraceId,
       httpStatus: response.status,
+      details: env.details,
     })
   },
   (error: AxiosError<ApiEnvelope<unknown>>) => {
@@ -215,6 +229,7 @@ http.interceptors.response.use(
         message,
         traceId,
         httpStatus: status,
+        details: body?.details,
       }),
     )
   },

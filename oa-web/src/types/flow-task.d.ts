@@ -360,6 +360,51 @@ export interface FlowTaskListItem {
   currentNodeSeq: number | null
   instanceStatus: string
   subStatus: string | null
+  /** 单据标题（`form_data.fields_json.title`；2026-10-04 随后端出参追加） */
+  title: string
+}
+
+/**
+ * 「抄送我的一览」列表项（`GET /flow-tasks/cc`）。
+ *
+ * 七项出参 + 已读标记：单号 / 类型 / 标题 / 发起人 / 发起时间 / 当前状态 / 抄送时间 +
+ * `readAt` / `read`。抄送**只读可见、不产生待办**（REQ-MSG-003 / AC-54）。
+ */
+export interface FlowCcListItem {
+  ccId: string
+  instanceId: string
+  bizNo: string
+  formType: string
+  category: string
+  title: string
+  initiatorId: string
+  initiatorName: string
+  /** 单据发起时间（`instanceCreatedAt`） */
+  instanceCreatedAt: string | null
+  currentNodeSeq: number | null
+  instanceStatus: string
+  subStatus: string | null
+  /** 抄送时间 */
+  ccCreatedAt: string | null
+  ccSource: string
+  readAt: string | null
+  read: boolean
+}
+
+/**
+ * 四个列表的统一筛选入参（`page/size/keyword/formType/status/dateFrom/dateTo`）。
+ *
+ * 空串 = 不筛（映射层不下发该参数）；`total` 是**筛选后**的总数，过滤在服务端 SQL 层完成。
+ */
+export interface FlowListFilter {
+  keyword?: string
+  /** 单据类型（`matter / fund / contract / seal`） */
+  formType?: string
+  /** 单据状态码，另接受子状态 `pending_supplement` */
+  status?: string
+  /** `YYYY-MM-DD`，口径是单据**发起时间**（四个列表同义） */
+  dateFrom?: string
+  dateTo?: string
 }
 
 /** 分页结果（`total` 已由映射层从字符串归一为 number） */
@@ -370,7 +415,7 @@ export interface FlowPage<T> {
   size: number
 }
 
-/** 列表类型（三个真实接口 + 一个**待实现**的抄送） */
+/** 列表类型（**四个真实接口**：待我审批 / 我已审批 / 我发起的 / 抄送我的） */
 export type FlowListKind = 'todo' | 'done' | 'initiated' | 'cc'
 
 // ---------------------------------------------------------------------------

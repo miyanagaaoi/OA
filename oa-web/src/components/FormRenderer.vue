@@ -39,14 +39,15 @@ const props = defineProps<{
   /** 逐字段错误索引（`utils/form-rules.ts#buildIssueIndex`） */
   errors: Record<string, FormFieldIssue[]>
   /**
-   * 金额字段是否可写（**角色维度**，与单据状态正交，PRD §5.3）。
+   * 金额字段是否可写（PRD §5.3）。
    *
-   * 由页面用 `utils/form-rules.ts#resolveAmountWrite` 算出（系统管理员 / 财务负责人可写），
-   * **不是**直接读 `field-groups` 的 `amountPolicy.writable` —— 后者当前被后端以 null principal
-   * 计算，对任何账号都返回 false（详见该函数注释）。
+   * 由页面用 `utils/form-rules.ts#resolveAmountWrite` 算出：**以服务端
+   * `GET /forms/{formType}/field-groups` 的 `amountPolicy.writable` 为准**
+   * （2026-10-04 起该字段按当前登录主体计算，与写路径 40306 同结论），
+   * 接口取不到时才回落到本地角色码（admin / finance_owner）兜底。
    */
   amountWritable: boolean
-  /** 金额判定说明（可写/只读都要能解释清楚；含与服务端 amountPolicy 不一致的披露） */
+  /** 金额判定说明（可写/只读都要能解释清楚；可写时给「以服务端 40306 为准」的兜底提示） */
   amountNote: string
   /** 字典缓存（按 dictType） */
   dictCache: FormDictCache

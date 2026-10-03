@@ -20,10 +20,16 @@
  *   → ③ 取金额角色策略（`field-groups`）→ ④ 预填默认值（仅 boolean / select）
  *   → 保存：`PUT /forms/instances/{id}/draft?mode=DRAFT`（新建时是 `POST /flow-instances`）
  *   → 提交：干跑 `POST /forms/instances/{id}/validate?mode=SUBMIT`（**先拿到逐字段错误**）
- *     → `POST /flow-instances/precheck`（40007 逐条拦截项）→ `submit`。
+ *     → `POST /flow-instances/precheck`（40007 逐条拦截项的**预览**）→ `submit`。
+ *
+ * ⚠ **预检的拦截点（2026-10-04 后端 7c409ea 起）**：`POST /flow-instances`（建草稿）
+ *   **不再**跑发起前预检 —— 保存草稿不会因「空候选人」40007 失败；预检移到
+ *   `POST /flow-instances/{id}/submit` 之前（`prepareSubmitSnapshot`），拦截即零落库。
+ *   本页两次提交路径（新建直接提交 / 实例提交）都在**提交前**调用只读干跑接口
+ *   `POST /flow-instances/precheck` 把「哪个节点、命中哪条规则、缺什么配置」提前铺开，
+ *   这样既不会产生半成品草稿，也不会让用户点了提交才知道缺配。
  *
  * ⚠ 附件上传接口属**阶段 2b.7**：附件字段渲染为明确的「待接入」状态（不伪造上传）。
- * ⚠ 「抄送我的」列表、打印属**阶段 3**：本页不含相关入口。
  */
 import { computed, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -59,6 +65,7 @@ import {
   applyFieldDefaults,
   buildIssueIndex,
   errorHint,
+  formRuleLabel,
   isSupplementState,
   parseValidationMessage,
   resolveAmountWrite,
@@ -66,6 +73,8 @@ import {
   syntheticDraftState,
   toFormDocType,
   toSubmitFields,
+  unboundIssueMessages,
+  validationReportFromDetails,
 } from '@/utils/form-rules'
 import { instancePillStatus, instanceStatusLabel, subStatusLabel } from '@/utils/flow-task'
 import { FORM_DOC_TYPE_LABEL } from '@/utils/form-rules'
@@ -122,8 +131,8 @@ const busy = ref(false)
 /** 整单级错误（无法归到具体字段：40304 / 40308 / 40309 / 预检 40007 等） */
 const pageError = ref('')
 const pageErrorHint = ref('')
-/** 未绑定到字段的校验文本 */
-const unboundErrors = ref<string[]>([])
+/** 手工登记的未绑定错误文本（40308 夹带未登记字段等；与报告里的无字段码条目合并展示） */
+const manualUnbound = ref<string[]>([])
 
 /** 已发布模板摘要（create 模式用来确认「该类单据有已发布模板」并取版本号） */
 const templateInfo = reactive({ templateCode: '', schemaVersion: 0, published: false, message: '' })
@@ -136,6 +145,16 @@ const formType = computed<FormDocType | null>(() => {
 const formTypeLabel = computed(() => (formType.value ? FORM_DOC_TYPE_LABEL[formType.value] : '未知单据类型'))
 
 const errors = computed<Record<string, FormFieldIssue[]>>(() => buildIssueIndex(report.value))
+
+/**
+ * 未绑定到字段的错误（「整单错误区」）。
+ *
+ * 两个来源合并：
+ *   ① 校验报告里 `field` 为空的条目（message 文本还原路径、整单级规则）；
+ *   ② 页面上手工登记的整单拒绝（40308 夹带未登记字段 —— 键不在 schema 里，挂不到控件）。
+ * 必须合并展示：渲染器只读 `errors[字段码]`，空字段码的条目否则会被静默丢掉。
+ */
+const unboundErrors = computed<string[]>(() => [...unboundIssueMessages(report.value), ...manualUnbound.value])
 
 /** 三态标签（服务端未下发时按状态推导） */
 const stateLabel = computed(() => writeState.value?.stateLabel ?? '尚未取得可写字段白名单（只读渲染）')
@@ -155,12 +174,13 @@ const supplementNoteWritable = computed(() => (writeState.value?.writableFields 
 const hasWritableField = computed(() => (writeState.value?.writableFields ?? []).length > 0)
 
 /**
- * 金额字段是否可写：**角色维度**判定（系统管理员 / 财务负责人），服务端 `amountPolicy` 作为第二判据。
+ * 金额字段是否可写：**以服务端 `amountPolicy.writable` 为准**
+ * （2026-10-04 起该字段按**当前登录主体**计算：admin / finance_owner → true，employee → false，
+ * 与写路径 40306 同结论）；接口取不到时才回落到本地角色码兜底。
  *
- * ⚠ 为什么不直接把 `field-groups` 的 `amountPolicy.writable` 当判据：该字段目前由后端
- * `FormRuleController` 以 `amountPolicyOf(null)` 计算，对**任何**账号（含系统管理员）都返回 false，
- * 而写路径实测量系统管理员可写金额（PUT draft amount → 200）。以它为主判据会让 admin 也填不了金额。
- * 详见 `utils/form-rules.ts#resolveAmountWrite` 的注释（前端只决定放不放行，40306 仍是裁决方）。
+ * ⚠ 为什么保留角色码兜底：`field-groups` 取数失败（网络/权限）时若一律只读，
+ * 系统管理员会被误判成只读，界面上的金额框根本填不了。详见
+ * `utils/form-rules.ts#resolveAmountWrite`（前端只决定放不放行，40306 仍是裁决方）。
  */
 const amountVerdict = computed(() =>
   resolveAmountWrite(
@@ -210,7 +230,7 @@ async function load(): Promise<void> {
 function resetPage(): void {
   pageError.value = ''
   pageErrorHint.value = ''
-  unboundErrors.value = []
+  manualUnbound.value = []
   report.value = null
   precheck.value = null
 }
@@ -219,20 +239,16 @@ function resetPage(): void {
  * **能力缺失说明**（区别于「界面坏了」）：本模板里出现了受后端能力限制的字段时，
  * 在页面顶部给一句可发现的说明，而不是让入口默默消失。
  *
- * 现状（后端已确认会补齐；补齐后这里改口径或删条目即可）：
- *   · `user` / `org`：doc/forms.md 写「≤20 人」，但服务端 `FormPayloadValidator#typeMatches`
- *     只接受单值 CharSequence → 页面上是单值控件；
+ * 现状（2026-10-04 收敛后**只剩一项**）：
  *   · 附件：上传接口属阶段 2b.7 → 只展示已落库元数据，不提供上传。
+ *
+ * 已删除的条目（后端 7c409ea 已交付，不要再写「待后端支持」）：
+ *   · `user` / `org` 多值：服务端已接受数组（去重保序 + `pickerValue` / `pickerLimit`），
+ *     界面已是真正的多选控件（见 `FormFieldControl.vue`）。
  */
 const capabilityNotes = computed<string[]>(() => {
   const fields = schema.value?.fields ?? []
   const notes: string[] = []
-  if (fields.some((field) => field.control === 'user')) {
-    notes.push('人员字段：多值（≤20 人）待后端支持，当前为单值选择；多人知会请用「抄送」动作。')
-  }
-  if (fields.some((field) => field.control === 'org')) {
-    notes.push('组织字段：多值组织选择待后端支持，当前为单值。')
-  }
   if (fields.some((field) => field.control === 'attachment')) {
     notes.push('附件字段：上传入口待阶段 2b.7 支持，当前只展示已落库的附件元数据。')
   }
@@ -366,7 +382,13 @@ async function loadPickers(loaded: FormSchema): Promise<void> {
 // ---------------------------------------------------------------------------
 // 动作
 // ---------------------------------------------------------------------------
-/** 保存草稿（create = 建草稿实例；instance = `PUT /draft?mode=DRAFT`） */
+/**
+ * 保存草稿（create = 建草稿实例；instance = `PUT /draft?mode=DRAFT`）。
+ *
+ * ⚠ **保存不预检**（2026-10-04 起）：`POST /flow-instances` 与 `PUT /draft?mode=DRAFT`
+ * 都不会因空候选人回 40007 —— 预检只在 `POST /flow-instances/{id}/submit` 之前执行。
+ * 因此这里不呈现预检拦截项，只按业务码如实报错（40011 / 40304 / 40306 / 40308 …）。
+ */
 async function save(): Promise<void> {
   busy.value = true
   resetPage()
@@ -389,8 +411,9 @@ async function save(): Promise<void> {
 /**
  * 建草稿实例（`POST /flow-instances`）→ 跳转到实例填单页。
  *
- * 服务端在**落库前**就会跑一次发起前预检（未通过即 `40007`，不落库），
- * 因此这条路径与「提交」共用同一份 blocker 呈现逻辑。
+ * 服务端**不再**在落库前跑发起前预检（2026-10-04 起）：空候选人**不会**让建草稿失败
+ * （`40007` 只在 `POST /flow-instances/{id}/submit` 之前按锁定模板重新解析时抛出，拦截即零落库）。
+ * 因此这里**不预期** 40007；真遇到其它拒绝（40011 / 40308 …）按业务码如实呈现。
  */
 async function createDraft(): Promise<void> {
   const type = routeFormType.value
@@ -414,12 +437,14 @@ async function createDraft(): Promise<void> {
 /**
  * 发起并直接提交（create 模式的「提交审批」）：
  *   ① `POST /forms/{formType}/validate?mode=SUBMIT` 干跑 → 拿到**逐字段**错误；
- *   ② `POST /flow-instances/precheck` → 未通过则逐条展示拦截项（节点 / 规则 / 缺什么配置）；
- *   ③ `POST /flow-instances` 建草稿（服务端会再预检一次，通过才落库）；
- *   ④ `POST /flow-instances/{id}/submit`（`reason` 必填）。
+ *   ② `POST /flow-instances/precheck` 只读干跑 → 未通过则逐条展示拦截项（节点 / 规则 / 缺什么配置）；
+ *   ③ `POST /flow-instances` 建草稿（**不再预检**，空候选人不会在这里 40007）；
+ *   ④ `POST /flow-instances/{id}/submit`（`reason` 必填；**预检在这一步真正强制**）。
  *
- * 顺序固定为「先校验 → 再预检 → 才落库 → 最后提交」：任何一步失败都**不产生半成品**，
- * 也不会出现「草稿建了但字段不合法」这种需要人工清理的状态。
+ * 顺序固定为「先校验 → 再预检 → 才落库 → 最后提交」：任何一步失败都**不产生半成品**草稿
+ * （② 是只读干跑，与 ④ 服务端强制的那次同源），也不会出现「草稿建了但字段不合法」这种
+ * 需要人工清理的状态。若 ④ 仍以 40007 拒绝（预检通过后配置被改动等），
+ * `applyError` 会**重新拉一次 precheck** 把逐条拦截项铺开（见 `refreshPrecheckOn40007`）。
  */
 async function createAndSubmit(): Promise<void> {
   const type = routeFormType.value
@@ -467,7 +492,7 @@ async function createAndSubmit(): Promise<void> {
   }
 }
 
-/** 提交审批（实例模式）：干跑 SUBMIT → 预检 → submit */
+/** 提交审批（实例模式）：干跑 SUBMIT → 预检（只读预览）→ 保存并 submit（服务端在这一步强制预检） */
 async function submit(): Promise<void> {
   const id = instanceId.value
   if (!id || !instance.value) return
@@ -481,7 +506,8 @@ async function submit(): Promise<void> {
       ElMessage({ type: 'warning', message: '提交前校验未通过，请按下方逐字段提示修正' })
       return
     }
-    // ② 预检：逐节点解析候选人（40007 的逐条拦截项在这里提前呈现）
+    // ② 预检（只读干跑）：逐节点解析候选人，把 40007 的逐条拦截项**在提交前**铺开
+    //    ⚠ 真正的拦截点在 ④ 的 `submit`（服务端按锁定模板重新解析）；保存草稿不预检。
     const precheckInput = precheckPayload()
     const pre = await precheckFlowInstance(precheckInput)
     precheck.value = pre
@@ -655,11 +681,13 @@ async function loadInstanceQuietly(): Promise<void> {
  * 错误呈现：**按业务码**给出「服务端原文 + 处置提示」。
  *
  * 重点覆盖任务书点名的错误码：
- *   · `40011` 表单校验 —— message 里带全部逐字段文案，用 `parseValidationMessage` **尽力还原**成
- *     逐字段错误挂到控件上（结构化明细不进 HTTP 响应体，见 `utils/form-rules.ts` 注释）；
+ *   · `40011` 表单校验 —— **首选**读响应体的结构化明细 `details.errors[]`
+ *     （`{field,label,rule,message}`，与干跑接口 `report.issues[]` 同源同形），
+ *     逐字段挂到控件上；**保留** message 文本解析作为兜底（老响应 / 未声明明细的响应）；
  *   · `40304` 三态只读 / `40308` 夹带未登记字段 / `40306` 金额只读 / `40309` 类别改判
  *     —— 服务端 message 已是可定位文案，原样展示并补一句「怎么办」；
- *   · `40007` 预检拦截 —— 逐条拦截项在 `precheck` 面板里展开。
+ *   · `40007` 预检拦截 —— 逐条拦截项在 `precheck` 面板里展开（提交时才可能发生；
+ *     命中时**重新拉一次**只读预检把结构化 blocker 补齐，见 `refreshPrecheckOn40007`）。
  */
 function applyError(error: unknown): void {
   if (!(error instanceof ApiError)) {
@@ -670,13 +698,39 @@ function applyError(error: unknown): void {
   pageError.value = `${error.message}${error.traceId ? `（追踪号 ${error.traceId}）` : ''}`
   pageErrorHint.value = errorHint(code)
   if (code === 40011) {
+    // ① 结构化明细（后端 7c409ea 起随响应体下发，唯一生产者 FormValidationReport#issueViews()）
+    const structured = validationReportFromDetails(error.details)
+    if (structured) {
+      report.value = structured
+      return
+    }
+    // ② 兜底：从 message 文本尽力还原（老响应 / 其它码）
     const parsed = parseValidationMessage(error.message)
     report.value = parsed
-    if (parsed.unrestored) unboundErrors.value = [parsed.unrestored]
+    if (parsed.unrestored) manualUnbound.value = [parsed.unrestored]
   }
   if (code === 40308) {
     // 未登记字段：服务端 message 里带字段名，原样作为整单级错误展示（键不在 schema 里，挂不到控件）
-    unboundErrors.value = [error.message]
+    manualUnbound.value = [error.message]
+  }
+  if (code === 40007) {
+    // 预检在**提交**处被拦：message 只有一段文本，重新拉一次只读干跑，把逐条拦截项铺开
+    void refreshPrecheckOn40007()
+  }
+}
+
+/**
+ * 40007 命中后补齐结构化拦截项（节点 / 规则 / 缺配）。
+ *
+ * <p>为什么再拉一次：`40007` 的响应体**不带** `details`（只有 40011 声明了结构化明细），
+ * 而 `/flow-instances/precheck` 是只读干跑、与提交时同源，因此重跑一次是拿到逐条明细的
+ * 唯一可靠路径。失败时**静默**（页面上已有 message + 错误码提示，不能再弹第二个错）。
+ */
+async function refreshPrecheckOn40007(): Promise<void> {
+  try {
+    precheck.value = await precheckFlowInstance(precheckPayload())
+  } catch {
+    // 静默：拦截项展示失败不影响已经呈现的 message 与错误码说明
   }
 }
 
@@ -727,13 +781,16 @@ function formatTime(value: string | null | undefined): string {
     <section v-if="report && !report.passed" class="oa-card report-card">
       <div class="oa-section-band">
         服务端校验未通过（{{ report.issueCount }} 项，逐字段列出）
-        <span v-if="report.parsedFromMessage" class="tag-warn">明细由 40011 的 message 文本还原</span>
+        <span v-if="report.parsedFromMessage" class="tag-warn">
+          明细由 40011 的 message 文本还原（本次响应未带 details.errors[]）
+        </span>
+        <span v-else class="meta">明细来自响应体 details.errors[]（与干跑接口同源）</span>
       </div>
       <ul class="issue-list">
         <li v-for="(issue, index) in report.issues" :key="`${issue.field}-${index}`">
           <b class="oa-mono">{{ issue.field }}</b>
           <span v-if="issue.label && issue.label !== issue.field">（{{ issue.label }}）</span>
-          <span v-if="issue.rule" class="rule">{{ issue.rule }}</span>
+          <span v-if="issue.rule" class="rule">{{ formRuleLabel(issue.rule) }}</span>
           ：{{ issue.message }}
         </li>
         <li v-if="report.unrestored" class="unrestored">{{ report.unrestored }}</li>
@@ -751,7 +808,9 @@ function formatTime(value: string | null | undefined): string {
 
       <template v-if="!precheck.allowed">
         <p class="error-hint">
-          服务端会以 40007（APPROVER_RESOLUTION_BLOCKED）拦在提交处，以下为逐条拦截项（节点 / 规则 / 缺什么配置）：
+          服务端在**提交**（<span class="oa-mono">POST /flow-instances/{id}/submit</span>）时按锁定模板重新解析，
+          拦截即 <span class="oa-mono">40007</span>（APPROVER_RESOLUTION_BLOCKED）且零落库；
+          以下为逐条拦截项（节点 / 规则 / 缺什么配置）：
         </p>
         <ul class="issue-list">
           <li v-for="(blocker, index) in precheck.blockers" :key="index">
@@ -781,12 +840,13 @@ function formatTime(value: string | null | undefined): string {
 
     <!-- ================= 能力缺失说明（不是界面坏了） ================= -->
     <section v-if="capabilityNotes.length > 0" class="oa-card capability-card">
-      <div class="oa-section-band">能力说明（后端待补齐，非界面故障）</div>
+      <div class="oa-section-band">能力说明（尚未交付的能力，非界面故障）</div>
       <ul>
         <li v-for="(note, index) in capabilityNotes" :key="index">{{ note }}</li>
       </ul>
       <p class="meta">
-        这些入口**不是被隐藏**，而是服务端当前不接受该形态的取值；后端补齐后前端会同步放开（已列入待办）。
+        这些入口**不是被隐藏**，而是服务端当前不接受该形态的取值；后端补齐后前端会同步放开。
+        （人员 / 组织多值已于 2026-10-04 交付：界面已是多选，提交按数组上送。）
       </p>
     </section>
 
@@ -810,8 +870,8 @@ function formatTime(value: string | null | undefined): string {
         （金额对非财务角色只读）。提交后由服务端按状态白名单接管。
       </p>
       <p v-if="amountVerdict" class="meta">
-        金额字段：{{ amountVerdict.writable ? '当前角色可写' : '当前角色只读' }} —— {{ amountVerdict.reason }}
-        <template v-if="amountPolicy">（服务端 field-groups 下发 amountPolicy.writable={{ amountPolicy.writable }}）</template>
+        金额字段：{{ amountVerdict.writable ? '当前主体可写' : '当前主体只读' }} —— {{ amountVerdict.reason }}
+        <template v-if="amountPolicy">（服务端 field-groups 下发 amountPolicy.writable={{ amountPolicy.writable }}，按当前登录主体计算）</template>
       </p>
       <p v-if="amountVerdict.note" class="meta">{{ amountVerdict.note }}</p>
     </section>
@@ -949,7 +1009,8 @@ function formatTime(value: string | null | undefined): string {
     </footer>
 
     <p class="footnote">
-      附件上传属阶段 2b.7（本页只展示已落库的附件元数据，不提供上传入口）；「抄送我的」列表与打印属阶段 3。
+      附件上传属阶段 2b.7（本页只展示已落库的附件元数据，不提供上传入口）；「抄送我的」列表现已在审批中心
+      `/task/cc` 提供；打印属阶段 3。
     </p>
   </div>
 </template>

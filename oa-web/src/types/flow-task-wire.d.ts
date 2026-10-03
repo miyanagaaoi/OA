@@ -72,6 +72,61 @@ export interface WireTaskListItemView {
   instanceStatus?: string | null
   /** `pending_supplement` 等子状态 */
   subStatus?: string | null
+  /**
+   * 单据标题（{@code form_data.fields_json.title}，四类单据标题字段码一致）。
+   *
+   * <p>**2026-10-04 追加**（末位追加，不影响既有字段顺序）：关键字筛选要能命中「标题」，
+   * 列表此前只有类型与发起人，前端拿不到标题就只剩「尽力还原」一条路。
+   */
+  title?: string | null
+}
+
+/**
+ * `CcListItemView` —— 「抄送我的一览」（`GET /flow-tasks/cc`，2026-10-04 新增）。
+ *
+ * <p>抄送**只读可见、不产生待办**（REQ-MSG-003 / AC-54），因此没有任务维度字段；
+ * 出参含单号 / 类型 / 标题 / 发起人 / 发起时间 / 当前状态 / 抄送时间 + 是否已读。
+ */
+export interface WireCcListItemView {
+  ccId?: WireId | null
+  instanceId: WireId
+  bizNo?: string | null
+  formType?: string | null
+  category?: string | null
+  title?: string | null
+  initiatorId?: WireId | null
+  initiatorName?: string | null
+  instanceCreatedAt?: string | null
+  /** `Integer`（JSON number） */
+  currentNodeSeq?: number | null
+  instanceStatus?: string | null
+  subStatus?: string | null
+  ccCreatedAt?: string | null
+  /** `manual` 等来源标记 */
+  ccSource?: string | null
+  readAt?: string | null
+  /** 是否已读（`read_at IS NOT NULL`）；抄送人打开详情时写入（`markCcRead`） */
+  read: boolean
+}
+
+/**
+ * 四个列表**同一套**筛选参数（`page/size/keyword/formType/status/dateFrom/dateTo`）。
+ *
+ * <p>过滤全部在 SQL 层，`total` 是**筛选后**的总数（不是「当前页里再筛」）；
+ * 空值等价于不筛（服务端 `TaskListFilter#of` 归一化），非法值回 400 / `40001`
+ * 并在 message 里给出合法取值清单（前端不得静默忽略）。
+ */
+export interface WireTaskListQuery {
+  page?: number
+  size?: number
+  keyword?: string
+  /** `matter / fund / contract / seal` */
+  formType?: string
+  /** 单据状态码，另接受子状态 `pending_supplement` */
+  status?: string
+  /** `YYYY-MM-DD`（含首含尾；口径是单据**发起时间**） */
+  dateFrom?: string
+  dateTo?: string
 }
 
 // ================================================================ 动作面清单
