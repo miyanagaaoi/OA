@@ -10,9 +10,9 @@ description:
   en: >
       Matter-specific validation: title ≤60, description ≥10 and ≤2000, amount/cost_bearer required when involve_cost=yes, expect_date not earlier than today, cc_users ≤20 and de-duplicated, attachment format and size; all server-side.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.273Z"
-fingerprint: 2d681b39bbd0a6c88097d97d5e903c245d4199a535f9765f464a63ba0d09b07c
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.021Z"
+fingerprint: db3ec03bd48cba01f4168dbba0c57475ff51dce3e9a1e32a3e53547c3db004d8
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/matter/MatterFormRules.java"

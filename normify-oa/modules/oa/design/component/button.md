@@ -10,8 +10,8 @@ description:
   en: >
       The five button families: primary (exactly one per screen, corporate-blue fill with white text, 4px radius, 32px tall and 16px horizontal padding, darkening on hover and press, disabled as a primary-border fill with ink-muted text), secondary (white with a hairline-strong border), ghost (row actions in primary text), danger (destructive, with a red-on-white variant preferred for reject) and the 44px H5 primary and secondary pair.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.246Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.985Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

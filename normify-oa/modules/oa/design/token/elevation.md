@@ -10,8 +10,8 @@ description:
   en: >
       Six elevation levels: flat 0 with no shadow, hairline 1 as the default 1px border, surface lift 2 as a canvas-subtle fill plus hairline, layer 3 for dropdowns and date panels, layer 4 for modals with a 40% overlay scrim, layer 5 for right drawers, plus the two-ring focus style; anything solvable with a hairline and the surface ladder must not get a shadow, and table rows, form sections and grouping containers never carry one.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.256Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.998Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

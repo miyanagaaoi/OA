@@ -10,8 +10,8 @@ description:
   en: >
       Publish pipeline for design output: after validation passes, generate the pending version, submit a publish request and let the admin console complete publishing while recording before/after values and the operator; in-flight instances keep running on the old version (REQ-FLOW-006, REQ-ADMIN-002, REQ-LOG-004).
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.367Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.145Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

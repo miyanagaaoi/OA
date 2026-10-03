@@ -93,13 +93,17 @@ public class FieldPolicyController {
         Set<String> allFields = request.allFields() == null || request.allFields().isEmpty()
                 ? fields
                 : names(request.allFields());
+        // 附件类字段（type ∈ {file, files}）：待补件窗口按**字段类型**放行，而不是写死 attachments。
+        // 请求未带该项时为空集 ⇒ 白名单退化为「attachments + supplement_note」（宁窄不宽）。
+        Set<String> attachmentFields = names(request.attachmentFields());
         boolean amountWritable = AmountFieldPolicy.canWriteAmounts(principal);
 
         if (Boolean.FALSE.equals(request.strict())) {
             // 宽容口径：返回过滤后的可写载荷
             Map<String, Object> filtered = writeGuard.filter(payload, state, formType, isInitiator, isArchiveNode,
-                    allFields);
-            Set<String> writable = FormWritePolicy.writableFields(state, formType, isInitiator, isArchiveNode, allFields);
+                    allFields, attachmentFields);
+            Set<String> writable = FormWritePolicy.writableFields(state, formType, isInitiator, isArchiveNode, allFields,
+                    attachmentFields);
             if (!amountWritable) {
                 writable.removeIf(AmountFieldPolicy::isAmountField);
             }
@@ -109,7 +113,8 @@ public class FieldPolicyController {
 
         // 严格口径：先收集全部拒绝原因（便于前端一次看清），再抛 403 —— 与 AC-28「篡改请求被拒绝」一致
         List<VisibilityDtos.RejectedField> rejected = new ArrayList<>();
-        Set<String> writable = FormWritePolicy.writableFields(state, formType, isInitiator, isArchiveNode, allFields);
+        Set<String> writable = FormWritePolicy.writableFields(state, formType, isInitiator, isArchiveNode, allFields,
+                attachmentFields);
         for (String field : fields) {
             if (!amountWritable && AmountFieldPolicy.isAmountField(field)) {
                 rejected.add(new VisibilityDtos.RejectedField(field, ErrorCode.AMOUNT_READ_ONLY.getCode(),

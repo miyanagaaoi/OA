@@ -73,10 +73,11 @@ public final class FormPayloadValidator {
      * <b>系统预留字段</b>：不属于任何 {@code form_schema_json.fields[]}，但合法的写入键。
      *
      * <p>唯一一项 {@code supplement_note}（补件说明）：{@code doc/forms.md} §8 把它定义为
-     * 「补件时除附件外，另有一个共用字段」——<b>跨表单共用</b>，因此不出现在四类模板的字段表里；
+     * 「补件时除**附件类字段**外，另有一个共用字段」——<b>跨表单共用</b>，因此不出现在四类模板的字段表里；
      * {@code doc/templates.md} §2.2 的 {@code readonlyAfterSubmit} 行也显式提到「补件字段」
-     * 属服务端字段级白名单内的字段。三态白名单（{@code FormWritePolicy.SUPPLEMENT_FIELDS}）已经
-     * 把它限死在「待补件」态，这里只负责**不把它误判成夹带**，并按 §8 的长度口径单独校验。
+     * 属服务端字段级白名单内的字段。三态白名单（待补件窗口＝**所有附件类字段** + 补件说明，
+     * 见 {@code FormWritePolicy#writableFields}）已经把它限死在「待补件」态，
+     * 这里只负责**不把它误判成夹带**，并按 §8 的长度口径单独校验。
      */
     public static final Set<String> SYSTEM_FIELDS = Set.of("supplement_note");
 

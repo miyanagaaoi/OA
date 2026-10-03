@@ -29,6 +29,10 @@ public final class VisibilityDtos {
      * @param isInitiator   当前登录人是否为本单发起人
      * @param isArchiveNode 当前登录人是否处于节点⑦（归档登记，印鉴单归还字段的唯一例外）
      * @param allFields     该表单的字段全集（草稿态放行全集；缺省取 {@code payload} 的键集）
+     * @param attachmentFields 该表单里 {@code type ∈ {file, files}} 的字段码（缺省空 = 无类型信息）。
+     *                      待补件窗口的写白名单**按字段类型**放行附件类字段（{@code doc/forms.md} §1.2）：
+     *                      传入本项才能让 {@code counterparty_docs} 这类附件字段不被误判成只读；
+     *                      不传则退化为 {@code attachments} + {@code supplement_note}（**宁窄不宽**）
      * @param payload       提交载荷（键 → 值）；金额字段出现在这里即触发金额只读判定
      * @param strict        {@code true} = 越权即整单拒绝（默认）；{@code false} = 返回过滤后的可写载荷
      */
@@ -38,6 +42,7 @@ public final class VisibilityDtos {
             Boolean isInitiator,
             Boolean isArchiveNode,
             List<String> allFields,
+            List<String> attachmentFields,
             Map<String, Object> payload,
             Boolean strict
     ) {

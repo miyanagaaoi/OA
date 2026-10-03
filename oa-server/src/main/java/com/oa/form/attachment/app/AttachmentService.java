@@ -49,8 +49,11 @@ import org.springframework.web.multipart.MultipartFile;
  *   <li><b>字段归属</b>：字段必须在该实例**锁定版本**的 schema 里且类型是
  *       {@code file}/{@code files}（AC-09 + 40308 禁止夹带未登记字段）；</li>
  *   <li><b>三态白名单</b>：复用 {@link FormStateWriteGuard}（草稿 / 待补件可传；
- *       **审批中与已完结一律 40304**）—— 附件绝不是绕过三态白名单的写入通道；</li>
- *   <li><b>身份</b>：发起人本人或系统管理员（补件态 forms.md §8「仅发起人可补附件与备注」）；</li>
+ *       **审批中与已完结一律 40304**）—— 附件绝不是绕过三态白名单的写入通道；
+ *       待补件窗口按**字段类型**放行**所有**附件类字段（{@code type ∈ {file, files}}），
+ *       不再写死 {@code attachments} 字段码（合同单 {@code counterparty_docs} 同理可传可删）；</li>
+ *   <li><b>身份</b>：**上传**= 发起人本人或系统管理员（补件态 forms.md §8「仅发起人可补附件与备注」）；
+ *       **删除**= 上传者本人 ∪ 单据发起人本人 ∪ 系统管理员（forms.md §1.4.4，代传不应让本人失去删除权）；</li>
  *   <li><b>三档限额 + 双校验</b>：{@link AttachmentPolicy}（纯函数，可穷举单测）；</li>
  *   <li><b>落盘 → 落库</b>：任一步失败即回滚并清理已落盘文件（不留垃圾文件）。</li>
  * </ol>
@@ -124,7 +127,8 @@ public class AttachmentService {
         FlowInstanceRow instance = requireInstance(instanceId);
         FormSchema schema = schemaService.forInstance(instance);
         FormFieldDef field = requireAttachmentField(schema, fieldCode);
-        WriteContext context = writeGuard.contextOf(instance, principal, schema.fieldCodes());
+        WriteContext context = writeGuard.contextOf(instance, principal, schema.fieldCodes(),
+                schema.attachmentFieldCodes());
 
         // ③ 三态白名单（审批中 / 已完结 → 40304；附件不是绕过白名单的通道）
         writeGuard.assertStateWritable(Set.of(field.code()), context);
@@ -245,25 +249,37 @@ public class AttachmentService {
     // ================================================================ 删除
 
     /**
-     * 删除附件（仅上传者本人或系统管理员；且仅在三态允许的窗口内）。
+     * 删除附件（**三档身份**：上传者本人 ∪ 单据发起人本人 ∪ 系统管理员；且仅在三态允许的窗口内）。
      *
      * <p>取舍见类注释：「先删物理文件，再删元数据行」。
+     *
+     * <h2>为什么发起人本人也算「能删的人」（2026-10 裁定）</h2>
+     * <p>旧判据只有「上传者本人 ∪ 系统管理员」。管理员**代传**（管理员 ≠ 发起人，
+     * 见 {@link #requireInitiatorOrAdmin}）时 {@code uploader_id = 管理员}，于是
+     * <b>单据发起人本人反而删不掉自己单据上的附件</b> —— 代传只应「多一个能删的人」，
+     * 不应「让本人失去删除权」。故放宽为三档。
+     *
+     * <p><b>不放宽到「任何有权看该单据的人」</b>：数据域内可见 ≠ 可删（同部门同事、
+     * 审批人、抄送人仍被 40310 拒绝，见 {@code doc/forms.md} §1.4.4 与 TC-FORM-034 系列）。
+     * 窗口判定仍是同一把尺：审批中 / 已完结一律 40304（{@link #assertStateWritable} 在身份判定之前）。
      */
     @Transactional
     public Map<String, Object> delete(Long attachmentId, CurrentUser principal) {
         Attachment attachment = requireAttachment(attachmentId);
         FlowInstanceRow instance = requireInstance(attachment.getInstanceId());
         FormSchema schema = schemaService.forInstance(instance);
-        WriteContext context = writeGuard.contextOf(instance, principal, schema.fieldCodes());
+        WriteContext context = writeGuard.contextOf(instance, principal, schema.fieldCodes(),
+                schema.attachmentFieldCodes());
 
         // 三态窗口（审批中 / 已完结 → 40304）：与上传同一判据，不给"删了再传"的旁路
         String fieldCode = attachment.getFieldCode() == null ? DEFAULT_FIELD_CODE : attachment.getFieldCode();
         writeGuard.assertStateWritable(Set.of(fieldCode), context);
-        // 上传者本人或系统管理员（AC-41 最小权限）
-        if (!isAdmin(principal) && !isUploader(attachment, principal)) {
+        // 三档身份：上传者本人 ∪ 单据发起人本人 ∪ 系统管理员（AC-41 最小权限）
+        if (!isAdmin(principal) && !isUploader(attachment, principal) && !isInitiator(instance, principal)) {
             throw new BizException(ErrorCode.ATTACHMENT_DELETE_DENIED)
                     .withDetail("attachmentId", attachmentId)
                     .withDetail("uploaderId", attachment.getUploaderId())
+                    .withDetail("initiatorId", instance.getInitiatorId())
                     .withDetail("operatorId", principal == null ? null : principal.id());
         }
 
@@ -368,6 +384,12 @@ public class AttachmentService {
     private static boolean isUploader(Attachment attachment, CurrentUser principal) {
         return principal != null && principal.id() != null
                 && principal.id().equals(attachment.getUploaderId());
+    }
+
+    /** 调用人是否为本单发起人（**附件删除**的第二档身份；上传仍只认「发起人本人 ∪ 管理员」）。 */
+    private static boolean isInitiator(FlowInstanceRow instance, CurrentUser principal) {
+        return instance != null && principal != null && principal.id() != null
+                && principal.id().equals(instance.getInitiatorId());
     }
 
     /**

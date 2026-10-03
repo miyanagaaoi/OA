@@ -10,9 +10,9 @@ description:
   en: >
       Evaluates linkage rules where visibility, requiredness and value depend on other fields, e.g. involve_cost → amount/cost_bearer, contract_type → contract_type_other, seal_type → cert_name/seal_count, return_status → return_date, is_framework → period_end.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.288Z"
-fingerprint: 1266f6407e434b7ee473c37529842b35c2605a39bc4ad8881f6bc19d40d4caf1
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.042Z"
+fingerprint: 10c6effd215627f1c844a3acecef0995e0cae341763861c18553845cb71394d6
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

@@ -5,14 +5,14 @@ parent: oa.form.template.write-model
 name: {zh: "补件写入", en: "Supplement Write"}
 description:
   zh: >
-      待补件状态下的写入通道：仅 `attachments` 与 `supplement_note` 可写；`supplement_note`（≥5 字符、≤500）写入 `flow_supplement.submitted_note` 并进入审批轨迹，附件按轮次入库。
+      待补件状态下的写入通道：**所有附件类字段（schema 中 type ∈ {file, files}，如合同单的 counterparty_docs）＋补件说明 supplement_note 可写**——判据是字段类型，不是名为 attachments 的字段码；supplement_note（≥5 字符、≤500）写入 flow_supplement.submitted_note 并进入审批轨迹，附件按轮次入库。其它类型字段（文本/金额/日期/枚举）在待补件期仍然只读。
       
   en: >
-      The write channel while awaiting supplement: only `attachments` and `supplement_note` are writable; `supplement_note` (≥5 and ≤500 characters) lands in `flow_supplement.submitted_note` and enters the approval trail, with attachments stored per round.
+      The write channel while awaiting supplement: every attachment-typed field (schema type ∈ {file, files}, e.g. the contract form's counterparty_docs) plus supplement_note are writable — the test is the field type, not the field code named attachments; supplement_note (≥5 and ≤500 characters) lands in flow_supplement.submitted_note and enters the approval trail, with attachments stored per round. Fields of any other type stay read-only while awaiting supplement.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.295Z"
-fingerprint: d2b7f5c2c0d01f03ccdc1861dd8edb4f8b9717fa1658b7e0272c77eb1d9c1073
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.054Z"
+fingerprint: 5abac5c20e8ad6a4ad1bb9d66df58fa025b9571cc0569f7b894d95b4b96a384d
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

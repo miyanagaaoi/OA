@@ -10,8 +10,8 @@ description:
   en: >
       The approval-task ledger: one row per approver on countersign nodes, the task state machine (pending/agreed/rejected/transferred/reassigned/added_sign/routed/returned/supplement/closed), opinion and decision time, the to-do list and task detail, plus automatic closing when another approver has decided or the document reached a terminal state.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.390Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.172Z"
 fingerprint: 5892235bf362330ec273a37ebb0cbbea0196d4812363113164ca1a4cd71bb494
 source:
   - path: "doc/data-model.md"

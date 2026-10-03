@@ -10,8 +10,8 @@ description:
   en: >
       The subsidiary sheet differs from the group sheet: an info strip (application number left, printer and print time right), a centred bold heading, a four-column vertical field table (label, value, label, value; one field per row), full-width centred group titles (approval detail, contract term, our side, counterparty, approval records), a trail of three-part rows (stage, handler/action/time, full-width opinion and attachments) and withdrawn and re-approved each on their own row.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.253Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.994Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

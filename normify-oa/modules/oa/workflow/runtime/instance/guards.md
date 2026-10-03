@@ -10,8 +10,8 @@ description:
   en: >
       Pre-transition guards: terminal states (approved/rejected/withdrawn/terminated) can never be resubmitted; withdrawal belongs to the initiator only and only before node ② passes; resubmission after rejection re-resolves the snapshot against the latest template version and drops already-approved nodes; termination is limited to the system admin and group line leader with a mandatory reason (REQ-FLOW-009/010/014/017, AC-15).
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.379Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.159Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

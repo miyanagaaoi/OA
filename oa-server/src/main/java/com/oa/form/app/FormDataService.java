@@ -458,7 +458,10 @@ public class FormDataService {
     private WriteContext writeContext(FlowInstanceRow instance, FormSchema schema) {
         List<FlowNodeInstanceRow> nodes = instance.getId() == null ? List.of()
                 : nodeInstanceMapper.selectByInstance(instance.getId());
-        return writeGuard.resolve(instance, currentPrincipal(), schema.fieldCodes(), nodes);
+        // 待补件窗口按**字段类型**放行附件类字段（schema.type ∈ {file, files}），
+        // 而不是写死 attachments 字段码：合同单的 counterparty_docs 同样是「仅补件」附件字段。
+        return writeGuard.resolve(instance, currentPrincipal(), schema.fieldCodes(), nodes,
+                schema.attachmentFieldCodes());
     }
 
     private static CurrentUser currentPrincipal() {

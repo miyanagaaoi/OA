@@ -10,8 +10,8 @@ description:
   en: >
       Approval-centre layout tokens: nav-w 224px expanded, nav-w-rail 64px collapsed, panel-list 380px with a 320px drag lower bound, a two-line list item of about 68px separated by 1px lines rather than card shadows, a 56px detail header aligned with the top bar and a fixed 60px bottom action bar; the drawer transitions over 160ms ease-out and respects prefers-reduced-motion.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.257Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.998Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -5,14 +5,14 @@ parent: oa.form.template.write-model
 name: {zh: "状态白名单校验", en: "State Whitelist Guard"}
 description:
   zh: >
-      按单据状态计算可写字段集合并拦截越权写入：待补件下主字段一律只读，需改主字段必须走「驳回 → 修改 → 重新提交」；状态取自流程实例。
+      按单据状态计算可写字段集合并拦截越权写入：草稿全可写；审批中全只读（唯一例外＝印鉴单 return_status / return_date，仅发起人与节点⑦）；**待补件按字段类型放行所有附件类字段（type ∈ {file, files}）＋补件说明 supplement_note**，主字段一律只读（40304）；已完结只读。判据是字段类型，不是名为 attachments 的字段码。状态取自流程实例。
       
   en: >
-      Computes the writable field set per document state and blocks out-of-scope writes: while awaiting supplement all main fields are read-only and changes must go through reject → edit → resubmit; state comes from the process instance.
+      Computes the writable field set per document state and blocks out-of-scope writes: all fields in draft; read-only while approving (sole exception: the seal form's return_status / return_date for the initiator and node ⑦); while awaiting supplement every attachment-typed field (type ∈ {file, files}) plus supplement_note is writable while main fields stay read-only; closed documents are read-only. The test is the field type, not the field code named attachments.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.295Z"
-fingerprint: 2592e6e2d0e272e8eb3c8a2ee8d3a0d6c4829981ece9483baa17bc91eb61c636
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.053Z"
+fingerprint: 1ba1928c51160fbc60a41e566345596b56340383dc97322ce98630f93d7d123e
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/writemodel/FormStateWriteGuard.java"

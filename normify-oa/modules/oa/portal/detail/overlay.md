@@ -10,8 +10,8 @@ description:
   en: >
       The centred overlay opened by clicking a list row: main form 2fr against approval record 1fr; the scrim is a fixed 40% black and the overlay closes on scrim click or Esc; closing with unsaved content asks for a second confirmation; no permanent detail column, and closing returns to the same table position.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.336Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.106Z"
 fingerprint: 6f97dc580ed4d0d87fae8063d855678f9a2f3b3425b149dd9321be8c4b605b79
 source:
   - path: "doc/prd-0.1.md"

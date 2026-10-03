@@ -86,6 +86,27 @@ public final class FormSchema {
         return new LinkedHashSet<>(fields.keySet());
     }
 
+    /**
+     * <b>附件类字段码</b>（{@code type ∈ {file, files}}，保序）。
+     *
+     * <p>用途：待补件窗口的写白名单必须**按字段类型**放行「所有附件类字段」，而不是写死
+     * {@code attachments} 一个字段码 —— 合同单的 {@code counterparty_docs} 同样是附件类字段
+     * （{@code doc/forms.md} §4 字段表 {@code 发起后 = 仅补件}），写死字段码会让它在待补件期
+     * 「既不能传也不能删」（40304），与 {@code doc/forms.md} §1.2 的意图相悖。
+     *
+     * <p>判定用 {@link FormFieldDef#isAttachment()}（即 {@link FormFieldType#isAttachment()}），
+     * 因此**模板新增一个附件类字段无需改任何白名单代码**。
+     */
+    public Set<String> attachmentFieldCodes() {
+        Set<String> codes = new LinkedHashSet<>();
+        for (FormFieldDef field : fields.values()) {
+            if (field.isAttachment()) {
+                codes.add(field.code());
+            }
+        }
+        return codes;
+    }
+
     /** 按字段码取定义。 */
     public Optional<FormFieldDef> field(String code) {
         return code == null ? Optional.empty() : Optional.ofNullable(fields.get(code));

@@ -127,8 +127,13 @@ public class AttachmentController {
      * 预览：**仅安全类型内联**，其余降级为下载。
      *
      * <p>真源：{@code doc/enums.md} §12.1 的降级口径要求 {@code heic} 转 {@code jpg} 后预览、
-     * {@code wps} 提示下载查看。**HEIC 转码未在本轮实现**（需要图像库；真源未指定实现方式）
-     * ⇒ 本轮 {@code heic} 会走 {@code attachment} 降级（不内联渲染），已列入待决策。
+     * {@code wps} 提示下载查看。
+     *
+     * <p><b>HEIC 转码是「已登记的未实现项」（2026-10 裁定，不再是「待决策」）</b>：
+     * 需要图像处理依赖，真源未指定实现方式 ⇒ 本轮 {@code heic} 走 {@code attachment} 降级
+     * （不内联渲染、不报错）。已**排期阶段 3**，与电子签名一起引入图像处理依赖（避免装两次）；
+     * 真源已如实回写于 {@code doc/enums.md} §12.1（A-03）、{@code doc/forms.md} §1.4「预览降级」行，
+     * 可执行用例 {@code doc/test-cases.md} TC-FORM-033（其「转 jpg 预览」一项未实现前**不得判通过**）。
      */
     @GetMapping("/attachments/{attachmentId}/preview")
     @Audited(action = "attachment_preview", targetType = "flow_attachment",

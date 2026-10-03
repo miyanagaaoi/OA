@@ -10,9 +10,9 @@ description:
   en: >
       Phone numbers are masked as 138****8888 in the directory and only the owner or a system admin may see the full value; a single masking contract is exposed for the directory, document detail and H5 surfaces.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.243Z"
-fingerprint: ddc04a36cdc4ba75d3e0a941a2bfc318dd2517641db09187b9c00bd3a779a9e6
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.981Z"
+fingerprint: 5ee64703508fb334a52b0a110162fcdfca393ce75709c00ef1cb8f0cbcc3d7e8
 source:
   - path: "oa-server/src/main/java/com/oa/authz/visibility/PhoneVisibilityService.java"
   - path: "oa-server/src/main/java/com/oa/authz/api/FieldPolicyController.java"

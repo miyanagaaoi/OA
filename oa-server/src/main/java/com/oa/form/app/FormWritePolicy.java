@@ -17,16 +17,34 @@ import java.util.Set;
  *   <tr><th>单据状态</th><th>可写字段</th></tr>
  *   <tr><td>草稿 {@code draft}</td><td>全部字段</td></tr>
  *   <tr><td>审批中 {@code approving}</td><td>无（全只读）</td></tr>
- *   <tr><td>待补件 {@code pending_supplement}</td><td>仅 {@code attachments} + {@code supplement_note}</td></tr>
+ *   <tr><td>待补件 {@code pending_supplement}</td><td>**所有附件类字段** + {@code supplement_note}</td></tr>
  *   <tr><td>已完结（通过/驳回/终止）</td><td>无（只读，含归档）</td></tr>
  * </table>
+ *
+ * <h2>待补件窗口为什么按「字段类型」而不是「字段码」判定（2026-10 裁定）</h2>
+ * <p>{@code doc/forms.md} §1.2 的意图是「待补件仅**附件**与补件说明可写」。旧实现把「附件」
+ * 落成写死的字段码清单 {@code {attachments, supplement_note}}，于是**同为附件类的其它字段**
+ * （如合同单的 {@code counterparty_docs}，§4 字段表 {@code 发起后 = 仅补件}）在待补件期
+ * 既不能上传也不能删除（40304）—— 那是实现把真源的「附件」误读成「名为 attachments 的字段」。
+ * 现行口径：
+ * <ul>
+ *   <li>放行 {@code form_schema_json.fields[]} 里**所有** {@code type ∈ {file, files}} 的字段
+ *       （由调用方经 {@code FormSchema#attachmentFieldCodes()} 传入）；</li>
+ *   <li>加上系统附件字段码 {@link #FIELD_ATTACHMENTS}（它可能**不在** schema 内，
+ *       属父实体约定的系统字段，故一并放行；是否真能落到某字段上另由 schema 归属校验兜底）；</li>
+ *   <li>加上补件说明 {@link #FIELD_SUPPLEMENT_NOTE}（跨表单共用的系统预留字段，§8）；</li>
+ *   <li><b>不放宽任何其它类型</b>：文本 / 金额 / 日期 / 枚举 / 选择器…在待补件期**仍然只读**
+ *       （40304），与旧口径逐字一致；审批中与已完结窗口**完全不变**。</li>
+ *   <li>调用方**未提供**字段类型信息时（例如字段策略预检接口的入参只有字段名），退化为旧的
+ *       字段码清单 {@code {attachments, supplement_note}} —— <b>宁可少放行，不可多放行</b>。</li>
+ * </ul>
  *
  * <b>唯一例外</b>：印鉴证照单（{@code form_type = seal}）的 {@code return_status} / {@code return_date}
  * 在「审批中」态下，**仅发起人与节点⑦（归档登记）可改**；其余角色/节点仍全只读。
  * <b>待补件态不适用该例外</b>（2026-10-04 修正）：{@code doc/forms.md} §5 的例外边界表原文写
- * 「待补件 | 发起人 | 仅 {@code attachments} + {@code supplement_note} | **一律只读**——
+ * 「待补件 | 发起人 | 仅附件类字段 + {@code supplement_note} | **一律只读**——
  * {@code return_status} / {@code return_date} 在待补件期**同样只读**」，§7 对照表同口径
- * （「补件可写字段 … 附件 + 补件说明（**归还状态/归还日期在此阶段也只读**）」），
+ * （「补件可写字段 … 附件类字段（type=file/files）+ 补件说明（**归还状态/归还日期在此阶段也只读**）」），
  * 可执行用例见 {@code doc/test-cases.md} TC-FORM-013「待补件期归还状态同样只读
  * （三态例外仅在「审批中」生效）」。
  *
@@ -47,7 +65,13 @@ public final class FormWritePolicy {
     /** 印鉴单「归还日期」字段。 */
     public static final String FIELD_RETURN_DATE = "return_date";
 
-    /** 待补件态下唯一可写的两个字段。 */
+    /**
+     * 待补件态在**没有** schema 字段类型信息时的退化白名单（系统字段码）。
+     *
+     * <p>有类型信息时请用 {@link #writableFields(FormState, FormType, boolean, boolean, Set, Set)}
+     * 传入 {@code attachmentFields}（{@code FormSchema#attachmentFieldCodes()}）—— 那才会按类型
+     * 放行**全部**附件类字段。本常量保留：① 5 参重载的退化口径；② 出参/文档引用的稳定符号。
+     */
     public static final Set<String> SUPPLEMENT_FIELDS =
             Collections.unmodifiableSet(new LinkedHashSet<>(java.util.List.of(FIELD_ATTACHMENTS, FIELD_SUPPLEMENT_NOTE)));
 
@@ -107,7 +131,7 @@ public final class FormWritePolicy {
     }
 
     /**
-     * 计算可写字段集合。
+     * 计算可写字段集合（**不含** schema 字段类型信息：待补件态退化为 {@link #SUPPLEMENT_FIELDS}）。
      *
      * @param state        表单状态
      * @param formType     单据类型
@@ -117,6 +141,19 @@ public final class FormWritePolicy {
      */
     public static Set<String> writableFields(FormState state, FormType formType, boolean isInitiator,
                                              boolean isArchiveNode, Set<String> allFields) {
+        return writableFields(state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /**
+     * 计算可写字段集合（**按字段类型**放行待补件期的附件字段）。
+     *
+     * @param attachmentFields 该 schema 里 {@code type ∈ {file, files}} 的字段码全集
+     *                         （{@code FormSchema#attachmentFieldCodes()}）；传空集 = 无类型信息，
+     *                         待补件态退化为 {@link #SUPPLEMENT_FIELDS}
+     */
+    public static Set<String> writableFields(FormState state, FormType formType, boolean isInitiator,
+                                             boolean isArchiveNode, Set<String> allFields,
+                                             Set<String> attachmentFields) {
         Set<String> result = new LinkedHashSet<>();
         FormState effectiveState = state == null ? FormState.DRAFT : state;
         if (effectiveState == FormState.DRAFT) {
@@ -130,7 +167,7 @@ public final class FormWritePolicy {
             return result;
         }
         if (effectiveState == FormState.PENDING_SUPPLEMENT) {
-            result.addAll(SUPPLEMENT_FIELDS);
+            result.addAll(supplementWritableFields(attachmentFields));
             // 待补件期**不**追加 SEAL_RETURN_FIELDS：forms.md §5 / §7 与 TC-FORM-013 明确
             // 「归还状态/归还日期在待补件期同样只读」（例外仅在「审批中」生效）。
             return result;
@@ -142,19 +179,59 @@ public final class FormWritePolicy {
         return result;
     }
 
-    /** 单字段可写判定。 */
+    /**
+     * <b>待补件窗口的可写字段集</b>（forms.md §1.2「仅附件与补件说明」的落地口径）。
+     *
+     * <p>= schema 里**所有附件类字段**（{@code type ∈ {file, files}}，由调用方经
+     * {@code FormSchema#attachmentFieldCodes()} 传入）
+     * ∪ 系统附件字段码 {@link #FIELD_ATTACHMENTS}（它可能**不在** schema 内 —— 父实体另有附件表，
+     * 故无条件放行；真要落到某个字段上时另由「字段必须在该实例锁定版本 schema 内」那道闸门兜底）
+     * ∪ 补件说明 {@link #FIELD_SUPPLEMENT_NOTE}（跨表单共用的系统预留字段，§8）。
+     *
+     * <p><b>单调性</b>：传入的 {@code attachmentFields} 只会**增加**白名单，绝不会移除
+     * {@code attachments} / {@code supplement_note} —— 因此「没有类型信息」与「有类型信息但该
+     * schema 只有 {@code attachments}」两种情形得到的集合，与旧实现逐字一致（不放宽已有口径）。
+     *
+     * @param attachmentFields schema 附件类字段码；{@code null}/空集 = 调用方没有类型信息，
+     *                         此时退化为旧的字段码清单 {@code {attachments, supplement_note}}
+     */
+    public static Set<String> supplementWritableFields(Set<String> attachmentFields) {
+        Set<String> result = new LinkedHashSet<>();
+        if (attachmentFields != null) {
+            // 调用方传入的必须是**按 schema 类型过滤过**的字段码（type ∈ {file, files}）；
+            // 本类拿不到类型，故不做二次判定 —— 过滤点在 FormSchema#attachmentFieldCodes()。
+            result.addAll(attachmentFields);
+        }
+        result.add(FIELD_ATTACHMENTS);
+        result.add(FIELD_SUPPLEMENT_NOTE);
+        return result;
+    }
+
+    /** 单字段可写判定（无 schema 字段类型信息：见 5 参重载）。 */
     public static boolean isWritable(String field, FormState state, FormType formType, boolean isInitiator,
                                      boolean isArchiveNode, Set<String> allFields) {
+        return isWritable(field, state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /** 单字段可写判定（按字段类型放行待补件期的附件字段）。 */
+    public static boolean isWritable(String field, FormState state, FormType formType, boolean isInitiator,
+                                     boolean isArchiveNode, Set<String> allFields, Set<String> attachmentFields) {
         if (field == null) {
             return false;
         }
-        return writableFields(state, formType, isInitiator, isArchiveNode, allFields).contains(field);
+        return writableFields(state, formType, isInitiator, isArchiveNode, allFields, attachmentFields).contains(field);
     }
 
     /** 断言可写，否则抛 403 {@link ErrorCode#FIELD_WRITE_DENIED}。 */
     public static void assertWritable(String field, FormState state, FormType formType, boolean isInitiator,
                                       boolean isArchiveNode, Set<String> allFields) {
-        if (!isWritable(field, state, formType, isInitiator, isArchiveNode, allFields)) {
+        assertWritable(field, state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /** 断言可写（按字段类型放行待补件期的附件字段），否则抛 403 {@link ErrorCode#FIELD_WRITE_DENIED}。 */
+    public static void assertWritable(String field, FormState state, FormType formType, boolean isInitiator,
+                                      boolean isArchiveNode, Set<String> allFields, Set<String> attachmentFields) {
+        if (!isWritable(field, state, formType, isInitiator, isArchiveNode, allFields, attachmentFields)) {
             throw new BizException(ErrorCode.FIELD_WRITE_DENIED,
                     String.format(ErrorCode.FIELD_WRITE_DENIED.getMessage(), field));
         }
@@ -163,10 +240,16 @@ public final class FormWritePolicy {
     /** 批量断言（任一字段越权即整单拒绝，避免部分写入）。 */
     public static void assertWritable(Set<String> fields, FormState state, FormType formType, boolean isInitiator,
                                       boolean isArchiveNode, Set<String> allFields) {
+        assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /** 批量断言（按字段类型放行待补件期的附件字段）。 */
+    public static void assertWritable(Set<String> fields, FormState state, FormType formType, boolean isInitiator,
+                                      boolean isArchiveNode, Set<String> allFields, Set<String> attachmentFields) {
         if (fields == null) {
             return;
         }
-        Set<String> writable = writableFields(state, formType, isInitiator, isArchiveNode, allFields);
+        Set<String> writable = writableFields(state, formType, isInitiator, isArchiveNode, allFields, attachmentFields);
         for (String field : fields) {
             if (!writable.contains(field)) {
                 throw new BizException(ErrorCode.FIELD_WRITE_DENIED,
@@ -182,11 +265,18 @@ public final class FormWritePolicy {
      */
     public static Map<String, Object> filterWritable(Map<String, Object> payload, FormState state, FormType formType,
                                                      boolean isInitiator, boolean isArchiveNode, Set<String> allFields) {
+        return filterWritable(payload, state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /** 过滤提交载荷（按字段类型放行待补件期的附件字段）。 */
+    public static Map<String, Object> filterWritable(Map<String, Object> payload, FormState state, FormType formType,
+                                                     boolean isInitiator, boolean isArchiveNode, Set<String> allFields,
+                                                     Set<String> attachmentFields) {
         Map<String, Object> filtered = new LinkedHashMap<>();
         if (payload == null) {
             return filtered;
         }
-        Set<String> writable = writableFields(state, formType, isInitiator, isArchiveNode, allFields);
+        Set<String> writable = writableFields(state, formType, isInitiator, isArchiveNode, allFields, attachmentFields);
         for (Map.Entry<String, Object> entry : payload.entrySet()) {
             if (writable.contains(entry.getKey())) {
                 filtered.put(entry.getKey(), entry.getValue());
@@ -228,8 +318,19 @@ public final class FormWritePolicy {
      */
     public static void assertWritable(Set<String> fields, FormState state, FormType formType, boolean isInitiator,
                                       boolean isArchiveNode, Set<String> allFields, boolean amountWritable) {
+        assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields, Set.of(), amountWritable);
+    }
+
+    /**
+     * 组合断言（含 schema 附件类字段类型信息）：**状态白名单 ∧ 角色金额规则**。
+     *
+     * <p>待补件期按字段类型放行附件类字段 —— 表单保存路径应调用本重载。
+     */
+    public static void assertWritable(Set<String> fields, FormState state, FormType formType, boolean isInitiator,
+                                      boolean isArchiveNode, Set<String> allFields, Set<String> attachmentFields,
+                                      boolean amountWritable) {
         assertAmountWritable(fields, amountWritable);
-        assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields);
+        assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields, attachmentFields);
     }
 
     /**
@@ -238,7 +339,17 @@ public final class FormWritePolicy {
     public static Map<String, Object> filterWritable(Map<String, Object> payload, FormState state, FormType formType,
                                                      boolean isInitiator, boolean isArchiveNode, Set<String> allFields,
                                                      boolean amountWritable) {
-        Map<String, Object> filtered = filterWritable(payload, state, formType, isInitiator, isArchiveNode, allFields);
+        return filterWritable(payload, state, formType, isInitiator, isArchiveNode, allFields, Set.of(), amountWritable);
+    }
+
+    /**
+     * 组合过滤（含 schema 附件类字段类型信息）：先按状态白名单过滤，再剥掉金额字段。
+     */
+    public static Map<String, Object> filterWritable(Map<String, Object> payload, FormState state, FormType formType,
+                                                     boolean isInitiator, boolean isArchiveNode, Set<String> allFields,
+                                                     Set<String> attachmentFields, boolean amountWritable) {
+        Map<String, Object> filtered = filterWritable(payload, state, formType, isInitiator, isArchiveNode, allFields,
+                attachmentFields);
         if (!amountWritable) {
             filtered.keySet().removeIf(FormWritePolicy::isAmountField);
         }

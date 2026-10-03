@@ -10,8 +10,8 @@ description:
   en: >
       The amount control: typography.amount with tnum, right-aligned, thousands separators while typing, a fixed yuan prefix on the left and normalisation to two decimals on blur; an amount of zero or blank blocks submission, and above one million the display also shows a ten-thousand-yuan conversion to cut misreading risk.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.248Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.987Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

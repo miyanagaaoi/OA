@@ -10,9 +10,9 @@ description:
   en: >
       Fund-specific validation: the amount is required and > 0 (zero or empty blocks submission), payee name and account are required with a valid account character set, the pay date is not earlier than today, the linked contract number must be valid, and at least one attachment is required; all server-side.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.268Z"
-fingerprint: 93dfb68e0c017f6851f4e505abb4e3fb8872131b4d4223d4b3133a2aae529acc
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.015Z"
+fingerprint: fcf07a02d1e78c7b0431fef35adfd1940dba00be452872407e2af70620c1cbfd
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/fund/FundFormRules.java"

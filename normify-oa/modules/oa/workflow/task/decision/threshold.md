@@ -10,8 +10,8 @@ description:
   en: >
       Parsing and evaluating countersign pass thresholds: a percentage (e.g. 66%) or an absolute headcount (e.g. 2 people), with the headcount winning when both are configured; the threshold is frozen into the node instance at submission and evaluated against approvals over total candidates, defaulting to a simple majority.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.389Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.170Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

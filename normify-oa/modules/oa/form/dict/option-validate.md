@@ -10,9 +10,9 @@ description:
   en: >
       Validates values against the bound dictionary at submission: the code must exist among enabled items, disabled or unknown codes are rejected, and multi-select values are de-duplicated; submitted documents display the snapshotted names regardless of later dictionary edits.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.262Z"
-fingerprint: 90607856d87728d4f78aca5048f8a486389f9004f87617d538f296824d19d2fa
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.007Z"
+fingerprint: 5460deb08aa4c17fff80d41f4e0818ad08a8bd2e95712868c104ae72ef32e570
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

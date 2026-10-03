@@ -10,8 +10,8 @@ description:
   en: >
       Multi-device sign-in (REQ-USER-003): the number of concurrently online devices per account is configurable with a default of three; exceeding it kicks out the device that signed in earliest with an explanation, the kicked session dies at once and every kick is written to the login log.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.338Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.108Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * 三态白名单服务端强制（doc/tech-design.md §5.4）纯逻辑单测。
  *
- * <p>草稿全可写 / 审批中全只读 / 待补件仅 attachments + supplement_note /
+ * <p>草稿全可写 / 审批中全只读 / 待补件仅**附件类字段（type ∈ {file, files}）** + supplement_note /
  * 唯一例外：印鉴单 return_status、return_date 仅发起人与节点⑦可改。
  */
 class FormWritePolicyTest {
@@ -49,7 +49,7 @@ class FormWritePolicyTest {
     }
 
     @Test
-    @DisplayName("待补件：仅 attachments + supplement_note")
+    @DisplayName("待补件：仅 attachments + supplement_note（**无 schema 字段类型信息**时的退化口径）")
     void pendingSupplementOnlyTwoFields() {
         Set<String> writable = FormWritePolicy.writableFields(FormState.PENDING_SUPPLEMENT, FormType.MATTER, true, false, MATTER_FIELDS);
         assertThat(writable).containsExactlyInAnyOrder(FormWritePolicy.FIELD_ATTACHMENTS, FormWritePolicy.FIELD_SUPPLEMENT_NOTE);
@@ -61,6 +61,78 @@ class FormWritePolicyTest {
         assertThatThrownBy(() -> FormWritePolicy.assertWritable(Set.of("attachments", "amount"),
                 FormState.PENDING_SUPPLEMENT, FormType.MATTER, true, false, MATTER_FIELDS))
                 .isInstanceOf(BizException.class);
+    }
+
+    @Test
+    @DisplayName("待补件：按**字段类型**放行全部附件类字段（合同单 counterparty_docs 也能传能删）")
+    void pendingSupplementAllowsEveryAttachmentTypedField() {
+        Set<String> contractFields = new LinkedHashSet<>(Set.of(
+                "title", "amount", "period_start", "attachments", "counterparty_docs", "supplement_note"));
+        Set<String> attachmentFields = new LinkedHashSet<>(Set.of("attachments", "counterparty_docs"));
+
+        Set<String> writable = FormWritePolicy.writableFields(FormState.PENDING_SUPPLEMENT, FormType.CONTRACT,
+                true, false, contractFields, attachmentFields);
+
+        assertThat(writable).as("待补件期 = 所有 type ∈ {file, files} 的字段 + 补件说明")
+                .containsExactlyInAnyOrder("attachments", "counterparty_docs", "supplement_note");
+        assertThatCode(() -> FormWritePolicy.assertWritable(
+                Set.of("counterparty_docs", "attachments", "supplement_note"),
+                FormState.PENDING_SUPPLEMENT, FormType.CONTRACT, true, false, contractFields, attachmentFields))
+                .doesNotThrowAnyException();
+        // 不得放宽：文本 / 金额 / 日期在待补件期**仍然只读**（40304）
+        assertThatThrownBy(() -> FormWritePolicy.assertWritable(Set.of("title"),
+                FormState.PENDING_SUPPLEMENT, FormType.CONTRACT, true, false, contractFields, attachmentFields))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+        assertThatThrownBy(() -> FormWritePolicy.assertWritable(Set.of("amount"),
+                FormState.PENDING_SUPPLEMENT, FormType.CONTRACT, true, false, contractFields, attachmentFields))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+        assertThatThrownBy(() -> FormWritePolicy.assertWritable(Set.of("period_start"),
+                FormState.PENDING_SUPPLEMENT, FormType.CONTRACT, true, false, contractFields, attachmentFields))
+                .isInstanceOf(BizException.class);
+    }
+
+    @Test
+    @DisplayName("待补件：系统附件字段码 attachments（不在 schema 内）也放行；其它窗口完全不变")
+    void pendingSupplementSystemAttachmentFieldAndOtherWindowsUnchanged() {
+        // ① schema 里**没有** attachments（只有 counterparty_docs）：系统附件字段码仍无条件放行
+        assertThat(FormWritePolicy.supplementWritableFields(Set.of("counterparty_docs")))
+                .containsExactlyInAnyOrder("attachments", "counterparty_docs", "supplement_note");
+        // ② 单调性：无类型信息（null/空集）与旧口径逐字一致，且传类型只增不减
+        assertThat(FormWritePolicy.supplementWritableFields(null))
+                .containsExactlyInAnyOrder("attachments", "supplement_note");
+        assertThat(FormWritePolicy.supplementWritableFields(Set.of()))
+                .containsExactlyInAnyOrder("attachments", "supplement_note");
+        assertThat(FormWritePolicy.supplementWritableFields(Set.of("attachments")))
+                .containsExactlyInAnyOrder("attachments", "supplement_note");
+
+        // ③ 附件类型信息**不得**放宽审批中 / 已完结两个窗口
+        Set<String> attachmentFields = Set.of("attachments", "counterparty_docs");
+        assertThat(FormWritePolicy.writableFields(FormState.APPROVING, FormType.CONTRACT, true, false,
+                Set.of("title", "attachments", "counterparty_docs"), attachmentFields)).isEmpty();
+        assertThat(FormWritePolicy.writableFields(FormState.CLOSED, FormType.CONTRACT, true, false,
+                Set.of("title", "attachments", "counterparty_docs"), attachmentFields)).isEmpty();
+        // ④ 审批中印鉴单归还例外不受影响（附件类型信息不参与该分支）
+        assertThat(FormWritePolicy.writableFields(FormState.APPROVING, FormType.SEAL, true, false, SEAL_FIELDS,
+                attachmentFields))
+                .containsExactlyInAnyOrder(FormWritePolicy.FIELD_RETURN_STATUS, FormWritePolicy.FIELD_RETURN_DATE);
+    }
+
+    @Test
+    @DisplayName("filterWritable：待补件按字段类型保留附件字段，剥掉主字段")
+    void filterWritableKeepsAttachmentTypedFields() {
+        Set<String> contractFields = new LinkedHashSet<>(Set.of("title", "amount", "attachments", "counterparty_docs"));
+        Set<String> attachmentFields = new LinkedHashSet<>(Set.of("attachments", "counterparty_docs"));
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("counterparty_docs", "<file>");
+        payload.put("title", "篡改合同名称");
+        payload.put("amount", "1.00");
+
+        Map<String, Object> filtered = FormWritePolicy.filterWritable(payload, FormState.PENDING_SUPPLEMENT,
+                FormType.CONTRACT, true, false, contractFields, attachmentFields);
+
+        assertThat(filtered).containsOnlyKeys("counterparty_docs");
     }
 
     @Test

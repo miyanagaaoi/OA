@@ -10,9 +10,9 @@ description:
   en: >
       Attachments carry a round marker: 0 for originals uploaded at draft time, 1..3 for the Nth supplement. The round is decided by the server, never supplied by the client: 0 while in draft; during pending-supplement it comes from the supplement_round of the in-flight flow_supplement row (falling back to supplement_count + 1 clamped to 1..3). At most one supplement per node and three per document; the attachment list groups by round and the printed list labels it too.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.285Z"
-fingerprint: 2f64261ff952ff46b4116bbe3b0ec413415ca264b218a0e1cef09f18a6046944
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.037Z"
+fingerprint: 348ca18e3911952d9fa7fb6f8323141de4a9fe7967ac579fb3a1b8f0f4cb0bb4
 source:
   - path: "doc/forms.md"
   - path: "doc/enums.md"

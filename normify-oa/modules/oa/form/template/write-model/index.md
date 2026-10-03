@@ -10,9 +10,9 @@ description:
   en: >
       Field read/write rights across the three lifecycle stages (draft fully writable, in-approval fully read-only, awaiting supplement only attachments and the supplement note). The server enforces a state whitelist rather than trusting greyed-out UI; amount and account fields add role-based masking.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.295Z"
-fingerprint: 6c95f02bc10cd6e33c3c98cbd1307bf0561cfec1f8a05f91f1d9425c80d2ae49
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.052Z"
+fingerprint: 43ba16e298a19457babccc7854eca68e55e0a4cc9c08b25e15706bfce96671ce
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/writemodel/FormStateWriteGuard.java"

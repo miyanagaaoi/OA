@@ -10,9 +10,9 @@ description:
   en: >
       A block-style upload button with capacity copy (at most 30 files, 500MB each) instead of a large dashed drop zone; uploaded files appear as list rows (icon, name, size, delete) with no image thumbnail grid; over-limit uploads state the exact cap, and supplement attachments carry their round number.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.345Z"
-fingerprint: 0a8dce606796993b3c58b78c640b6eb33fbab91c821f159672f1f01fa1f7240d
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.117Z"
+fingerprint: 84e73298633e69866b44401911c474f18cd34d63ff8b4a46d09e2d711c341178
 source:
   - path: "DESIGN.md"
     line: 867

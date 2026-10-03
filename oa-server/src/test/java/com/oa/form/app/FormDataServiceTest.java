@@ -284,6 +284,52 @@ class FormDataServiceTest {
                 eq(ThreadAction.ARCHIVE_REGISTER), anyString());
     }
 
+    @Test
+    @DisplayName("待补件（合同单）：按字段类型可保存 counterparty_docs；title/amount 仍 40304（B 项裁定）")
+    void pendingSupplementContractAttachmentFieldByType() {
+        // 财务角色：绕开「金额对非财务角色只读（40306）」这条**正交**规则，
+        // 使断言命中的确实是**状态白名单**。
+        login(INITIATOR_ID, "finance_owner");
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("title", "供热管网维护合同");
+        payload.put("category", "business");
+        payload.put("contract_type", "service");
+        payload.put("counterparty", "某某市政工程有限公司");
+        payload.put("counterparty_credit", "91310000MA1K35XXXX");
+        payload.put("amount", "1250000.00");
+        payload.put("period_start", "2099-01-01");
+        payload.put("period_end", "2099-12-31");
+        payload.put("is_framework", false);
+        payload.put("seal_type", "contract_seal");
+        payload.put("attachments", List.of(Map.of("fileName", "contract.pdf", "fileSize", 4096)));
+
+        FormDataService.PreparedPayload prepared = service.prepareDraft(schemas.get("contract"), payload);
+        instance("contract", "approving", "pending_supplement", prepared.fieldsJson());
+
+        // ① 附件类字段（counterparty_docs，type=files）在待补件窗口**可写**
+        service.save(INSTANCE_ID, Map.of("counterparty_docs",
+                List.of(Map.of("fileName", "license.pdf", "fileSize", 2048))), ValidationMode.DRAFT);
+        assertThat(capturedPayload.get()).containsKey("counterparty_docs");
+
+        // ② 同一窗口内主字段**仍然只读**（文本 / 金额 / 日期一律 40304）
+        assertThatThrownBy(() -> service.save(INSTANCE_ID, Map.of("title", "偷改合同名称"), ValidationMode.DRAFT))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+        assertThatThrownBy(() -> service.save(INSTANCE_ID, Map.of("amount", "1.00"), ValidationMode.DRAFT))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+        assertThatThrownBy(() -> service.save(INSTANCE_ID, Map.of("period_start", "2099-02-01"), ValidationMode.DRAFT))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+
+        // ③ 审批中窗口**完全不变**：连附件类字段也只读
+        instance("contract", "approving", null, prepared.fieldsJson());
+        assertThatThrownBy(() -> service.save(INSTANCE_ID, Map.of("counterparty_docs",
+                List.of(Map.of("fileName", "license.pdf"))), ValidationMode.DRAFT))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+    }
+
     // ================================================================ 拒绝样例
 
     @Test
@@ -319,7 +365,7 @@ class FormDataServiceTest {
         assertThatThrownBy(() -> service.save(INSTANCE_ID, Map.of("amount", "999999.00"), ValidationMode.DRAFT))
                 .isInstanceOf(BizException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED)
-                .hasMessageContaining("待补件期仅附件与补件说明可写");
+                .hasMessageContaining("待补件期仅附件类字段（type=file/files）与补件说明可写");
 
         service.save(INSTANCE_ID, Map.of("attachments", List.of(Map.of("fileName", "invoice.pdf")),
                 "supplement_note", "已补充发票原件"), ValidationMode.DRAFT);

@@ -10,8 +10,8 @@ description:
   en: >
       The application layer exposes no UPDATE/DELETE path for signature records or audit logs and offers a self-check endpoint proving there is no bypass around the database triggers.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.356Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.132Z"
 fingerprint: 5892235bf362330ec273a37ebb0cbbea0196d4812363113164ca1a4cd71bb494
 source:
   - path: "doc/data-model.md"

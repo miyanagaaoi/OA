@@ -10,9 +10,9 @@ description:
   en: >
       Contract approval form (form_type=contract): counterparty, contract type, amount and period fields plus a mandatory contract text attachment; subject also to the fund-style read-only and non-exportable amount rules; group-level output uses the group contract routing sheet.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.259Z"
-fingerprint: 817e002cf6cd1b7b2daac2ce0bc0d5d6b2698605785376a293a5177aac9e33e7
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.002Z"
+fingerprint: 33f59e8835169e436acd28454a4beba0ebcd8991abeefb9f50ce434caef163cb
 source:
   - path: "doc/forms.md"
   - path: "doc/prd-0.1.md"

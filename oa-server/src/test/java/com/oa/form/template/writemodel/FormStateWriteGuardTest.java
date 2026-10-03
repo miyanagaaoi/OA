@@ -98,7 +98,7 @@ class FormStateWriteGuardTest {
     }
 
     @Test
-    @DisplayName("待补件：仅 attachments + supplement_note；改金额等主字段 → 40304（TC-FORM-011/012）")
+    @DisplayName("待补件（无字段类型信息）：退化为 attachments + supplement_note；改金额等主字段 → 40304")
     void pendingSupplementOnlyTwoFields() {
         WriteContext context = guard.resolve(instance("matter", "approving", "pending_supplement", 2),
                 user(304L, "employee"), MATTER_FIELDS, List.of());
@@ -108,7 +108,42 @@ class FormStateWriteGuardTest {
                 .doesNotThrowAnyException();
         assertThatThrownBy(() -> guard.assertStateWritable(Set.of("amount"), context))
                 .isInstanceOf(BizException.class)
-                .hasMessageContaining("待补件期仅附件与补件说明可写");
+                .hasMessageContaining("待补件期仅附件类字段（type=file/files）与补件说明可写");
+    }
+
+    @Test
+    @DisplayName("待补件（合同单）：按**字段类型**放行 counterparty_docs；title/amount 仍 40304（B 项裁定）")
+    void pendingSupplementAllowsAttachmentTypedFields() {
+        Set<String> contractFields = Set.of("title", "amount", "contract_type", "attachments", "counterparty_docs");
+        Set<String> attachmentFields = Set.of("attachments", "counterparty_docs");
+        WriteContext context = guard.resolve(instance("contract", "approving", "pending_supplement", 2),
+                user(304L, "employee"), contractFields, List.of(), attachmentFields);
+
+        assertThat(context.state()).isEqualTo(FormWritePolicy.FormState.PENDING_SUPPLEMENT);
+        assertThat(context.attachmentFields()).containsExactlyInAnyOrderElementsOf(attachmentFields);
+        assertThat(context.writableFields()).as("待补件期 = 所有附件类字段 + 补件说明")
+                .containsExactlyInAnyOrder("attachments", "counterparty_docs", "supplement_note");
+        assertThatCode(() -> guard.assertStateWritable(Set.of("counterparty_docs"), context))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> guard.assertStateWritable(Set.of("title"), context))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+        assertThatThrownBy(() -> guard.assertStateWritable(Set.of("contract_type"), context))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
+    }
+
+    @Test
+    @DisplayName("附件类型信息不得放宽审批中窗口：合同单在审批中连附件字段也只读")
+    void attachmentTypedFieldsDoNotWidenApprovingWindow() {
+        Set<String> contractFields = Set.of("title", "attachments", "counterparty_docs");
+        WriteContext context = guard.resolve(instance("contract", "approving", null, 1),
+                user(304L, "employee"), contractFields, List.of(), Set.of("attachments", "counterparty_docs"));
+
+        assertThat(context.writableFields()).isEmpty();
+        assertThatThrownBy(() -> guard.assertStateWritable(Set.of("counterparty_docs"), context))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
     }
 
     @Test

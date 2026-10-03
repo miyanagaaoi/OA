@@ -10,8 +10,8 @@ description:
   en: >
       Density and readability rules: high data density by default, restrained elevation with one-pixel hairlines instead of shadows, whitespace philosophy, responsive strategy for H5, and an iteration guide plus known gaps.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.245Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.984Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

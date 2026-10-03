@@ -10,8 +10,8 @@ description:
   en: >
       Empty and loading states of the pending list: the empty state is a 64px monochrome line icon in ink-disabled plus one line of copy and a single primary button (Initiate approval), vertically centred with 48px of vertical whitespace; the loading skeleton uses surface-1 blocks that keep the row height stable to avoid layout shift.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.346Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.118Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

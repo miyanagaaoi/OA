@@ -10,9 +10,9 @@ description:
   en: >
       Fund attachments `attachments` (files, required, ≥1, invoices/contracts/statements, format and size per 1.4); after initiation they are writable only during supplement.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.264Z"
-fingerprint: 1266f6407e434b7ee473c37529842b35c2605a39bc4ad8881f6bc19d40d4caf1
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.010Z"
+fingerprint: 10c6effd215627f1c844a3acecef0995e0cae341763861c18553845cb71394d6
 source:
   - path: "doc/forms.md"
 apis:

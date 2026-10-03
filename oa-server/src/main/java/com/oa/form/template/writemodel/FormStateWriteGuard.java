@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
  * <h2>三层各管什么（缺一不可）</h2>
  * <ol>
  *   <li><b>状态层</b>：{@link FormWritePolicy}（纯逻辑）——草稿全可写 / 审批中全只读 /
- *       待补件仅 {@code attachments}+{@code supplement_note} / 已完结只读；
+ *       待补件仅**附件类字段（{@code type ∈ {file, files}}）**+ {@code supplement_note} / 已完结只读；
  *       印鉴单 {@code return_status}/{@code return_date} 是**唯一例外**且**仅在审批中**；
  *       {doc/forms.md} §1.2 / §5 / §7；</li>
  *   <li><b>角色层</b>：{@link FormFieldWriteGuard}（1.6 既有实现）——金额字段对非财务角色只读（40306），
@@ -66,13 +66,29 @@ public class FormStateWriteGuard {
     /**
      * 计算写入上下文（**读库**：节点实例用于判定节点⑦身份）。
      *
+     * <p>不传 schema 字段类型信息 ⇒ 待补件窗口退化为字段码清单
+     * （{@code attachments} + {@code supplement_note}）。**表单/附件路径请改用 4 参重载**
+     * 并传入 {@code FormSchema#attachmentFieldCodes()}。
+     *
      * @param instance  实例行（已过数据域，域外调用方拿不到）
      * @param principal 当前登录人（为 {@code null} 时不做身份例外，仍按状态白名单判）
      * @param allFields schema 字段全集
      */
     public WriteContext contextOf(FlowInstanceRow instance, CurrentUser principal, Set<String> allFields) {
+        return contextOf(instance, principal, allFields, Set.of());
+    }
+
+    /**
+     * 计算写入上下文（**读库**；含 schema 附件类字段类型信息）。
+     *
+     * @param attachmentFields schema 里 {@code type ∈ {file, files}} 的字段码
+     *                         （{@code FormSchema#attachmentFieldCodes()}）——待补件窗口按**字段类型**
+     *                         放行全部附件类字段（合同单的 {@code counterparty_docs} 等同理）
+     */
+    public WriteContext contextOf(FlowInstanceRow instance, CurrentUser principal, Set<String> allFields,
+                                  Set<String> attachmentFields) {
         List<FlowNodeInstanceRow> nodes = loadNodes(instance);
-        return resolve(instance, principal, allFields, nodes);
+        return resolve(instance, principal, allFields, nodes, attachmentFields);
     }
 
     /**
@@ -80,6 +96,14 @@ public class FormStateWriteGuard {
      */
     public WriteContext resolve(FlowInstanceRow instance, CurrentUser principal, Set<String> allFields,
                                List<FlowNodeInstanceRow> nodes) {
+        return resolve(instance, principal, allFields, nodes, Set.of());
+    }
+
+    /**
+     * 纯函数版本（不读库；含 schema 附件类字段类型信息）。
+     */
+    public WriteContext resolve(FlowInstanceRow instance, CurrentUser principal, Set<String> allFields,
+                               List<FlowNodeInstanceRow> nodes, Set<String> attachmentFields) {
         FormWritePolicy.FormState state = FormWritePolicy.resolveState(
                 instance == null ? null : instance.getStatus(),
                 instance == null ? null : instance.getSubStatus());
@@ -88,7 +112,7 @@ public class FormStateWriteGuard {
         boolean isInitiator = instance != null && principal != null && principal.id() != null
                 && principal.id().equals(instance.getInitiatorId());
         boolean isArchiveNode = isArchiveNodeActor(instance, principal, nodes);
-        return WriteContext.of(state, formType, isInitiator, isArchiveNode, allFields);
+        return WriteContext.of(state, formType, isInitiator, isArchiveNode, allFields, attachmentFields);
     }
 
     private List<FlowNodeInstanceRow> loadNodes(FlowInstanceRow instance) {
@@ -188,13 +212,13 @@ public class FormStateWriteGuard {
     /** 宽容过滤：剥掉不可写字段（增量保存口径；**不用于**提交动作）。 */
     public Map<String, Object> filterWritable(Map<String, Object> payload, WriteContext context) {
         return fieldWriteGuard.filter(payload, context.state(), context.formType(),
-                context.isInitiator(), context.isArchiveNode(), context.allFields());
+                context.isInitiator(), context.isArchiveNode(), context.allFields(), context.attachmentFields());
     }
 
     private static BizException deny(String field, WriteContext context) {
         String extra = "";
         if (context.state() == FormWritePolicy.FormState.PENDING_SUPPLEMENT) {
-            extra = "（待补件期仅附件与补件说明可写；改主字段请走「驳回 → 修改 → 重新提交」）";
+            extra = "（待补件期仅附件类字段（type=file/files）与补件说明可写；改主字段请走「驳回 → 修改 → 重新提交」）";
         } else if (context.state() == FormWritePolicy.FormState.APPROVING) {
             extra = "（审批中主字段一律只读；印鉴单归还状态/日期是唯一例外，且仅发起人与节点⑦可改）";
         } else if (context.state() == FormWritePolicy.FormState.CLOSED) {

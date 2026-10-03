@@ -10,8 +10,8 @@ description:
   en: >
       State linkage: a node rejection rejects the instance, auto-closes sibling tasks and cancels other node instances; reaching the countersign threshold or any single any-sign approval passes the node, closes remaining tasks and advances; entering a terminal state cancels or closes all open nodes and tasks and notifies the initiator; a no-cost matter marks node ② skipped with a note in the trace.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.380Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.160Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

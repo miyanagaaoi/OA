@@ -5,14 +5,14 @@ parent: oa.form.template.attachment
 name: {zh: "附件删除与三态窗口", en: "Attachment Deletion Guard"}
 description:
   zh: >
-      删除附件的两条闸门：**身份**（仅上传者本人或系统管理员，其余 40310）与**状态窗口**（复用三态白名单，草稿/待补件可删，审批中与已完结 40304，不给「先删后传」的写旁路）。元数据与物理文件的删除顺序为**先删文件、后删元数据**：文件删除失败即 50004 并回滚事务（元数据保留、可重试），因此不可能出现无人引用却占空间的孤儿文件；元数据删除失败则留下悬挂行，下载按 404 fail-closed。
+      删除附件的两条闸门：**身份**（上传者本人 ∪ 单据发起人本人 ∪ 系统管理员，其余 40310「无权删除该附件：仅上传者本人、单据发起人本人或系统管理员可删除」）与**状态窗口**（复用三态白名单，草稿/待补件可删，审批中与已完结 40304，不给「先删后传」的写旁路）。「发起人本人」是代传场景的补丁：管理员代传时 uploader_id＝管理员，只认上传者会让发起人反而删不掉自己单据的附件。删除顺序为先删文件、后删元数据：文件删除失败即 50004 并回滚（元数据保留、可重试）。
       
   en: >
-      Two gates for deleting an attachment: identity (only the uploader or a system administrator, otherwise 40310) and the state window (the three-state whitelist is reused; deletable in draft and pending-supplement, 40304 while approving or closed). The physical file is removed before the metadata row: a failed file delete raises 50004 and rolls the transaction back (metadata kept, retry possible), so an unreferenced file can never linger.
+      Two gates for deleting an attachment: identity (uploader, document initiator, or system administrator; else 40310) and the state window (three-state whitelist reused; deletable in draft and pending-supplement, 40304 while approving or closed). The initiator tier covers delegated uploads, where uploader_id is the admin. The file is deleted before the metadata row: a failed file delete raises 50004 and rolls back (metadata kept, retryable).
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.283Z"
-fingerprint: 8ab58cc56f45ce0c0663a9f6fe9cb3bc5eca4d203713a3a26182b4aa04d22f03
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.035Z"
+fingerprint: d4d66fddc36c266d7ab9fbbd808f6b3802ea345dd1badc4fce143b7e4485e3ec
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/attachment/app/AttachmentService.java"
@@ -23,10 +23,10 @@ apis:
     path: "/api/v1/forms/attachments/{attachment_id}"
     description:
       zh: >
-          删除附件（仅上传者本人或管理员，且仅在草稿/待补件窗口内）：先删物理文件再删元数据行。
+          删除附件（上传者本人 ∪ 单据发起人本人 ∪ 系统管理员，且仅在草稿/待补件窗口内）：先删物理文件再删元数据行。
           
       en: >
-          Deletes an attachment (uploader or administrator only, and only within the draft/pending-supplement window): the physical file is removed first, then the metadata row.
+          Deletes an attachment (uploader, document initiator, or system administrator, and only within the draft/pending-supplement window): the physical file is removed first, then the metadata row.
           
 deps:
   - kind: call

@@ -10,8 +10,8 @@ description:
   en: >
       During a supplement only attachments and the supplement note are writable; amount, counterparty, category and every other already-approved main field stay read-only. If the initiator truly must change a main field the only path is reject, modify and resubmit from node one. The boundary is enforced server-side so supplements cannot smuggle content changes.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.383Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.163Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

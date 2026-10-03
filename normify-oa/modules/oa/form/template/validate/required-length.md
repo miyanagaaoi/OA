@@ -10,9 +10,9 @@ description:
   en: >
       Required checks (empty string and all-whitespace count as empty) and max-length checks, with the messages 「请填写{标签}」 and 「{标签}不能超过 {N} 个字符」; Chinese counts by character.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.293Z"
-fingerprint: dd81a2916ac59f65631a920cf9129c0af6d47a60fafeb8c75da9be2392107064
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.050Z"
+fingerprint: dc5b0e0a8cec41ead706d20bd0f7f079e855f29076fd1c1f520b7dbe896a0e72
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/validate/FormPayloadValidator.java"

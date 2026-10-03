@@ -10,9 +10,9 @@ description:
   en: >
       Dictionary items are maintained in the admin console and stored in `sys_dict_item` (REQ-ADMIN-004); new options need no release. Forms read enabled items through a cache that is invalidated when the console changes them.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.262Z"
-fingerprint: e68573150fe1f02b99f7449d6a9a99cd5af80d5c5f880b1ba26e4901b4dc4b08
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.006Z"
+fingerprint: f0c892258f26a36134e5c22adc00a821ac9d3d1af639909d3d9b7bf9aa9f5921
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

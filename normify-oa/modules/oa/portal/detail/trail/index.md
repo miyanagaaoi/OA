@@ -10,8 +10,8 @@ description:
   en: >
       The approval trail area: nodes in time order with approver, opinion, signature image, time and each person's conclusion under a decision mode (REQ-LOG-002); progress is expressed by four-state dots joined by 2px connectors, parallel collaboration folds into one group; the trail is read-only and can never be edited or deleted.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.337Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.106Z"
 fingerprint: 6f97dc580ed4d0d87fae8063d855678f9a2f3b3425b149dd9321be8c4b605b79
 source:
   - path: "doc/prd-0.1.md"

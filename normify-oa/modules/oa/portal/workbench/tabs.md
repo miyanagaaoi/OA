@@ -10,8 +10,8 @@ description:
   en: >
       The four workbench tabs — pending my approval, my approvals, raised by me, cc to me: 40px tall with a 2px corporate-blue underline indicator and a count badge beside each label (no coloured dots); the tab bar stays fixed while the list scrolls independently.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.349Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.121Z"
 fingerprint: 6f97dc580ed4d0d87fae8063d855678f9a2f3b3425b149dd9321be8c4b605b79
 source:
   - path: "DESIGN.md"

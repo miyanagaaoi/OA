@@ -10,8 +10,8 @@ description:
   en: >
       The H5 bottom action bar: a persistent 60px band, white with a 1px top border instead of a shadow to avoid flicker while scrolling, padded for env(safe-area-inset-bottom); approve is the primary button filling the remaining width, reject is a fixed 96px secondary button and More (transfer / countersign) is a text button.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.339Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.110Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

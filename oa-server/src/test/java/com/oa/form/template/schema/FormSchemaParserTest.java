@@ -41,6 +41,27 @@ class FormSchemaParserTest {
     }
 
     @Test
+    @DisplayName("附件类字段码按 **type ∈ {file, files}** 判定：合同单含 counterparty_docs（B 项裁定）")
+    void attachmentFieldCodesAreTypeBased() {
+        Map<String, FormSchema> schemas = FormSchemaFixtures.schemas();
+        // 事项/资金/印鉴单各只有一个 attachments；合同单有两个（attachments + counterparty_docs）
+        assertThat(schemas.get("matter").attachmentFieldCodes()).containsExactly("attachments");
+        assertThat(schemas.get("fund").attachmentFieldCodes()).containsExactly("attachments");
+        assertThat(schemas.get("seal").attachmentFieldCodes()).containsExactly("attachments");
+        assertThat(schemas.get("contract").attachmentFieldCodes())
+                .as("真源 03-templates.sql 里 counterparty_docs 的 type=files，必须被按类型识别出来")
+                .containsExactlyInAnyOrder("attachments", "counterparty_docs");
+        // 反向：非附件类型一律不得进入该集合
+        for (FormSchema schema : schemas.values()) {
+            assertThat(schema.attachmentFieldCodes()).doesNotContain("title", "amount", "category", "return_status");
+            for (String code : schema.attachmentFieldCodes()) {
+                assertThat(schema.field(code).orElseThrow().isAttachment())
+                        .as("%s.%s 是附件类字段", schema.formType(), code).isTrue();
+            }
+        }
+    }
+
+    @Test
     @DisplayName("字典绑定落在白名单内，且只在 select/multiselect 上出现")
     void dictBindingsAreWhitelisted() {
         Map<String, String> matter = FormSchemaFixtures.schema("matter").dictBindings();

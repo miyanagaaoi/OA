@@ -5,14 +5,14 @@ parent: oa.form.template.attachment
 name: {zh: "私有存储与鉴权下载", en: "Private Storage & Authorized Download"}
 description:
   zh: >
-      附件落**私有本地目录**（默认 ${user.home}/.oa/attachments，仓库之外；可用 oa.attachment.root 覆盖），按 年/月/日/随机名 分片，先写 .part 再原子改名；落库的是相对路径。工程**不注册任何静态资源映射**，因此 storage_path 没有可达 URL（直链 404）。下载/预览必须过鉴权接口 + 数据域（受控表 flow_attachment，每条 SELECT 带 @dataScope 标记、过滤主体恒为 flow_instance），域外与不存在同样 404；下载恒为 attachment，仅 image/jpeg、image/png、application/pdf 允许 inline。
+      附件落**私有本地目录**（默认 ${user.home}/.oa/attachments，仓库之外；可用 oa.attachment.root 覆盖），按 年/月/日/随机名 分片，先写 .part 再原子改名；落库的是相对路径。工程**不注册任何静态资源映射**，因此 storage_path 没有可达 URL（直链 404）。下载/预览必须过鉴权接口 + 数据域（受控表 flow_attachment，每条 SELECT 带 @dataScope 标记、过滤主体恒为 flow_instance），域外与不存在同样 404；下载恒为 attachment，仅 image/jpeg、image/png、application/pdf 允许 inline。**heic → jpg 转码本期未实现**（需图像处理依赖，已排期阶段 3，与电子签名共用），故 heic 预览也降级为下载（不报错、不内联）。
       
   en: >
-      Attachments live in a private dir (default ~/.oa/attachments, outside the repo; override oa.attachment.root), sharded by yyyy/MM/dd plus a random name, atomically renamed from a .part file; only the relative path is stored. No static mapping exists, so storage_path has no reachable URL. Download and preview need auth plus the data scope (controlled table flow_attachment, one @dataScope marker per SELECT, filtered via flow_instance). Downloads are always attachment; only jpeg/png/pdf may inline.
+      Attachments live in a private dir outside the repo (oa.attachment.root overrides), sharded by date and a random name; only the relative path is stored. No static mapping exists, so storage_path is unreachable. Download and preview need auth plus data scope (controlled table flow_attachment; out-of-scope and missing ids both 404). Downloads always attachment; only jpeg/png/pdf inline. HEIC preview degrades to download: the HEIC-to-JPG transcode is unimplemented (phase 3).
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.286Z"
-fingerprint: f51e73e0efc55924d9ecc441480a34501d51cbc674130bc97dfbc58ed18992d0
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.039Z"
+fingerprint: c4a48f17816feff238dcc98f4666c96ef57cdbaf0b48eaa1f2f7f6c075057dd7
 source:
   - path: "doc/forms.md"
   - path: "doc/data-model.md"
@@ -37,10 +37,10 @@ apis:
     path: "/api/v1/forms/attachments/{attachment_id}/preview"
     description:
       zh: >
-          预览：仅 image/jpeg、image/png、application/pdf 内联，其余降级为下载。
+          预览：仅 image/jpeg、image/png、application/pdf 内联，其余（含 heic，转码未实现）降级为下载。
           
       en: >
-          Preview: inline only for image/jpeg, image/png and application/pdf; everything else degrades to download.
+          Preview: inline only for image/jpeg, image/png and application/pdf; everything else (including HEIC, transcode unimplemented) degrades to download.
           
   - protocol: mysql
     path: "flow_attachment"

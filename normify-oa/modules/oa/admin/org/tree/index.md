@@ -10,8 +10,8 @@ description:
   en: >
       Console-side maintenance of the four-level org tree: node CRUD, a disable gate and leader maintenance; disabling requires every in-flight document of that node to be finished first, and a disabled node can no longer own new initiators.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.198Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.904Z"
 fingerprint: 5892235bf362330ec273a37ebb0cbbea0196d4812363113164ca1a4cd71bb494
 source:
   - path: "doc/prd-0.1.md"

@@ -91,6 +91,9 @@ class AttachmentServiceTest {
 
     private final FormSchema matterSchema = FormSchemaParser.parse(matterSchemaJson(), "matter", 1);
 
+    /** 合同单最小 schema：**两个**附件类字段（{@code attachments} + {@code counterparty_docs}）。 */
+    private final FormSchema contractSchema = FormSchemaParser.parse(contractSchemaJson(), "contract", 1);
+
     @BeforeEach
     void setUp() {
         attachmentMapper = mock(AttachmentMapper.class);
@@ -159,6 +162,58 @@ class AttachmentServiceTest {
         ArgumentCaptor<Attachment> captor = ArgumentCaptor.forClass(Attachment.class);
         verify(attachmentMapper).insert(captor.capture());
         assertThat(captor.getValue().getRound()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("待补件 + 合同单 counterparty_docs（同为 type=files）→ 按**字段类型**放行（B 项裁定）")
+    void pendingSupplementUploadsAnyAttachmentTypedField() {
+        when(schemaService.forInstance(any())).thenReturn(contractSchema);
+        when(instanceMapper.selectInstanceById(anyLong()))
+                .thenAnswer(invocation -> instance("approving", "pending_supplement", "contract"));
+
+        Map<String, Object> view = service.upload(INSTANCE_ID, "counterparty_docs",
+                List.of(new MockMultipartFile("files", "license.pdf", "application/pdf", PDF_BYTES)), initiator());
+
+        assertThat(view.get("fieldCode")).isEqualTo("counterparty_docs");
+        ArgumentCaptor<Attachment> captor = ArgumentCaptor.forClass(Attachment.class);
+        verify(attachmentMapper).insert(captor.capture());
+        assertThat(captor.getValue().getFieldCode()).isEqualTo("counterparty_docs");
+    }
+
+    @Test
+    @DisplayName("待补件 + counterparty_docs 附件 → 可删（window 与字段类型两条都放行）")
+    void pendingSupplementDeletesAnyAttachmentTypedField() {
+        when(schemaService.forInstance(any())).thenReturn(contractSchema);
+        when(instanceMapper.selectInstanceById(anyLong()))
+                .thenAnswer(invocation -> instance("approving", "pending_supplement", "contract"));
+        Attachment row = storedRow("draft");
+        row.setFieldCode("counterparty_docs");
+        when(attachmentMapper.selectById(7L)).thenReturn(row);
+        when(attachmentMapper.deleteById(7L)).thenReturn(1);
+
+        Map<String, Object> view = service.delete(7L, initiator());
+
+        verify(attachmentMapper).deleteById(7L);
+        assertThat(storage.exists(row.getStoragePath())).isFalse();
+        assertThat(view.get("physicalFileRemoved")).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("审批中 + counterparty_docs → 仍 40304（按类型放行**不放宽**审批中窗口）")
+    void approvingDeleteOfAttachmentTypedFieldStillDenied() {
+        when(schemaService.forInstance(any())).thenReturn(contractSchema);
+        when(instanceMapper.selectInstanceById(anyLong()))
+                .thenAnswer(invocation -> instance("approving", null, "contract"));
+        Attachment row = storedRow("draft");
+        row.setFieldCode("counterparty_docs");
+        when(attachmentMapper.selectById(7L)).thenReturn(row);
+
+        assertThatThrownBy(() -> service.delete(7L, initiator()))
+                .isInstanceOf(BizException.class)
+                .satisfies(ex -> assertThat(((BizException) ex).getErrorCode())
+                        .isEqualTo(ErrorCode.FIELD_WRITE_DENIED));
+        verify(attachmentMapper, never()).deleteById(anyLong());
+        assertThat(storage.exists(row.getStoragePath())).isTrue();
     }
 
     // ================================================================ 三态白名单（核心：附件不是旁路）
@@ -310,6 +365,37 @@ class AttachmentServiceTest {
         service.delete(7L, admin());
         verify(attachmentMapper).deleteById(7L);
         assertThat(storage.exists(row.getStoragePath())).isFalse();
+    }
+
+    @Test
+    @DisplayName("删除（E 项裁定）：管理员代传后，**发起人本人**仍可删除 —— 代传只应「多一个能删的人」")
+    void deleteByInitiatorAfterAdminUploadIsAllowed() {
+        Attachment row = storedRow("draft");
+        row.setUploaderId(1L);           // 上传者 = 系统管理员（代传，≠ 发起人 208）
+        when(attachmentMapper.selectById(7L)).thenReturn(row);
+        when(attachmentMapper.deleteById(7L)).thenReturn(1);
+
+        Map<String, Object> view = service.delete(7L, initiator());
+
+        verify(attachmentMapper).deleteById(7L);
+        assertThat(storage.exists(row.getStoragePath())).as("物理文件必须消失").isFalse();
+        assertThat(view.get("physicalFileRemoved")).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("删除（E 项裁定不放宽）：数据域内、但既非上传者也非发起人/管理员 → 仍 40310，文件不动")
+    void deleteByBystanderAfterAdminUploadIsDenied() {
+        Attachment row = storedRow("draft");
+        row.setUploaderId(1L);           // 上传者 = 管理员；调用人 = 内勤（既非上传者也非发起人）
+        when(attachmentMapper.selectById(7L)).thenReturn(row);
+
+        assertThatThrownBy(() -> service.delete(7L, otherUser()))
+                .isInstanceOf(BizException.class)
+                .satisfies(ex -> assertThat(((BizException) ex).getErrorCode())
+                        .isEqualTo(ErrorCode.ATTACHMENT_DELETE_DENIED))
+                .hasMessageContaining("单据发起人本人");
+        verify(attachmentMapper, never()).deleteById(anyLong());
+        assertThat(storage.exists(row.getStoragePath())).isTrue();
     }
 
     // ================================================================ 三档限额 + 格式双校验
@@ -483,12 +569,16 @@ class AttachmentServiceTest {
     // ================================================================ 夹具
 
     private static FlowInstanceRow instance(String status, String subStatus) {
+        return instance(status, subStatus, "matter");
+    }
+
+    private static FlowInstanceRow instance(String status, String subStatus, String formType) {
         FlowInstanceRow row = new FlowInstanceRow();
         row.setId(INSTANCE_ID);
         row.setBizNo("OA-2026-400007");
         row.setStatus(status);
         row.setSubStatus(subStatus);
-        row.setFormType("matter");
+        row.setFormType(formType);
         row.setInitiatorId(INITIATOR_ID);
         row.setTemplateId(1L);
         row.setTemplateVersion(1);
@@ -566,6 +656,30 @@ class AttachmentServiceTest {
                     {"code": "attachments", "label": "附件", "type": "files",
                      "rules": [{"type": "filePolicy", "maxSizeMb": 1, "maxCount": 3,
                                 "message": "本单最多 3 个附件"}]}
+                  ]
+                }
+                """;
+    }
+
+    /**
+     * 合同单最小 schema：{@code attachments}（必填）与 {@code counterparty_docs}（非必填、同为
+     * {@code type=files}）—— 待补件窗口必须按**字段类型**同时放行两者（B 项裁定）。
+     */
+    private static String contractSchemaJson() {
+        return """
+                {
+                  "form_type": "contract",
+                  "template_code": "contract",
+                  "schema_version": 1,
+                  "fields": [
+                    {"code": "title", "label": "合同名称", "type": "text",
+                     "rules": [{"type": "maxLength", "value": 80}]},
+                    {"code": "amount", "label": "合同金额", "type": "amount", "required": true,
+                     "rules": [{"type": "amountRange", "min": "0.01"}]},
+                    {"code": "attachments", "label": "合同文本附件", "type": "files", "required": true,
+                     "rules": [{"type": "filePolicy", "maxSizeMb": 50, "maxCount": 20}]},
+                    {"code": "counterparty_docs", "label": "对方资质附件", "type": "files", "required": false,
+                     "rules": [{"type": "filePolicy", "maxSizeMb": 50, "maxCount": 20}]}
                   ]
                 }
                 """;

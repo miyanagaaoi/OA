@@ -10,8 +10,8 @@ description:
   en: >
       Resignation requires all of a user's pending tasks to be handled first: the system reports the count of unfinished tasks and forces transfer or reassignment before the status can become resigned — the compensating control for snapshots.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.309Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:40.070Z"
 fingerprint: acf5d54845d53a19544bf9794fc33dc41c37be311916cfcfbf52a40c34cc40cf
 source:
   - path: "doc/prd-0.1.md"

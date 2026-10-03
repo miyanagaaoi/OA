@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
  * <p>组合两条正交规则（缺一不可）：
  * <ol>
  *   <li><b>状态规则</b>：{@link FormWritePolicy} 的三态白名单（草稿可写 / 审批中只读 /
- *       待补件仅附件与补件说明 / 已完结只读，含印鉴单归还状态例外）；</li>
+ *       待补件仅**附件类字段（{@code type ∈ {file, files}}）**与补件说明 / 已完结只读，
+ *       含印鉴单归还状态例外）；</li>
  *   <li><b>角色规则</b>：{@link AmountFieldPolicy} 的金额只读（非系统管理员/财务角色，
  *       载荷里出现金额字段即 403 {@link ErrorCode#AMOUNT_READ_ONLY}）。</li>
  * </ol>
@@ -39,18 +40,38 @@ public class FormFieldWriteGuard {
      */
     public void assertWritable(Set<String> fields, FormWritePolicy.FormState state, FormWritePolicy.FormType formType,
                                boolean isInitiator, boolean isArchiveNode, Set<String> allFields) {
+        assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /**
+     * 严格判定（含 schema 附件类字段类型信息）：
+     * 待补件窗口按**字段类型**放行**所有** {@code type ∈ {file, files}} 的字段
+     * （{@code doc/forms.md} §1.2 —— 合同单的 {@code counterparty_docs} 不再是只读）。
+     *
+     * @param attachmentFields schema 附件类字段码（{@code FormSchema#attachmentFieldCodes()}）
+     */
+    public void assertWritable(Set<String> fields, FormWritePolicy.FormState state, FormWritePolicy.FormType formType,
+                               boolean isInitiator, boolean isArchiveNode, Set<String> allFields,
+                               Set<String> attachmentFields) {
         CurrentUser principal = requirePrincipal();
         FormWritePolicy.assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields,
-                AmountFieldPolicy.canWriteAmounts(principal));
+                attachmentFields, AmountFieldPolicy.canWriteAmounts(principal));
     }
 
     /** 宽容过滤：剥掉状态不可写与角色不可写的字段，返回实际可落库的载荷（增量保存口径）。 */
     public Map<String, Object> filter(Map<String, Object> payload, FormWritePolicy.FormState state,
                                       FormWritePolicy.FormType formType, boolean isInitiator,
                                       boolean isArchiveNode, Set<String> allFields) {
+        return filter(payload, state, formType, isInitiator, isArchiveNode, allFields, Set.of());
+    }
+
+    /** 宽容过滤（含 schema 附件类字段类型信息；待补件窗口按字段类型放行附件类字段）。 */
+    public Map<String, Object> filter(Map<String, Object> payload, FormWritePolicy.FormState state,
+                                      FormWritePolicy.FormType formType, boolean isInitiator,
+                                      boolean isArchiveNode, Set<String> allFields, Set<String> attachmentFields) {
         CurrentUser principal = requirePrincipal();
         return FormWritePolicy.filterWritable(payload, state, formType, isInitiator, isArchiveNode, allFields,
-                AmountFieldPolicy.canWriteAmounts(principal));
+                attachmentFields, AmountFieldPolicy.canWriteAmounts(principal));
     }
 
     /** 角色规则单独判定（不涉及状态；供只关心金额口径的调用方使用）。 */

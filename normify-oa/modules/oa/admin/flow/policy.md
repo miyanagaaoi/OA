@@ -10,8 +10,8 @@ description:
   en: >
       Owns the operational parameter set changed without a release: total routing plus rollback limit of 5, per-node rollback limit of 2, return-to-own-department limit of 2, supplement limits of 1 per node and 3 per document, and the 3-working-day supplement deadline.
       
-revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
-updated_at: "2026-10-03T07:50:07.189Z"
+revision: b08abc4417060c06343ed11a019f7fea44966e64
+updated_at: "2026-10-03T08:18:39.885Z"
 fingerprint: 5892235bf362330ec273a37ebb0cbbea0196d4812363113164ca1a4cd71bb494
 source:
   - path: "doc/prd-0.1.md"
