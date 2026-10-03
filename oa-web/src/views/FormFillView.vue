@@ -29,7 +29,10 @@
  *   `POST /flow-instances/precheck` 把「哪个节点、命中哪条规则、缺什么配置」提前铺开，
  *   这样既不会产生半成品草稿，也不会让用户点了提交才知道缺配。
  *
- * ⚠ 附件上传接口属**阶段 2b.7**：附件字段渲染为明确的「待接入」状态（不伪造上传）。
+ * ⚠ 附件自**阶段 2b.7** 起是**真接口**：`file` / `files` 字段渲染 `AttachmentPanel`
+ *   ——上传（拖拽/多选 + 前端预检）、按 round 分组的清单、鉴权下载与预览、本人删除；
+ *   三态白名单（草稿 / 待补件可传，审批中与已完结只读）与身份闸门（发起人或管理员）
+ *   都在面板里如实呈现，服务端仍是边界（40304 / 403 / 40310）。
  */
 import { computed, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -197,6 +200,24 @@ const isInitiator = computed(
   () => writeState.value?.isInitiator === true || instance.value?.initiatorId === userStore.user?.userId,
 )
 
+/**
+ * 附件面板的身份闸门（镜像后端 `AttachmentService#requireInitiatorOrAdmin`：
+ * 上传/删除仅**发起人本人或系统管理员**）。
+ *
+ * 注意「服务端走的是角色码 `admin`」，而 store 里的 `isSuperAdmin` 是管理员兜底能力：
+ * 两个都认（与 `utils/form-rules.ts#AMOUNT_WRITABLE_ROLES` 的口径一致）。
+ * 判定权仍在服务端：身份不符时服务端按 403 拒绝，界面只是**不显示入口**。
+ */
+const attachmentIdentity = computed<'initiator' | 'admin' | 'other'>(() => {
+  if (isInitiator.value) return 'initiator'
+  const isAdmin =
+    userStore.isSuperAdmin || userStore.roles.some((role) => role.roleCode === 'admin')
+  return isAdmin ? 'admin' : 'other'
+})
+
+/** 当前登录人 id（附件删除入口的判据：只能删自己传的） */
+const currentUserId = computed(() => userStore.user?.userId ?? '')
+
 // ---------------------------------------------------------------------------
 // 加载
 // ---------------------------------------------------------------------------
@@ -239,18 +260,24 @@ function resetPage(): void {
  * **能力缺失说明**（区别于「界面坏了」）：本模板里出现了受后端能力限制的字段时，
  * 在页面顶部给一句可发现的说明，而不是让入口默默消失。
  *
- * 现状（2026-10-04 收敛后**只剩一项**）：
- *   · 附件：上传接口属阶段 2b.7 → 只展示已落库元数据，不提供上传。
+ * 现状（阶段 2b.7 收敛后**只剩一项**）：
+ *   · heic 附件：后端**本轮未实现** heic→jpg 转码（`AttachmentController#preview`
+ *     的注释写明「HEIC 转码未在本轮实现（需要图像库）」），预览接口对 heic 返回
+ *     `Content-Disposition: attachment` 降级 ⇒ 界面只给下载并如实说明。
  *
- * 已删除的条目（后端 7c409ea 已交付，不要再写「待后端支持」）：
- *   · `user` / `org` 多值：服务端已接受数组（去重保序 + `pickerValue` / `pickerLimit`），
- *     界面已是真正的多选控件（见 `FormFieldControl.vue`）。
+ * 已删除的条目（不要再写回来）：
+ *   · 「附件字段：上传入口待阶段 2b.7 支持」——2b.7 已交付上传/清单/下载/预览/删除
+ *     五条接口，附件字段已是真正可用的控件（`components/AttachmentPanel.vue`）；
+ *   · 「user / org 多值待支持」——2026-10-04 后端 7c409ea 已交付，界面已是多选。
  */
 const capabilityNotes = computed<string[]>(() => {
   const fields = schema.value?.fields ?? []
   const notes: string[] = []
   if (fields.some((field) => field.control === 'attachment')) {
-    notes.push('附件字段：上传入口待阶段 2b.7 支持，当前只展示已落库的附件元数据。')
+    notes.push(
+      '附件：上传 / 清单（按 round 分组）/ 鉴权下载 / 预览 / 本人删除均已可用（阶段 2b.7）；' +
+        '**heic 暂不支持在线预览，请下载查看**（后端本轮未实现 heic→jpg 转码）。',
+    )
   }
   return notes
 })
@@ -891,6 +918,9 @@ function formatTime(value: string | null | undefined): string {
       :org-options="orgOptions"
       :picker-unavailable="pickerUnavailable"
       :unbound-errors="unboundErrors"
+      :instance-id="instanceId"
+      :current-user-id="currentUserId"
+      :attachment-identity="attachmentIdentity"
     />
 
     <!-- ================= 补件说明（系统字段，不在 schema 内） ================= -->
@@ -1009,8 +1039,9 @@ function formatTime(value: string | null | undefined): string {
     </footer>
 
     <p class="footnote">
-      附件上传属阶段 2b.7（本页只展示已落库的附件元数据，不提供上传入口）；「抄送我的」列表现已在审批中心
-      `/task/cc` 提供；打印属阶段 3。
+      附件：上传 / 清单（按 round 分组）/ 下载 / 预览 / 删除走阶段 2b.7 的**鉴权接口**
+      （不出直链、不暴露存储路径）；审批中与已完结只读（40304），删除仅限本人上传的附件（40310）。
+      heic 暂不支持在线预览，请下载查看。「抄送我的」列表现已在审批中心 `/task/cc` 提供；打印属阶段 3。
     </p>
   </div>
 </template>

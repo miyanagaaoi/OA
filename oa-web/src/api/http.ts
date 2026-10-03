@@ -15,6 +15,21 @@
  *   6. 幂等：写操作带 Idempotency-Key（gateway/idempotency）
  *   7. 结构化错误明细：响应体的 `details`（当前唯一已登记键是 40011 的 `errors[]`）
  *      随 `ApiError#details` 透出；缺失时调用方仍走 message 文本兜底
+ *
+ * ── 2026-10-05 · 附件（阶段 2b.7）带来的两处**最小扩展**（不改变任何既有请求的行为）──
+ *   ① `postMultipart()`：multipart 上传。**必须**逐请求覆盖实例默认的
+ *      `Content-Type: application/json` —— axios 1.x 的 `transformRequest` 在
+ *      「声明 JSON 且 data 是 FormData」时会把 FormData **序列化成 JSON 对象**
+ *      （文件直接丢失），且缺 boundary 的 multipart 服务端也解析不了。
+ *      改为 `multipart/form-data` 后，浏览器环境由 axios 交还浏览器自动补 boundary。
+ *      同时把超时抬到 {@link MULTIPART_TIMEOUT_MS}：默认 30s 对 50MB 附件不够，
+ *      超时会让用户以为「上传失败」，而服务端其实已经落库（重复上传）。
+ *   ② `getBlob()`：鉴权下载/预览（响应体是**二进制流**，不是统一响应体）。
+ *      走 `responseType: 'blob'` + `unwrap: false` 取出响应头（`Content-Disposition` /
+ *      `Content-Type` 是服务端对内联与否的裁决结果，前端必须读它而不是自己猜）。
+ *      失败响应的 body 此时也是 Blob，因此错误拦截器**增加**一段：把 Blob 读成文本
+ *      再按统一响应体解析，否则 40402 这类错误的服务端文案会退化成
+ *      「Request failed with status code 404」而被吞掉。
  */
 import axios, {
   AxiosError,
@@ -191,49 +206,76 @@ http.interceptors.response.use(
       details: env.details,
     })
   },
-  (error: AxiosError<ApiEnvelope<unknown>>) => {
-    const cfg = (error.config || {}) as OaRequestConfig
-    const policy: NotifyPolicy = { ...defaultNotify, ...(cfg.notify || {}) }
-    const status = error.response?.status ?? 0
-    const body = error.response?.data
-    const rawHeaders = (error.response?.headers || {}) as Record<string, unknown>
-    const headerTrace =
-      (rawHeaders['x-trace-id'] as string | undefined) ||
-      (rawHeaders['trace-id'] as string | undefined)
-    const traceId = body?.traceId || headerTrace || lastTraceId
-
-    if (traceId) lastTraceId = traceId
-
-    let message = body?.message || error.message || '网络异常，请稍后重试'
-
-    if (status === 401) {
-      // 会话失效 / 未登录：不弹 toast，直接交给路由守卫跳登录
-      onUnauthorized(body?.code === 'SESSION_REVOKED' ? 'expired' : 'anonymous')
-    } else if (status === 403 && policy.forbidden) {
-      message = body?.message || '无权访问该数据（数据域外）'
-      notifyWithTrace(message, traceId)
-    } else if (status === 409 && policy.conflict) {
-      message = body?.message || '单据状态已变更，请刷新后重试'
-      notifyWithTrace(message, traceId, 'warning')
-    } else if (status === 429 && policy.rateLimited) {
-      message = body?.message || '操作过于频繁，请稍后再试'
-      notifyWithTrace(message, traceId, 'warning')
-    } else if (status >= 500 && policy.serverError) {
-      message = body?.message || '服务暂时不可用，请稍后重试'
-      notifyWithTrace(message, traceId)
-    }
-
-    return Promise.reject(
-      new ApiError({
-        code: body?.code ?? status ?? 'NETWORK_ERROR',
-        message,
-        traceId,
-        httpStatus: status,
-        details: body?.details,
-      }),
-    )
+  (error: AxiosError<ApiEnvelope<unknown>>): Promise<never> => {
+    return handleError(error)
   },
 )
+
+/**
+ * 错误响应体归一：普通 JSON 直接用；`responseType: 'blob'` 的请求失败时
+ * body 是 `Blob`，必须读成文本再解析，否则服务端文案（如 40402「附件不存在或无权访问」）
+ * 会被 axios 的通用 message 顶掉。
+ *
+ * <p>解析失败（非 JSON / 空体）时返回 `undefined` —— 调用方仍走
+ * `error.message` 兜底，绝不因为「读不出明细」而把错误吞掉。
+ */
+async function readErrorBody(data: unknown): Promise<ApiEnvelope<unknown> | undefined> {
+  if (data === null || data === undefined) return undefined
+  if (typeof Blob !== 'undefined' && data instanceof Blob) {
+    try {
+      const text = await data.text()
+      const parsed: unknown = JSON.parse(text)
+      if (parsed !== null && typeof parsed === 'object') return parsed as ApiEnvelope<unknown>
+    } catch {
+      return undefined
+    }
+    return undefined
+  }
+  if (typeof data === 'object') return data as ApiEnvelope<unknown>
+  return undefined
+}
+
+/** 统一错误处理（含可选的中间拦截 toast 策略，见 `NotifyPolicy`） */
+async function handleError(error: AxiosError<ApiEnvelope<unknown>>): Promise<never> {
+  const cfg = (error.config || {}) as OaRequestConfig
+  const policy: NotifyPolicy = { ...defaultNotify, ...(cfg.notify || {}) }
+  const status = error.response?.status ?? 0
+  const body = await readErrorBody(error.response?.data)
+  const rawHeaders = (error.response?.headers || {}) as Record<string, unknown>
+  const headerTrace =
+    (rawHeaders['x-trace-id'] as string | undefined) ||
+    (rawHeaders['trace-id'] as string | undefined)
+  const traceId = body?.traceId || headerTrace || lastTraceId
+
+  if (traceId) lastTraceId = traceId
+
+  let message = body?.message || error.message || '网络异常，请稍后重试'
+
+  if (status === 401) {
+    // 会话失效 / 未登录：不弹 toast，直接交给路由守卫跳登录
+    onUnauthorized(body?.code === 'SESSION_REVOKED' ? 'expired' : 'anonymous')
+  } else if (status === 403 && policy.forbidden) {
+    message = body?.message || '无权访问该数据（数据域外）'
+    notifyWithTrace(message, traceId)
+  } else if (status === 409 && policy.conflict) {
+    message = body?.message || '单据状态已变更，请刷新后重试'
+    notifyWithTrace(message, traceId, 'warning')
+  } else if (status === 429 && policy.rateLimited) {
+    message = body?.message || '操作过于频繁，请稍后再试'
+    notifyWithTrace(message, traceId, 'warning')
+  } else if (status >= 500 && policy.serverError) {
+    message = body?.message || '服务暂时不可用，请稍后重试'
+    notifyWithTrace(message, traceId)
+  }
+
+  throw new ApiError({
+    code: body?.code ?? status ?? 'NETWORK_ERROR',
+    message,
+    traceId,
+    httpStatus: status,
+    details: body?.details,
+  })
+}
 
 export default http
 
@@ -252,6 +294,76 @@ export async function put<T>(url: string, data?: unknown, config?: OaRequestConf
 
 export async function del<T>(url: string, config?: OaRequestConfig): Promise<T> {
   return (await http.delete(url, config)) as unknown as T
+}
+
+// ---------------------------------------------------------------------------
+// 附件（阶段 2b.7）：multipart 上传 / 鉴权二进制下载
+// ---------------------------------------------------------------------------
+
+/**
+ * multipart 请求的超时（附件最大 50MB）。
+ *
+ * <p>默认 30s 对 50MB 上传偏紧：一旦超时，**服务端可能已经落库**，用户只会看到
+ * 「上传失败」然后重传（重复附件）。这里给足 5 分钟，并在 UI 上如实说明
+ * 「上传中请勿关闭页面」。
+ */
+export const MULTIPART_TIMEOUT_MS = 300_000
+
+/**
+ * multipart POST（`Content-Type: multipart/form-data`）。
+ *
+ * <p><b>为什么必须在封装里覆盖 Content-Type</b>：实例默认头是
+ * `application/json;charset=UTF-8`，而 axios 1.x 的 `transformRequest` 遇到
+ * 「Content-Type 含 application/json ∧ data 是 FormData」时会走
+ * `JSON.stringify(formDataToJSON(data))` —— **文件被丢掉、只剩一个 JSON 对象**。
+ * 覆盖成 multipart 后 axios 在浏览器环境会 `setContentType(false)`，
+ * 交由浏览器补 `boundary`（自己拼 boundary 必然错）。
+ *
+ * <p>调用方只需传 `FormData`，**不要**自己设置 Content-Type。
+ */
+export async function postMultipart<T>(
+  url: string,
+  form: FormData,
+  config?: OaRequestConfig,
+): Promise<T> {
+  const merged: OaRequestConfig = {
+    ...config,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: config?.timeout ?? MULTIPART_TIMEOUT_MS,
+  }
+  return (await http.post(url, form, merged)) as unknown as T
+}
+
+/** 二进制响应（原始 body + 响应头；`Content-Disposition` 是服务端的裁决结果） */
+export interface BlobResponse {
+  blob: Blob
+  headers: Record<string, unknown>
+  status: number
+}
+
+/**
+ * 取二进制内容（鉴权下载 / 预览）。
+ *
+ * <p>三处要点：
+ * <ol>
+ *   <li>`responseType: 'blob'`：响应体是二进制流，**没有**统一响应体外壳；</li>
+ *   <li>`unwrap: false`：保留 `AxiosResponse`，否则拦截器会把非响应体外壳的 body
+ *       直接返回，`Content-Disposition` / `Content-Type` 就丢了；</li>
+ *   <li>出错时仍走同一套拦截器（Blob 错误体由 {@link readErrorBody} 还原成服务端文案）。</li>
+ * </ol>
+ */
+export async function getBlob(url: string, config?: OaRequestConfig): Promise<BlobResponse> {
+  const merged: OaRequestConfig = {
+    ...config,
+    responseType: 'blob',
+    unwrap: false,
+  }
+  const response = (await http.get(url, merged)) as unknown as AxiosResponse<Blob>
+  return {
+    blob: response.data,
+    headers: (response.headers ?? {}) as unknown as Record<string, unknown>,
+    status: response.status,
+  }
 }
 
 /** 是否开启离线演示（阶段 1 骨架：后端未就绪时页面仍可渲染） */

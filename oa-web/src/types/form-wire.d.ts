@@ -75,6 +75,20 @@ export interface WireFieldOptionView {
 }
 
 /**
+ * `ruleDetails[]` 的一项 —— 规则**参数**（`FormFieldDef#ruleDetailsView`，2026-10-05 追加）。
+ *
+ * <p>键的存在性本身就是语义：**只转写模板声明过的键**，服务端不注入默认值。
+ * 例：`{"type":"filePolicy","maxSizeMb":50,"maxCount":20,"allowExt":[…],"denyExt":[…],"message":"…"}`
+ * ——模板没写 `maxSizeMb` 时这里就**没有** `maxSizeMb` 键（此时生效的是全局缺省，
+ * 属另一层口径，前端必须回落而不是假装模板声明了）。
+ */
+export interface WireFieldRuleDetailView {
+  /** 规则类型名（与 `rules[i]` 同值） */
+  type: string
+  [key: string]: WireJson
+}
+
+/**
  * `FormFieldDef#view()` —— 单个字段定义出参（`doc/templates.md` §2.2）。
  *
  * 键的存在性本身就是语义：
@@ -83,6 +97,7 @@ export interface WireFieldOptionView {
  *   · `options` 只在模板内联了静态选项时出现（与 `dictType` 互斥）；
  *   · `defaultValue` 只在模板**声明了**该键时出现（可能是 `null`）；
  *   · `rules` 是**规则类型名数组**（不是规则体），条件必填等细则在服务端；
+ *   · `ruleDetails` 是 `rules` 的**参数镜像**（下标一一对应，只含模板声明的键）；
  *   · `type` 未知取值时后端原样回显模板里的原始文本（`FormFieldDef#view()` 的
  *     `type == null ? rawType : type.code()`），因此这里不能收窄成 14 值联合。
  */
@@ -110,6 +125,8 @@ export interface WireFormFieldView {
   unit?: string | null
   /** 规则**类型名**清单（顺序即服务端执行顺序） */
   rules: string[]
+  /** 规则**参数**（与 `rules` 下标一一对应；老响应可能整键缺失） */
+  ruleDetails?: WireFieldRuleDetailView[] | null
 }
 
 /** `FormSchema.Section` —— `sections[]` 一项（**只给字段码**，字段体在 `fields[]`）。 */

@@ -13,8 +13,10 @@
  *      **绝不 `Number()` / `parseFloat`** —— 浮点一旦往返就会写出服务端必拒的载荷（40306/40011）。
  *   2. **只读必须给原因**：`readonlyReason` 非空时控件 disabled，并在字段下方显示原因
  *      （不是「只是灰掉」，而是告诉用户为什么、以及该走哪条路径）。
- *   3. **附件如实标注「待接入」**：阶段 2b.7 才有上传接口，本组件只展示已落库的附件元数据，
- *      **不伪造上传入口**。
+ *   3. **附件是真接口（阶段 2b.7 起）**：`file` / `files` 字段渲染 `AttachmentPanel`
+ *      ——上传（拖拽/多选 + 前端预检）、按 round 分组的清单、鉴权下载/预览、本人删除都在面板里；
+ *      本组件只负责把「字段 → 面板」的上下文（实例 id、三态、身份、模板 filePolicy）透传。
+ *      表单值里若还存着历史的附件元数据，**照旧只读展示**（读法不变，不静默丢弃）。
  *
  * `user` / `org` 是**多值**控件（2026-10-04 后端 7c409ea 起）：
  * 服务端 `FormPayloadValidator#typeMatches` 对 `USER` / `ORG` 同时接受单值与数组，
@@ -24,9 +26,9 @@
  * 由服务端逐条裁决。单值历史数据的读法不变（`asTextList` 把字符串当单元素清单）。
  */
 import { computed, ref, watch } from 'vue'
-import type { FormField, FormJsonValue, FormOption } from '@/types/form'
+import AttachmentPanel from '@/components/AttachmentPanel.vue'
+import type { FormField, FormJsonValue, FormOption, FormWriteStateCode } from '@/types/form'
 import {
-  ATTACHMENT_PENDING_HINT,
   asBool,
   asDisplayText,
   asInputText,
@@ -63,6 +65,17 @@ const props = defineProps<{
   orgOptions: FormOption[]
   /** 候选人数据源是否加载失败（失败时降级为手填 id 并说明） */
   pickerUnavailable: boolean
+  /**
+   * 附件面板上下文（仅 `file` / `files` 字段用）：
+   *   · `instanceId`：附件接口挂在实例上（发起页在「保存草稿」之前为空串）；
+   *   · `currentUserId`：删除入口的判据（只能删自己传的）；
+   *   · `stateCode`：三态码，用于给出附件专属的只读原因；
+   *   · `identity`：发起人 / 系统管理员 / 其他（镜像后端 `requireInitiatorOrAdmin`）。
+   */
+  instanceId?: string
+  currentUserId?: string
+  writeStateCode?: FormWriteStateCode | null
+  attachmentIdentity?: 'initiator' | 'admin' | 'other'
 }>()
 
 const emit = defineEmits<{ (event: 'update:modelValue', value: FormJsonValue): void }>()
@@ -132,11 +145,18 @@ function onPickerText(raw: string): void {
   update(parsePickerInput(raw))
 }
 
-/** 附件已落库的元数据（`{fileName,fileSize}`；上传接口未交付，只读展示） */
+/** 附件字段的表单值元数据（2b.7 之前的落库形态：`{fileName,fileSize}` / 字符串） */
 interface AttachmentMeta {
   name: string
   size: string
 }
+/**
+ * 表单值里的历史附件元数据（**只读展示**）。
+ *
+ * <p>附件实体自 2b.7 起由 `flow_attachment` + 附件接口承载（见 `AttachmentPanel`）；
+ * 但历史草稿的表单值里可能仍存着 `{fileName,fileSize}` 这类元数据。
+ * 该读法**保持不变**（不静默丢弃、不改写成附件实体），只在面板上方如实标注来源。
+ */
 const attachmentItems = computed<AttachmentMeta[]>(() => {
   const value = props.modelValue
   if (!Array.isArray(value)) {
@@ -152,6 +172,17 @@ const attachmentItems = computed<AttachmentMeta[]>(() => {
     return { name: asDisplayText(item), size: '' }
   })
 })
+
+/** 附件面板上下文（缺省值集中在模板里判，避免每个调用点都传全） */
+const attachContext = computed(() => ({
+  instanceId: props.instanceId ?? '',
+  fieldCode: props.field.code,
+  fieldLabel: props.field.label,
+  currentUserId: props.currentUserId ?? '',
+  stateCode: props.writeStateCode ?? null,
+  identity: props.attachmentIdentity ?? 'other',
+  filePolicy: props.field.ruleParams?.filePolicy,
+}))
 
 /** 单选下拉的当前值（选项类字段归一为字符串） */
 const selectValue = computed(() => textValue.value)
@@ -199,7 +230,10 @@ function onBoolean(value: string | number | boolean): void {
 </script>
 
 <template>
-  <div class="field-control" :class="{ 'is-readonly': disabled, 'has-error': errors.length > 0 }">
+  <div
+    class="field-control"
+    :class="{ 'is-readonly': disabled, 'has-error': errors.length > 0, 'is-attachment': field.control === 'attachment' }"
+  >
     <p class="label-row">
       <span class="label">{{ field.label }}</span>
       <i v-if="field.required" class="req">必填</i>
@@ -425,17 +459,30 @@ function onBoolean(value: string | number | boolean): void {
       {{ field.label }}
     </el-checkbox>
 
-    <!-- 附件（file / files）：阶段 2b.7 才有上传接口 → 明确「待接入」，不伪造上传 -->
+    <!-- 附件（file / files）：阶段 2b.7 起是真接口（上传 / 清单 / 下载预览 / 删除） -->
     <div v-else-if="field.control === 'attachment'" class="attachment">
-      <p class="pending">待接入（阶段 2b.7）</p>
-      <ul v-if="attachmentItems.length > 0" class="attach-list">
-        <li v-for="(item, index) in attachmentItems" :key="`${item.name}-${index}`">
-          <span class="attach-name">{{ item.name }}</span>
-          <span v-if="item.size" class="attach-meta oa-mono">{{ item.size }} B</span>
-        </li>
-      </ul>
-      <p v-else class="hint">尚无已落库的附件元数据。</p>
-      <p class="hint">{{ ATTACHMENT_PENDING_HINT }}</p>
+      <AttachmentPanel
+        :instance-id="attachContext.instanceId"
+        :field-code="attachContext.fieldCode"
+        :field-label="attachContext.fieldLabel"
+        :writable="writable"
+        :state-code="attachContext.stateCode"
+        :current-user-id="attachContext.currentUserId"
+        :identity="attachContext.identity"
+        :file-policy="attachContext.filePolicy"
+      />
+
+      <template v-if="attachmentItems.length > 0">
+        <p class="hint">
+          表单值里还存着 {{ attachmentItems.length }} 条历史附件元数据（2b.7 之前的落库形态，只读）：
+        </p>
+        <ul class="attach-list">
+          <li v-for="(item, index) in attachmentItems" :key="`${item.name}-${index}`">
+            <span class="attach-name">{{ item.name }}</span>
+            <span v-if="item.size" class="attach-meta oa-mono">{{ item.size }} B</span>
+          </li>
+        </ul>
+      </template>
     </div>
 
     <!-- 未知类型：如实提示，不静默渲染成文本框（否则用户会以为能填） -->
@@ -446,8 +493,12 @@ function onBoolean(value: string | number | boolean): void {
       </p>
     </div>
 
-    <!-- 只读原因（硬要求：明确置灰并给原因） -->
-    <p v-if="disabled && readonlyReason" class="reason">只读原因：{{ readonlyReason }}</p>
+    <!-- 只读原因（硬要求：明确置灰并给原因）——
+         附件字段的只读原因是**附件专属**的（审批中附件只读 / 身份不符），由 AttachmentPanel
+         给出并说明；这里不再叠加通用原因，避免同一件事说两遍、口径还不一样。 -->
+    <p v-if="disabled && readonlyReason && field.control !== 'attachment'" class="reason">
+      只读原因：{{ readonlyReason }}
+    </p>
 
     <!-- 服务端逐字段错误 -->
     <ul v-if="errors.length > 0" class="errors">
@@ -567,19 +618,14 @@ function onBoolean(value: string | number | boolean): void {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: var(--oa-space-xs);
-  border: 1px dashed var(--oa-color-hairline-strong);
-  border-radius: var(--oa-radius-sm);
-  background: var(--oa-color-canvas-subtle);
 }
 
-.pending {
-  align-self: flex-start;
-  padding: 1px 6px;
-  border-radius: var(--oa-radius-xs);
-  background: var(--oa-color-warning-subtle, var(--oa-color-surface-1));
-  color: var(--oa-color-warning);
-  font: var(--oa-font-caption);
+/*
+ * 附件面板要放下「档位 + 拖拽区 + 逐文件结果 + 按 round 分组的清单」，
+ * 挤在渲染器的两列网格里会读不了 —— 让它**独占整行**（其余字段布局不变）。
+ */
+.field-control.is-attachment {
+  grid-column: 1 / -1;
 }
 
 .attach-list {

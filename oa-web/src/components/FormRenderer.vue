@@ -29,6 +29,7 @@ import type {
   FormOption,
   FormSchema,
   FormWriteState,
+  FormWriteStateCode,
 } from '@/types/form'
 import { groupFields, resolveFieldReadonlyReason } from '@/utils/form-rules'
 
@@ -69,6 +70,17 @@ const props = defineProps<{
    * 因此这里用一个显式的强制只读原因，理由与展示都给得准确。
    */
   forceReadonlyReason?: string
+  /**
+   * 附件面板上下文（仅 `file` / `files` 字段用，阶段 2b.7）。
+   *
+   * 附件接口挂在**实例**上（`/forms/instances/{id}/attachments`），因此渲染器必须
+   * 把实例 id、当前登录人与身份闸门透传到 `FormFieldControl` → `AttachmentPanel`；
+   * 三态码由本组件的 `state` 推出，不重复传。
+   */
+  instanceId?: string
+  currentUserId?: string
+  /** 身份：发起人 / 系统管理员 / 其他（镜像后端 `requireInitiatorOrAdmin`） */
+  attachmentIdentity?: 'initiator' | 'admin' | 'other'
 }>()
 
 const emit = defineEmits<{ (event: 'update:modelValue', value: Record<string, FormJsonValue>): void }>()
@@ -140,6 +152,14 @@ function reasonOf(field: FormField): string {
 function updateField(code: string, value: FormJsonValue): void {
   emit('update:modelValue', { ...props.modelValue, [code]: value })
 }
+
+/**
+ * 附件的三态码（附件专属只读原因的输入）。
+ *
+ * `state` 为 `null`（白名单未知）或整个 `state` 缺失时传 `null` —— 面板会按
+ * 「尚未取得白名单 → 只读」呈现，而不是假装可写。
+ */
+const attachmentStateCode = computed<FormWriteStateCode | null>(() => props.state?.state ?? null)
 </script>
 
 <template>
@@ -183,6 +203,10 @@ function updateField(code: string, value: FormJsonValue): void {
           :user-options="userOptions"
           :org-options="orgOptions"
           :picker-unavailable="pickerUnavailable"
+          :instance-id="instanceId ?? ''"
+          :current-user-id="currentUserId ?? ''"
+          :write-state-code="attachmentStateCode"
+          :attachment-identity="attachmentIdentity ?? 'other'"
           @update:model-value="(value: FormJsonValue) => updateField(field.code, value)"
         />
       </div>

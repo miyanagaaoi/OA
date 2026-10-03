@@ -55,8 +55,9 @@ export type FormFieldType =
 /**
  * 渲染器支持的控件种类。
  *
- * `attachment` 是**待接入**形态：阶段 2b.7 才有上传接口，本轮只渲染明确提示
- * （见任务书 A 段「附件字段」），**不伪造上传**。
+ * `attachment`（`file` / `files` 字段）渲染 `components/AttachmentPanel.vue`：
+ * 上传（拖拽/多选 + 前端预检）、按 round 分组的清单、鉴权下载与预览、本人删除
+ * 都是真接口（阶段 2b.7 起）；只读态只给查看与下载，并说明原因。
  */
 export type FormControlKind =
   | 'text'
@@ -109,6 +110,20 @@ export interface FormField {
   unit: string | null
   /** 规则类型名清单 */
   rules: string[]
+  /**
+   * 规则**参数**（键 = 规则类型名）。
+   *
+   * <p>来源是 schema 出参的 `ruleDetails[]`（与 `rules` 下标一一对应，**只含模板声明过的键**，
+   * 2026-10-05 起下发）。此前前端只拿得到规则**类型名**，于是「模板声明的
+   * `filePolicy.maxCount` / `pickerLimit.max` / `conditionalRequired.when`」在前端
+   * 完全不可见，只能按服务端缺省兜底或让用户试错。
+   *
+   * <p>⚠ 键**缺失** ≠ 值为空：模板没声明该键时这里就没有它，此时生效的是
+   * 服务端缺省（另一层口径），调用方必须回落而**不得**假装模板声明过。
+   * 例：`ruleParams.filePolicy` → `{maxSizeMb, maxCount, allowExt, denyExt, message}`
+   * （`utils/attachment.ts#resolveAttachmentBounds` 按此解析附件档位）。
+   */
+  ruleParams: Record<string, FormJsonValue>
 }
 
 /** 字段分组（`sections[]`；`fields` 为字段码列表，按分组顺序） */

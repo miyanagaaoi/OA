@@ -171,6 +171,31 @@ function toOptions(field: WireFormFieldView): FormOption[] {
   }))
 }
 
+/**
+ * `rules` 的**参数镜像**归一：`ruleDetails[]` → `{ [规则类型名]: 参数 }`。
+ *
+ * <p>后端的 `ruleDetails` 与 `rules` **下标一一对应**，只转写模板声明过的键
+ * （不注入服务端默认值）。同一类型重复声明时**后者覆盖前者**（服务端 `rules`
+ * 也按顺序执行，以最后一处声明为准；这里如实按顺序覆盖，不做合并臆造）。
+ *
+ * <p>缺失该键（老响应）时返回空对象：调用方按「模板未声明」处理 —— 例如附件档位
+ * 回落到全局缺省（`utils/attachment.ts#resolveAttachmentBounds`）。
+ */
+function toRuleParams(field: WireFormFieldView): Record<string, FormJsonValue> {
+  const params: Record<string, FormJsonValue> = {}
+  for (const detail of field.ruleDetails ?? []) {
+    const type = text(detail?.type).trim()
+    if (type === '') continue
+    const values: Record<string, FormJsonValue> = {}
+    for (const [key, value] of Object.entries(detail)) {
+      if (key === 'type') continue
+      values[key] = formValue(value)
+    }
+    params[type] = values
+  }
+  return params
+}
+
 /** 单个字段定义 → 领域模型 */
 export function toFormField(wire: WireFormFieldView): FormField {
   return {
@@ -192,6 +217,7 @@ export function toFormField(wire: WireFormFieldView): FormField {
     placeholder: nullableText(wire.placeholder),
     unit: nullableText(wire.unit),
     rules: Array.isArray(wire.rules) ? wire.rules.map((rule) => text(rule)) : [],
+    ruleParams: toRuleParams(wire),
   }
 }
 

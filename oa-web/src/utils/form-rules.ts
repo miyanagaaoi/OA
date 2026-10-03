@@ -128,10 +128,6 @@ export const RULE_PICKER_LIMIT = 'pickerLimit'
  */
 export const PICKER_LIMIT_DEFAULT = 20
 
-/** 附件上传接口属阶段 2b.7 —— 本轮的显式「待接入」文案（**不伪造上传**） */
-export const ATTACHMENT_PENDING_HINT =
-  '附件上传接口属阶段 2b.7（尚未交付），本页只展示已落库的附件元数据，不提供上传入口。'
-
 /** 三态的中文标签与提示（与后端 `WriteContext#stateLabel` 同口径，用于无服务端响应时的兜底） */
 export const FORM_WRITE_STATE_LABEL: Record<FormWriteStateCode, string> = {
   DRAFT: '草稿（全部可写）',

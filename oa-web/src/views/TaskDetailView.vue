@@ -109,6 +109,23 @@ const deptOptions = ref<FormOption[]>([])
 /** 详情页不展示字段级校验错误（校验发生在填单/提交路径；这里表单只读） */
 const NO_ISSUES: Record<string, never[]> = {}
 
+/**
+ * 附件面板的身份闸门（镜像后端 `AttachmentService#requireInitiatorOrAdmin`）。
+ *
+ * 详情页是**只读视图**（`force-readonly-reason` 已让所有字段只读），因此这里只在
+ * 「是否发起人/管理员」上给面板一个如实的原因文本；上传与删除入口本就不会出现。
+ */
+const attachmentIdentity = computed<'initiator' | 'admin' | 'other'>(() => {
+  const me = userStore.user?.userId ?? ''
+  if (me !== '' && instance.value?.initiatorId === me) return 'initiator'
+  const isAdmin =
+    userStore.isSuperAdmin || userStore.roles.some((role) => role.roleCode === 'admin')
+  return isAdmin ? 'admin' : 'other'
+})
+
+/** 当前登录人 id（附件删除入口的判据：只能删自己传的；详情页不发删除请求） */
+const currentUserId = computed(() => userStore.user?.userId ?? '')
+
 // ---------------------------------------------------------------------------
 // 派生
 // ---------------------------------------------------------------------------
@@ -536,6 +553,9 @@ function formatTime(value: string | null | undefined): string {
       :picker-unavailable="true"
       :unbound-errors="[]"
       force-readonly-reason="单据详情页为只读视图：如需修改请在「填单页」操作（那里按服务端可写字段白名单开放）"
+      :instance-id="props.id"
+      :current-user-id="currentUserId"
+      :attachment-identity="attachmentIdentity"
     />
     <p v-else-if="!loading" class="meta">表单模板未取到，无法渲染字段（见上方取数失败信息）。</p>
 
