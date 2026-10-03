@@ -196,6 +196,14 @@ function canAct(item: FlowTaskListItem): boolean {
       </div>
 
       <template v-else>
+        <!-- 能力缺失说明（不是入口消失）：让使用者知道是后端能力未到，而不是界面坏了 -->
+        <p class="capability-note">
+          <b>能力说明</b>：高级筛选（单号 / 标题 / 发起人 / 单据类型 / 状态 / 日期区间）与
+          批量同意、批量转办**待后端支持** —— 当前三个列表接口只接受 `page` / `size`，
+          也没有批量动作端点；为避免「只筛当前页」或「点了没生效」的假功能，这些入口先不渲染，
+          后端补齐后会同步放开（已列入待办）。
+        </p>
+
         <div v-if="errorText" class="notice is-error">
           <p class="notice-title">列表加载失败</p>
           <p>{{ errorText }}</p>

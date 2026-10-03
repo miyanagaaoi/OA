@@ -38,8 +38,10 @@ const props = defineProps<{
   options: FormOption[]
   /** 选项是否正在加载（字典接口未返回时） */
   optionsLoading: boolean
-  /** 金额字段对当前角色是否可写（`amountPolicy.writable`；与状态正交） */
+  /** 金额字段对当前角色是否可写（`utils/form-rules.ts#resolveAmountWrite`；与状态正交） */
   amountWritable: boolean
+  /** 金额判定说明（可写/只读都能解释清楚；含与服务端 amountPolicy 不一致时的披露） */
+  amountNote: string
   /** 通讯录候选人（`user` 字段） */
   userOptions: FormOption[]
   /** 组织候选人（`org` 字段） */
@@ -65,10 +67,14 @@ const maxLength = computed(() => (props.field.maxLength > 0 ? props.field.maxLen
 /** 金额实时提示（服务端仍是裁决方） */
 const amountCheck = computed(() => checkAmountText(textValue.value, props.field.unit ?? '元'))
 const amountHint = computed(() => {
-  if (!props.amountWritable) return '金额对非财务类角色只读（PRD §5.3；服务端按 40306 拒绝）'
+  if (!props.amountWritable) {
+    return props.amountNote || '金额对非财务类角色只读（PRD §5.3；服务端按 40306 拒绝）'
+  }
   if (amountCheck.value.message) return amountCheck.value.message
   return '定点两位小数（DECIMAL(18,2)），不支持千分位/科学计数；提交时按字符串上送，绝不经浮点'
 })
+/** 角色判定的补充披露（服务端 amountPolicy 与角色口径不一致时给用户一个解释） */
+const amountRoleNote = computed(() => (props.amountWritable ? props.amountNote : ''))
 
 /** 附件已落库的元数据（`{fileName,fileSize}`；上传接口未交付，只读展示） */
 interface AttachmentMeta {
@@ -161,6 +167,7 @@ function onBoolean(value: string | number | boolean): void {
         <template #prefix>¥</template>
       </el-input>
       <p class="hint" :class="{ 'is-error': !amountCheck.ok }">{{ amountHint }}</p>
+      <p v-if="amountRoleNote" class="hint capability">{{ amountRoleNote }}</p>
     </template>
 
     <!-- 数字（非金额）：同样按字符串上送 -->
@@ -299,9 +306,11 @@ function onBoolean(value: string | number | boolean): void {
         placeholder="通讯录不可用，请填写用户 id"
         @update:model-value="(value: string) => update(value)"
       />
-      <p class="hint">
-        当前服务端对 user 字段只接受**单值**（`FormPayloadValidator#typeMatches` 要求 CharSequence，
-        数组形态会回 typeMismatch）；doc/forms.md 的「≤20 人」多值口径待后端补齐，多值入口请走「抄送」。
+      <p class="hint capability">
+        <b>多值（≤20 人）待后端支持</b>，当前请用抄送。
+        现状：服务端 `FormPayloadValidator#typeMatches` 对 user 字段只接受单值 CharSequence，
+        数组形态会回 `typeMismatch`（doc/forms.md 的「≤20 人」口径待后端补齐）；
+        需要多人知会时请走「抄送」动作（`POST /flow-instances/{id}/cc`，抄送只读可见、不产生待办）。
       </p>
     </template>
 
@@ -326,6 +335,10 @@ function onBoolean(value: string | number | boolean): void {
         placeholder="组织选择器不可用，请填写组织 id 或约定符号"
         @update:model-value="(value: string) => update(value)"
       />
+      <p class="hint capability">
+        <b>多值组织选择待后端支持</b>，当前为单值。
+        现状：服务端 `FormPayloadValidator#typeMatches` 对 org 字段只接受单值 CharSequence（同 user）。
+      </p>
       <p class="hint">
         单值组织 id；模板默认值里的符号型占位（如 <code>initiator_company</code>）是界面预填指令，
         服务端不会据此写库（doc/templates.md §2.2 扩展键说明）。
@@ -438,6 +451,19 @@ function onBoolean(value: string | number | boolean): void {
 .hint {
   font: var(--oa-font-caption);
   color: var(--oa-color-ink-subtle);
+}
+
+/* 能力缺失说明（不是界面坏了）：给底色，便于用户一眼分辨「待支持」与「填错了」 */
+.hint.capability {
+  padding: 2px 6px;
+  border-left: 2px solid var(--oa-color-warning);
+  border-radius: var(--oa-radius-xs);
+  background: var(--oa-color-canvas-subtle);
+  color: var(--oa-color-ink-muted);
+}
+
+.hint.capability b {
+  color: var(--oa-color-warning);
 }
 
 .hint code {

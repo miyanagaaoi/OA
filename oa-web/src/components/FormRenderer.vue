@@ -22,7 +22,6 @@
 import { computed, ref } from 'vue'
 import FormFieldControl from '@/components/FormFieldControl.vue'
 import type {
-  FormAmountPolicy,
   FormDictCache,
   FormField,
   FormFieldIssue,
@@ -31,7 +30,7 @@ import type {
   FormSchema,
   FormWriteState,
 } from '@/types/form'
-import { groupFields, readonlyReason } from '@/utils/form-rules'
+import { groupFields, resolveFieldReadonlyReason } from '@/utils/form-rules'
 
 const props = defineProps<{
   schema: FormSchema
@@ -39,8 +38,16 @@ const props = defineProps<{
   state: FormWriteState | null
   /** 逐字段错误索引（`utils/form-rules.ts#buildIssueIndex`） */
   errors: Record<string, FormFieldIssue[]>
-  /** 金额角色策略（来自 `GET /forms/{formType}/field-groups`；缺省视为不可写） */
-  amountPolicy: FormAmountPolicy | null
+  /**
+   * 金额字段是否可写（**角色维度**，与单据状态正交，PRD §5.3）。
+   *
+   * 由页面用 `utils/form-rules.ts#resolveAmountWrite` 算出（系统管理员 / 财务负责人可写），
+   * **不是**直接读 `field-groups` 的 `amountPolicy.writable` —— 后者当前被后端以 null principal
+   * 计算，对任何账号都返回 false（详见该函数注释）。
+   */
+  amountWritable: boolean
+  /** 金额判定说明（可写/只读都要能解释清楚；含与服务端 amountPolicy 不一致的披露） */
+  amountNote: string
   /** 字典缓存（按 dictType） */
   dictCache: FormDictCache
   /** 字典加载中标记（按 dictType） */
@@ -69,10 +76,6 @@ const emit = defineEmits<{ (event: 'update:modelValue', value: Record<string, Fo
 const collapsed = ref<Set<string>>(new Set())
 
 const groups = computed(() => groupFields(props.schema))
-
-const amountFieldCodes = computed(() =>
-  props.schema.fields.filter((field) => field.control === 'amount').map((field) => field.code),
-)
 
 function isCollapsed(sectionId: string): boolean {
   return collapsed.value.has(sectionId)
@@ -109,25 +112,28 @@ function errorsOf(field: FormField): string[] {
   return list.map((issue) => issue.message)
 }
 
-/** 字段是否可写（金额另受角色策略约束，与状态正交，见 PRD §5.3） */
+/**
+ * 字段是否可写 / 只读原因（**状态白名单 ∧ 金额角色**，两条正交规则一次判清）。
+ *
+ * 判定集中在 `utils/form-rules.ts#resolveFieldReadonlyReason`（可脱离 Vue 自测），
+ * 组件只负责把结果铺到控件上。
+ */
+function editabilityOf(field: FormField): { writable: boolean; reason: string } {
+  const reason = resolveFieldReadonlyReason(field, {
+    state: props.state,
+    amountWritable: props.amountWritable,
+    amountReadonlyReason: props.amountNote,
+    forceReadonlyReason: props.forceReadonlyReason,
+  })
+  return { writable: reason === null, reason: reason ?? '' }
+}
+
 function writableOf(field: FormField): boolean {
-  if (props.forceReadonlyReason) return false
-  return (
-    readonlyReason(field, props.state, {
-      amountWritable: props.amountPolicy?.writable !== false,
-      amountFieldCodes: amountFieldCodes.value,
-    }) === null
-  )
+  return editabilityOf(field).writable
 }
 
 function reasonOf(field: FormField): string {
-  if (props.forceReadonlyReason) return props.forceReadonlyReason
-  return (
-    readonlyReason(field, props.state, {
-      amountWritable: props.amountPolicy?.writable !== false,
-      amountFieldCodes: amountFieldCodes.value,
-    }) ?? ''
-  )
+  return editabilityOf(field).reason
 }
 
 function updateField(code: string, value: FormJsonValue): void {
@@ -171,7 +177,8 @@ function updateField(code: string, value: FormJsonValue): void {
           :errors="errorsOf(field)"
           :options="optionsOf(field)"
           :options-loading="optionsLoadingOf(field)"
-          :amount-writable="amountPolicy?.writable !== false"
+          :amount-writable="amountWritable"
+          :amount-note="amountNote"
           :user-options="userOptions"
           :org-options="orgOptions"
           :picker-unavailable="pickerUnavailable"

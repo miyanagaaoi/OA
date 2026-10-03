@@ -46,6 +46,7 @@ import {
   FORM_DOC_TYPE_GLYPH,
   FORM_DOC_TYPE_LABEL,
   errorHint,
+  resolveAmountWrite,
   toFormDocType,
 } from '@/utils/form-rules'
 import {
@@ -120,6 +121,17 @@ const subject = computed(() => ({
   permissions: userStore.permissions,
   roleCodes: userStore.roles.map((role) => role.roleCode),
 }))
+
+const amountVerdict = computed(() =>
+  resolveAmountWrite(
+    {
+      isSuperAdmin: userStore.isSuperAdmin,
+      permissions: userStore.permissions,
+      roleCodes: userStore.roles.map((role) => role.roleCode),
+    },
+    amountPolicy.value,
+  ),
+)
 
 /** 动作可用性（**纯函数**判定，见 `utils/flow-task.ts#resolveActionAvailability`） */
 const availability = computed<ActionAvailability[]>(() => {
@@ -515,7 +527,8 @@ function formatTime(value: string | null | undefined): string {
       :schema="schema"
       :state="writeState"
       :errors="NO_ISSUES"
-      :amount-policy="amountPolicy"
+      :amount-writable="amountVerdict.writable"
+      :amount-note="amountVerdict.note || amountVerdict.reason"
       :dict-cache="dictCache"
       :dict-loading="{}"
       :user-options="[]"

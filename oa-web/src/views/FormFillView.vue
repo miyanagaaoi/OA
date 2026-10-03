@@ -61,7 +61,9 @@ import {
   errorHint,
   isSupplementState,
   parseValidationMessage,
+  resolveAmountWrite,
   SUPPLEMENT_NOTE_FIELD,
+  syntheticDraftState,
   toFormDocType,
   toSubmitFields,
 } from '@/utils/form-rules'
@@ -152,6 +154,25 @@ const supplementNoteWritable = computed(() => (writeState.value?.writableFields 
 /** 是否存在任何可写字段（决定「保存」按钮是否出现） */
 const hasWritableField = computed(() => (writeState.value?.writableFields ?? []).length > 0)
 
+/**
+ * 金额字段是否可写：**角色维度**判定（系统管理员 / 财务负责人），服务端 `amountPolicy` 作为第二判据。
+ *
+ * ⚠ 为什么不直接把 `field-groups` 的 `amountPolicy.writable` 当判据：该字段目前由后端
+ * `FormRuleController` 以 `amountPolicyOf(null)` 计算，对**任何**账号（含系统管理员）都返回 false，
+ * 而写路径实测量系统管理员可写金额（PUT draft amount → 200）。以它为主判据会让 admin 也填不了金额。
+ * 详见 `utils/form-rules.ts#resolveAmountWrite` 的注释（前端只决定放不放行，40306 仍是裁决方）。
+ */
+const amountVerdict = computed(() =>
+  resolveAmountWrite(
+    {
+      isSuperAdmin: userStore.isSuperAdmin,
+      permissions: userStore.permissions,
+      roleCodes: userStore.roles.map((role) => role.roleCode),
+    },
+    amountPolicy.value,
+  ),
+)
+
 const isInitiator = computed(
   () => writeState.value?.isInitiator === true || instance.value?.initiatorId === userStore.user?.userId,
 )
@@ -194,6 +215,30 @@ function resetPage(): void {
   precheck.value = null
 }
 
+/**
+ * **能力缺失说明**（区别于「界面坏了」）：本模板里出现了受后端能力限制的字段时，
+ * 在页面顶部给一句可发现的说明，而不是让入口默默消失。
+ *
+ * 现状（后端已确认会补齐；补齐后这里改口径或删条目即可）：
+ *   · `user` / `org`：doc/forms.md 写「≤20 人」，但服务端 `FormPayloadValidator#typeMatches`
+ *     只接受单值 CharSequence → 页面上是单值控件；
+ *   · 附件：上传接口属阶段 2b.7 → 只展示已落库元数据，不提供上传。
+ */
+const capabilityNotes = computed<string[]>(() => {
+  const fields = schema.value?.fields ?? []
+  const notes: string[] = []
+  if (fields.some((field) => field.control === 'user')) {
+    notes.push('人员字段：多值（≤20 人）待后端支持，当前为单值选择；多人知会请用「抄送」动作。')
+  }
+  if (fields.some((field) => field.control === 'org')) {
+    notes.push('组织字段：多值组织选择待后端支持，当前为单值。')
+  }
+  if (fields.some((field) => field.control === 'attachment')) {
+    notes.push('附件字段：上传入口待阶段 2b.7 支持，当前只展示已落库的附件元数据。')
+  }
+  return notes
+})
+
 /** 发起模式：确认已发布模板 → 取 published schema → 取字段分组（金额策略） */
 async function loadCreate(): Promise<void> {
   const type = routeFormType.value
@@ -218,7 +263,11 @@ async function loadCreate(): Promise<void> {
   await loadDicts(loaded)
   await loadPickers(loaded)
   values.value = applyFieldDefaults(loaded, {})
-  writeState.value = null
+  // ⚠ 新建草稿**没有实例**，因此**不调** `GET /forms/instances/{id}/writable-fields`：
+  // 白名单是「已有实例」时才有的东西。把 state 留 null 会让渲染器按「白名单未知 → 全只读」
+  // 处理，发起页就一个字都填不进去。这里合成「草稿态全可写」（doc/forms.md §1.2），
+  // 字段级限制只剩角色维度的金额规则；服务端 FormStateWriteGuard 仍是边界。
+  writeState.value = syntheticDraftState(type, loaded.fields.map((field) => field.code))
   sealReturn.status = String(values.value.return_status ?? '')
   sealReturn.date = String(values.value.return_date ?? '')
 }
@@ -730,6 +779,17 @@ function formatTime(value: string | null | undefined): string {
       </ul>
     </section>
 
+    <!-- ================= 能力缺失说明（不是界面坏了） ================= -->
+    <section v-if="capabilityNotes.length > 0" class="oa-card capability-card">
+      <div class="oa-section-band">能力说明（后端待补齐，非界面故障）</div>
+      <ul>
+        <li v-for="(note, index) in capabilityNotes" :key="index">{{ note }}</li>
+      </ul>
+      <p class="meta">
+        这些入口**不是被隐藏**，而是服务端当前不接受该形态的取值；后端补齐后前端会同步放开（已列入待办）。
+      </p>
+    </section>
+
     <!-- ================= 三态说明 ================= -->
     <section class="oa-card state-card">
       <div class="oa-section-band">三态读写</div>
@@ -745,11 +805,15 @@ function formatTime(value: string | null | undefined): string {
         <template v-if="writeState.isArchiveNode"> · 当前账号处于节点⑦（归档登记）</template>
         <template v-if="writeState.isInitiator"> · 当前账号是发起人</template>
       </p>
-      <p v-else class="meta">新建草稿：全部字段可写（提交后由服务端按状态白名单接管）。</p>
-      <p v-if="amountPolicy" class="meta">
-        金额字段：{{ amountPolicy.writable ? '当前角色可写' : '当前角色**只读**（PRD §5.3，服务端按 40306 拒绝）' }}
-        · 可写角色 {{ amountPolicy.writableRoles.join(' / ') }}
+      <p v-else class="meta">
+        新建草稿：**全部字段可写**（合成态，不查实例白名单——实例尚不存在）；字段级限制只剩角色维度
+        （金额对非财务角色只读）。提交后由服务端按状态白名单接管。
       </p>
+      <p v-if="amountVerdict" class="meta">
+        金额字段：{{ amountVerdict.writable ? '当前角色可写' : '当前角色只读' }} —— {{ amountVerdict.reason }}
+        <template v-if="amountPolicy">（服务端 field-groups 下发 amountPolicy.writable={{ amountPolicy.writable }}）</template>
+      </p>
+      <p v-if="amountVerdict.note" class="meta">{{ amountVerdict.note }}</p>
     </section>
 
     <!-- ================= 表单主体（schema 驱动） ================= -->
@@ -759,7 +823,8 @@ function formatTime(value: string | null | undefined): string {
       :schema="schema"
       :state="writeState"
       :errors="errors"
-      :amount-policy="amountPolicy"
+      :amount-writable="amountVerdict.writable"
+      :amount-note="amountVerdict.note || amountVerdict.reason"
       :dict-cache="dictCache"
       :dict-loading="dictLoading"
       :user-options="userOptions"
@@ -960,11 +1025,26 @@ function formatTime(value: string | null | undefined): string {
 .error-card,
 .report-card,
 .precheck-card,
+.capability-card,
 .state-card,
 .supplement-card,
 .seal-card,
 .action-bar {
   padding-bottom: var(--oa-space-sm);
+}
+
+.capability-card ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: var(--oa-space-sm) var(--oa-space-md) 0 32px;
+  font: var(--oa-font-body-sm);
+  color: var(--oa-color-ink);
+}
+
+.capability-card .meta {
+  padding: 4px var(--oa-space-md) 0;
 }
 
 .error-text {

@@ -361,6 +361,148 @@ export function applyFieldDefaults(
   return next
 }
 
+// ================================================================ 金额角色判定
+
+/**
+ * 可写金额的角色码（权威源 `com.oa.authz.visibility.VisibilityRoles`：
+ * `ADMIN = "admin"`（系统管理员）、`FINANCE_OWNER = "finance_owner"`（集团归口/财务部负责人
+ * = PRD 所称「财务角色」））。
+ *
+ * 与 `AmountFieldPolicy#canWriteAmounts` 逐字一致：
+ * `principal.hasRole(ADMIN) || roleCodes.contains(FINANCE_OWNER)`。
+ */
+export const AMOUNT_WRITABLE_ROLES: readonly string[] = ['admin', 'finance_owner']
+
+/** 金额写权限判定的最小只读投影（便于脱离 Pinia 自测） */
+export interface AmountWriteSubject {
+  readonly isSuperAdmin: boolean
+  readonly permissions: readonly string[]
+  readonly roleCodes: readonly string[]
+}
+
+/** 金额写权限结论 */
+export interface AmountWriteVerdict {
+  writable: boolean
+  /** 面向用户的判定文案（可写时也给，用于解释「为什么这个框能填」） */
+  reason: string
+  /** 与服务端 `amountPolicy` 不一致时的披露（一致时为空串） */
+  note: string
+}
+
+/**
+ * 金额字段是否可写（**角色维度**，与单据状态正交，PRD §5.3）。
+ *
+ * <p>判定顺序：**① 角色码（系统管理员 / 财务负责人）→ ② 服务端 `amountPolicy.writable`**。
+ *
+ * <p><b>为什么角色码在前</b>：写路径的裁决点是 `FormFieldWriteGuard → AmountFieldPolicy`
+ * （`admin` ∪ `finance_owner`；实测系统管理员写 `amount` 返回 200 且落库成功）。而**读**路径的
+ * `GET /forms/{formType}/field-groups` 目前用 `amountPolicyOf(null)` 计算 `amountPolicy`
+ * （`FormRuleController` 传 null principal），于是它对**任何**账号都返回 `writable=false` ——
+ * 若前端以它为主判据，系统管理员与财务负责人会被误判成只读，界面上的金额框根本填不了
+ * （即「发起页金额框填不了」的成因之一）。因此前端以**角色码**为准，
+ * 并在两者不一致时把服务端的值如实披露出来（`note`）。
+ *
+ * <p>⚠ 前端只决定「渲不渲染 / 放不放行」：越权写入仍由服务端按 403/40306 拒绝。
+ */
+export function resolveAmountWrite(
+  subject: AmountWriteSubject | null | undefined,
+  serverPolicy: { writable: boolean } | null | undefined,
+): AmountWriteVerdict {
+  const roleWritable =
+    subject != null &&
+    (subject.isSuperAdmin || subject.roleCodes.some((role) => AMOUNT_WRITABLE_ROLES.includes(role)))
+  const serverWritable = serverPolicy?.writable === true
+
+  if (roleWritable) {
+    return {
+      writable: true,
+      reason: `当前角色可写金额（${AMOUNT_WRITABLE_ROLES.join(' / ')}；PRD §5.3）`,
+      note: serverWritable
+        ? ''
+        : '注意：`GET /forms/{formType}/field-groups` 返回的 amountPolicy.writable=false 与角色口径不一致' +
+          '（后端以 null principal 计算该字段），已按角色口径放行；能否写入以服务端 40306 为准。',
+    }
+  }
+  if (serverWritable) {
+    return { writable: true, reason: '服务端下发 amountPolicy.writable=true', note: '' }
+  }
+  return {
+    writable: false,
+    reason: `金额字段对非财务类角色只读（可写角色：${AMOUNT_WRITABLE_ROLES.join(' / ')}；PRD §5.3，服务端按 40306 拒绝）`,
+    note: '',
+  }
+}
+
+// ================================================================ 新建草稿的合成状态
+
+/**
+ * 为新键草稿合成「草稿态全可写」的三态上下文。
+ *
+ * <p><b>为什么必须有它</b>：`/form/new/:formType` 时实例**尚不存在**，没有 `instanceId`，
+ * 也就没有 `GET /forms/instances/{id}/writable-fields` 可取。若把 `state` 传 `null`，
+ * 渲染器会按「白名单未知 → 全部只读」处理（保守但对新建页是**错**的：新建时全部字段都可写），
+ * 结果就是发起页一个字都填不进去。
+ *
+ * <p>白名单语义只在**已有实例**时生效；新建时的字段级限制**只有角色维度**那些
+ * （金额对非财务角色只读，见 {@link resolveAmountWrite}）。服务端的 `FormStateWriteGuard`
+ * 仍是边界：越权/非法载荷由 40304 / 40306 / 40011 拒绝。
+ */
+export function syntheticDraftState(
+  formType: string | null | undefined,
+  fieldCodes: readonly string[],
+): FormWriteState {
+  const type = (formType ?? '').trim().toUpperCase()
+  return {
+    state: 'DRAFT',
+    formType: type === '' ? 'MATTER' : type,
+    isInitiator: true,
+    isArchiveNode: false,
+    writableFields: [...fieldCodes],
+    readonlyFields: [],
+    stateLabel: FORM_WRITE_STATE_LABEL.DRAFT,
+    evidence:
+      '前端合成：新建草稿尚无实例，按「草稿态全部可写」渲染（doc/forms.md §1.2）；' +
+      '服务端 FormStateWriteGuard 仍是边界（越权写入 403/40304、金额角色 40306）。',
+  }
+}
+
+// ================================================================ 字段可写性（状态 ∧ 金额角色）
+
+/** 字段可写性判定的上下文 */
+export interface FieldEditabilityContext {
+  /** 三态白名单（新建页传合成态；详情页可传 `null` 表示「白名单未知」） */
+  state: FormWriteState | null
+  /** 金额字段是否可写（由 {@link resolveAmountWrite} 得出，与状态正交） */
+  amountWritable: boolean
+  /** 金额只读时的专用原因（缺省回落到状态层原因） */
+  amountReadonlyReason?: string
+  /** 强制只读（详情页只读视图）；非空时优先级最高 */
+  forceReadonlyReason?: string
+}
+
+/** 字段是否属于金额字段（按字段类型判，不依赖后端字段码命名） */
+export function isAmountField(field: Pick<FormField, 'control' | 'type'>): boolean {
+  return field.control === 'amount' || field.type === 'amount'
+}
+
+/**
+ * 字段只读原因（`null` = 可写）。判定顺序：**强制只读 → 金额角色 → 状态白名单**。
+ *
+ * <p>为什么金额角色优先于状态：两者**正交**（PRD §5.3「金额对非财务类角色只读，
+ * 草稿态同样拒绝」）。金额只读时给出**角色**原因，用户才知道该换谁来做，
+ * 而不会被误导成「等状态变成草稿就能填了」。
+ */
+export function resolveFieldReadonlyReason(
+  field: Pick<FormField, 'code' | 'label' | 'locked' | 'control' | 'type'>,
+  ctx: FieldEditabilityContext,
+): string | null {
+  if (ctx.forceReadonlyReason) return ctx.forceReadonlyReason
+  if (isAmountField(field) && !ctx.amountWritable) {
+    return ctx.amountReadonlyReason ?? readonlyReason(field, ctx.state, { amountWritable: false })
+  }
+  return readonlyReason(field, ctx.state, { amountWritable: true })
+}
+
 // ================================================================ 分组
 
 /**
