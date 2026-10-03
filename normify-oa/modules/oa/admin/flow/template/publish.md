@@ -11,16 +11,12 @@ description:
   en: >
       Versioned publishing: each change creates a new version, already-started instances keep executing on the version and approver snapshot captured at initiation, and disabling a template leaves in-flight instances untouched.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.123Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.499Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 368
-    end_line: 368
   - path: "doc/data-model.md"
-    line: 283
-    end_line: 294
 apis:
   - protocol: http
     method: POST
@@ -72,3 +68,7 @@ deps:
     from_api: "POST /api/v1/admin/flow-templates/{template_id}/publish"
     label: {zh: "模板发布写入审计", en: "Publish is audited"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-002`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE flow_template`（§4. 流程定义）

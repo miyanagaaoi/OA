@@ -11,13 +11,11 @@ description:
   en: >
       State linkage: a node rejection rejects the instance, auto-closes sibling tasks and cancels other node instances; reaching the countersign threshold or any single any-sign approval passes the node, closes remaining tasks and advances; entering a terminal state cancels or closes all open nodes and tasks and notifies the initiator; a no-cost matter marks node ② skipped with a note in the trace.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.313Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.692Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 492
-    end_line: 507
 apis:
   - protocol: http
     method: POST
@@ -72,3 +70,6 @@ deps:
     to_api: "POST /api/v1/flow-instances/{instance_id}/transitions"
     label: {zh: "驱动实例终态", en: "Drive instance status"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-015`（§6.6 异常路径）

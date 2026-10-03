@@ -11,22 +11,14 @@ description:
   en: >
       Supplement caps: a node may request a supplement only once (node instance flag supplement_requested) and a document accumulates at most three (instance supplement_count, consistent with the unique key on instance and round). Once the cap is reached the supplement action disappears and the approver may only pass, reject or terminate.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.317Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.696Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 352
-    end_line: 352
   - path: "doc/prd-0.1.md"
-    line: 554
-    end_line: 554
   - path: "doc/data-model.md"
-    line: 401
-    end_line: 401
   - path: "doc/data-model.md"
-    line: 436
-    end_line: 436
 apis:
   - protocol: http
     method: POST
@@ -49,3 +41,7 @@ apis:
           Read used supplement rounds and whether another request is allowed.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_supplement`（§5. 流程运行时）

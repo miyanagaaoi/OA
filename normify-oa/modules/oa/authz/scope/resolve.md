@@ -10,16 +10,12 @@ description:
   en: >
       Resolves a user's final data scope by merging roles with the widest-wins rule, layering each role's effective org scope (scope_org_id) and multi-post affiliations into a filter-ready scope object.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.186Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.564Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 169
-    end_line: 183
   - path: "doc/data-model.md"
-    line: 722
-    end_line: 733
 apis:
   - protocol: rpc
     path: "authz.scope.resolve"
@@ -57,3 +53,7 @@ deps:
     to_api: "GET /api/v1/identity/users/{id}/positions"
     label: {zh: "一人多岗取最宽口径", en: "Widest scope from posts"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-AUTH-001`（§5.2 权限模型）
+- `doc/data-model.md` → `CREATE TABLE sys_role`（§3. 权限）

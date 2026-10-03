@@ -11,13 +11,11 @@ description:
   en: >
       Supported browsers: current Chrome, Edge and Safari; the WeChat built-in browser is explicitly not an acceptance target, yet opening the site inside WeChat must stay basically usable (no crash, can log in, can approve); every token is a standard CSS value and fonts fall back to system faces so no external font request can break the page.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.273Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.651Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "doc/prd-0.1.md"
-    line: 419
-    end_line: 419
   - path: "DESIGN.md"
     line: 1153
     end_line: 1153
@@ -50,3 +48,6 @@ deps:
     to: oa.design.token
     label: {zh: "标准 CSS 值与字体回退", en: "Standard CSS & font fallbacks"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-005`（§6.8 移动端 H5 与登录保持）

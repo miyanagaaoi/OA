@@ -11,8 +11,8 @@ description:
   en: >
       Contrast baselines are computed on white: body text at 4.5:1 or better and large text at 3:1 or better, with disabled states exempt; measured values are ink 16.8:1, ink-muted 7.8:1, ink-subtle 5.2:1, warning #9a6200 at 4.6:1 on white, inverse-ink 14.6:1 and inverse-ink-muted 6.4:1; tools/validate-design-md.js checks every component and raises an error below AA.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.190Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.567Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 671
     end_line: 671
   - path: "doc/prd-0.1.md"
-    line: 741
-    end_line: 741
 apis:
   - protocol: file
     path: "tools/validate-design-md.js"
@@ -41,3 +39,6 @@ deps:
     to_api: "file:styles/tokens/color-ink.css"
     label: {zh: "文字层级对比度取值", en: "Ink contrast values"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.3 交付与验收`（§13.3 交付与验收）

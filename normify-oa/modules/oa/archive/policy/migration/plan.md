@@ -11,13 +11,11 @@ description:
   en: >
       Organizes archive candidates into re-entrant batch jobs, recording scope, execution window and retry policy, with an impact preview before execution.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.146Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.526Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 822
-    end_line: 823
 apis:
   - protocol: http
     method: POST
@@ -55,3 +53,6 @@ deps:
     from_api: "POST /api/v1/archive/jobs"
     label: {zh: "大批量搬迁前复核", en: "Review before bulk move"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）

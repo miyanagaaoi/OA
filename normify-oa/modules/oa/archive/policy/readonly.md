@@ -11,16 +11,12 @@ description:
   en: >
       Marks archived instances read-only: no approval, no withdrawal and no supplementing, while document-number lookup, detail preview and audit export remain available.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.149Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.529Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 921
-    end_line: 921
   - path: "doc/prd-0.1.md"
-    line: 560
-    end_line: 560
 apis:
   - protocol: http
     method: POST
@@ -56,3 +52,7 @@ deps:
     from_api: "GET /api/v1/archive/instances/{biz_no}/capabilities"
     label: {zh: "详情页切只读态", en: "Detail page read-only mode"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）
+- `doc/prd-0.1.md` → `REQ-NFR-010`（§第9章 非功能需求）

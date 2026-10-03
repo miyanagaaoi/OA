@@ -11,16 +11,12 @@ description:
   en: >
       Advances to the next node after approval (marking skip_condition hits as skipped and continuing), returns to the previous completed node for re-review (the previous node's returned_count+1, automatically returning here afterwards, at most twice per node, REQ-FLOW-021) and creates tasks for the newly entered node.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.313Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.693Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 500
-    end_line: 507
   - path: "doc/prd-0.1.md"
-    line: 323
-    end_line: 323
 apis:
   - protocol: http
     method: POST
@@ -77,3 +73,6 @@ deps:
     to_api: "PUT /api/v1/flow-node-instances/{node_instance_id}/status"
     label: {zh: "更新节点状态", en: "Update node status"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-021`（§6.3.1 集团层流转机制）

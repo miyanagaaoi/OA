@@ -10,13 +10,11 @@ description:
   en: >
       Client-side login carriage: QR-code and short-link tickets are exchanged for a session; the compatibility matrix is mainstream Chrome/Edge/Safari, and the WeChat built-in browser must at least stay crash-free and able to log in and approve.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.237Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.613Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "doc/prd-0.1.md"
-    line: 413
-    end_line: 420
   - path: "DESIGN.md"
     line: 1144
     end_line: 1152
@@ -51,3 +49,6 @@ deps:
     to: oa.portal.entry
     label: {zh: "二维码与短链入口由门户首页承载", en: "QR and short-link entry"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-005`（§6.8 移动端 H5 与登录保持）

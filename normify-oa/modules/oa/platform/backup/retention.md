@@ -11,16 +11,12 @@ description:
   en: >
       Retention and cleanup rules for backup sets: thirty days of daily fulls, older sets pruned on schedule, and audit-relevant exports kept according to the ten-year retention rule.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.260Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.638Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 538
-    end_line: 538
   - path: "doc/prd-0.1.md"
-    line: 537
-    end_line: 537
 apis:
   - protocol: http
     method: GET
@@ -42,3 +38,6 @@ apis:
           Backup retention and cleanup policy.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-008`（§第9章 非功能需求）

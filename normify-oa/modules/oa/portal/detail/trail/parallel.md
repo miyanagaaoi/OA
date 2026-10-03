@@ -11,16 +11,14 @@ description:
   en: >
       Parallel collaboration grouping: several co-approving departments fold into one group box whose title reads Collaboration · N departments with progress on the right (for example 3/4) and all child nodes visible when expanded; the flow advances only when the whole group is done, and any rejecting department rejects the document.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.270Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.648Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 880
     end_line: 880
   - path: "doc/prd-0.1.md"
-    line: 367
-    end_line: 367
 apis:
   - protocol: http
     method: GET
@@ -41,3 +39,6 @@ deps:
     to: oa.workflow.task
     label: {zh: "协同任务状态", en: "Collaboration task status"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-LOG-002`（§6.9 审计日志）

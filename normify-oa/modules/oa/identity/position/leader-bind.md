@@ -10,16 +10,12 @@ description:
   en: >
       Each department or section may bind one or more leaders (primary/deputy, sortable, with effective dates); leader binding is the single authoritative source for approver resolution.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.235Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.610Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 85
-    end_line: 108
   - path: "doc/prd-0.1.md"
-    line: 137
-    end_line: 142
 apis:
   - protocol: http
     method: GET
@@ -82,3 +78,7 @@ deps:
     to_api: "GET /api/v1/identity/orgs/tree"
     label: {zh: "校验组织节点", en: "Validate org node"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_org_leader`（§2. 身份与组织）
+- `doc/prd-0.1.md` → `REQ-ORG-001`（§5.1 组织架构模型）

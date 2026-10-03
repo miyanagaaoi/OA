@@ -11,19 +11,13 @@ description:
   en: >
       Once the initiator picks the category, no approval node may change it; the only remedy for a wrong classification is rejecting back to the initiator. Category values come from admin-configured dictionary items, no longer determine central ownership, and serve only as a label and reporting dimension.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.212Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.591Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"
-    line: 80
-    end_line: 80
   - path: "doc/forms.md"
-    line: 91
-    end_line: 91
   - path: "doc/prd-0.1.md"
-    line: 259
-    end_line: 259
 apis:
   - protocol: http
     method: POST
@@ -52,3 +46,7 @@ deps:
     to_api: "GET /api/v1/forms/dicts/category/items"
     label: {zh: "类别取值来源", en: "Category option source"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 9.1 路由模型简化（Q10 的连带结论）`（§9.1 路由模型简化）
+- `doc/prd-0.1.md` → `REQ-FLOW-025`（§6.3 主干审批链）

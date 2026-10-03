@@ -11,16 +11,12 @@ description:
   en: >
       Owns the dictionary cache lifecycle: a manual refresh endpoint, a status probe for the cache version, and the Redis key layout that the form layer reads options from.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.115Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.487Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 438
-    end_line: 438
   - path: "doc/data-model.md"
-    line: 256
-    end_line: 267
 apis:
   - protocol: http
     method: POST
@@ -57,3 +53,7 @@ deps:
     from_api: "POST /api/v1/admin/dict-cache/refresh"
     label: {zh: "选项变更广播", en: "Broadcast option changes"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-004`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_dict_item`（§3. 权限）

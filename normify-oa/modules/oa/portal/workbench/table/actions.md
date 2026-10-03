@@ -11,8 +11,8 @@ description:
   en: >
       Row-level actions: at most three ghost buttons (view / approve / transfer), the rest folded into a More dropdown; the selected row uses a primary-subtle fill with a 2px primary indicator bar on the left; destructive actions such as reject use red text on white and a confirmation that names both the action and the object.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.281Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.660Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 758
     end_line: 758
   - path: "doc/prd-0.1.md"
-    line: 721
-    end_line: 721
 apis:
   - protocol: http
     method: POST
@@ -65,3 +63,6 @@ deps:
     from_api: "POST /api/v1/portal/workbench/tasks/{task_id}/transfer"
     label: {zh: "转办与改派规则", en: "Transfer & reassign rules"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

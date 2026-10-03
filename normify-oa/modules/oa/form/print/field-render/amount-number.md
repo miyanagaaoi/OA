@@ -11,19 +11,15 @@ description:
   en: >
       Sheets use a monospaced face (Consolas / Courier New) for archival checking: amounts carry thousands separators and two decimals, and from 1,000,000 they also show the ten-thousand conversion (e.g. `1,250,000.00 ¥ / 125.00 万`); document, contract and application numbers are monospaced too, and no information may be lost in black-and-white copying.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.214Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.593Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
     line: 999
     end_line: 1001
   - path: "doc/forms.md"
-    line: 66
-    end_line: 67
   - path: "doc/forms.md"
-    line: 432
-    end_line: 432
 apis:
   - protocol: http
     method: GET
@@ -51,3 +47,6 @@ deps:
     to_api: "POST /api/v1/forms/amount/normalize"
     label: {zh: "定点金额格式", en: "Fixed-point amounts"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.5 金额字段的统一规则（全局）`（§1.5 金额字段的统一规则）

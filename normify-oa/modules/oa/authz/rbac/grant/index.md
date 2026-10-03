@@ -10,14 +10,14 @@ description:
   en: >
       Ticks, level by level, the功能 menus/buttons and org nodes a role may access; the grant granularity is org node by function, and branch process admins may grant only inside their own company.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.180Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.558Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
   - path: "doc/data-model.md"
-    line: 238
-    end_line: 251
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-003`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_role_permission`（§3. 权限）

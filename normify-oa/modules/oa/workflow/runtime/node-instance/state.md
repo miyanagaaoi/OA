@@ -11,16 +11,12 @@ description:
   en: >
       Persists the node instance status enum (pending/active/waiting_supplement/approved/rejected/skipped/returned/cancelled, per doc/enums.md section 5) together with the frozen candidate snapshot approver_ids_json, decision mode, pass_threshold, returned_count and supplement_requested (the single writer of that table).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.314Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.694Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 495
-    end_line: 524
   - path: "doc/prd-0.1.md"
-    line: 478
-    end_line: 478
 apis:
   - protocol: mysql
     path: "flow_node_instance"
@@ -71,3 +67,7 @@ deps:
     from_api: "kafka:oa.workflow.node-instance.status-changed"
     label: {zh: "节点状态入轨迹", en: "Node status to trace"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_node_instance`（§5. 流程运行时）
+- `doc/prd-0.1.md` → `### 7.2 状态机`（§7.2 状态机）

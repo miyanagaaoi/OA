@@ -11,16 +11,12 @@ description:
   en: >
       Resolves the signature requirement of a node (mandatory / optional / none). Group leaders and the chairman are mandatory by default; a mandatory node cannot be approved unsigned. Includes the designer configuration endpoint.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.286Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.664Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 386
-    end_line: 386
   - path: "doc/prd-0.1.md"
-    line: 556
-    end_line: 556
 apis:
   - protocol: http
     method: POST
@@ -60,3 +56,6 @@ deps:
     to: oa.workflow.designer
     label: {zh: "流程设计器配置入口", en: "Process designer entry"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-003`（§6.5 电子签名与身份确认）

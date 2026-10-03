@@ -11,22 +11,14 @@ description:
   en: >
       Supports continuous routing A-B-C: each hop increments flow_routing.seq and the instance routing counters, updates the current receiving department, marks the current node instance approved and creates tasks for the leader of the new department. The chain remains visible to approvers.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.307Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.686Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 322
-    end_line: 322
   - path: "doc/prd-0.1.md"
-    line: 340
-    end_line: 340
   - path: "doc/data-model.md"
-    line: 399
-    end_line: 400
   - path: "doc/data-model.md"
-    line: 481
-    end_line: 481
 apis:
   - protocol: http
     method: GET
@@ -57,3 +49,7 @@ deps:
     from_api: "kafka:oa.workflow.routing.forwarded"
     label: {zh: "解析承接部门负责人", en: "Resolve receiving dept leader"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-020`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_routing`（§5. 流程运行时）

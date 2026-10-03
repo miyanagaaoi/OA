@@ -11,11 +11,12 @@ description:
   en: >
       Per-node timeout detection (configurable, at least 24 hours) sending in-app and email reminders, optionally copying the approver's superior; supplement deadlines remind the initiator only - never auto-skip and never auto-escalate.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.258Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.636Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 370
-    end_line: 370
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-007`（§6.4 流程引擎核心能力）

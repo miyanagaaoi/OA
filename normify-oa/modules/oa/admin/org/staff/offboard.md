@@ -11,16 +11,12 @@ description:
   en: >
       Before resignation, surface the number of unhandled tasks and force transfer or reassignment first; after resignation the user is excluded from new approver resolution while in-flight documents stay with their snapshot approvers.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.129Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.509Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 241
-    end_line: 241
   - path: "doc/prd-0.1.md"
-    line: 238
-    end_line: 238
 apis:
   - protocol: http
     method: GET
@@ -58,3 +54,6 @@ deps:
     from_api: "GET /api/v1/admin/users/{user_id}/pending-tasks"
     label: {zh: "待办任务数量与转办", en: "Pending tasks and transfer"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ORG-002`（§5.5 组织与人员变更的处理）

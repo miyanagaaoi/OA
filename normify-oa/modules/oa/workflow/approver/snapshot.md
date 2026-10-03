@@ -11,19 +11,13 @@ description:
   en: >
       Resolves all node candidates once at submission and freezes them into flow_instance.approver_snapshot_json (template_version / parsed_at / basis / nodes with evidence): later transfers, resignations or org changes never alter in-flight instances; resubmission re-resolves the snapshot while the old one stays in the audit log (REQ-FLOW-011/017).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.296Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.675Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 746
-    end_line: 746
   - path: "doc/prd-0.1.md"
-    line: 202
-    end_line: 202
   - path: "doc/prd-0.1.md"
-    line: 355
-    end_line: 355
 apis:
   - protocol: http
     method: POST
@@ -75,3 +69,7 @@ deps:
     from_api: "POST /api/v1/flow-instances/{instance_id}/approver-snapshot/reparse"
     label: {zh: "旧快照留痕", en: "Old snapshot kept in audit"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_instance`（§5. 流程运行时）
+- `doc/prd-0.1.md` → `REQ-FLOW-011`（§6.4 流程引擎核心能力）

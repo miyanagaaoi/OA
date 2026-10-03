@@ -11,16 +11,14 @@ description:
   en: >
       Top-bar entries for Save draft and Draft box (N); when an unsubmitted earlier edit is detected, an info bar appears with resume and delete actions on a semantic-info-surface fill; drafts keep the template version number and are re-resolved against the latest template on resubmission.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.276Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.655Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 866
     end_line: 866
   - path: "doc/prd-0.1.md"
-    line: 389
-    end_line: 389
 apis:
   - protocol: http
     method: GET
@@ -62,3 +60,6 @@ deps:
     from_api: "GET /api/v1/portal/initiate/drafts"
     label: {zh: "草稿按模板版本还原", en: "Restore draft by template ver."}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 6.2 四类审批单与事项类别的关系`（§6.2 四类审批单与事项类别的关系）

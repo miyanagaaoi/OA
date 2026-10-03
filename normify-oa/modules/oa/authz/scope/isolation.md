@@ -11,16 +11,12 @@ description:
   en: >
       Subsidiary isolation and unauthorized-access blocking: out-of-scope documents never appear in lists or search, direct URL access returns a permission error rather than an empty page, and attempts are written to the security audit.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.186Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.563Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
   - path: "doc/prd-0.1.md"
-    line: 563
-    end_line: 600
 apis:
   - protocol: rpc
     path: "authz.scope.assertAccess"
@@ -51,3 +47,6 @@ deps:
     to: oa.audit.security
     label: {zh: "越权访问尝试留痕", en: "Log denied access"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-AUTH-002`（§5.2 权限模型）

@@ -11,16 +11,12 @@ description:
   en: >
       Freezes the verdict of approved documents while still allowing the administrator to terminate an in-flight process with a reason or reassign a task, both of which are audited.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.112Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.484Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 459
-    end_line: 459
   - path: "doc/data-model.md"
-    line: 394
-    end_line: 395
 apis:
   - protocol: http
     method: PUT
@@ -65,3 +61,7 @@ deps:
     to_api: "mysql:flow_instance"
     label: {zh: "读取单据实例", en: "Read document instance"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-006`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE flow_instance`（§5. 流程运行时）

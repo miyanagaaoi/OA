@@ -11,19 +11,13 @@ description:
   en: >
       involve_cost is the only routing criterion in phase one: when no, node ② finance review is skipped with status skipped and no todo, yet the document's central-ownership field still records the finance department for reporting and audit; the trail records that the finance node was skipped. Amounts never drive routing.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.212Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.591Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"
-    line: 96
-    end_line: 96
   - path: "doc/forms.md"
-    line: 410
-    end_line: 410
   - path: "doc/prd-0.1.md"
-    line: 327
-    end_line: 327
 apis:
   - protocol: http
     method: POST
@@ -51,3 +45,7 @@ deps:
     from_api: "POST /api/v1/forms/matter/fields/involve-cost/evaluate"
     label: {zh: "路由判据", en: "Routing criterion"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 9.1 路由模型简化（Q10 的连带结论）`（§9.1 路由模型简化）
+- `doc/prd-0.1.md` → `REQ-FLOW-025`（§6.3 主干审批链）

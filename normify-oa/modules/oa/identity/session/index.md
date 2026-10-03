@@ -10,14 +10,13 @@ description:
   en: >
       Login with password complexity rules and 5-attempt lockout; remember-me sessions valid for seven days with automatic renewal; multi-device login with a configurable cap (default three, earliest device evicted); login logging.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.237Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.613Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 413
-    end_line: 420
   - path: "doc/prd-0.1.md"
-    line: 535
-    end_line: 562
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-002`（§6.8 移动端 H5 与登录保持）

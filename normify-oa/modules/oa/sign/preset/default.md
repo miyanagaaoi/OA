@@ -11,16 +11,12 @@ description:
   en: >
       Marks one preset signature as the default per user (is_default is exclusive) so the approval dialog preselects it for one-tap use.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.287Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.665Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 366
-    end_line: 366
   - path: "doc/data-model.md"
-    line: 131
-    end_line: 141
 apis:
   - protocol: http
     method: PUT
@@ -49,3 +45,7 @@ deps:
     to_api: "mysql:sys_user_signature"
     label: {zh: "默认标记落在预存签名记录上", en: "Default flag on preset record"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-002`（§6.5 电子签名与身份确认）
+- `doc/data-model.md` → `CREATE TABLE sys_user_signature`（§2. 身份与组织）

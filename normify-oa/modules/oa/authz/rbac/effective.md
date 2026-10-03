@@ -10,16 +10,12 @@ description:
   en: >
       Merges the permission codes and org scopes of all of a user's roles, produces the menu/button view and caches it; caches are invalidated per user when roles or grants change.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.179Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.557Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
   - path: "doc/data-model.md"
-    line: 238
-    end_line: 251
 apis:
   - protocol: http
     method: GET
@@ -67,3 +63,7 @@ deps:
     to_api: "GET /api/v1/authz/permissions/tree"
     label: {zh: "按权限树装配菜单", en: "Read permission tree"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-AUTH-001`（§5.2 权限模型）
+- `doc/data-model.md` → `CREATE TABLE sys_role_permission`（§3. 权限）

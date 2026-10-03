@@ -11,13 +11,11 @@ description:
   en: >
       Internal read-only org queries (list and detail) reused by the portal and the integration surface; phase one publishes read-only access only, with no write endpoints before the permission model matures (the public open prefix belongs to the integration branch).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.233Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.609Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 536
-    end_line: 536
 apis:
   - protocol: http
     method: GET
@@ -46,3 +44,6 @@ deps:
     to_api: "GET /api/v1/identity/orgs/tree"
     label: {zh: "由内部组织树装配只读视图", en: "Build read-only view"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 8.1 接口设计原则`（§8.1 接口设计原则）

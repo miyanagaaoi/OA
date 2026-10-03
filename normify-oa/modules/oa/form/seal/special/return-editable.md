@@ -11,16 +11,12 @@ description:
   en: >
       `return_status` and `return_date` are the only main fields editable during approval because they record a later fact (whether the certificate was returned) and are filled by archive node ⑦; the exception must be registered explicitly in the server-side state whitelist, and marking returned requires a return time.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.222Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.599Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 179
-    end_line: 179
   - path: "doc/forms.md"
-    line: 273
-    end_line: 273
 apis:
   - protocol: http
     method: POST
@@ -48,3 +44,6 @@ deps:
     from_api: "POST /api/v1/forms/seal/instances/{instance_id}/return/guard"
     label: {zh: "归档节点权限", en: "Archive node authority"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.2 字段的三态读写模型（**核心约束**）`（§1.2 字段的三态读写模型）

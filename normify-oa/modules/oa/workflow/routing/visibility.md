@@ -11,19 +11,13 @@ description:
   en: >
       A receiving department can see the document: the flow_routing chain is itself the basis for routing visibility, so every department the document has been routed to (and the current receiving department) may read it. Other departments and cc recipients stay read-only and may not approve.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.310Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.690Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 322
-    end_line: 322
   - path: "doc/prd-0.1.md"
-    line: 338
-    end_line: 338
   - path: "doc/data-model.md"
-    line: 498
-    end_line: 498
 apis:
   - protocol: http
     method: GET
@@ -51,3 +45,7 @@ deps:
     from_api: "POST /api/v1/flow/instances/{instance_id}/visibility-check"
     label: {zh: "数据域可见性判定", en: "Data-scope visibility check"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-AUTH-004`（§5.3 数据域口径）
+- `doc/data-model.md` → `CREATE TABLE flow_routing`（§5. 流程运行时）

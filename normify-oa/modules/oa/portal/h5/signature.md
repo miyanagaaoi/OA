@@ -11,16 +11,14 @@ description:
   en: >
       The handwritten signature pad: 200px tall and full width on H5 (640×200 on desktop) on a canvas-subtle fill with a 1px dashed border and rounded.sm; the prompt Please sign inside the box sits above, with Clear, Use preset signature and Confirm signature below; strokes are 2px ink round-capped smooth curves and Confirm stays disabled until something is drawn.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.274Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.653Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 901
     end_line: 902
   - path: "doc/prd-0.1.md"
-    line: 365
-    end_line: 368
 apis:
   - protocol: http
     method: POST
@@ -52,3 +50,6 @@ deps:
     from_api: "GET /api/v1/portal/h5/signatures/preset"
     label: {zh: "读取预存签名", en: "Load preset signature"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-001`（§6.5 电子签名与身份确认）

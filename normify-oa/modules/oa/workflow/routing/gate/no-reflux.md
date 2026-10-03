@@ -11,13 +11,11 @@ description:
   en: >
       A department already handled cannot be designated as a routing target again (A-B-A is refused); returning to the own department is the only exception and is limited to two consecutive times. The judgement uses the set of receiving departments already present in the routing chain, and a hit is refused with a concrete reason and no state change.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.308Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.688Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 357
-    end_line: 357
 apis:
   - protocol: http
     method: POST
@@ -45,3 +43,6 @@ deps:
     to_api: "mysql:flow_routing"
     label: {zh: "依据流转链判定", en: "Judge from the routing chain"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-024`（§6.4 流程引擎核心能力）

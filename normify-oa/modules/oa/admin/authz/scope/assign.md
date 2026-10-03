@@ -11,16 +11,12 @@ description:
   en: >
       Sets the data_scope value of a role among the five allowed values and keeps the role's group/company level consistent with it.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.108Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.478Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 174
-    end_line: 176
   - path: "doc/prd-0.1.md"
-    line: 437
-    end_line: 437
 apis:
   - protocol: http
     method: GET
@@ -52,3 +48,7 @@ deps:
     to_api: "mysql:sys_role"
     label: {zh: "写入角色数据域", en: "Write role data scope"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_role`（§3. 权限）
+- `doc/prd-0.1.md` → `REQ-ADMIN-003`（§6.10 管理后台）

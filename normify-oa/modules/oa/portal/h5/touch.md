@@ -11,19 +11,15 @@ description:
   en: >
       H5 touch and control sizing: every clickable element and control is at least 44px tall (spacing.control-h5) and lists become card lists rather than tables; form fields are single-column with the label above the control; body text stays 14px so larger targets do not cost density.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.274Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.653Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 724
     end_line: 724
   - path: "doc/prd-0.1.md"
-    line: 668
-    end_line: 668
   - path: "doc/prd-0.1.md"
-    line: 666
-    end_line: 666
 apis:
   - protocol: http
     method: GET
@@ -41,3 +37,6 @@ deps:
     from_api: "GET /m/portal/todo"
     label: {zh: "卡片列表取任务数据", en: "Card list from tasks"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

@@ -11,13 +11,11 @@ description:
   en: >
       Contract type `contract_type`: purchase, sales, service, lease, construction, labor and other (other requires the `contract_type_other` note).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.205Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.583Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 203
-    end_line: 213
 apis:
   - protocol: http
     method: GET
@@ -40,3 +38,6 @@ apis:
           Tells whether the type requires an explanatory note.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.3 合同类型（字段 code `contract_type` · 字典类型 `contract_type`）`（§6.3 合同类型）

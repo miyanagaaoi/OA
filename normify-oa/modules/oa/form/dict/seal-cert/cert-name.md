@@ -11,13 +11,11 @@ description:
   en: >
       Certificate name `cert_name`: business license, tax registration certificate, organization code certificate, qualification certificate and other; required when seal_type is certificate borrow.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.207Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.585Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 269
-    end_line: 269
 apis:
   - protocol: http
     method: GET
@@ -30,3 +28,6 @@ apis:
           Lists selectable certificate names.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.5 证照类型（字段 code `cert_name` · 字典类型 `cert_type`）`（§6.5 证照类型）

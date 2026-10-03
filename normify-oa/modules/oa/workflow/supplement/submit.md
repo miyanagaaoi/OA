@@ -11,22 +11,14 @@ description:
   en: >
       The initiator submits the supplement: only newly uploaded attachments (flow_attachment.round equals the supplement round) and a supplement note of up to 500 characters. Submission clears the sub-status, increments supplement_count, marks the record submitted and returns the node to active with tasks back to the requesting approver. A supplement is not a rejection and never writes a rejection record.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.319Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.697Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 325
-    end_line: 325
   - path: "doc/prd-0.1.md"
-    line: 331
-    end_line: 331
   - path: "doc/prd-0.1.md"
-    line: 522
-    end_line: 522
   - path: "doc/data-model.md"
-    line: 511
-    end_line: 515
 apis:
   - protocol: http
     method: POST
@@ -67,3 +59,7 @@ deps:
     from_api: "kafka:oa.workflow.supplement.submitted"
     label: {zh: "任务交回请求人", en: "Return task to requester"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_supplement`（§5. 流程运行时）

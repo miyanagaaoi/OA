@@ -11,13 +11,11 @@ description:
   en: >
       Dates must not precede today (some fields must not precede the initiation date) and a date range's end must be ≥ its start; messages are 「{标签}不能早于今天」 and 「结束日期不能早于开始日期」.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.228Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.604Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 49
-    end_line: 49
 apis:
   - protocol: http
     method: POST
@@ -40,3 +38,6 @@ apis:
           Validates date-range ordering.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.3 通用校验规则`（§1.3 通用校验规则）

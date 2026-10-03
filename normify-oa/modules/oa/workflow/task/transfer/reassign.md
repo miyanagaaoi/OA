@@ -11,19 +11,13 @@ description:
   en: >
       Only system administrators may reassign a task, used when a snapshot approver has left or become unavailable; a reason is mandatory and every reassignment is audited. In-flight documents are never reassigned automatically - reassignment compensates for the immutable approver snapshot.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.324Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.703Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 391
-    end_line: 391
   - path: "doc/prd-0.1.md"
-    line: 238
-    end_line: 238
   - path: "doc/prd-0.1.md"
-    line: 241
-    end_line: 241
 apis:
   - protocol: http
     method: POST
@@ -55,3 +49,6 @@ deps:
     from_api: "GET /api/v1/flow/tasks/pending-reassign"
     label: {zh: "人员离职调岗查询", en: "Check user leave/transfer"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-019`（§6.6 异常路径）

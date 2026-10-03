@@ -11,13 +11,11 @@ description:
   en: >
       Designer node property panel: choose the approver rule, configure decision mode and pass threshold, mandatory signature, timeout hours and the add-sign/jump switches, forwarded uniformly to the node behavior config and rule declaration (REQ-FLOW-008).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.302Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.680Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 371
-    end_line: 371
 apis:
   - protocol: http
     method: GET
@@ -66,3 +64,6 @@ deps:
     to_api: "PUT /api/v1/flow-nodes/{node_id}/approver-rule"
     label: {zh: "写入解析规则", en: "Write approver rule"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-008`（§6.4 流程引擎核心能力）

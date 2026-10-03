@@ -11,16 +11,12 @@ description:
   en: >
       Validates values against the bound dictionary at submission: the code must exist among enabled items, disabled or unknown codes are rejected, and multi-select values are de-duplicated; submitted documents display the snapshotted names regardless of later dictionary edits.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.206Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.584Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 176
-    end_line: 178
   - path: "doc/forms.md"
-    line: 400
-    end_line: 400
 apis:
   - protocol: http
     method: POST
@@ -49,3 +45,6 @@ deps:
     to_api: "GET /api/v1/forms/templates/{form_type}/schema/fields/{field_id}/options"
     label: {zh: "与字段绑定一致", en: "Matches field binding"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.3 通用校验规则`（§1.3 通用校验规则）

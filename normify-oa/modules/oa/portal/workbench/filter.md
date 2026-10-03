@@ -11,16 +11,14 @@ description:
   en: >
       In-list search (the system deliberately has no global search box): document type, status, submission date range, initiator/department, amount range and document-number keyword; filters persist across the four tabs; organisation nodes outside the caller's data scope never appear as filter options.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.280Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.659Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 891
     end_line: 892
   - path: "doc/prd-0.1.md"
-    line: 722
-    end_line: 722
 apis:
   - protocol: http
     method: GET
@@ -57,3 +55,6 @@ deps:
     to_api: "mysql:form_data"
     label: {zh: "按表单字段值筛选", en: "Filter by form values"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

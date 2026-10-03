@@ -11,13 +11,11 @@ description:
   en: >
       MySQL 8.0 triggers: no_update allows only the verify-result write-back (image, hash, user and sign time unchanged) while no_delete always raises SIGNAL; these triggers are the acceptance object of AC-20.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.291Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.671Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 745
-    end_line: 773
 apis:
   - protocol: rpc
     path: "db.trigger.flow_signature.no_update"
@@ -43,3 +41,6 @@ deps:
     to_api: "mysql:flow_signature"
     label: {zh: "保护的签名记录表", en: "Protected signature table"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `### 8.1 审计与签名的不可变约束（对应 AC-20）`（§8.1 审计与签名的不可变约束）

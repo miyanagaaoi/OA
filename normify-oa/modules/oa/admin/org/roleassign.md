@@ -11,19 +11,13 @@ description:
   en: >
       Assign roles to users together with the org scope the role applies to (scope_org_id), allowing multiple roles per user; every assignment is written to the permission-change log and branch admins cannot assign across companies.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.127Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.507Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 435
-    end_line: 435
   - path: "doc/prd-0.1.md"
-    line: 166
-    end_line: 166
   - path: "doc/data-model.md"
-    line: 191
-    end_line: 203
 apis:
   - protocol: http
     method: GET
@@ -69,3 +63,7 @@ deps:
     to_api: "mysql:sys_user_role"
     label: {zh: "写入用户角色关联", en: "Write user-role link"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-001`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_user_role`（§3. 权限）

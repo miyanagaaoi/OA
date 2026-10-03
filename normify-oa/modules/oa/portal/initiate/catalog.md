@@ -11,8 +11,8 @@ description:
   en: >
       Entry point for the four document types (matter / fund / contract / seal-and-licence): icon blocks all use a primary-subtle fill with a primary glyph, and types differ by icon shape rather than colour; templates outside the caller's permission are not rendered; card-style layout is an exception only on this page and on H5, lists otherwise default to tables.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.276Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.655Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 907
     end_line: 907
   - path: "doc/prd-0.1.md"
-    line: 270
-    end_line: 275
 apis:
   - protocol: http
     method: GET
@@ -59,3 +57,6 @@ deps:
     from_api: "POST /api/v1/portal/initiate/drafts"
     label: {zh: "绑定流程模板版本", en: "Bind workflow template version"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 6.2 四类审批单与事项类别的关系`（§6.2 四类审批单与事项类别的关系）

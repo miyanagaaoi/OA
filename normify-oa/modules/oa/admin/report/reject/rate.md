@@ -11,13 +11,11 @@ description:
   en: >
       Computes the rejection rate split by node, department and time window, exposing which review step rejects most often.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.139Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.517Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
 apis:
   - protocol: http
     method: GET
@@ -40,3 +38,6 @@ apis:
           Rejection rate trend over the selected window.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-005`（§6.10 管理后台）

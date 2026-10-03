@@ -11,13 +11,11 @@ description:
   en: >
       Declared index plan for the hot paths: tasks by assignee and status, instance lookup by document number, routing and supplement chains.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.263Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.641Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 800
-    end_line: 817
 apis:
   - protocol: file
     path: "config/db/index-plan.yml"
@@ -29,3 +27,6 @@ apis:
           Declared index plan for the hot query paths.
           
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 11. 表清单与需求追溯`（§11. 表清单与需求追溯）

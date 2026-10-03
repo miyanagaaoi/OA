@@ -11,16 +11,12 @@ description:
   en: >
       Single ingestion entry for the operation log: records actor, timestamp, source IP and user agent, target type and ID, and action code, appending only to sys_log with no update or delete.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.158Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.542Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 445
-    end_line: 445
   - path: "doc/data-model.md"
-    line: 723
-    end_line: 739
 apis:
   - protocol: mysql
     path: "sys_log"
@@ -52,3 +48,7 @@ deps:
     to_api: "GET /api/v1/audit/logs"
     label: {zh: "写入后供检索与导出", en: "Feed query and export"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-LOG-001`（§6.9 审计日志）
+- `doc/data-model.md` → `CREATE TABLE sys_log`（§6. 签名、附件、抄送、消息、审计）

@@ -11,13 +11,11 @@ description:
   en: >
       The sheet carries an attachment list that names files only (never their bodies) and labels supplement rounds; the submitted-materials cell works together with that list.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.213Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.592Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 433
-    end_line: 433
 apis:
   - protocol: file
     path: "templates/print/partials/attachment-list.html"
@@ -45,3 +43,6 @@ deps:
     to_api: "GET /api/v1/forms/instances/{instance_id}/attachments"
     label: {zh: "附件与轮次来源", en: "Attachment and round source"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 10.1 打印版式映射（四类单据 × 集团/子公司层）`（§10.1 打印版式映射）

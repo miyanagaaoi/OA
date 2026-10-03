@@ -11,19 +11,15 @@ description:
   en: >
       Batch actions after selecting rows: batch approve (per-row opinion and signature checks), batch transfer, and export of the selection (system administrator only); destructive batches require a second confirmation listing the affected objects; results come back row by row and one failure does not roll back the rest.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.279Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.658Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 910
     end_line: 910
   - path: "doc/prd-0.1.md"
-    line: 663
-    end_line: 663
   - path: "doc/prd-0.1.md"
-    line: 700
-    end_line: 700
 apis:
   - protocol: http
     method: POST
@@ -64,3 +60,6 @@ deps:
     from_api: "file:export/workbench-selected.csv"
     label: {zh: "导出权限校验", en: "Export permission check"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

@@ -11,16 +11,12 @@ description:
   en: >
       Decides archive targets from instance status (approved, rejected, withdrawn, terminated) plus finished_at older than three years, producing a candidate list with include/exclude reasons.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.144Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.524Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 818
-    end_line: 822
   - path: "doc/prd-0.1.md"
-    line: 540
-    end_line: 540
 apis:
   - protocol: http
     method: GET
@@ -52,3 +48,7 @@ deps:
     from_api: "POST /api/v1/archive/candidates/evaluate"
     label: {zh: "归档操作复核与留痕", en: "Review before archiving"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）
+- `doc/prd-0.1.md` → `REQ-NFR-010`（§第9章 非功能需求）

@@ -11,13 +11,11 @@ description:
   en: >
       Lists the user's available preset signatures (default first) in the approval dialog; using one generates a fresh signature record rather than reusing an old one.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.288Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.666Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 365
-    end_line: 366
 apis:
   - protocol: http
     method: GET
@@ -46,3 +44,6 @@ deps:
     to_api: "POST /api/v1/sign/records"
     label: {zh: "生成本次签名记录", en: "Create signature record"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-002`（§6.5 电子签名与身份确认）

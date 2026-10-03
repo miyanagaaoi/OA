@@ -11,13 +11,11 @@ description:
   en: >
       Verifies signature hashes and log records, producing verification jobs and results as acceptance evidence for the immutability constraint, and alerts when tampering traces are found.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.157Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.541Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 832
-    end_line: 867
 apis:
   - protocol: http
     method: POST
@@ -49,3 +47,6 @@ deps:
     from_api: "GET /api/v1/audit/integrity/verify/{job_id}"
     label: {zh: "违规改写尝试告警", en: "Alert on tampering attempts"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `### 8.1 审计与签名的不可变约束（对应 AC-20）`（§8.1 审计与签名的不可变约束）

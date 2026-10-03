@@ -11,13 +11,11 @@ description:
   en: >
       Matter-specific validation: title ≤60, description ≥10 and ≤2000, amount/cost_bearer required when involve_cost=yes, expect_date not earlier than today, cc_users ≤20 and de-duplicated, attachment format and size; all server-side.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.213Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.592Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 79
-    end_line: 87
 apis:
   - protocol: http
     method: POST
@@ -45,3 +43,6 @@ deps:
     from_api: "POST /api/v1/forms/matter/validate"
     label: {zh: "复用通用校验引擎", en: "Reuses shared validator"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 2. 事项审批单（`form_type = matter`）`（§2. 事项审批单）

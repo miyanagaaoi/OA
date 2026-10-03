@@ -11,16 +11,12 @@ description:
   en: >
       Configures an optional per-node timeout with a 24-hour minimum; on expiry the system only sends in-app and mail reminders, with no automatic skip or escalation in phase one.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.121Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.494Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 370
-    end_line: 370
   - path: "doc/prd-0.1.md"
-    line: 550
-    end_line: 550
 apis:
   - protocol: http
     method: GET
@@ -48,3 +44,6 @@ deps:
     from_api: "PUT /api/v1/admin/flow-nodes/{node_id}/timeout"
     label: {zh: "超时触发催办", en: "Timeout drives reminders"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-007`（§6.4 流程引擎核心能力）

@@ -11,13 +11,11 @@ description:
   en: >
       Complexity policy (at least eight characters with letters and digits), change-password flow and reuse rules enforced server-side.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.267Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.644Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 555
-    end_line: 555
 apis:
   - protocol: file
     path: "config/security/password-policy.yml"
@@ -39,3 +37,6 @@ apis:
           Changes the caller's password after policy validation.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-005`（§第9章 非功能需求）

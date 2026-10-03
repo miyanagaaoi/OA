@@ -11,13 +11,11 @@ description:
   en: >
       One field's schema entry: field ID, label, type (text/textarea/number/amount/select/multiselect/date/daterange/user/org/tag/boolean/file/files), required (yes/no/conditional), length, validation, post-submit mutability, default and linkage. A field code is never reused once used.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.226Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.602Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 11
-    end_line: 23
 apis:
   - protocol: http
     method: GET
@@ -60,3 +58,6 @@ apis:
           Lists field types and their controls.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.1 字段属性含义`（§1.1 字段属性含义）

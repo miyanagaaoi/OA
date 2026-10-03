@@ -11,21 +11,19 @@ description:
   en: >
       Overdue scanning for stalled approval tasks (per-node timeout_hours, explicitly configured and ≥24h) and supplement deadlines (default 3 working days); it only emits reminder signals and never auto-skips, escalates or rejects.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.259Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.636Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 394
-    end_line: 394
   - path: "doc/prd-0.1.md"
-    line: 398
-    end_line: 399
   - path: "doc/data-model.md"
-    line: 519
-    end_line: 520
 deps:
   - kind: reference
     to: oa.workflow.exception
     label: {zh: "超时异常路径规则", en: "Timeout exception rules"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-007`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_node_instance`（§5. 流程运行时）

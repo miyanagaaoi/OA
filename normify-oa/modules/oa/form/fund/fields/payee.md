@@ -11,16 +11,12 @@ description:
   en: >
       Payee name `payee` (text ≤100, required) and payee account `payee_account` (text ≤40, required, digits/letters/`-` only, encrypted at rest); the account is masked in lists and detail, with the full value only for finance roles and admins.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.208Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.587Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 107
-    end_line: 108
   - path: "doc/forms.md"
-    line: 118
-    end_line: 118
 apis:
   - protocol: http
     method: GET
@@ -58,3 +54,6 @@ deps:
     from_api: "POST /api/v1/forms/fund/fields/payee-account/encrypt"
     label: {zh: "敏感字段加密存储", en: "Encrypt sensitive fields"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 3. 资金审批单（`form_type = fund`）`（§3. 资金审批单）

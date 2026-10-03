@@ -10,16 +10,12 @@ description:
   en: >
       Resignation requires all of a user's pending tasks to be handled first: the system reports the count of unfinished tasks and forces transfer or reassignment before the status can become resigned — the compensating control for snapshots.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.243Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.619Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 246
-    end_line: 246
   - path: "doc/prd-0.1.md"
-    line: 563
-    end_line: 600
 apis:
   - protocol: http
     method: GET
@@ -61,3 +57,6 @@ deps:
     to: oa.workflow.task
     label: {zh: "查询名下待办并转办/改派", en: "List and reassign tasks"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ORG-002`（§5.5 组织与人员变更的处理）

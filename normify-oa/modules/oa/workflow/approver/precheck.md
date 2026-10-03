@@ -11,19 +11,13 @@ description:
   en: >
       Blocks submission when any node's candidate set is empty (department without a leader, GM vacancy), reporting "no valid approver for node XX" instead of silently skipping, and also blocks missing required fields and unauthorized org nodes (REQ-FLOW-012, AC-11).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.294Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.673Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 230
-    end_line: 230
   - path: "doc/prd-0.1.md"
-    line: 356
-    end_line: 356
   - path: "doc/data-model.md"
-    line: 716
-    end_line: 720
 apis:
   - protocol: http
     method: POST
@@ -60,3 +54,7 @@ deps:
     from_api: "POST /api/v1/flow-instances/precheck"
     label: {zh: "无权限组织节点", en: "Unauthorized org node"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-012`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_node`（§4. 流程定义）

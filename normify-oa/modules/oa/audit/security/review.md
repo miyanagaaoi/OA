@@ -11,13 +11,11 @@ description:
   en: >
       Joint query across permission-change and login logs with failed-login and anomalous-IP analysis, scoped by data domain, plus export of security logs for audit.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.165Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.553Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 441
-    end_line: 450
 apis:
   - protocol: http
     method: GET
@@ -58,3 +56,6 @@ deps:
     from_api: "GET /api/v1/audit/security-logs"
     label: {zh: "复核管理员操作留痕", en: "Review admin traces"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-LOG-005`（§6.9 审计日志）

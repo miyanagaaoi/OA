@@ -11,13 +11,11 @@ description:
   en: >
       Cost involved `involve_cost` (boolean, required, default no), amount `amount` (amount, conditionally required, see rule 1.5) and cost bearer `cost_bearer` (org, conditionally required, defaults to the initiator's company, limited to that company and below); involve_cost also decides whether the finance review node is skipped.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.211Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.590Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 88
-    end_line: 88
 apis:
   - protocol: http
     method: GET
@@ -60,3 +58,6 @@ deps:
     to_api: "POST /api/v1/forms/matter/fields/involve-cost/evaluate"
     label: {zh: "路由判定归属", en: "Routing decision owner"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 2. 事项审批单（`form_type = matter`）`（§2. 事项审批单）

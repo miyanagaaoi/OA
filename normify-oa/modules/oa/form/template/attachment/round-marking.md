@@ -11,13 +11,11 @@ description:
   en: >
       Supplement attachments carry a `round` marker: 0 for originals, 1..3 for the Nth supplement; at most one supplement per node and three per document; the printed attachment list labels each round.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.223Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.600Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 63
-    end_line: 63
 apis:
   - protocol: http
     method: POST
@@ -45,3 +43,6 @@ deps:
     from_api: "POST /api/v1/forms/attachments/{attachment_id}/round"
     label: {zh: "补件轮次上限", en: "Supplement round limit"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.4 附件通用限制`（§1.4 附件通用限制）

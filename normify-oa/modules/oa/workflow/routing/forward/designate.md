@@ -11,19 +11,13 @@ description:
   en: >
       Entry point of the routing action: the approver picks the next receiving department from the eligible set and must give a routing reason. Candidates are filtered by routing visibility (the department must be able to see the document) and by the departments already handled; on success action_type=route is written and the current department updated.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.307Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.686Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 322
-    end_line: 322
   - path: "doc/prd-0.1.md"
-    line: 357
-    end_line: 357
   - path: "doc/data-model.md"
-    line: 555
-    end_line: 579
 apis:
   - protocol: http
     method: POST
@@ -69,3 +63,7 @@ deps:
     to_api: "POST /api/v1/flow/instances/{instance_id}/routing-quota/check"
     label: {zh: "流转前过次数闸门", en: "Enforce routing quota gate"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-020`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_routing`（§5. 流程运行时）

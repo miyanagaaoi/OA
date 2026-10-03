@@ -11,8 +11,8 @@ description:
   en: >
       The document form inside the overlay: every field is read-only after submission (changes require an approver to reject and the initiator to resubmit) and read-only values use a canvas-subtle block; amounts are tnum right-aligned with two decimals and a ten-thousand-yuan conversion above one million; the header carries title, status badge and document number, with print / route / more as secondary actions on the right.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.268Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.646Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 759
     end_line: 759
   - path: "doc/prd-0.1.md"
-    line: 726
-    end_line: 726
 apis:
   - protocol: http
     method: GET
@@ -54,3 +52,6 @@ deps:
     to: oa.design.component
     label: {zh: "只读字段的呈现规范", en: "Read-only field styling"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

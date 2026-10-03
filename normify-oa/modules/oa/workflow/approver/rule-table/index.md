@@ -11,15 +11,16 @@ description:
   en: >
       Implementation of the nine approver rules in PRD 5.4: org-chain derivation (direct department leader, branch line leader, subsidiary GM), Finance ownership (always the group Finance owner), group layer (line leader by category, chairman) and manual rules (designated person/role, initiator pick, collaborating departments picked at approval time).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.295Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.674Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 204
-    end_line: 216
 deps:
   - kind: reference
     to: oa.workflow.definition.approver-rule
     label: {zh: "规则编码来自节点声明", en: "Rule codes come from nodes"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-011`（§6.4 流程引擎核心能力）

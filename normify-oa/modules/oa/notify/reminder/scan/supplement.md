@@ -11,16 +11,12 @@ description:
   en: >
       Scans pending supplement requests against flow_supplement.deadline (3 working days by default), marks them overdue and emits a reminder aimed only at the initiator; no auto-reject or auto-approve.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.259Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.637Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 523
-    end_line: 523
   - path: "doc/data-model.md"
-    line: 500
-    end_line: 524
 apis:
   - protocol: http
     method: GET
@@ -52,3 +48,7 @@ deps:
     to_api: "POST /api/v1/notifications/reminders"
     label: {zh: "触发补件催办", en: "Trigger supplement reminder"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_supplement`（§5. 流程运行时）

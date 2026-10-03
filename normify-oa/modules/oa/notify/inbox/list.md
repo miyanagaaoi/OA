@@ -11,16 +11,12 @@ description:
   en: >
       Paged inbox list (unread first, newest first) and detail with a deep link back to the document; phase one has no mobile push, so the user must open the system.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.254Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.631Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 403
-    end_line: 407
   - path: "doc/prd-0.1.md"
-    line: 411
-    end_line: 411
 apis:
   - protocol: http
     method: GET
@@ -47,3 +43,6 @@ deps:
     to: oa.portal.detail
     label: {zh: "跳回单据详情", en: "Deep link to document"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-MSG-001`（§6.7 消息通知）

@@ -10,13 +10,11 @@ description:
   en: >
       Returns leader candidates for an org node: the section's leaders first, escalating to the parent department when none is set; an empty candidate set blocks initiation rather than being silently skipped.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.235Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.611Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 204
-    end_line: 216
 apis:
   - protocol: http
     method: GET
@@ -64,3 +62,6 @@ deps:
     to_api: "GET /api/v1/identity/users/{id}/positions"
     label: {zh: "合并一人多岗候选人", en: "Merge multi-post holders"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ORG-001`（§5.1 组织架构模型）

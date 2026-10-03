@@ -11,13 +11,11 @@ description:
   en: >
       Return status `return_status` (select, required, default pending, editable during approval but only by the archive node) and return time `return_date` (datetime, required when the status is returned, editable during approval).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.221Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.598Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 166
-    end_line: 167
 apis:
   - protocol: http
     method: GET
@@ -46,3 +44,6 @@ deps:
     to_api: "GET /api/v1/forms/dicts/return-status/items"
     label: {zh: "归还状态取值来源", en: "Return status options"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.6 归还状态（字段 code `return_status` · 字典类型 `return_status`）`（§6.6 归还状态）

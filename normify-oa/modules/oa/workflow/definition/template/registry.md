@@ -11,16 +11,12 @@ description:
   en: >
       Resolves the document type (matter/fund/contract/seal) from flow_template.code/form_type and maintains the template name, node_count and the form_schema_json field definitions that drive form rendering and the field dictionary (see doc/forms.md).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.300Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.679Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 335
-    end_line: 368
   - path: "doc/prd-0.1.md"
-    line: 475
-    end_line: 475
 apis:
   - protocol: mysql
     path: "flow_template"
@@ -67,3 +63,7 @@ deps:
     from_api: "POST /api/v1/flow-templates"
     label: {zh: "拉取表单字段定义", en: "Fetch form fields into schema"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_template`（§4. 流程定义）
+- `doc/prd-0.1.md` → `REQ-FLOW-006`（§6.4 流程引擎核心能力）

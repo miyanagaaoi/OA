@@ -11,19 +11,15 @@ description:
   en: >
       The watermark layer shared by H5 and the detail page: name plus employee number, 5%–8% opacity, rotated -24° and tiled every 240×160px at caption size; it covers the screen without intercepting events (pointer-events none) and must never cover the bottom action bar buttons or form values.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.275Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.654Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 900
     end_line: 900
   - path: "doc/prd-0.1.md"
-    line: 418
-    end_line: 418
   - path: "doc/prd-0.1.md"
-    line: 724
-    end_line: 724
 apis:
   - protocol: http
     method: GET
@@ -41,3 +37,6 @@ deps:
     from_api: "GET /api/v1/portal/h5/watermark"
     label: {zh: "姓名与工号", en: "Name & employee number"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-004`（§6.8 移动端 H5 与登录保持）

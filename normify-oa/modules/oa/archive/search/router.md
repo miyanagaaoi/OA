@@ -11,16 +11,12 @@ description:
   en: >
       Single archive search entry that routes a query to the live store or the history store by document age and archive flag, returning the data source and read-only state.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.153Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.534Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 540
-    end_line: 540
   - path: "doc/data-model.md"
-    line: 824
-    end_line: 824
 apis:
   - protocol: http
     method: GET
@@ -53,3 +49,7 @@ deps:
     from_api: "GET /api/v1/archive/search"
     label: {zh: "按数据域过滤", en: "Filter by data scope"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-010`（§第9章 非功能需求）
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）

@@ -10,14 +10,13 @@ description:
   en: >
       Hard-coded phase-one field rules: contract and fund amounts are read-only and non-exportable for non-finance roles, and phone numbers are masked in the directory; no configurable field whitelist (P2).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.188Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.566Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 192
-    end_line: 199
   - path: "doc/prd-0.1.md"
-    line: 613
-    end_line: 613
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-AUTH-003`（§5.3 数据域口径）

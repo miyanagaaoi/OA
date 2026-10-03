@@ -10,16 +10,12 @@ description:
   en: >
       Every change to roles, data scopes, permission-tree ticks and org grants records actor, time and before/after values and is pushed to the audit log (producer side of REQ-LOG-004).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.176Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.557Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
   - path: "doc/prd-0.1.md"
-    line: 422
-    end_line: 431
 apis:
   - protocol: http
     method: GET
@@ -45,3 +41,6 @@ deps:
     to: oa.audit.oplog
     label: {zh: "变更前后值写入审计日志", en: "Push permission changes"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-LOG-004`（§6.9 审计日志）

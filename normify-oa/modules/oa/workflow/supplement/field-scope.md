@@ -11,13 +11,11 @@ description:
   en: >
       During a supplement only attachments and the supplement note are writable; amount, counterparty, category and every other already-approved main field stay read-only. If the initiator truly must change a main field the only path is reject, modify and resubmit from node one. The boundary is enforced server-side so supplements cannot smuggle content changes.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.315Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.694Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 349
-    end_line: 349
 apis:
   - protocol: http
     method: GET
@@ -45,3 +43,6 @@ deps:
     from_api: "GET /api/v1/flow/supplements/{supplement_id}/writable-fields"
     label: {zh: "事项主字段定义", en: "Matter main-field definitions"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）

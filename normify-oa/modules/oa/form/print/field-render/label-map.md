@@ -11,16 +11,12 @@ description:
   en: >
       Sheets use the paper form's Chinese labels; each field carries a printLabel defaulting to the screen label. Phase-one mapping: category→事项分类, amount→申请金额/合同金额, return_status→证件归还状态, period_start/period_end→履约期限 (one merged cell), counterparty→合同签订主体（乙方）, our_company→甲方/审批单位/用印单位 (derived from the initiator's company with no new column), attachments→附送材料 plus the attachment list.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.215Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.593Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 366
-    end_line: 367
   - path: "doc/forms.md"
-    line: 374
-    end_line: 391
 apis:
   - protocol: http
     method: GET
@@ -49,3 +45,6 @@ deps:
     to_api: "GET /api/v1/forms/templates/{form_type}/schema"
     label: {zh: "字段定义来源", en: "Field definition source"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 10. 打印稿（A4）字段要求`（§10. 打印稿）

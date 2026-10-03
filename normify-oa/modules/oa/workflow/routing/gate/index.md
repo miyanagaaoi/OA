@@ -11,14 +11,13 @@ description:
   en: >
       The two gates of the routing chain plus its trail: the total-count gate (routing plus rollback at most five, after which further hops are refused with a hint to reject or terminate) and the no-reflux gate (a department already handled can never be designated again, back-home being the only exception); all routing, rollback and supplement actions are audited.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.308Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.688Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 335
-    end_line: 338
   - path: "doc/prd-0.1.md"
-    line: 361
-    end_line: 361
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-024`（§6.4 流程引擎核心能力）

@@ -11,8 +11,8 @@ description:
   en: >
       The seal-and-licence approval sheet derives from the group sheet layout because no paper original exists: using unit, seal type, licence name, period of use and return status follow the group sheet three-column header and value cells, with the same signature bands and closing row; it measures 205mm and is driven by the seal-type and licence-name fields.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.195Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.574Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

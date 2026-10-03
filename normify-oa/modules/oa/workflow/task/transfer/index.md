@@ -11,11 +11,12 @@ description:
   en: >
       Two ways to change a task owner: transfer, raised by the approver with a mandatory reason and only to people inside the same data scope who can see the document; and reassignment, restricted to system administrators for departed or unavailable snapshot approvers, also with a mandatory audited reason.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.323Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.702Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 409
-    end_line: 409
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-018`（§6.6 异常路径）

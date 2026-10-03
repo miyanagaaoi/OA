@@ -11,16 +11,12 @@ description:
   en: >
       Maintains the form_schema_json behind each form type, validating required fields and checking that every option list still resolves against the shared data dictionary.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.119Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.492Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
   - path: "doc/data-model.md"
-    line: 286
-    end_line: 286
 apis:
   - protocol: http
     method: GET
@@ -61,3 +57,7 @@ deps:
     to: oa.admin.dict
     label: {zh: "字段选项取自数据字典", en: "Options from dictionary"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-002`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE form_data`（§4. 流程定义）

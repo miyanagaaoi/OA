@@ -11,8 +11,8 @@ description:
   en: >
       Nodes that require a signature leave a blank signature line on the sheet (signature ____ date); the fund sheet has three sections (group function department, group executives, chairman); already-signed blocks print a signature thumbnail with a timestamp, taking seals and signatures from signature records.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.218Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.596Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 1008
     end_line: 1008
   - path: "doc/forms.md"
-    line: 369
-    end_line: 369
 apis:
   - protocol: file
     path: "templates/print/partials/signature-block.html"
@@ -50,3 +48,6 @@ deps:
     from_api: "GET /api/v1/forms/print/{instance_id}/signatures"
     label: {zh: "签名与印章来源", en: "Signature source"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 10. 打印稿（A4）字段要求`（§10. 打印稿）

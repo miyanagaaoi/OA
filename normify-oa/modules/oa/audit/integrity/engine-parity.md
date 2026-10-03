@@ -11,13 +11,11 @@ description:
   en: >
       Captures the difference between MySQL triggers and PostgreSQL rules/REVOKE for immutability, and maintains the per-engine DDL scripts so append-only constraints survive a database migration.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.154Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.537Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 901
-    end_line: 901
 apis:
   - protocol: http
     method: GET
@@ -44,3 +42,6 @@ deps:
     from_api: "GET /api/v1/audit/immutability/engine-profile"
     label: {zh: "数据库选型与 DDL 下发", en: "Database choice and DDL"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `### 8.1 审计与签名的不可变约束（对应 AC-20）`（§8.1 审计与签名的不可变约束）

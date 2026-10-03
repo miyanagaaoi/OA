@@ -11,19 +11,13 @@ description:
   en: >
       Shared amount rules: > 0, at most two decimals, ≤ 99,999,999,999.99, stored as DECIMAL(18,2) fixed point, never persisted after float arithmetic; the error message is 「金额必须大于 0 且最多两位小数」; amounts never drive routing.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.227Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.603Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 43
-    end_line: 43
   - path: "doc/forms.md"
-    line: 61
-    end_line: 69
   - path: "doc/forms.md"
-    line: 401
-    end_line: 401
 apis:
   - protocol: http
     method: POST
@@ -46,3 +40,6 @@ apis:
           Normalizes an amount string to fixed point (no floats).
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.5 金额字段的统一规则（全局）`（§1.5 金额字段的统一规则）

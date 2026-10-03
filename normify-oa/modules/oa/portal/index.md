@@ -11,14 +11,15 @@ description:
   en: >
       The day-to-day approver surface: task workbench, initiation and form entry, document detail with approval trace, mobile H5 (watermark, signature, QR entry), remember-me sessions and device limits.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.275Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.654Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "doc/prd-0.1.md"
-    line: 432
-    end_line: 432
   - path: "DESIGN.md"
     line: 835
     end_line: 912
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `## 第13章 设计规范与UI约定`（§第13章 设计规范与UI约定）

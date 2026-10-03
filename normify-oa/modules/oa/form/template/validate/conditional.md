@@ -11,16 +11,12 @@ description:
   en: >
       Non-empty checks gated by dependency fields: involve_cost=是 → amount/cost_bearer, contract_type=其他 → contract_type_other, seal_type=证照借用 → cert_name, return_status=已归还 → return_date; message 「{标签}为必填」.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.227Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.604Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 47
-    end_line: 47
   - path: "doc/forms.md"
-    line: 82
-    end_line: 84
 apis:
   - protocol: http
     method: POST
@@ -39,3 +35,6 @@ deps:
     to_api: "POST /api/v1/forms/render/{form_type}/linkage"
     label: {zh: "复用联动求值", en: "Reuses linkage evaluation"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.3 通用校验规则`（§1.3 通用校验规则）

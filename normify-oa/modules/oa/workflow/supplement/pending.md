@@ -11,25 +11,15 @@ description:
   en: >
       The instance keeps its approving main status but takes the pending_supplement sub-status; the current node instance becomes waiting_supplement and that node's tasks become supplement_requested, i.e. no longer approvable. While waiting, the document stays read-only visible to other roles (other departments, CC recipients) but nobody may approve it.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.318Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.696Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 325
-    end_line: 325
   - path: "doc/prd-0.1.md"
-    line: 332
-    end_line: 332
   - path: "doc/prd-0.1.md"
-    line: 399
-    end_line: 399
   - path: "doc/prd-0.1.md"
-    line: 501
-    end_line: 501
   - path: "doc/data-model.md"
-    line: 396
-    end_line: 396
 apis:
   - protocol: http
     method: POST
@@ -67,3 +57,7 @@ deps:
     from_api: "POST /api/v1/flow/instances/{instance_id}/sub-status/supplement"
     label: {zh: "子状态与节点联动", en: "Apply sub-status cascade"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_supplement`（§5. 流程运行时）

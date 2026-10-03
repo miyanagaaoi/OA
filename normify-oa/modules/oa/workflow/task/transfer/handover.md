@@ -11,16 +11,12 @@ description:
   en: >
       An approver transfers the task: a reason is mandatory and the target must be someone inside the same data scope who can see the document. The original approver loses the task; the previous assignee and the reason are stored on flow_task and the transfer is written to the approval trail.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.323Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.702Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 409
-    end_line: 409
   - path: "doc/data-model.md"
-    line: 457
-    end_line: 462
 apis:
   - protocol: http
     method: POST
@@ -65,3 +61,7 @@ deps:
     to_api: "mysql:flow_task"
     label: {zh: "更新处理人与转办原因", en: "Update assignee and reason"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-018`（§6.6 异常路径）
+- `doc/data-model.md` → `CREATE TABLE flow_task`（§5. 流程运行时）

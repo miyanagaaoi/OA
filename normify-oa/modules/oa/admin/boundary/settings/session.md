@@ -11,16 +11,12 @@ description:
   en: >
       Adjustable items: concurrent device cap (default three, earliest device evicted), remember-me validity (default seven days with automatic renewal) and login failure lockout (default five attempts, fifteen-minute lockout).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.113Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.485Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 577
-    end_line: 577
   - path: "doc/prd-0.1.md"
-    line: 416
-    end_line: 417
 apis:
   - protocol: http
     method: GET
@@ -58,3 +54,6 @@ deps:
     from_api: "PUT /api/v1/admin/session-policy"
     label: {zh: "会话策略由身份域执行", en: "Session policy in identity"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-006`（§第9章 非功能需求）

@@ -11,13 +11,11 @@ description:
   en: >
       Pre-publish validation: trunk node continuity, mandatory approver rule, valid countersign threshold, timeout ≥24h, skip-condition field existence, no rule that always yields an empty candidate set and complete decision modes; the post-rejection destination is NOT part of per-node validation — phase 1 fixes it to "back to the initiator" with no per-node configuration (per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4); any failure blocks publishing with a concrete reason.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.302Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.680Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 234
-    end_line: 234
 apis:
   - protocol: http
     method: POST
@@ -66,3 +64,6 @@ deps:
     to_api: "GET /api/v1/flow-nodes/{node_id}/approver-rule"
     label: {zh: "校验解析规则", en: "Validate approver rule"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-008`（§6.4 流程引擎核心能力）

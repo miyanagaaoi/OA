@@ -11,16 +11,14 @@ description:
   en: >
       The four workbench tabs — pending my approval, my approvals, raised by me, cc to me: 40px tall with a 2px corporate-blue underline indicator and a count badge beside each label (no coloured dots); the tab bar stays fixed while the list scrolls independently.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.283Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.661Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 883
     end_line: 883
   - path: "doc/prd-0.1.md"
-    line: 667
-    end_line: 669
 apis:
   - protocol: http
     method: GET
@@ -77,3 +75,6 @@ deps:
     to_api: "mysql:flow_cc"
     label: {zh: "抄送关系记录", en: "Cc relation records"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

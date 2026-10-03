@@ -11,22 +11,14 @@ description:
   en: >
       Pre-transition guards: terminal states (approved/rejected/withdrawn/terminated) can never be resubmitted; withdrawal belongs to the initiator only and only before node ② passes; resubmission after rejection re-resolves the snapshot against the latest template version and drops already-approved nodes; termination is limited to the system admin and group line leader with a mandatory reason (REQ-FLOW-009/010/014/017, AC-15).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.311Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.691Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 353
-    end_line: 354
   - path: "doc/prd-0.1.md"
-    line: 389
-    end_line: 389
   - path: "doc/prd-0.1.md"
-    line: 481
-    end_line: 483
   - path: "doc/prd-0.1.md"
-    line: 506
-    end_line: 507
 apis:
   - protocol: http
     method: POST
@@ -72,3 +64,6 @@ deps:
     from_api: "kafka:oa.workflow.instance.guard-rejected"
     label: {zh: "拒绝与原因留痕", en: "Refusal & reason to log"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-009`（§6.4 流程引擎核心能力）

@@ -11,16 +11,12 @@ description:
   en: >
       Adjustable items: retention of audit logs and approval traces (never shorter than ten years) and of login logs (one year); values below the floor are refused on save.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.113Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.485Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 560
-    end_line: 560
   - path: "doc/data-model.md"
-    line: 925
-    end_line: 925
 apis:
   - protocol: http
     method: GET
@@ -61,3 +57,7 @@ deps:
     to: oa.archive.policy
     label: {zh: "归档保留期衔接", en: "Align with archive policy"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-007`（§6.9 审计日志）
+- `doc/data-model.md` → `CREATE TABLE sys_log`（§6. 签名、附件、抄送、消息、审计）

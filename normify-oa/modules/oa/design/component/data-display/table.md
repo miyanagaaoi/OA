@@ -11,16 +11,14 @@ description:
   en: >
       The table: canvas fill with a 1px outer border, 44px rows (36px compact rows for audit logs and details), a canvas-subtle header 40px tall that sticks while scrolling, canvas-subtle row hover and primary-subtle selection, a frozen first column (number/type) and a frozen right action column; amount columns are tnum right-aligned with two decimals.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.192Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.571Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 875
     end_line: 876
   - path: "doc/prd-0.1.md"
-    line: 668
-    end_line: 668
 apis:
   - protocol: file
     path: "styles/components/table.css"
@@ -38,3 +36,6 @@ deps:
     to_api: "file:styles/tokens/spacing.css"
     label: {zh: "行高与单元格内边距", en: "Row height & padding"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

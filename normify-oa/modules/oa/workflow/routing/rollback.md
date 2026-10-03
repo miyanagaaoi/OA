@@ -11,22 +11,14 @@ description:
   en: >
       Roll the document back to the previous completed node for re-approval: a reason is mandatory; the current node instance becomes returned, the previous node instance returns to active with returned_count +1, and once it passes the document automatically comes back. A node may be rolled back at most twice and each rollback counts towards the total gate.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.310Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.690Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 323
-    end_line: 323
   - path: "doc/prd-0.1.md"
-    line: 358
-    end_line: 358
   - path: "doc/data-model.md"
-    line: 553
-    end_line: 553
   - path: "doc/prd-0.1.md"
-    line: 505
-    end_line: 505
 apis:
   - protocol: http
     method: POST
@@ -59,3 +51,7 @@ deps:
     to_api: "POST /api/v1/flow/instances/{instance_id}/routing-quota/check"
     label: {zh: "回退前过次数闸门", en: "Enforce routing quota gate"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-021`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_routing`（§5. 流程运行时）

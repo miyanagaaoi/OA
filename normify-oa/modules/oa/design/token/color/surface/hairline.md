@@ -11,8 +11,8 @@ description:
   en: >
       Two hairline weights: hairline #e2e5ea for the default border of cards, tables and inputs, and hairline-strong #c8cdd6 for input hover, nested panel outlines and table group separators; the boundary between the sidebar and the content area is also a 1px hairline rather than a shadow.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.200Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.578Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

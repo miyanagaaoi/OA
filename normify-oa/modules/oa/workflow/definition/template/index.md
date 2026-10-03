@@ -11,18 +11,18 @@ description:
   en: >
       Template metadata and version accumulation: each code binds a document type and form template (form_schema_json drives rendering); changes create new versions without overwriting history. In-flight instances keep the version and approver snapshot captured at submission, and disabling a template never affects them (REQ-FLOW-006).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.300Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.678Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 276
-    end_line: 295
   - path: "doc/prd-0.1.md"
-    line: 368
-    end_line: 368
 deps:
   - kind: reference
     to: oa.form.template
     label: {zh: "模板绑定表单与字段", en: "Binds form template & schema"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_template`（§4. 流程定义）
+- `doc/prd-0.1.md` → `REQ-FLOW-006`（§6.4 流程引擎核心能力）

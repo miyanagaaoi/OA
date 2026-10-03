@@ -11,14 +11,14 @@ description:
   en: >
       Two ways for an approver to add a temporary approver: add-sign before inserts the signer ahead of the current approver, add-sign after hands the task over once the current approver has passed. Added signers must give an opinion; the chain is stored on the node instance and audited.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.320Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.698Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 365
-    end_line: 365
   - path: "doc/data-model.md"
-    line: 437
-    end_line: 437
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-003`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_task`（§5. 流程运行时）

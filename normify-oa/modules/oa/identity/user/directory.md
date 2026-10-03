@@ -10,13 +10,11 @@ description:
   en: >
       Directory search and member browsing: phone numbers are masked by default (138****8888) and only the owner or a system admin sees the full value; lists and search respect the caller's data scope.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.240Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.616Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 201
-    end_line: 201
 apis:
   - protocol: http
     method: GET
@@ -60,3 +58,6 @@ deps:
     to_api: "rpc:authz.visibility.mask.phone"
     label: {zh: "应用手机号脱敏规则", en: "Apply phone masking"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-AUTH-003`（§5.3 数据域口径）

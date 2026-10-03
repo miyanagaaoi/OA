@@ -11,8 +11,8 @@ description:
   en: >
       Structure blocks shared by the group sheets: the document heading with its three-column header row, the repeated document-receipt block (one per group-level routing), multi-section signature blocks, and merged cells with closing rows.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.217Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.595Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

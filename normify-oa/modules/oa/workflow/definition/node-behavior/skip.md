@@ -11,19 +11,13 @@ description:
   en: >
       Writes and resolves skip_condition JSON (for example {"field":"involve_cost","op":"eq","value":false}): the only phase-1 branch is a matter form's involve-cost flag — when false node ② (Finance review) is marked skipped while the owning department is still recorded as Finance (REQ-FLOW-001).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.299Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.677Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 264
-    end_line: 264
   - path: "doc/prd-0.1.md"
-    line: 307
-    end_line: 308
   - path: "doc/data-model.md"
-    line: 316
-    end_line: 316
 apis:
   - protocol: http
     method: GET
@@ -66,3 +60,7 @@ deps:
     from_api: "POST /api/v1/flow-nodes/{node_id}/skip-condition/validate"
     label: {zh: "校验字段在表单 schema", en: "Verify field in form schema"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-025`（§6.3 主干审批链）
+- `doc/data-model.md` → `CREATE TABLE flow_node`（§4. 流程定义）

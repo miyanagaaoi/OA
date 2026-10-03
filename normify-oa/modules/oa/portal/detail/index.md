@@ -11,14 +11,15 @@ description:
   en: >
       Document detail: field values, attachments by round, approval trail timeline, routing chain and supplement history, with the approval action bar (approve/reject/route/rollback/supplement/transfer/add-sign) and the name-plus-employee-ID watermark.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.268Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.646Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 895
     end_line: 904
   - path: "doc/prd-0.1.md"
-    line: 726
-    end_line: 726
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

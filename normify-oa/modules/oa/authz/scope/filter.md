@@ -10,16 +10,12 @@ description:
   en: >
       Compiles a scope into query filters: initiator or task assignee or CC user, org path prefix, company, or no filter at all; reused by document lists, search and detail authorisation.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.185Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.563Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 722
-    end_line: 733
   - path: "doc/prd-0.1.md"
-    line: 169
-    end_line: 183
 apis:
   - protocol: rpc
     path: "authz.scope.buildFilter"
@@ -52,3 +48,7 @@ deps:
     to_api: "GET /api/v1/authz/categories"
     label: {zh: "归口类别口径输入", en: "Category scope input"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_role`（§3. 权限）
+- `doc/prd-0.1.md` → `REQ-AUTH-001`（§5.2 权限模型）

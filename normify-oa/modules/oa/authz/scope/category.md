@@ -10,13 +10,11 @@ description:
   en: >
       Category scope: category values come from the data dictionary (no release needed, downstream consumer of REQ-ADMIN-004) and a role's category range lives in the role-category table; after centralizing on Finance it only applies to business-line roles such as group executives.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.185Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.562Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 264
-    end_line: 276
 apis:
   - protocol: http
     method: GET
@@ -64,3 +62,6 @@ deps:
     to_api: "mysql:sys_dict_item"
     label: {zh: "类别取值由数据字典维护", en: "Category options source"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_role_category`（§3. 权限）

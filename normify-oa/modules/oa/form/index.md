@@ -11,14 +11,14 @@ description:
   en: >
       Four approval document types (matter/fund/contract/seal) on one form-template engine: field dictionary, three-state write model, shared validation, attachment limits, amount rules, dictionary options, and A4 print layout.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.210Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.589Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"
-    line: 9
-    end_line: 421
   - path: "doc/prd-0.1.md"
-    line: 266
-    end_line: 279
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 1. 通用约定`（§1. 通用约定）
+- `doc/prd-0.1.md` → `### 6.2 四类审批单与事项类别的关系`（§6.2 四类审批单与事项类别的关系）

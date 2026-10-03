@@ -11,14 +11,14 @@ description:
   en: >
       Archive policy: completed documents are eligible for the history store three years after completion, become read-only once archived, and the archive schema is standardised for warehouse extraction.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.145Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.525Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 915
-    end_line: 915
   - path: "doc/prd-0.1.md"
-    line: 540
-    end_line: 540
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）
+- `doc/prd-0.1.md` → `REQ-NFR-010`（§第9章 非功能需求）

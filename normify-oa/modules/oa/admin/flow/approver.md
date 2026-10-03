@@ -11,16 +11,12 @@ description:
   en: >
       Configures the resolution rule for each node (department leader, group owner department, subsidiary GM, designated user or role, initiator pick) and previews the candidate set so an empty set is caught before go-live.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.118Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.491Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
   - path: "doc/prd-0.1.md"
-    line: 204
-    end_line: 216
 apis:
   - protocol: http
     method: GET
@@ -63,3 +59,6 @@ deps:
     to_api: "GET /api/v1/admin/orgs/{org_id}/leaders"
     label: {zh: "候选人取自组织负责人", en: "Leaders supply candidates"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-011`（§6.4 流程引擎核心能力）

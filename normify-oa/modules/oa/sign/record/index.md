@@ -11,14 +11,14 @@ description:
   en: >
       Per-node signature policy (mandatory/optional/none, with group line leader and chairman mandatory by default) and append-only signature records storing image, timestamp, approver, device fingerprint, IP and hash, bound to the document and never modified or deleted - re-signing adds a new version.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.292Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.672Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 367
-    end_line: 375
   - path: "doc/data-model.md"
-    line: 529
-    end_line: 620
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-004`（§6.5 电子签名与身份确认）
+- `doc/data-model.md` → `CREATE TABLE flow_signature`（§6. 签名、附件、抄送、消息、审计）

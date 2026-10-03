@@ -11,19 +11,13 @@ description:
   en: >
       Publish pipeline for design output: after validation passes, generate the pending version, submit a publish request and let the admin console complete publishing while recording before/after values and the operator; in-flight instances keep running on the old version (REQ-FLOW-006, REQ-ADMIN-002, REQ-LOG-004).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.302Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.680Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 349
-    end_line: 349
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
   - path: "doc/prd-0.1.md"
-    line: 579
-    end_line: 579
 apis:
   - protocol: http
     method: POST
@@ -69,3 +63,6 @@ deps:
     from_api: "kafka:oa.workflow.template.publish-requested"
     label: {zh: "变更前后值入日志", en: "Before/after values to log"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-002`（§6.10 管理后台）

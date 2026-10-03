@@ -11,16 +11,12 @@ description:
   en: >
       Aggregates rejection reasons captured in approval opinions into a distribution, so recurring rejection causes can be fixed at the source.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.139Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.518Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
   - path: "doc/prd-0.1.md"
-    line: 427
-    end_line: 427
 apis:
   - protocol: http
     method: GET
@@ -46,3 +42,6 @@ deps:
     to: oa.audit.trace
     label: {zh: "驳回意见取自审批轨迹", en: "Rejection opinions in trace"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-005`（§6.10 管理后台）

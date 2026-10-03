@@ -11,16 +11,12 @@ description:
   en: >
       Application layer forbids UPDATE/DELETE while database triggers reject modification and deletion of audit logs and signature records, forming a two-layer immutability baseline.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.155Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.538Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 739
-    end_line: 775
   - path: "doc/prd-0.1.md"
-    line: 450
-    end_line: 450
 apis:
   - protocol: http
     method: POST
@@ -56,3 +52,7 @@ deps:
     from_api: "GET /api/v1/audit/immutability/constraints"
     label: {zh: "管理员不可删除日志", en: "Admins cannot delete logs"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `### 8.1 审计与签名的不可变约束（对应 AC-20）`（§8.1 审计与签名的不可变约束）
+- `doc/prd-0.1.md` → `REQ-LOG-006`（§6.9 审计日志）

@@ -11,16 +11,12 @@ description:
   en: >
       Fields carry printVisible (default true); internal-note fields such as cost_bearer can be set false; involve_cost prints as part of the fund-approval body text rather than its own row.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.215Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.593Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 368
-    end_line: 368
   - path: "doc/forms.md"
-    line: 382
-    end_line: 382
 apis:
   - protocol: http
     method: GET
@@ -43,3 +39,6 @@ apis:
           Configures a field's printVisible.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 10. 打印稿（A4）字段要求`（§10. 打印稿）

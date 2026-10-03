@@ -11,16 +11,12 @@ description:
   en: >
       Computes average elapsed time for whole documents and for each node from node-instance start and finish timestamps, and ranks the slowest nodes.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.141Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.521Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
   - path: "doc/data-model.md"
-    line: 402
-    end_line: 403
 apis:
   - protocol: http
     method: GET
@@ -47,3 +43,7 @@ deps:
     to: oa.workflow.runtime
     label: {zh: "耗时取自节点实例时间戳", en: "Duration from node runs"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-005`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE flow_node_instance`（§5. 流程运行时）

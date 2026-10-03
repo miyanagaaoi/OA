@@ -11,19 +11,13 @@ description:
   en: >
       Masks or hides amount and account fields per role: contract and fund amounts are read-only and non-exportable for non-finance roles (export is admin-only); the payee account shows `****1234` by default with the full value only for finance roles and admins. Phase one hardcodes these rules without per-field whitelists.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.229Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.605Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"
-    line: 68
-    end_line: 68
   - path: "doc/forms.md"
-    line: 118
-    end_line: 118
   - path: "doc/prd-0.1.md"
-    line: 192
-    end_line: 198
 apis:
   - protocol: http
     method: GET
@@ -51,3 +45,7 @@ deps:
     from_api: "GET /api/v1/forms/instances/{instance_id}/fields/{field_id}/permission"
     label: {zh: "角色可见性规则", en: "Role visibility rules"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.2 字段的三态读写模型（**核心约束**）`（§1.2 字段的三态读写模型）
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）

@@ -11,16 +11,12 @@ description:
   en: >
       Aggregates process volume by period, company and matter category, using the company, category and status columns deliberately kept on the instance table for reporting.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.140Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.520Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
   - path: "doc/data-model.md"
-    line: 408
-    end_line: 411
 apis:
   - protocol: http
     method: GET
@@ -48,3 +44,7 @@ deps:
     to_api: "mysql:flow_instance"
     label: {zh: "读取流程实例", en: "Read flow instances"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-005`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE flow_instance`（§5. 流程运行时）

@@ -11,16 +11,12 @@ description:
   en: >
       Records login and logout time, source IP, device information and failure reason, covering multi-device login, over-limit eviction and lockout scenarios; retained for one year.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.163Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.552Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 449
-    end_line: 449
   - path: "doc/data-model.md"
-    line: 152
-    end_line: 170
 apis:
   - protocol: http
     method: POST
@@ -47,3 +43,7 @@ deps:
     to_api: "mysql:sys_login_log"
     label: {zh: "读取登录记录", en: "Read login records"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-LOG-005`（§6.9 审计日志）
+- `doc/data-model.md` → `CREATE TABLE sys_login_log`（§2. 身份与组织）

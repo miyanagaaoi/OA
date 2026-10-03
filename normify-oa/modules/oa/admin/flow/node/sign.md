@@ -11,19 +11,13 @@ description:
   en: >
       Sets whether a node requires a signature, allows an optional one or forbids it, with the group executive and chairman nodes defaulting to a mandatory signature.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.121Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.494Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 386
-    end_line: 386
   - path: "doc/prd-0.1.md"
-    line: 556
-    end_line: 556
   - path: "doc/data-model.md"
-    line: 311
-    end_line: 311
 apis:
   - protocol: http
     method: GET
@@ -51,3 +45,7 @@ deps:
     from_api: "PUT /api/v1/admin/flow-nodes/{node_id}/sign-policy"
     label: {zh: "签名采集执行该策略", en: "Signature capture policy"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-003`（§6.5 电子签名与身份确认）
+- `doc/data-model.md` → `CREATE TABLE flow_node`（§4. 流程定义）

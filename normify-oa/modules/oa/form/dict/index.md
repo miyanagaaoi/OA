@@ -11,11 +11,12 @@ description:
   en: >
       Dictionary options used by all forms - matter category, contract type, seal type, certificate type, payment ownership and planned category - maintained by admins at runtime without code changes; category values are configurable and historical documents keep the chosen value.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.205Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.583Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 176
-    end_line: 263
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 6. 数据字典与布尔字段取值（6.7 / 6.8 不是字典）`（§6. 数据字典与布尔字段取值）

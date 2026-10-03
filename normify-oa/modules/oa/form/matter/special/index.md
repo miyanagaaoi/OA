@@ -11,14 +11,14 @@ description:
   en: >
       Matter-only business rules: cost involvement as the document's single branch criterion (whether the finance review node is skipped), the category being frozen after submission (reclassification requires rejecting back to the initiator), and CC users being written and notified.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.213Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.592Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"
-    line: 89
-    end_line: 92
   - path: "doc/prd-0.1.md"
-    line: 274
-    end_line: 274
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 9. 实单字段的处置决定（Q8–Q10 已关闭）`（§9. 实单字段的处置决定）
+- `doc/prd-0.1.md` → `REQ-FORM-001`（§6.2 四类审批单与事项类别的关系）

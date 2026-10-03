@@ -10,16 +10,14 @@ description:
   en: >
       Four-level org cascader with per-level search (240px panels); nodes outside the caller's data scope are not rendered at all (invisible rather than disabled) so the picker cannot be used to probe the org tree.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.231Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.607Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 845
     end_line: 912
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
 apis:
   - protocol: http
     method: GET
@@ -53,3 +51,6 @@ deps:
     to_api: "rpc:authz.scope.buildFilter"
     label: {zh: "按数据域过滤可见节点", en: "Filter by data scope"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ORG-001`（§5.1 组织架构模型）

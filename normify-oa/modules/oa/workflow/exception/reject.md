@@ -11,19 +11,13 @@ description:
   en: >
       A rejection requires an opinion of at least five characters, blank rejections are forbidden. After rejection the destination is always the initiator, with no choice offered to the approver: the instance becomes rejected and the initiator may modify and resubmit or terminate. Rejections are written to the trail and to the rejection record used for the rejection-rate report.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.304Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.682Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 384
-    end_line: 385
   - path: "doc/prd-0.1.md"
-    line: 496
-    end_line: 496
   - path: "doc/data-model.md"
-    line: 460
-    end_line: 460
 apis:
   - protocol: http
     method: POST
@@ -64,3 +58,7 @@ deps:
     from_api: "kafka:oa.workflow.instance.rejected"
     label: {zh: "写审批轨迹与驳回记录", en: "Write the approval trail"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-014`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_instance`（§5. 流程运行时）

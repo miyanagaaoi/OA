@@ -11,16 +11,12 @@ description:
   en: >
       Manages the sort order and active state of dictionary items and reports reference counts so an operator can judge whether disabling an option is safe.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.118Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.490Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 261
-    end_line: 262
   - path: "doc/prd-0.1.md"
-    line: 438
-    end_line: 438
 apis:
   - protocol: http
     method: PUT
@@ -58,3 +54,7 @@ deps:
     from_api: "GET /api/v1/admin/dict-items/{item_id}/usage"
     label: {zh: "表单侧引用校验", en: "Reference check on forms"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_dict_item`（§3. 权限）
+- `doc/prd-0.1.md` → `REQ-ADMIN-004`（§6.10 管理后台）

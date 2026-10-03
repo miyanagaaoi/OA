@@ -10,14 +10,14 @@ description:
   en: >
       User profiles, accounts, contact directory and Excel import/export; mobile numbers are masked by default, and resignation is blocked until all of the user's tasks are handled.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.241Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.617Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 246
-    end_line: 246
   - path: "doc/data-model.md"
-    line: 28
-    end_line: 163
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-001`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_user`（§2. 身份与组织）

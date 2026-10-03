@@ -11,16 +11,12 @@ description:
   en: >
       Imports and exports the whole dictionary through Excel, keyed idempotently by dict_type plus item_code so repeated imports do not duplicate options.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.116Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.488Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 438
-    end_line: 438
   - path: "doc/data-model.md"
-    line: 256
-    end_line: 267
 apis:
   - protocol: file
     path: "import/dict-items.xlsx"
@@ -61,3 +57,7 @@ apis:
           Export all dictionary types and items.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-004`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_dict_item`（§3. 权限）

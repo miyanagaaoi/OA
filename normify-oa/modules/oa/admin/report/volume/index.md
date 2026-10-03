@@ -11,14 +11,14 @@ description:
   en: >
       Phase-one reports (P1) built from flow instances and tasks: process volume, average duration, timeout rate, approver efficiency, rejection rate and rejection-reason distribution.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.142Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.522Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
   - path: "doc/data-model.md"
-    line: 381
-    end_line: 418
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-005`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE flow_instance`（§5. 流程运行时）

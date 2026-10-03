@@ -11,19 +11,13 @@ description:
   en: >
       Writes in-app messages (sys_message) for new tasks, rejection, withdrawal, collaboration tasks, timeout reminders and results, keyed by msg_type with ref_instance_id for deep links, and publishes a creation event.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.255Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.632Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 407
-    end_line: 407
   - path: "doc/prd-0.1.md"
-    line: 411
-    end_line: 411
   - path: "doc/data-model.md"
-    line: 686
-    end_line: 698
 apis:
   - protocol: mysql
     path: "sys_message"
@@ -63,3 +57,7 @@ deps:
     to: oa.identity.user
     label: {zh: "收件人", en: "Recipient"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-MSG-001`（§6.7 消息通知）
+- `doc/data-model.md` → `CREATE TABLE sys_message`（§6. 签名、附件、抄送、消息、审计）

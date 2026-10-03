@@ -11,14 +11,14 @@ description:
   en: >
       Supplement requests: the instance pauses in a pending-supplement sub-status, only attachments and a supplement note may be written, submission returns to the requesting node (not the start), supplements do not count as rejections, limits are once per node and three per document with a three-working-day deadline.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.316Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.695Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 328
-    end_line: 333
   - path: "doc/data-model.md"
-    line: 375
-    end_line: 528
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_supplement`（§5. 流程运行时）

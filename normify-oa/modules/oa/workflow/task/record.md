@@ -11,16 +11,12 @@ description:
   en: >
       The approval-task ledger: one row per approver on countersign nodes, the task state machine (pending/agreed/rejected/transferred/reassigned/added_sign/routed/returned/supplement/closed), opinion and decision time, the to-do list and task detail, plus automatic closing when another approver has decided or the document reached a terminal state.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.323Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.701Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 525
-    end_line: 554
   - path: "doc/prd-0.1.md"
-    line: 510
-    end_line: 510
 apis:
   - protocol: mysql
     path: "flow_task"
@@ -67,3 +63,7 @@ deps:
     from_api: "POST /api/v1/flow/tasks/{task_id}/close"
     label: {zh: "任务关闭驱动状态联动", en: "Close task and cascade state"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_task`（§5. 流程运行时）
+- `doc/prd-0.1.md` → `### 7.2 状态机`（§7.2 状态机）

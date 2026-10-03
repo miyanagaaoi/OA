@@ -10,8 +10,8 @@ description:
   en: >
       Initial-password generation shared by manual user creation and the user.csv bulk import: random, at least 8 characters and guaranteed to contain both letters and digits (REQ-NFR-005), then self-checked against the password policy; returned exactly once in the response, stored only as a BCrypt hash, with forced change on first login (import-spec T-03) and never mailed in clear text.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.241Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.617Z"
 fingerprint: 79970c212718a599d15647cd2da192d40d444c22f36c9471b7097ebfdffe241c
 source:
   - path: "oa-server/src/main/java/com/oa/identity/app/InitialPasswordGenerator.java"

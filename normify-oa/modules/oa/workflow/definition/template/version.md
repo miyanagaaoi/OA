@@ -11,19 +11,13 @@ description:
   en: >
       Version accumulation and lifecycle (draft/published/archived): open a new draft from a published version, bump version and record published_at on publish, never overwrite history; in-flight instances stay on the version captured at submission (REQ-FLOW-006, AC-09).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.301Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.679Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 349
-    end_line: 349
   - path: "doc/data-model.md"
-    line: 333
-    end_line: 333
   - path: "doc/prd-0.1.md"
-    line: 579
-    end_line: 579
 apis:
   - protocol: http
     method: POST
@@ -76,3 +70,7 @@ deps:
     from_api: "POST /api/v1/flow-templates/{template_id}/publish"
     label: {zh: "发布落管理后台", en: "Admin console publishes"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-006`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_template`（§4. 流程定义）

@@ -11,16 +11,12 @@ description:
   en: >
       CC users see documents read-only and get no todo; while a document awaits supplements it stays read-only for other roles and cannot be approved, so a pending-supplement document cannot be signed off by someone else.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.189Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.566Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 312
-    end_line: 333
   - path: "doc/prd-0.1.md"
-    line: 401
-    end_line: 409
 apis:
   - protocol: rpc
     path: "authz.visibility.canApprove"
@@ -46,3 +42,6 @@ deps:
     to: oa.workflow.runtime
     label: {zh: "读取子状态与抄送关系", en: "Read sub-status and CC"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）

@@ -11,16 +11,12 @@ description:
   en: >
       Owns the operational parameter set changed without a release: total routing plus rollback limit of 5, per-node rollback limit of 2, return-to-own-department limit of 2, supplement limits of 1 per node and 3 per document, and the 3-working-day supplement deadline.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.121Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.496Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 551
-    end_line: 555
   - path: "doc/data-model.md"
-    line: 553
-    end_line: 553
 apis:
   - protocol: http
     method: GET
@@ -62,3 +58,7 @@ deps:
     from_api: "PUT /api/v1/admin/flow-policies/{policy_key}"
     label: {zh: "闸门上限供异常处理", en: "Gate limits for exception"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 9.1 可配置项汇总（运营期由管理员调整，不经开发）`（§9.1 可配置项汇总）
+- `doc/data-model.md` → `CREATE TABLE flow_instance`（§5. 流程运行时）

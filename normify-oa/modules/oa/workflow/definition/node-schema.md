@@ -11,16 +11,12 @@ description:
   en: >
       The flow_node definition itself: sequence seq mapped to PRD 6.3's ①-⑦, node_code, display name and node_type (approve / condition reserved for phase 2 / cc / archive), keeping seq unique within a template and supporting node add, update and delete.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.299Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.678Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 369
-    end_line: 396
   - path: "doc/prd-0.1.md"
-    line: 457
-    end_line: 457
 apis:
   - protocol: mysql
     path: "flow_node"
@@ -78,3 +74,7 @@ deps:
     to_api: "GET /api/v1/flow-templates/{template_id}"
     label: {zh: "校验模板为草稿态", en: "Verify template is a draft"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_node`（§4. 流程定义）
+- `doc/prd-0.1.md` → `REQ-FLOW-008`（§6.4 流程引擎核心能力）

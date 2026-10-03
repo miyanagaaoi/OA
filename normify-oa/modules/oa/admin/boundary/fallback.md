@@ -11,19 +11,13 @@ description:
   en: >
       Defines the super-admin fallback capability set, pre-checks whether a requested operation is forbidden, and provides the audited fallback reassignment used when snapshot approvers cannot act.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.110Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.482Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 459
-    end_line: 459
   - path: "doc/prd-0.1.md"
-    line: 202
-    end_line: 202
   - path: "doc/prd-0.1.md"
-    line: 238
-    end_line: 238
 apis:
   - protocol: http
     method: GET
@@ -64,3 +58,6 @@ deps:
     to: oa.admin.boundary.guard
     label: {zh: "禁区校验由边界闸门执行", en: "Boundary rules are enforced"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-006`（§6.10 管理后台）

@@ -11,19 +11,13 @@ description:
   en: >
       Matter category `category`: business / economy / admin / hr / invest (added by Q10); configurable and extendable, with all five categories owned centrally by the finance department. Category never determines ownership - it is only a label and reporting dimension (V0.4: the code for 经营 changed from operate to business).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.205Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.583Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 180
-    end_line: 192
   - path: "doc/forms.md"
-    line: 298
-    end_line: 298
   - path: "doc/forms.md"
-    line: 314
-    end_line: 317
 apis:
   - protocol: http
     method: GET
@@ -46,3 +40,6 @@ apis:
           Returns the category's central owner (always finance).
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.1 事项类别（字段 code `category` · 字典类型 `matter_category`）`（§6.1 事项类别）

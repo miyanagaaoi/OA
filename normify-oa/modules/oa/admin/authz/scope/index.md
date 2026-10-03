@@ -11,17 +11,15 @@ description:
   en: >
       Configure each role's data scope (self, department, company, group-wide, group-wide by category), bind the matter categories used by category-scoped roles, and simulate the resulting visibility.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.108Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.479Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 437
-    end_line: 437
   - path: "doc/prd-0.1.md"
-    line: 169
-    end_line: 183
   - path: "doc/data-model.md"
-    line: 170
-    end_line: 186
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-003`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_role`（§3. 权限）

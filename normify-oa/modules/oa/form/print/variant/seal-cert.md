@@ -11,8 +11,8 @@ description:
   en: >
       No paper counterpart exists, so the layout derives from the group sheets; measured height 205mm leaves ample single-page room; it must show seal type, certificate name and certificate return status.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.219Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.597Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 1046
     end_line: 1046
   - path: "doc/forms.md"
-    line: 445
-    end_line: 445
 apis:
   - protocol: file
     path: "templates/print/seal-cert.html"
@@ -45,3 +43,6 @@ apis:
           Renders a seal & certificate document.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 10.1 打印版式映射（四类单据 × 集团/子公司层）`（§10.1 打印版式映射）

@@ -11,16 +11,12 @@ description:
   en: >
       Create, update and delete org nodes, maintaining node type (group/company/department/section), parent, sort order and materialised path; a node with in-flight documents or members cannot be deleted, only disabled.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.135Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.514Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 435
-    end_line: 435
   - path: "doc/data-model.md"
-    line: 34
-    end_line: 54
 apis:
   - protocol: http
     method: GET
@@ -72,3 +68,7 @@ deps:
     to_api: "mysql:sys_org"
     label: {zh: "写入组织架构表", en: "Write org structure table"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ORG-001`（§5.1 组织架构模型）
+- `doc/data-model.md` → `CREATE TABLE sys_org`（§2. 身份与组织）

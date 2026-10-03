@@ -11,13 +11,11 @@ description:
   en: >
       Moves attachment files to cold storage together with their metadata, keeping the stored paths resolvable from the history store; public direct links stay forbidden.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.144Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.523Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 922
-    end_line: 922
 apis:
   - protocol: http
     method: POST
@@ -49,3 +47,6 @@ deps:
     from_api: "POST /api/v1/archive/attachments/migrate"
     label: {zh: "冷存储目录纳入备份", en: "Back up cold storage dir"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）

@@ -11,13 +11,11 @@ description:
   en: >
       Records, queries and manually retries failed mail (failures are inspectable, REQ-MSG-002); failures never block the flow nor retry indefinitely.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.256Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.633Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 427
-    end_line: 427
 apis:
   - protocol: http
     method: POST
@@ -54,3 +52,6 @@ deps:
     to: oa.admin.report
     label: {zh: "通知失败率统计", en: "Mail failure statistics"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-MSG-002`（§6.7 消息通知）

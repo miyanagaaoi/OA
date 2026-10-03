@@ -11,16 +11,12 @@ description:
   en: >
       Template composition for the four document types (matter/fund/contract/seal): form template plus process template, distinguished by composition rather than branching; template versions and publishing; started documents are unaffected by later template changes.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.227Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.602Z"
 fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
 source:
   - path: "doc/forms.md"
-    line: 395
-    end_line: 402
   - path: "doc/prd-0.1.md"
-    line: 266
-    end_line: 279
 apis:
   - protocol: http
     method: GET
@@ -68,3 +64,7 @@ deps:
     from_api: "GET /api/v1/forms/templates/{form_type}"
     label: {zh: "表单模板与流程模板组合", en: "Form and process templates"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 11. 表单模板实现要求`（§11. 表单模板实现要求）
+- `doc/prd-0.1.md` → `### 6.2 四类审批单与事项类别的关系`（§6.2 四类审批单与事项类别的关系）

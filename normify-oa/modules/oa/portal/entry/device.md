@@ -11,13 +11,11 @@ description:
   en: >
       Multi-device sign-in (REQ-USER-003): the number of concurrently online devices per account is configurable with a default of three; exceeding it kicks out the device that signed in earliest with an explanation, the kicked session dies at once and every kick is written to the login log.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.271Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.649Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
 apis:
   - protocol: http
     method: GET
@@ -54,3 +52,6 @@ deps:
     from_api: "DELETE /api/v1/portal/entry/devices/{device_id}"
     label: {zh: "踢出设备写入登录日志", en: "Log device kick-out"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-003`（§6.8 移动端 H5 与登录保持）

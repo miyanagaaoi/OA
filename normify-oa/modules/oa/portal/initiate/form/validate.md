@@ -11,13 +11,11 @@ description:
   en: >
       Pre-submit field validation: client-side checks are convenience only, while required, length, amount and date rules are always re-validated on the server; on submit the page scrolls to the first failing field; the error state is a semantic-red border with a 12px red message below; an amount of zero or blank blocks submission.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.278Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.657Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "doc/forms.md"
-    line: 398
-    end_line: 398
   - path: "DESIGN.md"
     line: 847
     end_line: 847
@@ -55,3 +53,6 @@ deps:
     from_api: "GET /api/v1/portal/initiate/validate/required-rules"
     label: {zh: "资金单金额必填与为零禁止提交", en: "Fund amount required, non-zero"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 11. 表单模板实现要求`（§11. 表单模板实现要求）

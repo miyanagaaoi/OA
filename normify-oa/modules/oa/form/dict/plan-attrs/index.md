@@ -11,14 +11,13 @@ description:
   en: >
       Dictionaries for the fund form's two paper-form fields: plan category (in-plan/out-of-plan, defaulting to in-plan) and payment belong (current month/year/prior years, defaulting to current month); phase one stores the values only, with the dictionaries feeding print and display.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.206Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.584Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 243
-    end_line: 260
   - path: "doc/forms.md"
-    line: 354
-    end_line: 355
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.7 计划类别 `plan_category`（**非字典项**：布尔 checkbox，一期仅存储）`（§6.7 计划类别 `plan_category`）

@@ -11,8 +11,8 @@ description:
   en: >
       The fund sheet's three-part signature block (group function department / group line leader / chairman), each with a blank signature line and date. Formal A4 printouts always leave the signature area blank for handwriting; only the on-screen preview shows the signed thumbnail with its timestamp. The print sheet keeps the paper form's label "group function department" even though Finance is the single owner.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.196Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.574Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 1037
     end_line: 1037
   - path: "doc/forms.md"
-    line: 369
-    end_line: 369
 apis:
   - protocol: file
     path: "print/templates/group-fund-a4.html"
@@ -39,3 +37,6 @@ deps:
     to: oa.sign.record
     label: {zh: "签名按欄位打印", en: "Signatures printed in place"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 10.1 打印版式映射（四类单据 × 集团/子公司层）`（§10.1 打印版式映射）

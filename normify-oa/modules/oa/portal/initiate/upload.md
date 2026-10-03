@@ -11,8 +11,8 @@ description:
   en: >
       A block-style upload button with capacity copy (at most 30 files, 500MB each) instead of a large dashed drop zone; uploaded files appear as list rows (icon, name, size, delete) with no image thumbnail grid; over-limit uploads state the exact cap, and supplement attachments carry their round number.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.279Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.658Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 853
     end_line: 853
   - path: "doc/forms.md"
-    line: 433
-    end_line: 433
 apis:
   - protocol: http
     method: POST
@@ -56,3 +54,6 @@ deps:
     to_api: "mysql:flow_attachment"
     label: {zh: "附件存取与补件轮次", en: "Attachment storage access"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.4 附件通用限制`（§1.4 附件通用限制）

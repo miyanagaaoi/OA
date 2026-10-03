@@ -11,16 +11,12 @@ description:
   en: >
       Declares and validates the node's approver_rule and approver_param: dept_leader/department_leader/finance_leader/company_exec/gm/group_dept_leader/group_dept/group_exec/chairman/designated/initiator_pick; designated requires user_ids or role_code. Only the rule code is declared here — resolution runs at submission in the approver module (REQ-FLOW-011).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.296Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.675Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 307
-    end_line: 308
   - path: "doc/prd-0.1.md"
-    line: 204
-    end_line: 216
 apis:
   - protocol: http
     method: GET
@@ -63,3 +59,7 @@ deps:
     from_api: "POST /api/v1/flow-nodes/{node_id}/approver-rule/validate"
     label: {zh: "校验角色/组织编码", en: "Verify role/org code exists"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_node`（§4. 流程定义）
+- `doc/prd-0.1.md` → `REQ-FLOW-011`（§6.4 流程引擎核心能力）

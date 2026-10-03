@@ -11,16 +11,12 @@ description:
   en: >
       The write channel while awaiting supplement: only `attachments` and `supplement_note` are writable; `supplement_note` (≥5 and ≤500 characters) lands in `flow_supplement.submitted_note` and enters the approval trail, with attachments stored per round.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.229Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.606Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 33
-    end_line: 33
   - path: "doc/forms.md"
-    line: 343
-    end_line: 343
 apis:
   - protocol: http
     method: POST
@@ -43,3 +39,6 @@ deps:
     to_api: "mysql:flow_supplement"
     label: {zh: "读取补件记录", en: "Read supplement records"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 8. 补件说明字段（跨表单共用）`（§8. 补件说明字段）

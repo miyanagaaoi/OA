@@ -11,13 +11,11 @@ description:
   en: >
       Required checks (empty string and all-whitespace count as empty) and max-length checks, with the messages 「请填写{标签}」 and 「{标签}不能超过 {N} 个字符」; Chinese counts by character.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.228Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.604Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 46
-    end_line: 46
 apis:
   - protocol: http
     method: POST
@@ -40,3 +38,6 @@ apis:
           Max-length validation.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.3 通用校验规则`（§1.3 通用校验规则）

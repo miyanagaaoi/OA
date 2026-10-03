@@ -10,16 +10,12 @@ description:
   en: >
       Issues the login session after successful verification (cookie vs token is a technical decision), maintains the server-side session registry and provides the current-user context and logout.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.239Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.615Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 413
-    end_line: 420
   - path: "doc/data-model.md"
-    line: 59
-    end_line: 83
 apis:
   - protocol: http
     method: POST
@@ -72,3 +68,7 @@ deps:
     to_api: "GET /api/v1/identity/users"
     label: {zh: "载入登录人上下文", en: "Load caller context"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-002`（§6.8 移动端 H5 与登录保持）
+- `doc/data-model.md` → `CREATE TABLE sys_user_session`（§2. 身份与组织）

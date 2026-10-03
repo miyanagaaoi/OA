@@ -11,16 +11,12 @@ description:
   en: >
       When seal_type is certificate borrow, `cert_name` is required and `seal_count` is hidden; for the four seal types (company/contract/finance/legal) `seal_count` is required (integer 1–999) and `cert_name` is hidden.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.221Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.599Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 159
-    end_line: 160
   - path: "doc/forms.md"
-    line: 164
-    end_line: 164
 apis:
   - protocol: http
     method: POST
@@ -49,3 +45,6 @@ deps:
     to_api: "POST /api/v1/forms/render/{form_type}/linkage"
     label: {zh: "复用联动求值", en: "Reuses linkage evaluation"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.4 用印类型（字段 code `seal_type` · 字典类型 `seal_type`）`（§6.4 用印类型）

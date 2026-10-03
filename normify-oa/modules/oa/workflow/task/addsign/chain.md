@@ -11,16 +11,12 @@ description:
   en: >
       Maintains the add-sign chain on the node instance: the type (before/after), the added signer, insertion position and time. Every add-sign action is written to the audit log and the approval trail for later accountability.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.319Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.698Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 437
-    end_line: 437
   - path: "doc/prd-0.1.md"
-    line: 392
-    end_line: 392
 apis:
   - protocol: http
     method: GET
@@ -51,3 +47,7 @@ deps:
     from_api: "kafka:oa.workflow.task.add-signed"
     label: {zh: "加签链记入审批轨迹", en: "Record chain in trail"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE flow_task`（§5. 流程运行时）
+- `doc/prd-0.1.md` → `REQ-FLOW-003`（§6.4 流程引擎核心能力）

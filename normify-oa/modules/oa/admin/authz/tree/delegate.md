@@ -11,13 +11,11 @@ description:
   en: >
       Controls who may assign permissions to whom: branch process admins receive a company-scoped delegation range and are explicitly barred from re-delegating further down.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.110Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.481Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 165
-    end_line: 166
 apis:
   - protocol: http
     method: GET
@@ -55,3 +53,6 @@ deps:
     from_api: "POST /api/v1/admin/delegations/{role_id}/check"
     label: {zh: "再分配边界校验", en: "Boundary on re-delegation"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-003`（§6.10 管理后台）

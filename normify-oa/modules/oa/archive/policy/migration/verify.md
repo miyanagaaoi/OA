@@ -11,13 +11,11 @@ description:
   en: >
       Reconciles row counts, document numbers and hashes between the live store and the history store after migration; a mismatch blocks subsequent batches and raises an alert.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.147Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.527Z"
 fingerprint: 3b00610613fe0f45aad673a1508d23c3d3cd2c88a03dfe3d41047751592de232
 source:
   - path: "doc/data-model.md"
-    line: 823
-    end_line: 826
 apis:
   - protocol: http
     method: POST
@@ -50,3 +48,6 @@ deps:
     from_api: "GET /api/v1/archive/jobs/{job_id}/verify"
     label: {zh: "不一致时人工复核", en: "Manual review on mismatch"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `## 10. 归档策略（对应 REQ-NFR-010）`（§10. 归档策略）

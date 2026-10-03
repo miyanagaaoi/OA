@@ -11,16 +11,12 @@ description:
   en: >
       When a document is resubmitted the previously reviewed nodes are not kept: node instances, tasks and routing counters from the earlier attempt are cleared according to policy and node instances plus tasks are recreated from node one, so no stale decision is reused.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.304Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.682Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 389
-    end_line: 389
   - path: "doc/prd-0.1.md"
-    line: 480
-    end_line: 480
 apis:
   - protocol: http
     method: POST
@@ -48,3 +44,6 @@ deps:
     from_api: "POST /api/v1/flow/instances/{instance_id}/node-instances/reset"
     label: {zh: "重建节点实例与任务", en: "Rebuild nodes and tasks"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-017`（§6.6 异常路径）

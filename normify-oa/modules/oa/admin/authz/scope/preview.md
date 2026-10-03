@@ -11,16 +11,12 @@ description:
   en: >
       Lets an administrator verify a data-scope configuration before it goes live by simulating which documents a role would see and by showing the role-by-scope matrix.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.109Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.480Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 169
-    end_line: 183
   - path: "doc/data-model.md"
-    line: 722
-    end_line: 738
 apis:
   - protocol: http
     method: POST
@@ -48,3 +44,7 @@ deps:
     from_api: "POST /api/v1/admin/data-scope/preview"
     label: {zh: "按数据域口径试算", en: "Simulate the data scope"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-003`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE sys_role`（§3. 权限）

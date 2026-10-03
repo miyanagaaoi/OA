@@ -11,16 +11,12 @@ description:
   en: >
       Creates and edits flow template drafts, including node list and ordering, and hands the layout to the graphical designer; unpublished drafts can be deleted outright.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.122Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.497Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
   - path: "doc/data-model.md"
-    line: 278
-    end_line: 295
 apis:
   - protocol: http
     method: GET
@@ -75,3 +71,7 @@ deps:
     to_api: "mysql:flow_template"
     label: {zh: "发布流程模板版本", en: "Publish template version"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-ADMIN-002`（§6.10 管理后台）
+- `doc/data-model.md` → `CREATE TABLE flow_template`（§4. 流程定义）

@@ -11,11 +11,12 @@ description:
   en: >
       Shared attachment rules: ≤50MB per file, ≤20 files per upload, ≤50 per document including supplements, 13 allowed formats, 9 forbidden formats (extension plus MIME), private on-premise storage with authorized download, and supplement round marking.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.222Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.600Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 49
-    end_line: 59
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.4 附件通用限制`（§1.4 附件通用限制）

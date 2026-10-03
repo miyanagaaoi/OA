@@ -11,16 +11,12 @@ description:
   en: >
       The payee account is sensitive: stored encrypted rather than in clear text; masked as `****1234` in lists and detail; the full value is visible only to finance roles and admins and is never exportable.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.209Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.588Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 108
-    end_line: 108
   - path: "doc/forms.md"
-    line: 118
-    end_line: 118
 apis:
   - protocol: http
     method: GET
@@ -52,3 +48,6 @@ deps:
     from_api: "POST /api/v1/forms/fund/fields/payee-account/mask"
     label: {zh: "加密存储与密钥", en: "Encryption and key handling"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 3. 资金审批单（`form_type = fund`）`（§3. 资金审批单）

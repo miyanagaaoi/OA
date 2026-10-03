@@ -11,19 +11,13 @@ description:
   en: >
       Every routing, rollback, return-home and supplement action is written uniformly to the audit log and the approval trail: actor, action type, source and target department, reason and timestamp. Audit rows are append-only and support statistics and accountability.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.308Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.688Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 361
-    end_line: 361
   - path: "doc/prd-0.1.md"
-    line: 322
-    end_line: 322
   - path: "doc/data-model.md"
-    line: 488
-    end_line: 488
 apis:
   - protocol: kafka
     path: "oa.workflow.routing.action-logged"
@@ -54,3 +48,7 @@ deps:
     from_api: "kafka:oa.workflow.routing.action-logged"
     label: {zh: "写审批轨迹", en: "Write the approval trail"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-024`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_routing`（§5. 流程运行时）

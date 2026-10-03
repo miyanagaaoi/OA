@@ -11,19 +11,13 @@ description:
   en: >
       Plan category `plan_category` (checkbox per 6.7: in-plan/out-of-plan, defaults to in-plan); phase one stores the value without any flow logic and prints it as ☑/☐ per the paper form; it gains business meaning only when phase-two plan management ships.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.209Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.588Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 108
-    end_line: 108
   - path: "doc/forms.md"
-    line: 243
-    end_line: 250
   - path: "doc/forms.md"
-    line: 296
-    end_line: 296
 apis:
   - protocol: http
     method: GET
@@ -51,3 +45,6 @@ deps:
     from_api: "GET /api/v1/forms/fund/fields/plan-category"
     label: {zh: "字典取值来源", en: "Option source"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.7 计划类别 `plan_category`（**非字典项**：布尔 checkbox，一期仅存储）`（§6.7 计划类别 `plan_category`）

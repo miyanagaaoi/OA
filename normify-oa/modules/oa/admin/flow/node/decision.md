@@ -11,16 +11,12 @@ description:
   en: >
       Configures any-sign, all-sign or sequential approval per node together with a pass threshold expressed as a percentage or an absolute headcount, with the absolute form taking precedence when both are present.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.119Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.492Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 218
-    end_line: 232
   - path: "doc/prd-0.1.md"
-    line: 548
-    end_line: 549
 apis:
   - protocol: http
     method: PUT
@@ -52,3 +48,6 @@ deps:
     to_api: "mysql:flow_node"
     label: {zh: "写入流程节点定义", en: "Write flow node schema"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-002`（§6.4 流程引擎核心能力）

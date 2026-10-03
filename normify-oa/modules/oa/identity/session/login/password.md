@@ -10,16 +10,12 @@ description:
   en: >
       Password complexity (8+ characters with letters and digits) validation, salted-hash comparison and password change; passwords and phones are encrypted at rest and never stored in clear text.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.240Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.616Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 555
-    end_line: 555
   - path: "doc/data-model.md"
-    line: 59
-    end_line: 83
 apis:
   - protocol: http
     method: POST
@@ -63,3 +59,7 @@ deps:
     to_api: "GET /api/v1/auth/lock-status"
     label: {zh: "失败计数与锁定判定", en: "Failure count and lock"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-005`（§第9章 非功能需求）
+- `doc/data-model.md` → `CREATE TABLE sys_user_session`（§2. 身份与组织）

@@ -10,16 +10,12 @@ description:
   en: >
       Role master data: code (admin/company_admin/employee/dept_leader/gm/group_dept_leader/group_exec/chairman), name, group or company level and default data scope — the entry point for grants and scope decisions.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.183Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.560Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 201
-    end_line: 221
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
 apis:
   - protocol: http
     method: GET
@@ -77,3 +73,7 @@ deps:
     to_api: "GET /api/v1/authz/data-scopes"
     label: {zh: "默认数据域取口径取值", en: "Default data scope value"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_role`（§3. 权限）
+- `doc/prd-0.1.md` → `REQ-AUTH-001`（§5.2 权限模型）

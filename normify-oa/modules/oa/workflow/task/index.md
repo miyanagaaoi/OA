@@ -11,14 +11,14 @@ description:
   en: >
       Approval tasks including one row per approver on countersign nodes: decisions (approve/reject with a mandatory five-character opinion), decision modes (any/all with percentage or absolute threshold/sequential), deduplication, transfer, admin reassignment and add-sign before/after.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.322Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.700Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 218
-    end_line: 232
   - path: "doc/data-model.md"
-    line: 375
-    end_line: 528
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-002`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_task`（§5. 流程运行时）

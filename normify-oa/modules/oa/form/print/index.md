@@ -11,17 +11,17 @@ description:
   en: >
       A4 print layout for all four document types, matching the group's existing paper forms: the group contract routing sheet and fund approval sheet at group level, the internal approval sheet at subsidiary level; no colour blocks, radius or shadows, information must survive black-and-white copying, content limited to a 297mm page height.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.216Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.594Z"
 fingerprint: a704b11dfb09e375e9b90b2f19f26f32e8d5b1e3b582a00abd3741ae5448f332
 source:
   - path: "doc/forms.md"
-    line: 360
-    end_line: 394
   - path: "DESIGN.md"
     line: 962
     end_line: 1057
   - path: "doc/prd-0.1.md"
-    line: 295
-    end_line: 295
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 10. 打印稿（A4）字段要求`（§10. 打印稿）
+- `doc/prd-0.1.md` → `REQ-FORM-001`（§6.2 四类审批单与事项类别的关系）

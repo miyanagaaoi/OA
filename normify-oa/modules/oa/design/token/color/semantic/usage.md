@@ -11,8 +11,8 @@ description:
   en: >
       Status and colour mapping is globally unique and must not be extended: draft and closed are neutral, pending my approval is warning, in approval is info, approved is success, rejected or terminated is error, and transferred or countersigned is tag-info; no document type may invent its own palette, and when categories genuinely need separation use text plus a neutral grey tag.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.200Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.578Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,6 @@ source:
     line: 668
     end_line: 668
   - path: "doc/prd-0.1.md"
-    line: 718
-    end_line: 718
 apis:
   - protocol: http
     method: GET
@@ -49,3 +47,6 @@ deps:
     to: oa.design.component
     label: {zh: "徽标取色的唯一来源", en: "Badge colour source"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 13.2 与审批业务强相关的约定`（§13.2 与审批业务强相关的约定）

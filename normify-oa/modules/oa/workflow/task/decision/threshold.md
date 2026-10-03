@@ -11,16 +11,12 @@ description:
   en: >
       Parsing and evaluating countersign pass thresholds: a percentage (e.g. 66%) or an absolute headcount (e.g. 2 people), with the headcount winning when both are configured; the threshold is frozen into the node instance at submission and evaluated against approvals over total candidates, defaulting to a simple majority.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.322Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.700Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 226
-    end_line: 229
   - path: "doc/prd-0.1.md"
-    line: 569
-    end_line: 569
 apis:
   - protocol: http
     method: POST
@@ -48,3 +44,6 @@ deps:
     from_api: "GET /api/v1/flow/node-instances/{node_instance_id}/threshold-check"
     label: {zh: "阈值结论交给模式判定", en: "Pass threshold to mode check"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-002`（§6.4 流程引擎核心能力）

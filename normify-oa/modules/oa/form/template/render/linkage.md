@@ -11,25 +11,15 @@ description:
   en: >
       Evaluates linkage rules where visibility, requiredness and value depend on other fields, e.g. involve_cost → amount/cost_bearer, contract_type → contract_type_other, seal_type → cert_name/seal_count, return_status → return_date, is_framework → period_end.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.226Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.601Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 23
-    end_line: 23
   - path: "doc/forms.md"
-    line: 82
-    end_line: 84
   - path: "doc/forms.md"
-    line: 132
-    end_line: 133
   - path: "doc/forms.md"
-    line: 159
-    end_line: 164
   - path: "doc/forms.md"
-    line: 139
-    end_line: 139
 apis:
   - protocol: http
     method: POST
@@ -52,3 +42,6 @@ apis:
           Reads the linkage rules declared by a template.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 11. 表单模板实现要求`（§11. 表单模板实现要求）

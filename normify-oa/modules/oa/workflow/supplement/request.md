@@ -11,19 +11,13 @@ description:
   en: >
       An approval node raises a supplement request: the reason stating what is missing is mandatory, a flow_supplement row is written (node_instance_id points to the requesting node, supplement_round increments, deadline defaults to three working days) and the instance enters the pending-supplement sub-status. At most once per node and three times per document.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.318Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.697Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 325
-    end_line: 325
   - path: "doc/prd-0.1.md"
-    line: 360
-    end_line: 360
   - path: "doc/data-model.md"
-    line: 580
-    end_line: 610
 apis:
   - protocol: http
     method: POST
@@ -72,3 +66,7 @@ deps:
     to: oa.notify.mail
     label: {zh: "邮件通知发起人", en: "Email the initiator"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-023`（§6.3.1 集团层流转机制）
+- `doc/data-model.md` → `CREATE TABLE flow_supplement`（§5. 流程运行时）

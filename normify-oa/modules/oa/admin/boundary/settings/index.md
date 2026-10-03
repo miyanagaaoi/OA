@@ -11,14 +11,13 @@ description:
   en: >
       System-wide parameters the super-admin may tune: session and login policy plus audit and log retention, with hard floors that cannot be crossed (audit and trace retention never shorter than ten years).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.112Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.484Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 544
-    end_line: 561
   - path: "doc/prd-0.1.md"
-    line: 580
-    end_line: 580
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-NFR-007`（§6.9 审计日志）

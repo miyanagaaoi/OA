@@ -11,19 +11,13 @@ description:
   en: >
       Atomic maintenance and gates for the three runtime counters: routing_count (routing+return, cap 5), supplement_count (cap 3) and returned_count (cap 2 per node); once a limit is reached the operation is refused with a hint to use reject or terminate and the refusal is written to the audit log (REQ-FLOW-021/022/023/024, AC-23).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.311Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.691Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 335
-    end_line: 338
   - path: "doc/prd-0.1.md"
-    line: 551
-    end_line: 554
   - path: "doc/data-model.md"
-    line: 399
-    end_line: 401
 apis:
   - protocol: http
     method: GET
@@ -76,3 +70,7 @@ deps:
     from_api: "POST /api/v1/flow-instances/{instance_id}/counters/check"
     label: {zh: "超限拒绝写日志", en: "Refusals to audit log"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-024`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_routing`（§5. 流程运行时）

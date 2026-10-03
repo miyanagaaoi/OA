@@ -11,14 +11,14 @@ description:
   en: >
       The approval core: process templates and node definitions, visual designer, approver resolution and snapshot, instance runtime state machine, task decisions (any/all/sequential), group-level chained routing and rollback, supplements, and exception paths.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.306Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.684Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 246
-    end_line: 441
   - path: "doc/data-model.md"
-    line: 272
-    end_line: 528
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `## 第6章 核心功能需求`（§第6章 核心功能需求）
+- `doc/data-model.md` → `CREATE TABLE flow_template`（§4. 流程定义）

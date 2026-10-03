@@ -10,16 +10,12 @@ description:
   en: >
       User profiles and login accounts: name, employee number (for watermarking), primary org and company, position, employment status, salted password hash and encrypted phone; phones are never stored in clear text.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.242Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.619Z"
 fingerprint: f8e38f7f0b6512932e51f8673c1f72206035c69b378cec50bce639ed8972830c
 source:
   - path: "doc/data-model.md"
-    line: 59
-    end_line: 83
   - path: "doc/prd-0.1.md"
-    line: 133
-    end_line: 142
   - path: "oa-server/src/main/java/com/oa/identity/app/UserService.java"
 apis:
   - protocol: http
@@ -77,3 +73,7 @@ deps:
     to_api: "GET /api/v1/identity/orgs/tree"
     label: {zh: "校验归属组织与公司", en: "Validate parent org"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_user`（§2. 身份与组织）
+- `doc/prd-0.1.md` → `REQ-ADMIN-001`（§6.10 管理后台）

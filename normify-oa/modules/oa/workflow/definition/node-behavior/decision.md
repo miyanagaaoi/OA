@@ -11,16 +11,12 @@ description:
   en: >
       Writes and resolves decision_mode (any-sign default / countersign / sequential) and pass_threshold (percentage such as "50%" or absolute such as "2"; absolute wins when both are set). The post-rejection destination is fixed to "back to the initiator" in phase 1, with no per-node configuration (any one rejection in a countersign/collaboration task rejects that node; per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.298Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.676Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 218
-    end_line: 232
   - path: "doc/data-model.md"
-    line: 309
-    end_line: 310
 apis:
   - protocol: http
     method: GET
@@ -59,3 +55,7 @@ deps:
     to_api: "PUT /api/v1/flow-nodes/{node_id}"
     label: {zh: "决议字段属于节点", en: "Decision fields on node"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-002`（§6.4 流程引擎核心能力）
+- `doc/data-model.md` → `CREATE TABLE flow_node`（§4. 流程定义）

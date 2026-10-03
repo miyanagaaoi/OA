@@ -11,13 +11,11 @@ description:
   en: >
       Rejects every external write attempt in phase one, keeping the gateway read-only until the permission model is mature.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.246Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.623Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 516
-    end_line: 516
 apis:
   - protocol: http
     method: POST
@@ -30,3 +28,6 @@ apis:
           Rejects non-GET methods coming from outside the system in phase one.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 8.1 接口设计原则`（§8.1 接口设计原则）

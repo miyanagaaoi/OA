@@ -11,16 +11,12 @@ description:
   en: >
       Canvas layer of the graphical designer: loads the template node graph, adds and removes nodes, reorders them and previews links; the result is written back to flow_node definitions and editing is allowed only on draft versions (REQ-FLOW-008).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.301Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.679Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 371
-    end_line: 371
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
 apis:
   - protocol: http
     method: GET
@@ -84,3 +80,6 @@ deps:
     to_api: "GET /api/v1/flow-templates/{template_id}"
     label: {zh: "读模板与表单绑定", en: "Read template & form binding"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-008`（§6.4 流程引擎核心能力）

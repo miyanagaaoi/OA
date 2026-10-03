@@ -11,16 +11,12 @@ description:
   en: >
       The mobile entry QR code offered on the OA home page (REQ-USER-001): zero cost and no third-party integration; the code points at a short link that opens the H5 portal, and the page offers a downloadable and printable image plus expiry refresh and entry instructions.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.272Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.649Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 415
-    end_line: 415
   - path: "doc/prd-0.1.md"
-    line: 637
-    end_line: 637
 apis:
   - protocol: http
     method: GET
@@ -47,3 +43,6 @@ deps:
     from_api: "GET /api/v1/portal/entry/qr"
     label: {zh: "二维码指向 H5 入口", en: "QR points to H5 entry"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-USER-001`（§6.8 移动端 H5 与登录保持）

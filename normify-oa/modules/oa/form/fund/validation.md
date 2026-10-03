@@ -11,13 +11,11 @@ description:
   en: >
       Fund-specific validation: the amount is required and > 0 (zero or empty blocks submission), payee name and account are required with a valid account character set, the pay date is not earlier than today, the linked contract number must be valid, and at least one attachment is required; all server-side.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.210Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.588Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 41
-    end_line: 41
 apis:
   - protocol: http
     method: POST
@@ -55,3 +53,6 @@ deps:
     from_api: "POST /api/v1/forms/fund/validate"
     label: {zh: "复用通用校验引擎", en: "Reuses shared validator"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 3. 资金审批单（`form_type = fund`）`（§3. 资金审批单）

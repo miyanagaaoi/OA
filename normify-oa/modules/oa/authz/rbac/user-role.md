@@ -10,16 +10,12 @@ description:
   en: >
       Grants roles to users, optionally bounded by the org scope where the role takes effect (scope_org_id, falling back to the role default); branch process admins may assign only inside their own company and cannot delegate further.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.184Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.561Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 222
-    end_line: 244
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
 apis:
   - protocol: http
     method: GET
@@ -72,3 +68,7 @@ deps:
     to_api: "GET /api/v1/identity/users"
     label: {zh: "校验被授权人", en: "Validate grantee"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_user_role`（§3. 权限）
+- `doc/prd-0.1.md` → `REQ-AUTH-001`（§5.2 权限模型）

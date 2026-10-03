@@ -11,13 +11,11 @@ description:
   en: >
       ≤50MB per file, ≤20 files per upload, ≤50 attachments per document including supplements; allows pdf/doc/docx/wps/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/zip/rar/7z (V0.4 adds wps and heic - heic is converted to jpg for preview, wps is download-only), and rejects exe/bat/cmd/js/vbs/ps1/dll/msi/scr on both extension and MIME checks at upload time.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.224Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.600Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 51
-    end_line: 57
 apis:
   - protocol: http
     method: POST
@@ -40,3 +38,6 @@ apis:
           Reads the attachment policy (format whitelist and limits).
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.4 附件通用限制`（§1.4 附件通用限制）

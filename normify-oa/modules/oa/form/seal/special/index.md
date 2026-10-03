@@ -11,14 +11,13 @@ description:
   en: >
       Seal-only rules: return status and return time are the system's only main fields editable during approval (archive node ⑦ only, explicitly whitelisted server-side), plus the mutual exclusion between certificate borrow and copy count.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.222Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.599Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 166
-    end_line: 172
   - path: "doc/forms.md"
-    line: 273
-    end_line: 273
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 5. 印鉴证照审批单（`form_type = seal`）`（§5. 印鉴证照审批单）

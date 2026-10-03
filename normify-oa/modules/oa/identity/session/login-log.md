@@ -10,16 +10,12 @@ description:
   en: >
       Logs each login attempt with time, IP, device info, success/failure and failure reason (bad_password/locked/disabled), recording the attempted account even on failure; append-only, kept for one year.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.238Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.614Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 143
-    end_line: 159
   - path: "doc/prd-0.1.md"
-    line: 449
-    end_line: 449
 apis:
   - protocol: http
     method: GET
@@ -55,3 +51,7 @@ deps:
     to: oa.audit.security
     label: {zh: "登录失败与锁定事件进入安全审计", en: "Push login security events"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_login_log`（§2. 身份与组织）
+- `doc/prd-0.1.md` → `REQ-LOG-005`（§6.9 审计日志）

@@ -11,16 +11,12 @@ description:
   en: >
       Delivers mail through a privately deployed SMTP server with timeouts, retries and a connectivity self-check; results feed the failure module and never change document state.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.257Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.634Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 408
-    end_line: 408
   - path: "doc/prd-0.1.md"
-    line: 531
-    end_line: 531
 apis:
   - protocol: http
     method: POST
@@ -49,3 +45,6 @@ deps:
     to_api: "POST /api/v1/notifications/mail/failures"
     label: {zh: "记录发送失败", en: "Record send failure"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-MSG-002`（§6.7 消息通知）

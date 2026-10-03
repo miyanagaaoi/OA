@@ -11,13 +11,11 @@ description:
   en: >
       The catalogue of business items operations may tune at runtime: decision mode, countersign threshold, node timeout, routing and rollback caps, supplement limits, forced-signature nodes, session and lockout rules, audit retention, export permission.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.261Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.639Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 544
-    end_line: 561
 apis:
   - protocol: file
     path: "config/configurable-items.yml"
@@ -39,3 +37,6 @@ apis:
           Reads the effective value of runtime-adjustable items.
           
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 9.1 可配置项汇总（运营期由管理员调整，不经开发）`（§9.1 可配置项汇总）

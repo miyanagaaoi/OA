@@ -11,14 +11,15 @@ description:
   en: >
       Document initiation: pick the document type, fill the template-driven form with inline validation, choose matter category and CC recipients, upload attachments, and pass pre-flight checks (empty approver sets, missing required fields, unauthorised org node) before submission.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.278Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.657Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 856
     end_line: 872
   - path: "doc/prd-0.1.md"
-    line: 375
-    end_line: 375
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 6.2 四类审批单与事项类别的关系`（§6.2 四类审批单与事项类别的关系）

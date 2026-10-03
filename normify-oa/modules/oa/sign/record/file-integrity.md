@@ -11,19 +11,13 @@ description:
   en: >
       File integrity for signature images and attachments: private local storage, authenticated download only, upload guard of 50MB per file, 20 per batch and 50 per document including supplements, whitelist formats with executables blocked by extension and MIME, plus sha256 anti-substitution.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.290Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.668Z"
 fingerprint: 589f2eb4c62069d3aec4fc5c8289ba618fc4d81a5635b917e7e0b21061f1da0b
 source:
   - path: "doc/forms.md"
-    line: 49
-    end_line: 59
   - path: "doc/data-model.md"
-    line: 830
-    end_line: 830
   - path: "doc/prd-0.1.md"
-    line: 462
-    end_line: 462
 apis:
   - protocol: file
     path: "storage/signatures/{user_id}/{id}.png"
@@ -85,3 +79,8 @@ deps:
     to: oa.authz.visibility
     label: {zh: "下载鉴权与可见性", en: "Download auth & visibility"}
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 1.4 附件通用限制`（§1.4 附件通用限制）
+- `doc/data-model.md` → `CREATE TABLE flow_attachment`（§6. 签名、附件、抄送、消息、审计）
+- `doc/prd-0.1.md` → `REQ-FORM-002`（§3.1 本期做）

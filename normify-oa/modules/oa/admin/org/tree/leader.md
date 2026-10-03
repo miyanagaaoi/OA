@@ -11,16 +11,12 @@ description:
   en: >
       Maintain primary and deputy org leaders (multiple leaders and multiple posts per person), optionally bound to a matter category as the single authoritative source for approver resolution; a vacancy affects the initiate-time block check.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.134Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.513Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"
-    line: 88
-    end_line: 108
   - path: "doc/prd-0.1.md"
-    line: 239
-    end_line: 239
 apis:
   - protocol: http
     method: GET
@@ -62,3 +58,7 @@ deps:
     to_api: "mysql:sys_org_leader"
     label: {zh: "写入组织负责人", en: "Write org leader binding"}
 ---
+
+## 证据锚点
+- `doc/data-model.md` → `CREATE TABLE sys_org_leader`（§2. 身份与组织）
+- `doc/prd-0.1.md` → `REQ-ORG-001`（§5.1 组织架构模型）

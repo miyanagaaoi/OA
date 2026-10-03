@@ -11,19 +11,13 @@ description:
   en: >
       Node-level sign_policy (required/optional/none; group line leader and chairman default to required), timeout_hours (explicit and ≥24h, reminder only and never auto-skip), allow_add_sign, allow_jump (off by default) and allow_route for group-layer routing/return (REQ-FLOW-007/003/004/020, REQ-SIGN-003).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.298Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.677Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 346
-    end_line: 352
   - path: "doc/prd-0.1.md"
-    line: 367
-    end_line: 367
   - path: "doc/prd-0.1.md"
-    line: 550
-    end_line: 556
 apis:
   - protocol: http
     method: GET
@@ -70,3 +64,6 @@ deps:
     from_api: "PUT /api/v1/flow-nodes/{node_id}/policy"
     label: {zh: "超时时长决定催办", en: "Timeout drives reminders"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-SIGN-003`（§6.5 电子签名与身份确认）

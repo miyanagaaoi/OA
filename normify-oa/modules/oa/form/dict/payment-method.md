@@ -11,13 +11,11 @@ description:
   en: >
       Payment method `pay_method`: transfer, acceptance (bank acceptance bill), cash and other; used by the fund approval form's payment-method field.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.206Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.584Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 194
-    end_line: 201
 apis:
   - protocol: http
     method: GET
@@ -30,3 +28,6 @@ apis:
           Lists selectable payment methods.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `### 6.2 支付方式（字段 code `pay_method` · 字典类型 `payment_method`）`（§6.2 支付方式）

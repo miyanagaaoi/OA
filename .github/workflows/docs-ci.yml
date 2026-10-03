@@ -48,6 +48,9 @@ jobs:
       - name: 权限树种子与生成器一致性（防手工改产物）
         run: node tools/gen-permission-seed.js --check
 
+      - name: 结构基线证据锚点校验（doc 引用不得带行号 / 锚点必须存在且可唯一定位）
+        run: node tools/check-normify-anchors.js --check
+
       - name: 校验汇总
         if: always()
         run: echo "全部检查完成；任一上游步骤失败即视为本次提交不合规。"

@@ -11,19 +11,15 @@ description:
   en: >
       Single and multi-select fields print as the text symbols `☑ / ☐` at body size rather than input[type=checkbox], keeping print and photocopy consistent; plan_category, payment_belong and the other joint-review departments line follow the paper form's look.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.215Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.593Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
     line: 1011
     end_line: 1011
   - path: "doc/forms.md"
-    line: 370
-    end_line: 370
   - path: "doc/forms.md"
-    line: 379
-    end_line: 380
 apis:
   - protocol: file
     path: "templates/print/partials/checkbox.html"
@@ -45,3 +41,6 @@ apis:
           Returns the fields rendered as checkboxes on the sheet.
           
 ---
+
+## 证据锚点
+- `doc/forms.md` → `## 10. 打印稿（A4）字段要求`（§10. 打印稿）

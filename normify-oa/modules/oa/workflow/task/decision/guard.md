@@ -11,16 +11,12 @@ description:
   en: >
       Pre-checks before a decision is recorded: rejections require an opinion of at least five characters (no blank rejection); a person appearing several times in one node is deduplicated into a single candidate and task; the same person approving several sequential nodes is handled node by node, not merged.
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.321Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.699Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 237
-    end_line: 237
   - path: "doc/prd-0.1.md"
-    line: 384
-    end_line: 384
 apis:
   - protocol: http
     method: POST
@@ -59,3 +55,6 @@ deps:
     to_api: "mysql:flow_task"
     label: {zh: "去重后写回任务", en: "Write the deduplicated tasks"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `REQ-FLOW-002`（§6.4 流程引擎核心能力）

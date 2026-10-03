@@ -11,19 +11,19 @@ description:
   en: >
       Node-level runtime state on flow_node_instance: pending → active → waiting_supplement → approved / rejected / skipped / returned / cancelled, covering node advancement, return-for-review and skip marking (REQ-FLOW-001/014/021/023).
       
-revision: c974d064e39527a7b4ddd8fe34345b4615b42437
-updated_at: "2026-10-03T03:27:10.314Z"
+revision: 939b76191ad354700ff099851baf5cadf4a0db09
+updated_at: "2026-10-03T04:05:58.693Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
-    line: 508
-    end_line: 508
   - path: "doc/data-model.md"
-    line: 420
-    end_line: 447
 deps:
   - kind: reference
     to: oa.workflow.runtime.instance.state
     to_api: "GET /api/v1/flow-instances/{instance_id}/state"
     label: {zh: "驱动实例状态", en: "Feed instance state"}
 ---
+
+## 证据锚点
+- `doc/prd-0.1.md` → `### 7.2 状态机`（§7.2 状态机）
+- `doc/data-model.md` → `CREATE TABLE flow_node_instance`（§5. 流程运行时）
