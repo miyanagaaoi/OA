@@ -31,7 +31,12 @@ ON DUPLICATE KEY UPDATE
 -- 201 分公司管理员(公司A) / 202 部门负责人(公司A-部门1) / 203 集团分管领导(集团)
 -- 204 普通员工(公司A-部门1) / 205 普通员工(公司B-部门3)
 -- password_hash 是**固定的占位哈希**（矩阵测试走数据域 SQL，不做登录；HTTP 矩阵另建于 API），
--- **不对应任何口令**；需要登录时按 ./90-dev-admin.md 自行 UPDATE 一个你自己生成的哈希。
+-- **不对应任何口令**：它是 '$2a$12$' + 52 个 '0'，合计 **59 字符**，而 BCrypt 密文恒为 60 字符
+--   ⇒ 结构上不是合法 BCrypt 密文 ⇒ BCryptPasswordEncoder#matches 对**任何**口令都返回 false
+--   （运行期实测：以已知 dev 口令登录这些账号一律 401/40103）。
+--   任何「看起来可用」的真实哈希**不得**入库：无从证明它不是某个已知口令的哈希。
+--   回归网见 oa-server/src/test/java/com/oa/platform/fixture/FixtureCredentialSafetyTest.java；
+--   需要登录时按 ./README.md §6 在运行期 UPDATE（AuthzMatrixHttpTest 就是这么做的）。
 INSERT INTO sys_user (id, account, name, employee_no, password_hash, phone, email,
                       org_id, company_id, position, status, remark) VALUES
   (201, 'mtx_ca01', '分公司管理员', 'MTX0001', '$2a$12$0000000000000000000000000000000000000000000000000000',

@@ -185,7 +185,7 @@ function main() {
     ) + '\n' + templateRaw.replace(/^-- =+[\s\S]*?SET NAMES utf8mb4;\n\n/, ''),
 
     'V4__permissions.sql': banner(
-      'V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 375 授权行，幂等）',
+      'V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 376 授权行，幂等）',
       [source('oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义）', path.join(SQL_DIR, '04-permissions.sql'))],
       [
         '三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。',

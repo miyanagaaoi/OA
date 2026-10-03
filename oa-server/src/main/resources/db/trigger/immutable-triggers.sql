@@ -1,7 +1,7 @@
 -- ============================================================================
 -- 不可篡改触发器（sys_log / flow_signature：拒绝 UPDATE 与 DELETE，AC-20）
 -- ----------------------------------------------------------------------------
--- 生成器: tools/build-flyway-migrations.js sha256=f03ac8fd71c2
+-- 生成器: tools/build-flyway-migrations.js sha256=1a70ffc3f41d
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
 -- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
 -- 来源: oa-deploy/sql/01-schema.sql 的 DELIMITER 段 sha256=d690e736aed2

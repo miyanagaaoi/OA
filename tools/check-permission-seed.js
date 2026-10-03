@@ -26,6 +26,9 @@
  *   8. 断言 admin 角色被授予**全部**权限 code；
  *   9. 断言 company_admin **不含** admin:user:export、admin:role:grant、admin:authz:*、admin:system:*、
  *      以及 `admin:role` 整支（含只读的 admin:role:list —— 「不可再授权」）；
+ *   9a. 断言 company_admin **含** `flow`（门户基础权限 = 发起审批的凭据，PRD 附录A 权限矩阵
+ *       「发起审批」行：分公司管理员 = ✓），且**不含**任何 `flow:task:*` 审批动作码
+ *       （同表「审批单据」行：分公司管理员 = -）；
  *   9b. 断言 employee **含** `flow:task:withdraw` 与 `portal:h5`，且**不含**任何审批动作；
  *   9c. 断言 group_leader / chairman **含** `admin:report` 节点与 `admin:report:*` 查看项，
  *       且**不含** `admin:report:export`；
@@ -78,6 +81,9 @@ const COMPANY_ADMIN_FORBIDDEN_PREFIX = ['admin:authz:', 'admin:system:'];
 
 /** company_admin 不得持有 `admin:role` 整支（含只读的 admin:role:list）—— 裁定「不可再授权」 */
 const COMPANY_ADMIN_FORBIDDEN_ROLE_BRANCH = 'admin:role';
+
+/** company_admin 必须持有的权限码（PRD 附录A 权限矩阵「发起审批」行：分公司管理员 = ✓） */
+const COMPANY_ADMIN_REQUIRED = ['flow'];
 
 /** employee 必须持有的权限码（裁定 3：可撤回自己发起的单据 + H5 全员入口） */
 const EMPLOYEE_REQUIRED = ['flow:task:withdraw', 'portal:h5'];
@@ -480,6 +486,19 @@ function check(text, errors, warnings) {
     if (violations.length) {
       errors.push(`company_admin 越权（不可再授权）：不应包含 ${violations.sort().join(', ')}`);
     }
+    // 9a：company_admin 必须持有门户基础权限 flow（发起审批，PRD 附录A 权限矩阵第 756 行）；
+    //     同时**不得**因此拿到任何审批动作码（同表「审批单据」行：分公司管理员 = -）。
+    for (const code of COMPANY_ADMIN_REQUIRED) {
+      if (!byCode.has(code)) {
+        errors.push(`company_admin 必备权限码在权限树中不存在：${code}`);
+      } else if (!caSet.has(code)) {
+        errors.push(`company_admin 缺少必备权限项：${code}（PRD 附录A「发起审批」行：分公司管理员 = ✓）`);
+      }
+    }
+    const caApproverActions = [...caSet].filter((c) => c.startsWith('flow:') && c !== 'flow');
+    if (caApproverActions.length) {
+      errors.push(`company_admin 越权：不应持有审批动作码（矩阵「审批单据」行为 -）${caApproverActions.sort().join(', ')}`);
+    }
   }
 
   // 每个角色码都应至少有一条授权语句
@@ -613,6 +632,7 @@ function check(text, errors, warnings) {
     rolesWithGrants: grantedByRole.size,
     grantedPerRole,
     adminOnlyCodes: ADMIN_ONLY_CODES,
+    companyAdminRequired: COMPANY_ADMIN_REQUIRED,
     terminateRoles: TERMINATE_ROLES,
     terminateHolders: ROLE_WHITELIST.filter((role) =>
       (grantedByRole.get(role) || new Set()).has(TERMINATE_CODE)),

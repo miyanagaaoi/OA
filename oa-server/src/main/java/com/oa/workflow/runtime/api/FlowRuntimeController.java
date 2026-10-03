@@ -41,11 +41,11 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>GET</td><td>{@code /flow-actions}</td><td><b>动作面清单</b>（动作 → 权限码 / 必填原因 / 意见下限 / 轨迹动作 / 状态迁移）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-linkage-rules}</td><td><b>§7.2 联动规则书</b>（触发 → 联动结果，逐行可核对）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-opinion-rules}</td><td>意见 / 原因校验规则（驳回 ≥5 字等）</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{id}/reopen}</td><td>回到草稿（驳回/撤回后）</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{id}/resubmit}</td><td><b>重提</b>：重新解析快照与版本 → 回草稿 → 提交</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{id}/reopen}</td><td>回到草稿（驳回/撤回后；<b>入口闸门 = {@code FlowAction.REOPEN.permission()} = {@code flow}</b>）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{id}/resubmit}</td><td><b>重提</b>：重新解析快照与版本 → 回草稿 → 提交（<b>入口闸门 = {@code FlowAction.SUBMIT.permission()} = {@code flow}</b>）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/withdraw}</td><td>撤回（仅发起人本人或系统管理员；仅节点②通过前；<b>入口闸门 = {@code flow:task:withdraw}</b>，与引擎同源）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/terminate}</td><td>终止（系统管理员 / 集团分管领导；<b>入口闸门 = AC-49 专用判据</b>，见下）</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{id}/supplement}</td><td>提交补件（仅发起人）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{id}/supplement}</td><td>提交补件（仅发起人；<b>入口闸门 = {@code FlowAction.SUPPLEMENT_SUBMIT.permission()} = {@code flow}</b>）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/cc}</td><td>抄送登记（不产生待办、不参与决议；<b>入口闸门 = {@code flow}</b>，与引擎同源）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/runtime}</td><td><b>运行态总览</b>（三层状态 + 轨迹 + 流转链 + 补件 + 抄送 + Q6 剩余）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/node-instances}</td><td>节点实例清单</td></tr>
@@ -60,19 +60,20 @@ import org.springframework.web.bind.annotation.RestController;
  * <p><b>分工</b>：入口层只判**权限**（不读实例、不碰 mapper —— 拒人必须在读库之前），
  * 引擎层判**身份 + 状态机 + 闸门**（发起人本人由引擎按 {@code instance.initiatorId} 判）。
  * 「入口放行」只说明这个账号有资格执行该类动作，不说明这张单归他管。
+ *
+ * <p><b>入口闸门的取值口径（2026-10-04 收敛）</b>：一律取**该动作自己的权限码**
+ * {@code FlowAction.XXX.permission()}（单一真源，见 {@link FlowAction}），
+ * **不再**用 {@code requireInitiator}（它放行 {@code flow} ∪ {@code admin:flow}，
+ * 比动作面宽：持 {@code admin:flow} 的 {@code company_admin} 会「先过入口、再被引擎 403」）。
  * <ol>
  *   <li><b>入口层</b>（本控制器）：
  *     <ul>
- *       <li>发起侧动作（{@code reopen} / {@code resubmit} / {@code supplement}）用
- *           {@code WorkflowPermissionService#requireInitiator}（{@code flow} 或 {@code admin:flow}），
- *           与各自引擎方法逐字同参；</li>
- *       <li>{@code /withdraw} 用 <b>动作面权限码本身</b> {@code FlowAction.WITHDRAW.permission()}
- *           （{@code flow:task:withdraw}）—— 与 {@code FlowEngineService#withdraw} 同源同参。
- *           <b>不能</b>用 {@code requireInitiator}：它放行 {@code admin:flow}，
- *           而引擎只认 {@code flow:task:withdraw}，入口比引擎宽（{@code company_admin} 会
- *           「先过入口、再被引擎 403」）；</li>
- *       <li>{@code /cc} 同理用 {@code FlowAction.CC.permission()}（{@code flow}），
- *           与 {@code FlowEngineService#addCc} 同源同参；</li>
+ *       <li>{@code /reopen} → {@code FlowAction.REOPEN.permission()}（{@code flow}）；
+ *           {@code /resubmit} → {@code FlowAction.SUBMIT.permission()}（{@code flow}）；
+ *           {@code /supplement} → {@code FlowAction.SUPPLEMENT_SUBMIT.permission()}（{@code flow}）；</li>
+ *       <li>{@code /withdraw} → {@code FlowAction.WITHDRAW.permission()}（{@code flow:task:withdraw}），
+ *           与 {@code FlowEngineService#withdraw} 同源同参；</li>
+ *       <li>{@code /cc} → {@code FlowAction.CC.permission()}（{@code flow}），与引擎同源同参；</li>
  *       <li>{@code /terminate} 用 <b>AC-49 专用闸门</b>
  *           {@code WorkflowPermissionService#requireTerminate}（系统管理员 ∪ {@code group_leader} 角色 ∪
  *           {@code flow:task:terminate} 权限）—— 因为 {@code flow} 是门户基础权限，
@@ -149,7 +150,7 @@ public class FlowRuntimeController {
     @PostMapping("/flow-instances/{instanceId}/reopen")
     @Audited(action = "reopen", targetType = "instance", targetId = "#instanceId", recordAfter = false)
     public ApiResponse<InstanceView> reopen(@PathVariable("instanceId") Long instanceId) {
-        permissionService.requireInitiator("回到草稿");
+        permissionService.requirePermission(FlowAction.REOPEN.label(), FlowAction.REOPEN.permission());
         return ApiResponse.success(engine.reopen(instanceId));
     }
 
@@ -159,7 +160,7 @@ public class FlowRuntimeController {
             recordAfter = false)
     public ApiResponse<InstanceView> resubmit(@PathVariable("instanceId") Long instanceId,
                                              @RequestBody(required = false) ReasonRequest request) {
-        permissionService.requireInitiator("重新提交审批单");
+        permissionService.requirePermission(FlowAction.SUBMIT.label(), FlowAction.SUBMIT.permission());
         return ApiResponse.success(engine.resubmit(instanceId,
                 request == null ? null : request.reason()));
     }
@@ -226,7 +227,8 @@ public class FlowRuntimeController {
     public ApiResponse<com.oa.workflow.runtime.api.dto.RuntimeDtos.ActionResult> supplementSubmit(
             @PathVariable("instanceId") Long instanceId,
             @RequestBody(required = false) SupplementSubmitRequest request) {
-        permissionService.requireInitiator("提交补件");
+        permissionService.requirePermission(FlowAction.SUPPLEMENT_SUBMIT.label(),
+                FlowAction.SUPPLEMENT_SUBMIT.permission());
         return ApiResponse.success(engine.supplementSubmit(instanceId,
                 request == null ? null : request.note()));
     }

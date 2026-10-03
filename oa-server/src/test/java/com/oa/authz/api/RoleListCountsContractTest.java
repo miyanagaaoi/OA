@@ -89,14 +89,14 @@ class RoleListCountsContractTest {
     }
 
     @Test
-    @DisplayName("列表：admin=94/1、company_admin=37/0、employee=24/0（种子库实测值）")
+    @DisplayName("列表：admin=94/1、company_admin=38/0、employee=24/0（种子库实测值；company_admin 含门户基础权限 flow）")
     void listReturnsRealCounts() {
         when(roleMapper.selectAll(null, null)).thenReturn(List.of(
                 role(1L, "admin", "系统管理员", SysRole.SCOPE_GROUP, "group_all"),
                 role(2L, "company_admin", "分公司流程管理员", SysRole.SCOPE_COMPANY, "company"),
                 role(3L, "employee", "普通员工", SysRole.SCOPE_COMPANY, "self")));
         when(rolePermissionMapper.countByRoleIds(anyCollection()))
-                .thenReturn(List.of(count(1L, 94), count(2L, 37), count(3L, 24)));
+                .thenReturn(List.of(count(1L, 94), count(2L, 38), count(3L, 24)));
         when(userRoleMapper.countByRoleIds(anyCollection())).thenReturn(List.of(count(1L, 1)));
 
         List<AuthzDtos.RoleView> views = service.list(null, null);
@@ -105,7 +105,7 @@ class RoleListCountsContractTest {
         assertThat(views.get(0).code()).isEqualTo("admin");
         assertThat(views.get(0).permissionCount()).isEqualTo(94);
         assertThat(views.get(0).userCount()).isEqualTo(1);
-        assertThat(views.get(1).permissionCount()).isEqualTo(37);
+        assertThat(views.get(1).permissionCount()).isEqualTo(38);
         assertThat(views.get(1).userCount()).isZero();
         assertThat(views.get(2).permissionCount()).isEqualTo(24);
         assertThat(views.get(2).userCount()).isZero();

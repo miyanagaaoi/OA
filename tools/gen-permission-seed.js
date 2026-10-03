@@ -369,9 +369,20 @@ const ROLE_GRANTS = [
   {
     role: 'company_admin',
     roleName: ROLE_NAMES.company_admin,
-    scope: '门户全部 + 组织/人员/流程/表单管理；**不可再授权**',
+    scope: '**发起审批（门户基础权限 flow）** + 门户全部 + 组织/人员/流程/表单管理；**不可再授权**',
+    // `flow` = **门户基础权限 / 发起审批的凭据**。取证：
+    //   · doc/prd-0.1.md **附录A 权限矩阵**（第 756 行）「发起审批」行：**分公司管理员 = ✓**；
+    //   · 同表 5.3（第 183 行）「分公司流程管理员：本公司的全部单据 + 本公司流程模板」——
+    //     一个能看见本公司全部单据、能维护本公司组织/人员/流程的角色，当然能发起审批；
+    //   · 服务端发起侧闸门是 FlowConfigPermission#requireInitiator（`flow` ∪ `admin:flow`），
+    //     而**动作端点**的入口闸门取 FlowAction.XXX.permission()（`flow:task:*`，不含 `admin:flow`）；
+    //     把 `admin:flow` 当作发起凭据，会让「发起」与「动作」两套口径互相迁就。
+    // 因此这是**种子漏授**（company_admin 曾是 9 个角色中唯一不持 `flow`、却又持 `portal:h5`
+    // 与 `admin:flow:*` 的角色 —— 内部矛盾），按矩阵补齐为**发起审批**所需的最小集合。
+    // 只授 `flow` 本身，**不授任何 `flow:task:*` 动作码**：动作码按矩阵「审批单据」行授予，
+    // 而该行分公司管理员为 `-`（审批动作由审批角色持有，见 APPROVER_ACTIONS）。
     // 刻意不包含 admin:role:*（含 admin:role:list）—— 见 scope
-    include: ['portal:*', 'admin:org:*', 'admin:user:*', 'admin:flow:*', 'admin:form:*'],
+    include: ['flow', 'portal:*', 'admin:org:*', 'admin:user:*', 'admin:flow:*', 'admin:form:*'],
     exclude: ['admin:user:export'], // 主数据导出仅系统管理员（import-spec §9.2 T-11）
   },
   {
@@ -794,8 +805,11 @@ ${treeLines.join('\n')}
 ${grantTable}
 --   关键口径（越权防护的种子层保障）：
 --     · admin               = 全部权限；
---     · company_admin       = portal:* + admin:org:* + admin:user:*（**除** admin:user:export）
---                             + admin:flow:* + admin:form:*；
+--     · company_admin       = **flow（门户基础权限 / 发起审批）** + portal:* + admin:org:* + admin:user:*
+--                             （**除** admin:user:export）+ admin:flow:* + admin:form:*；
+--                             flow 的取证：PRD 附录A 权限矩阵「发起审批」行「分公司管理员 = ✓」
+--                             （该角色还是 9 个角色里唯一持 portal:h5 却曾不持 flow 的，属种子漏授）；
+--                             动作码仍按「审批单据」行授予（该行为 -，故**不含任何 flow:task: 动作码**）；
 --                             **完全不含 admin:role 整支（含只读的 admin:role:list）**、
 --                             **不含 admin:authz:*、admin:system:*** —— 体现 PRD 5.2「分公司管理员不可再授权」；
 --     · employee            = 门户基础包 + flow:task:withdraw（可撤回自己发起的单据，PRD 6.4）；
@@ -1081,6 +1095,22 @@ function main() {
   );
   if (forbidden.length) {
     errors.push(`company_admin 越权：不应包含 ${forbidden.join(', ')}`);
+  }
+
+  // company_admin 必须持有门户基础权限 `flow`（= 发起审批的凭据）
+  //   取证：doc/prd-0.1.md 附录A 权限矩阵（第 756 行）「发起审批」行：分公司管理员 = ✓。
+  //   改前该角色是 9 个角色中唯一不持 `flow` 的角色，却持有 `portal:h5` 与 `admin:flow:*`
+  //   —— 内部矛盾；且发起侧闸门只认 `flow` ∪ `admin:flow`，把 `admin:flow` 当发起凭据会
+  //   让入口/引擎/动作面三套口径互相迁就（运行时表现为「过了入口又被下游 403」）。
+  if (!grantOf('company_admin').codes.includes('flow')) {
+    errors.push('company_admin 缺少门户基础权限 flow（PRD 附录A 权限矩阵「发起审批」行：分公司管理员 = ✓）');
+  }
+  // 反向：company_admin 只是「可发起」，**不得**因此拿到任何审批动作码（矩阵「审批单据」行为 `-`）
+  const caApproverActions = grantOf('company_admin').codes.filter(
+    (c) => c.startsWith('flow:') && c !== 'flow',
+  );
+  if (caApproverActions.length) {
+    errors.push(`company_admin 不应持有审批动作码（矩阵「审批单据」行为 -）：${caApproverActions.join(', ')}`);
   }
 
   // company_admin 不得持有 admin:role 整支（含只读的 admin:role:list）—— 裁定 3「不可再授权」

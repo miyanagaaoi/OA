@@ -121,7 +121,7 @@
 
 ## 5. 文档与结构工具依赖（`tools/*.js`）
 
-**零外部依赖**：11 个脚本只用 Node 内置模块（`fs` / `path` / `https`）。不需要 `package.json`、不需要 `npm install`。
+**零外部依赖**：12 个脚本只用 Node 内置模块（`fs` / `path` / `https`）。不需要 `package.json`、不需要 `npm install`。
 
 | 脚本 | 作用 |
 | --- | --- |
@@ -130,8 +130,9 @@
 | `check-ddl.js` | 28 张表结构（主键/外键目标/重复列/金额禁浮点） |
 | `check-templates-sql.js` | 模板 SQL（4 模板 × 7 节点、`form_schema_json` 合法性） |
 | `check-import-csv.js` | 导入模板（表头/BOM/枚举/跨文件引用/工号唯一/角色码白名单） |
-| `gen-permission-seed.js` / `check-permission-seed.js` | 权限树种子（9 角色 / 94 权限项 / 375 授权行）与全套断言：权限树结构与角色段顺序、`company_admin`/`employee` 越权防护、`group_leader`+`chairman` 报表口径、AC-49「终止持有角色恰为 `admin` + `group_leader`」、祖先闭包（原先此处写作「15 类断言」，该数字在代码里无对应物，已改为自描述清单） |
+| `gen-permission-seed.js` / `check-permission-seed.js` | 权限树种子（9 角色 / 94 权限项 / 376 授权行）与全套断言：权限树结构与角色段顺序、`company_admin`/`employee` 越权防护、`company_admin` 必备门户基础权限 `flow`（附录A 权限矩阵「发起审批」行：分公司管理员 ✓，且**不含**任何审批动作码）、`group_leader`+`chairman` 报表口径、AC-49「终止持有角色恰为 `admin` + `group_leader`」、祖先闭包（原先此处写作「15 类断言」，该数字在代码里无对应物，已改为自描述清单） |
 | `validate-design-md.js` | `DESIGN.md` 设计规范校验 |
+| `check-normify-anchors.js` | 结构基线证据引用的**锚点化**机检：① `source` 里 path 以 `doc/` 开头的条目**不得带 `line`/`end_line`**（行号会随文档增删漂移，且刷新指纹时不会重算）；② 每条 doc 引用在模块正文 `## 证据锚点` 节都要有同 path 的锚点条目；③ 锚点必须真的存在于该文档（REQ 编号 / 章节标题原文 / `CREATE TABLE <表名>`），找不到即 error；④ 同一文档中出现多次的锚点记 warning（REQ 编号天然多处引用，输出按 文档+锚点 聚合）；标注「锚点待定」的条目记 warning 不阻断。调用：`node tools/check-normify-anchors.js --check`（只读；有 error 时 exit 1；`--json` 出机器可读结果，`--repo`/`--dir` 指定仓库根与结构目录），已接入 `docs-ci.yml` |
 | 其余（`fetch-github-repo.js`、`serve.js`、`png-probe.js`、`png-alpha.js`、`npx.js`、`pack-tgz.js`） | 辅助（拉取参考仓库、本地静态服务、PNG 检查、打包） |
 
 CI 侧（`.github/workflows/docs-ci.yml`）用 `actions/setup-node@v4`（Node 20）、`actions/setup-java@v4`（Temurin 21 + Maven 缓存）、`pnpm/action-setup@v4`（pnpm 11）。

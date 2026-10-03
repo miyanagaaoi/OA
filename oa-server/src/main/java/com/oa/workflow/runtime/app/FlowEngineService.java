@@ -828,13 +828,18 @@ public class FlowEngineService {
     /**
      * 撤回（REQ-FLOW-009）：仅发起人、仅节点②通过前；{@code withdrawn} 为到达态，立即回草稿。
      *
+     * <p><b>窗口判据见 {@link #withdrawAllowed}（2026-10-04 修正）</b>：看「节点②是否已通过 /
+     * ②之后的节点是否被推进过」，**不再**看「②之后的节点是否被取消」——
+     * 后者因 {@link #submit} 一次性物化全部 7 个节点实例（全 {@code pending}）而恒为「已越过②」，
+     * 使撤回在提交后永远失败。{@code pending}（未开始）不构成越界的证据。
+     *
      * <p><b>这是第二层（引擎兜底）</b>：第一层是 {@code FlowRuntimeController#withdraw} 的入口闸门，
      * 两处都取同一权限码 {@code FlowAction.WITHDRAW.permission()}（{@code flow:task:withdraw}），
      * 但**各管一件事**：
      * <ul>
      *   <li>入口层只判权限（无该权限码 → 403，不进引擎）；</li>
-     *   <li>本层判**身份**（{@code instance.initiatorId} 本人，或系统管理员）与状态机、时间窗
-     *       （{@code withdrawAllowed}：节点②通过前）—— 删掉本层即安全回归：
+     *   <li>本层判**身份**（{@code instance.initiatorId} 本人，或系统管理员）、状态机（终态拒绝）与
+     *       时间窗（{@code withdrawAllowed}：节点②通过前）—— 删掉本层即安全回归：
      *       「有 {@code flow:task:withdraw} 但不是发起人」会拿到别人的单。</li>
      * </ul>
      */
@@ -851,6 +856,13 @@ public class FlowEngineService {
                 .orElseThrow(() -> new BizException(ErrorCode.CONFLICT, "未知的实例状态：" + instance.getStatus()));
         if (status == InstanceStatus.DRAFT) {
             throw new BizException(ErrorCode.CONFLICT, "草稿状态的单据无需撤回");
+        }
+        // 终态不可撤回（approved 的顺序本就被 withdrawAllowed 的「②已通过」挡住，
+        // 这里补的是 terminated：`cancelLiveNodes` 会把全部节点置 cancelled，
+        // 若只看节点状态，「终止后撤回→回草稿→重提」会绕过 REQ-FLOW-010「终止后不可再提交」）。
+        if (status == InstanceStatus.APPROVED || status == InstanceStatus.TERMINATED) {
+            throw new BizException(ErrorCode.CONFLICT,
+                    "单据已处于终态（" + status.code() + "），不可撤回（REQ-FLOW-010 / AC-49）");
         }
         if (!withdrawAllowed(instanceId)) {
             throw new BizException(ErrorCode.FLOW_ACTION_NOT_ALLOWED,
@@ -1408,24 +1420,52 @@ public class FlowEngineService {
     }
 
     /**
-     * 撤回闸门：**仅节点②通过前**（REQ-FLOW-009）。
+     * 撤回闸门：**仅节点②通过前**（REQ-FLOW-009 / doc/prd-0.1.md 第 372、407、787 行；附录B 状态机）。
      *
-     * <p>判定：不存在 seq=2 且已通过的节点实例，且没有任何 seq &gt; 2 的节点实例被推进过
-     * （未取消即视为已越过②）。
+     * <h2>判据（2026-10-04 修正：由「未被取消」改为「未被推进」）</h2>
+     * <p>越没越过②，看的是**节点实例有没有被推进过**，而不是「有没有被取消」：
+     * <ol>
+     *   <li>{@code seq = 2} 的节点已 {@code approved} ⇒ 已越过② → <b>拒绝</b>（REQ-FLOW-009 正面口径）；</li>
+     *   <li>{@code seq > 2} 的节点只要**离开 {@code pending} 且未被取消**（{@code active} /
+     *       {@code waiting_supplement} / {@code returned} / {@code approved} / {@code skipped} /
+     *       {@code rejected}）⇒ 主干已推进到②之后 → <b>拒绝</b>；</li>
+     *   <li>其余（含 {@code seq > 2} 的 {@code pending}、已被上级动作取消的 {@code cancelled}）→ 放行。</li>
+     * </ol>
+     *
+     * <h2>为什么不能拿「未取消」当「未到达」</h2>
+     * <p>{@link #submit} 是**一次性物化**：提交时把快照里的 7 个节点实例全部落库为 {@code pending}，
+     * 只有终态级联（驳回/撤回/终止）才会把它们改成 {@code cancelled}。因此「{@code seq > 2} 未取消」
+     * 这条判据在**单据一提交就恒为「已越过②」** —— 撤回永远失败（上一轮运行期实测：两张单分别
+     * 409 / 40910）。{@code pending} 的语义是「尚未轮到本节点」（doc/enums.md §5），
+     * **未到达的节点不得阻止撤回**。
+     *
+     * <p>判据只依赖节点实例状态，不依赖 {@code flow_instance.current_node_seq}：流转/回退会把
+     * 当前序号改到别的部门节点上，而撤回窗口是**沿②这条主干**判定的。
      */
     private boolean withdrawAllowed(Long instanceId) {
         for (FlowNodeInstanceRow row : nodeInstanceMapper.selectByInstance(instanceId)) {
             if (row.getNodeSeq() == null) {
                 continue;
             }
+            // ① ②已通过 ⇒ 已越过撤回窗口（REQ-FLOW-009 的正面口径）
             if (row.getNodeSeq() == 2 && NodeStatus.APPROVED.code().equals(row.getStatus())) {
                 return false;
             }
-            if (row.getNodeSeq() > 2 && !NodeStatus.CANCELLED.code().equals(row.getStatus())) {
+            // ② ②之后的节点「被推进过」即视为已越过②；未到达的 pending 与终态级联的 cancelled 都不算
+            if (row.getNodeSeq() > 2 && advancedBeyondPending(row.getStatus())) {
                 return false;
             }
         }
         return true;
+    }
+
+    /** 节点实例是否「已离开未开始态」（{@code pending} = 未开始，不构成「已越过②」的证据）。 */
+    private static boolean advancedBeyondPending(String status) {
+        if (status == null) {
+            return false;
+        }
+        NodeStatus parsed = NodeStatus.of(status).orElse(null);
+        return parsed != null && parsed != NodeStatus.PENDING && parsed != NodeStatus.CANCELLED;
     }
 
     /** 内部用（无权限包装）的回到草稿：清未完成节点与待决议任务，写审计。 */

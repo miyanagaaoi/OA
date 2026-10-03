@@ -1,10 +1,10 @@
 -- ============================================================================
--- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 375 授权行，幂等）
+-- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 376 授权行，幂等）
 -- ----------------------------------------------------------------------------
--- 生成器: tools/build-flyway-migrations.js sha256=f03ac8fd71c2
+-- 生成器: tools/build-flyway-migrations.js sha256=1a70ffc3f41d
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
 -- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
--- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=61bd6f0c00f8
+-- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=841d1ef1c339
 -- 三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。
 -- 若角色段被移到授权段之后，授权 JOIN 不到角色会**静默插入 0 行**（表现为登录后没有菜单）——check-permission-seed.js 有顺序断言。
 -- 权限码为**冒号风格**（如 admin:user:export），与 oa-web 的前端判据逐字一致。
@@ -651,9 +651,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 company_admin（分公司流程管理员）：37 项 =====
--- 范围：门户全部 + 组织/人员/流程/表单管理；**不可再授权**
--- company_admin 分公司流程管理员：共 37 项（第 1/5 段）
+-- ===== 角色 company_admin（分公司流程管理员）：38 项 =====
+-- 范围：**发起审批（门户基础权限 flow）** + 门户全部 + 组织/人员/流程/表单管理；**不可再授权**
+-- company_admin 分公司流程管理员：共 38 项（第 1/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -661,7 +661,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 2/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 2/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -669,27 +669,27 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 3/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 3/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('portal:profile:signature', 'portal:profile:password', 'portal:profile:session', 'portal:archive', 'portal:archive:search', 'portal:h5', 'admin:org', 'admin:org:tree')
+  JOIN sys_permission p ON p.code IN ('portal:profile:signature', 'portal:profile:password', 'portal:profile:session', 'portal:archive', 'portal:archive:search', 'portal:h5', 'flow', 'admin:org')
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 4/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 4/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('admin:org:leader', 'admin:org:position', 'admin:user', 'admin:user:profile', 'admin:user:handover', 'admin:user:import', 'admin:flow', 'admin:flow:template')
+  JOIN sys_permission p ON p.code IN ('admin:org:tree', 'admin:org:leader', 'admin:org:position', 'admin:user', 'admin:user:profile', 'admin:user:handover', 'admin:user:import', 'admin:flow')
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 5/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 5/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('admin:flow:node', 'admin:flow:publish', 'admin:form', 'admin:form:template', 'admin:form:field')
+  JOIN sys_permission p ON p.code IN ('admin:flow:template', 'admin:flow:node', 'admin:flow:publish', 'admin:form', 'admin:form:template', 'admin:form:field')
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
@@ -1015,7 +1015,7 @@ SELECT perm_type, COUNT(*) AS cnt FROM sys_permission GROUP BY perm_type ORDER B
 
 -- ⑤ 每个角色的授权行数（期望值见下方注释；少于期望值 = 本文件的授权段未执行完）
 --   admin           94 行
---   company_admin   37 行
+--   company_admin   38 行
 --   employee        24 行
 --   dept_leader     33 行
 --   branch_leader   33 行

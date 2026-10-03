@@ -104,7 +104,7 @@ oa-deploy\runtime\start-local.cmd
 
 期望（与 `oa-deploy/LOCAL-DEV.md` §5 的自检清单一致）：
 
-- `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 375`、`flow_template = 4`
+- `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 376`、`flow_template = 4`
 - `sys_org ≥ 13`（含 5 个 `RT-*`）、`sys_user.dev_* = 7`、`sys_user.mtx_* = 5`
 - `sys_org_leader` 上 ①–⑥ 全部可解析 ⇒ 四类单据 precheck `allowed=true`
 - `information_schema.TRIGGERS`（schema `oa`）**= 4**，且 `UPDATE sys_log WHERE id=1` 报错
@@ -149,5 +149,20 @@ mvn -f oa-server/pom.xml -B test "-Dtest=AuthzMatrixHttpTest"
 
 - 本目录**不含任何真实凭据**：没有明文口令、没有可用口令的哈希、没有密钥。
   所有 `password_hash` 都是占位哈希（`$2a$12$000…`），**不对应任何口令**。
+- **为什么占位哈希「不可登录」是可证明的**：它是 `$2a$12$` + **52** 个 `0`，合计 **59 字符**，
+  而 BCrypt 密文恒为 **60 字符**（`$2a$12$` + 22 位 salt + 31 位 digest）。Spring Security 的
+  `BCryptPasswordEncoder#matches` 遇到非 60 字符的密文会打印
+  `Encoded password does not look like BCrypt` 并**对任何口令一律返回 false**
+  —— 即**结构上无法参与校验**，不依赖「猜不到口令」这一较弱假设。
+  回归网：`oa-server/src/test/java/com/oa/platform/fixture/FixtureCredentialSafetyTest.java`
+  （① 逐字断言夹具里每个 BCrypt 字面量都等于该占位值，任何「看起来可用」的哈希直接变红；
+  ② 断言它非 60 字符 ⇒ 对任意口令 `matches=false`；③ 提供 `-Doa.it.known.passwords` 时
+  对候选口令逐个断言 `matches=false`）。
+  运行期实测（本机）：以已知 dev 口令 POST `/api/v1/auth/login` 打 `mtx_em01` / `mtx_dl01` /
+  `mtx_gl01` / `mtx_em02` / `matrix_admin` 全部 `401 40103 账号或口令错误`；
+  同一入口在把口令运行期 `UPDATE` 进 `mtx_ca01` 后返回 `200`（证明 401 是哈希不可用，不是入口坏了）。
+- **需要登录时怎么注入**：口令**只**在运行期给出，绝不写进本目录 ——
+  `AuthzMatrixHttpTest#applyFixtureAndCredentials` 会在 `@BeforeAll` 里重放本目录夹具，
+  再用 `PasswordService` 为 `mtx_*` 现生成**随机口令**并 `UPDATE sys_user.password_hash`。
 - 手机号 `138…` 是**示例号段**，非真实号码。
 - 这些脚本只应在本机开发库执行；生产/联调按 [`../env-checklist.md`](../env-checklist.md) 走。

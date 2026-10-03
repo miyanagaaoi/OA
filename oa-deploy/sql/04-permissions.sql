@@ -19,7 +19,7 @@
 --
 -- 【规模】
 --   角色 9 个；权限项合计 94 项：menu 82 + button 12 + api 0；
---   顶层节点 20 个，最大深度 2 层；授权行 375 行。
+--   顶层节点 20 个，最大深度 2 层；授权行 376 行。
 --   说明：任务书建议规模 60–90 项，但其「至少覆盖」清单本身展开即需 94 行
 --   （含 82 个页面级菜单/分组节点）；已裁定**接受 94 项**，不再删减。
 --
@@ -62,7 +62,7 @@
 --     · sys_role 命中 uk_sys_role_code(code)，只覆盖 name/role_scope/data_scope（**不改 code、不改 remark**）；
 --     · sys_permission 命中 uk_sys_permission_code(code)，只覆盖 name/url/sort_no；
 --     · sys_role_permission 命中 uk_role_permission(role_id, permission_id)，重复执行不产生重复行；
---   因此本文件可**重复执行**，且执行后：角色 9 行、权限项 94 行、授权 375 行。
+--   因此本文件可**重复执行**，且执行后：角色 9 行、权限项 94 行、授权 376 行。
 --   注意（已知限制）：sys_permission 的 ON DUPLICATE 分支**不重排 parent_id**。若已有环境的树形结构需要改挂
 --   父节点，请先在测试库 DELETE FROM sys_permission（生产环境请走「权限树勾选」界面，并留存审计 before/after），
 --   再整体重跑本文件。
@@ -87,7 +87,7 @@
 -- 【默认授权表】（可读定义在 tools/gen-permission-seed.js 的 ROLE_GRANTS；界面可再调）
 --   | 角色码          | 项数 | 授权范围
 --   | admin          |  94 | 全部权限（含全部 admin:* 与 flow:*）
---   | company_admin  |  37 | 门户全部 + 组织/人员/流程/表单管理；**不可再授权**
+--   | company_admin  |  38 | **发起审批（门户基础权限 flow）** + 门户全部 + 组织/人员/流程/表单管理；**不可再授权**
 --   | employee       |  24 | 门户基础（工作台/发起/详情/消息/个人中心/归档检索/H5）+ 撤回自己发起的单据；无审批动作
 --   | dept_leader    |  33 | 员工基础包 + 审批动作包
 --   | branch_leader  |  33 | 员工基础包 + 审批动作包
@@ -97,8 +97,11 @@
 --   | chairman       |  40 | 员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内
 --   关键口径（越权防护的种子层保障）：
 --     · admin               = 全部权限；
---     · company_admin       = portal:* + admin:org:* + admin:user:*（**除** admin:user:export）
---                             + admin:flow:* + admin:form:*；
+--     · company_admin       = **flow（门户基础权限 / 发起审批）** + portal:* + admin:org:* + admin:user:*
+--                             （**除** admin:user:export）+ admin:flow:* + admin:form:*；
+--                             flow 的取证：PRD 附录A 权限矩阵「发起审批」行「分公司管理员 = ✓」
+--                             （该角色还是 9 个角色里唯一持 portal:h5 却曾不持 flow 的，属种子漏授）；
+--                             动作码仍按「审批单据」行授予（该行为 -，故**不含任何 flow:task: 动作码**）；
 --                             **完全不含 admin:role 整支（含只读的 admin:role:list）**、
 --                             **不含 admin:authz:*、admin:system:*** —— 体现 PRD 5.2「分公司管理员不可再授权」；
 --     · employee            = 门户基础包 + flow:task:withdraw（可撤回自己发起的单据，PRD 6.4）；
@@ -772,9 +775,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 company_admin（分公司流程管理员）：37 项 =====
--- 范围：门户全部 + 组织/人员/流程/表单管理；**不可再授权**
--- company_admin 分公司流程管理员：共 37 项（第 1/5 段）
+-- ===== 角色 company_admin（分公司流程管理员）：38 项 =====
+-- 范围：**发起审批（门户基础权限 flow）** + 门户全部 + 组织/人员/流程/表单管理；**不可再授权**
+-- company_admin 分公司流程管理员：共 38 项（第 1/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -782,7 +785,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 2/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 2/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -790,27 +793,27 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 3/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 3/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('portal:profile:signature', 'portal:profile:password', 'portal:profile:session', 'portal:archive', 'portal:archive:search', 'portal:h5', 'admin:org', 'admin:org:tree')
+  JOIN sys_permission p ON p.code IN ('portal:profile:signature', 'portal:profile:password', 'portal:profile:session', 'portal:archive', 'portal:archive:search', 'portal:h5', 'flow', 'admin:org')
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 4/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 4/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('admin:org:leader', 'admin:org:position', 'admin:user', 'admin:user:profile', 'admin:user:handover', 'admin:user:import', 'admin:flow', 'admin:flow:template')
+  JOIN sys_permission p ON p.code IN ('admin:org:tree', 'admin:org:leader', 'admin:org:position', 'admin:user', 'admin:user:profile', 'admin:user:handover', 'admin:user:import', 'admin:flow')
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- company_admin 分公司流程管理员：共 37 项（第 5/5 段）
+-- company_admin 分公司流程管理员：共 38 项（第 5/5 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('admin:flow:node', 'admin:flow:publish', 'admin:form', 'admin:form:template', 'admin:form:field')
+  JOIN sys_permission p ON p.code IN ('admin:flow:template', 'admin:flow:node', 'admin:flow:publish', 'admin:form', 'admin:form:template', 'admin:form:field')
  WHERE r.code = 'company_admin'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
@@ -1136,7 +1139,7 @@ SELECT perm_type, COUNT(*) AS cnt FROM sys_permission GROUP BY perm_type ORDER B
 
 -- ⑤ 每个角色的授权行数（期望值见下方注释；少于期望值 = 本文件的授权段未执行完）
 --   admin           94 行
---   company_admin   37 行
+--   company_admin   38 行
 --   employee        24 行
 --   dept_leader     33 行
 --   branch_leader   33 行

@@ -14,6 +14,7 @@ import com.oa.workflow.runtime.api.dto.RuntimeRequests.JumpRequest;
 import com.oa.workflow.runtime.api.dto.RuntimeRequests.RejectRequest;
 import com.oa.workflow.runtime.api.dto.RuntimeRequests.ReasonRequest;
 import com.oa.workflow.runtime.api.dto.RuntimeRequests.RouteRequest;
+import com.oa.workflow.runtime.domain.FlowAction;
 import com.oa.workflow.task.app.FlowTaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,19 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>POST</td><td>{@code /flow-tasks/{taskId}/transfer}</td><td>{@code flow:task:transfer}</td><td>转办</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-tasks/{taskId}/reassign}</td><td>{@code flow:task:reassign}</td><td>改派（仅系统管理员）</td></tr>
  * </table>
+ *
+ * <h2>两层权限（纵深防御；与 {@code FlowRuntimeController} 同一范式）</h2>
+ * <p><b>入口层只判权限</b>：每个动作端点取**该动作自己的权限码** {@code FlowAction.XXX.permission()}
+ * （单一真源，见 {@link FlowAction}），不持有该码 → 403 / {@code 40301}，请求**不进引擎**、也不读实例。
+ * 改前 11 个动作端点用 {@code WorkflowPermissionService#requireInitiator}
+ * （放行 {@code flow} ∪ {@code admin:flow}），比引擎宽：{@code company_admin} 这类
+ * 「持有 {@code admin:flow} 但不持动作码」的账号会「先过入口、再被引擎 403」，层次不干净。
+ *
+ * <p><b>引擎层判身份 + 状态机</b>（{@code FlowEngineService}）：同一动作码复核一次，
+ * 再按 {@code flow_task.assignee_id} 判「任务本人」、按实例/节点/任务状态判可达性 ——
+ * 入口放行不等于业务放行。「有动作权限但不是任务本人」在引擎层被拒，是**可接受的第二层**：
+ * 入口层刻意不读实例，否则要么在闸门里引入数据库依赖，入口拒人发生在读库之后，
+ * 要么用「403 / 域外 404」的差异泄露任务是否存在。
  *
  * <p>控制器只做入参绑定与「收单前权限」判定；状态迁移全部在 {@code FlowEngineService}（引擎层统一）。
  */
@@ -92,7 +106,7 @@ public class FlowTaskController {
     @Audited(action = "approve", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> approve(@PathVariable("taskId") Long taskId,
                                              @RequestBody(required = false) ApproveRequest request) {
-        permissionService.requireInitiator("通过审批任务");
+        permissionService.requirePermission(FlowAction.APPROVE.label(), FlowAction.APPROVE.permission());
         return ApiResponse.success(taskService.approve(taskId,
                 request == null ? null : request.opinion(),
                 request == null ? null : request.collabDeptIds()));
@@ -102,7 +116,7 @@ public class FlowTaskController {
     @Audited(action = "reject", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> reject(@PathVariable("taskId") Long taskId,
                                             @RequestBody(required = false) RejectRequest request) {
-        permissionService.requireInitiator("驳回审批任务");
+        permissionService.requirePermission(FlowAction.REJECT.label(), FlowAction.REJECT.permission());
         return ApiResponse.success(taskService.reject(taskId, request == null ? null : request.opinion()));
     }
 
@@ -110,7 +124,7 @@ public class FlowTaskController {
     @Audited(action = "archive_register", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> archiveRegister(@PathVariable("taskId") Long taskId,
                                                      @RequestBody(required = false) ArchiveRegisterRequest request) {
-        permissionService.requireInitiator("归档登记");
+        permissionService.requirePermission(FlowAction.ARCHIVE_REGISTER.label(), FlowAction.ARCHIVE_REGISTER.permission());
         return ApiResponse.success(taskService.archiveRegister(taskId,
                 request == null ? null : request.opinion()));
     }
@@ -119,7 +133,7 @@ public class FlowTaskController {
     @Audited(action = "rollback", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> rollback(@PathVariable("taskId") Long taskId,
                                               @Valid @RequestBody ReasonRequest request) {
-        permissionService.requireInitiator("回退上一节点");
+        permissionService.requirePermission(FlowAction.ROLLBACK.label(), FlowAction.ROLLBACK.permission());
         return ApiResponse.success(taskService.rollback(taskId, request.reason()));
     }
 
@@ -127,7 +141,7 @@ public class FlowTaskController {
     @Audited(action = "route", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> route(@PathVariable("taskId") Long taskId,
                                            @Valid @RequestBody RouteRequest request) {
-        permissionService.requireInitiator("流转单据");
+        permissionService.requirePermission(FlowAction.ROUTE.label(), FlowAction.ROUTE.permission());
         return ApiResponse.success(taskService.route(taskId, request.toDeptId(), request.reason()));
     }
 
@@ -135,7 +149,7 @@ public class FlowTaskController {
     @Audited(action = "back_home", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> backHome(@PathVariable("taskId") Long taskId,
                                               @Valid @RequestBody ReasonRequest request) {
-        permissionService.requireInitiator("回到本部门");
+        permissionService.requirePermission(FlowAction.BACK_HOME.label(), FlowAction.BACK_HOME.permission());
         return ApiResponse.success(taskService.backHome(taskId, request.reason()));
     }
 
@@ -143,7 +157,7 @@ public class FlowTaskController {
     @Audited(action = "jump", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> jump(@PathVariable("taskId") Long taskId,
                                           @Valid @RequestBody JumpRequest request) {
-        permissionService.requireInitiator("自由跳转");
+        permissionService.requirePermission(FlowAction.JUMP.label(), FlowAction.JUMP.permission());
         return ApiResponse.success(taskService.jump(taskId, request.targetSeq(), request.reason()));
     }
 
@@ -151,7 +165,7 @@ public class FlowTaskController {
     @Audited(action = "add_sign", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> addSign(@PathVariable("taskId") Long taskId,
                                              @Valid @RequestBody AddSignRequest request) {
-        permissionService.requireInitiator("加签");
+        permissionService.requirePermission(FlowAction.ADD_SIGN.label(), FlowAction.ADD_SIGN.permission());
         return ApiResponse.success(taskService.addSign(taskId, request.type(), request.delegateUserId(),
                 request.reason()));
     }
@@ -160,7 +174,7 @@ public class FlowTaskController {
     @Audited(action = "supplement_request", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> supplementRequest(@PathVariable("taskId") Long taskId,
                                                        @Valid @RequestBody ReasonRequest request) {
-        permissionService.requireInitiator("请求补件");
+        permissionService.requirePermission(FlowAction.SUPPLEMENT_REQUEST.label(), FlowAction.SUPPLEMENT_REQUEST.permission());
         return ApiResponse.success(taskService.supplementRequest(taskId, request.reason()));
     }
 
@@ -168,7 +182,7 @@ public class FlowTaskController {
     @Audited(action = "transfer", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> transfer(@PathVariable("taskId") Long taskId,
                                               @Valid @RequestBody HandoverRequest request) {
-        permissionService.requireInitiator("转办审批任务");
+        permissionService.requirePermission(FlowAction.TRANSFER.label(), FlowAction.TRANSFER.permission());
         return ApiResponse.success(taskService.transfer(taskId, request.toUserId(), request.reason()));
     }
 
@@ -176,7 +190,7 @@ public class FlowTaskController {
     @Audited(action = "reassign", targetType = "task", targetId = "#taskId", recordArgs = true)
     public ApiResponse<ActionResult> reassign(@PathVariable("taskId") Long taskId,
                                               @Valid @RequestBody HandoverRequest request) {
-        permissionService.requireInitiator("改派审批任务");
+        permissionService.requirePermission(FlowAction.REASSIGN.label(), FlowAction.REASSIGN.permission());
         return ApiResponse.success(taskService.reassign(taskId, request.toUserId(), request.reason()));
     }
 }

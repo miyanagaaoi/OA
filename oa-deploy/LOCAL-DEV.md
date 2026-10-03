@@ -67,7 +67,7 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 # 启动应用后由 Flyway 自动执行 V1 → V2 → V3 → V4
 ```
 
-期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=375`。
+期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=376`。
 
 > **生成产物是确定性的，可安全重跑**：`tools/gen-init-sql.js` 与 `tools/build-flyway-migrations.js` 的产物头部只有
 > 确定性溯源行（生成器自身 sha256 + 来源内容 sha256），**不含墙钟时间戳**，因此「同一输入 → 逐字节相同」，
@@ -134,6 +134,8 @@ oa-deploy\runtime\start-local.cmd          # 等 /actuator/health 返回 UP（Fl
 
 > 第 3 条需要库里 `sys_log` 存在 `id=1` 的行——**MySQL 触发器是逐行触发的，空表上 `WHERE id=1` 命中 0 行不会触发**，会「假通过」。
 > 用 [`fixtures/50-trigger-fixture.sql`](fixtures/50-trigger-fixture.sql) 造夹具（已入库，替代原 `.cache/trigger-test-fixture.sql`）。
+
+> **文档侧只读自检（不需要起数据库）**：`node tools/check-normify-anchors.js --check` —— 校验结构基线 `normify-oa` 里 doc 证据引用「锚点化」是否成立（doc 引用不得带行号、每条 doc 引用在模块正文 `## 证据锚点` 有对应锚点、锚点必须真的存在于该文档）；有 error 时 exit 1，已接入 `docs-ci.yml`。工具清单见 [`../doc/dependencies.md`](../doc/dependencies.md) §5。
 
 ## 6. 已知限制（本机开发形态）
 
