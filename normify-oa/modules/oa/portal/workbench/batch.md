@@ -11,8 +11,8 @@ description:
   en: >
       Batch actions after selecting rows: batch approve (per-row opinion and signature checks), batch transfer, and export of the selection (system administrator only); destructive batches require a second confirmation listing the affected objects; results come back row by row and one failure does not roll back the rest.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.780Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.415Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

@@ -16,8 +16,9 @@ import java.util.Set;
  *   <li>{@code admin:flow:template} —— 流程模板（模板列表/详情/节点/版本历史）；</li>
  *   <li>{@code admin:flow:node} —— 节点配置（节点增删改、决议/策略/跳过条件/解析规则）；</li>
  *   <li>{@code admin:flow:publish} —— 发布与停用（开新版本、发布、归档、发布前校验）；</li>
- *   <li>{@code flow} —— 审批动作基础包（发起前预检 / 建实例 / 提交 / 读快照）；</li>
- *   <li>{@code admin:flow} —— 流程管理整支（{@code company_admin} 持有，作发起侧的兜底）；</li>
+ *   <li>{@code flow} —— 审批动作基础包（发起：建实例 / 提交 / 重提 / 补件；只读：预检 / 列表 / 详情 / 快照）；</li>
+ *   <li>{@code admin:flow} —— 流程管理整支（{@code company_admin} 持有；**只**作发起侧只读/干跑入口的兜底，
+ *       不再放行「建草稿」写入口 —— 见 {@link #FLOW_ADMIN} 与 {@link #requireInitiator}）；</li>
  *   <li>{@code flow:task:terminate} —— 终止流程（AC-49：仅系统管理员与集团分管领导）。</li>
  * </ul>
  *
@@ -41,10 +42,15 @@ public final class FlowConfigPermission {
     /** 版本发布（开新版本 / 发布 / 归档 / 发布前校验）。 */
     public static final String PUBLISH = "admin:flow:publish";
 
-    /** 审批动作基础包（发起前预检 / 建实例 / 提交 / 读快照）。 */
+    /** 审批动作基础包（发起：建实例 / 提交 / 重提 / 补件；只读：预检 / 列表 / 详情 / 快照）。 */
     public static final String FLOW_USE = "flow";
 
-    /** 流程管理整支（发起侧的兜底：{@code company_admin} 持有 {@code admin:flow:*} 但不含 {@code flow}）。 */
+    /**
+     * 流程管理整支 —— 发起侧**只读/干跑**入口（预检、列表、详情、读快照）的兜底。
+     *
+     * <p>{@code company_admin} 持有 {@code admin:flow:*}；V4 种子已给它补上 {@code flow}，
+     * 因此「建草稿」写入口在 2026-10-04 收紧到 {@link #FLOW_USE} 不会收窄它的可用面。
+     */
     public static final String FLOW_ADMIN = "admin:flow";
 
     /** 终止流程（AC-49 / REQ-FLOW-010）：种子 {@code V4__permissions.sql} 的持有人恰为 {admin, group_leader}。 */
@@ -79,7 +85,14 @@ public final class FlowConfigPermission {
         }
     }
 
-    /** 发起侧权限（预检 / 建实例 / 提交 / 读快照）：{@code flow} 或 {@code admin:flow} 均可。 */
+    /**
+     * 发起侧**只读/干跑**入口权限（预检 / 列表 / 详情 / 读快照）：{@code flow} 或 {@code admin:flow} 均可。
+     *
+     * <p><b>不再覆盖写入口</b>（2026-10-04）：建草稿（{@code POST /flow-instances}）与
+     * 提交 / 重提 / 补件一样，改取「该动作自己的权限码」{@code flow}（{@link #FLOW_USE}），
+     * 否则入口会比动作面宽 —— 只持 {@code admin:flow} 的主体能建草稿、却在 {@code submit} 处被引擎拒。
+     * 本方法保留给只读入口：那里 {@code admin:flow} 主体本就应当可读（数据域在查询层过滤）。
+     */
     public static void requireInitiator(Boolean superAdmin, Collection<String> codes, String action) {
         require(superAdmin, codes, action, FLOW_USE, FLOW_ADMIN);
     }

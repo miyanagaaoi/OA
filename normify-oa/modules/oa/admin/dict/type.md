@@ -11,8 +11,8 @@ description:
   en: >
       Maintains the dictionary type catalogue (category, pay_method, contract_type, seal_type, cert_name and friends) and provides a reset back to the built-in defaults.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.646Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.253Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"

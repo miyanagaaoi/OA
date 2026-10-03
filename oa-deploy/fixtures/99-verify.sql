@@ -45,8 +45,10 @@ SELECT 'leader_chain.3', '=1',    CAST(COUNT(*) AS CHAR),
        IF(COUNT(*) = 1, 'PASS', 'FAIL')
   FROM sys_org_leader WHERE org_id = 12 AND leader_type = 'deputy'
 UNION ALL
-SELECT 'leader_chain.45','=2',    CAST(COUNT(*) AS CHAR),
-       IF(COUNT(*) = 2, 'PASS', 'FAIL')
+-- ⑤ 集团分管领导按**事项类别五值全绑**（business/economy/admin/hr/invest，同一人 303），
+-- 故 org_id=1 的正职行 = ⑥ chairman（category IS NULL）1 行 + ⑤ 五类 5 行 = **6**。
+SELECT 'leader_chain.45','=6',    CAST(COUNT(*) AS CHAR),
+       IF(COUNT(*) = 6, 'PASS', 'FAIL')
   FROM sys_org_leader WHERE org_id = 1 AND leader_type = 'primary'
 UNION ALL
 SELECT 'role_codes',     '=9',    CAST(COUNT(*) AS CHAR),

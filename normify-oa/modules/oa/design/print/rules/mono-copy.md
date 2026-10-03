@@ -11,8 +11,8 @@ description:
   en: >
       No information may be lost in a black-and-white copy: anything distinguished by colour alone must also carry text, status and risk and selection are expressed as words or as the check-box glyphs, and fillable cells get a 3–4% grey wash (#fafafa) visible on screen but all but invisible in print while label columns stay unfilled.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.695Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.338Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -10,8 +10,8 @@ description:
   en: >
       Excel bulk import and export of the org tree; before restructuring, the affected in-flight documents are listed and execution requires admin confirmation, so snapshots cannot strand documents.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.725Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.367Z"
 fingerprint: 1366f352ed8dfb0182ade30ce729db8efcf4aa99f5e65519ff7641ca700ea4f6
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/strategy/OrgImportStrategy.java"

@@ -11,8 +11,8 @@ description:
   en: >
       Pre-publish validation: trunk node continuity, mandatory approver rule, valid countersign threshold, timeout ≥24h, skip-condition field existence, no rule that always yields an empty candidate set and complete decision modes; the post-rejection destination is NOT part of per-node validation — phase 1 fixes it to "back to the initiator" with no per-node configuration (per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4); any failure blocks publishing with a concrete reason.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.803Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.435Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

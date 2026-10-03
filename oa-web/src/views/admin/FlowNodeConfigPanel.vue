@@ -247,9 +247,9 @@ async function saveDecision(): Promise<void> {
   try {
     const saved = await putFlowNodeDecision(props.node.nodeId, {
       decisionMode: decision.mode,
-      // 「不配置」必须传**空串**清空 pass_threshold：后端只在 passThreshold != null 时才写该列，
-      // 传 null 是「不改动」——否则会停在「或签 + 残留阈值」的非法组合上（服务端 40008）。
-      passThreshold: decision.thresholdKind === 'none' ? '' : null,
+      // 「不配置」传 `null` 即清空 pass_threshold（与传空串同义，2026-10-04 后端三态统一）；
+      // absolute / percent 由下面两个字段给出（T-07：绝对人数优先）。
+      passThreshold: null,
       thresholdAbsolute: decision.thresholdKind === 'absolute' ? decision.absolute : null,
       thresholdPercent: decision.thresholdKind === 'percent' ? decision.percent : null,
     })
@@ -571,8 +571,8 @@ async function saveBase(): Promise<void> {
           保存决议模式与阈值
         </el-button>
         <span class="oa-text-caption oa-text-subtle">
-          「不配置（过半）」会**清空**已落库的 <code>pass_threshold</code>（传空串；传 null 是「不改动」——
-          服务端语义，curl 实测）。
+          「不配置（过半）」会**清空**已落库的 <code>pass_threshold</code>——传 <code>null</code>（本页当前下发）
+          与传空串同义（服务端三态，2026-10-04 统一）。
         </span>
       </div>
 

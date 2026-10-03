@@ -11,8 +11,8 @@ description:
   en: >
       Four ink levels: ink #14181f at 16.8:1, ink-muted #4a5563 at 7.8:1, ink-subtle #5f6b7a at 5.2:1 and ink-disabled #aeb7c4 at roughly 2.0:1; disabled means currently unavailable only and must never carry content that has to be read, so secondary text that still needs reading always uses ink-subtle.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.699Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.341Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

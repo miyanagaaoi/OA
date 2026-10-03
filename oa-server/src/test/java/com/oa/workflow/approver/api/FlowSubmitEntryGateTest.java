@@ -37,8 +37,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * —— 只持 {@code admin:flow} 的角色能过入口、再被引擎 403。故入口同步取同一个动作码：
  * <b>入口判权限、引擎判身份与状态机</b>，两层同源。
  *
- * <p>刻意保留的宽口：{@code POST /flow-instances}（<b>建草稿</b>）仍由 {@code requireInitiator} 放行
- * ——「发起」不在 {@link FlowAction} 的动作面内（PRD 附录A「发起审批」行 8 列全 ✓）。
+ * <p><b>最后一处宽口（{@code POST /flow-instances} 建草稿）也已收紧</b>（本轮，2026-10-04）：
+ * 「发起」取的仍是 {@code flow}（门户基础权限）而非 {@code admin:flow} ——
+ * 依据是 PRD 附录A「发起审批」行 8 个角色全 ✓，且 V4 种子已给 {@code company_admin} 补上 {@code flow}
+ * （因此业务可用面不变，被挡住的只有「只持 {@code admin:flow} 的自定义角色」这一类
+ * 「入口比动作面宽」的主体）。本类同时覆盖 {@code submit} 与 {@code create} 两处闸门。
  */
 class FlowSubmitEntryGateTest {
 
@@ -46,21 +49,21 @@ class FlowSubmitEntryGateTest {
 
     private EffectivePermissionService permissions;
     private FlowEngineService engine;
+    /** 建草稿（{@code POST /flow-instances}）落点：闸门拒人时必须**零交互**。 */
+    private FlowInstanceService instances;
     private MockMvc mvc;
 
     @BeforeEach
     void setUp() {
         permissions = mock(EffectivePermissionService.class);
         engine = mock(FlowEngineService.class);
-        FlowInstanceService instances = mock(FlowInstanceService.class);
+        instances = mock(FlowInstanceService.class);
         ApproverPrecheckService precheck = mock(ApproverPrecheckService.class);
         WorkflowPermissionService gate = new WorkflowPermissionService(permissions);
         mvc = MockMvcBuilders
                 .standaloneSetup(new FlowInstanceController(instances, precheck, gate, engine))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
-        when(instances.create(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
-                .thenReturn(null);
     }
 
     @AfterEach
@@ -124,5 +127,70 @@ class FlowSubmitEntryGateTest {
         org.assertj.core.api.Assertions.assertThat(FlowAction.SUBMIT.permission())
                 .as("入口与引擎共用同一动作码（单一真源 FlowAction）")
                 .isEqualTo("flow");
+    }
+
+    // ================================================================ 建草稿（POST /flow-instances）
+
+    @Test
+    @DisplayName("入口层｜create：只持 admin:flow（改前被 requireInitiator 放行）→ 403/40301，服务层零交互")
+    void createEntryRejectsAdminFlowOnly() throws Exception {
+        login(101L, "ca01", "company_admin", FlowConfigPermission.FLOW_ADMIN, FlowConfigPermission.TEMPLATE_READ);
+
+        mvc.perform(post("/api/v1/flow-instances")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"formType\":\"matter\",\"category\":\"business\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(ErrorCode.FORBIDDEN.getCode()))
+                .andExpect(jsonPath("$.message").value("无权执行「发起审批单」：需要权限 "
+                        + FlowConfigPermission.FLOW_USE));
+
+        // 拒人发生在读库之前：建草稿服务一行都没被调到（预检 / 快照 / 落库全部未发生）
+        verifyNoInteractions(instances);
+    }
+
+    @Test
+    @DisplayName("入口层｜create：持 flow → 200 且交给建草稿服务（门户基础权限即「发起」的口径）")
+    void createEntryPassesWithFlow() throws Exception {
+        login(102L, "emp01", "employee", FlowConfigPermission.FLOW_USE);
+
+        mvc.perform(post("/api/v1/flow-instances")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"formType\":\"matter\",\"category\":\"business\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        verify(instances).create(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("入口层｜create：系统管理员（admin 角色）即使无有效权限码也放行")
+    void createEntryPassesForSuperAdmin() throws Exception {
+        login(100L, "admin", "admin");
+
+        mvc.perform(post("/api/v1/flow-instances")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"formType\":\"matter\",\"category\":\"business\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        verify(instances).create(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("对照表锁｜create 的闸门是 flow 单码：改前的 requireInitiator 会放行 admin:flow（故必须收紧）")
+    void createGateIsFlowOnlyNotInitiator() {
+        java.util.Collection<String> adminFlowOnly = java.util.Set.of(FlowConfigPermission.FLOW_ADMIN);
+
+        org.assertj.core.api.Assertions.assertThat(FlowConfigPermission.FLOW_USE)
+                .as("「发起」这一动作的权限码")
+                .isEqualTo("flow");
+        org.assertj.core.api.Assertions.assertThat(FlowConfigPermission.has(false, adminFlowOnly,
+                        FlowConfigPermission.FLOW_USE))
+                .as("新闸门（flow 单码）拒绝只持 admin:flow 的主体")
+                .isFalse();
+        org.assertj.core.api.Assertions.assertThat(FlowConfigPermission.has(false, adminFlowOnly,
+                        FlowConfigPermission.FLOW_USE, FlowConfigPermission.FLOW_ADMIN))
+                .as("旧闸门 requireInitiator 会放行 —— 这正是本轮收紧的不对称")
+                .isTrue();
     }
 }

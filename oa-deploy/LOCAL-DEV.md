@@ -121,6 +121,17 @@ oa-deploy\runtime\start-local.cmd          # 等 /actuator/health 返回 UP（Fl
 > （飞轮路径：改 `doc/data-model.md` → `node tools/gen-init-sql.js` → `node tools/build-flyway-migrations.js` → 重置库）。
 > 已在临时库上从零验证：同一套迁移 + 夹具 + 断言 16/16 PASS，重复执行行数不变（连跑两次 `sys_org_leader` 行数一致）。
 
+> **⑤ 集团分管领导「五类业务线全绑」**（2026-10-04）：`fixtures/20-dev-people.sql` 在集团根
+> （`org_id = 1`）为 `business` / `economy` / `admin` / `hr` / `invest` **各绑一行**
+> `leader_type = 'primary'` 的分管领导（同一人 `dev_gl01`），因此**任意事项类别**都能跑到
+> `precheck allowed=true`；`99-verify.sql` 的 `leader_chain.45` 期望值随之改为 **6**
+> （⑥ chairman 1 行 + ⑤ 五类 5 行）。
+>
+> **建草稿的入口闸门**（2026-10-04 收紧）：`POST /api/v1/flow-instances` 只认 **`flow`**
+> （门户基础权限）——旧的 `flow` ∪ `admin:flow` 口径已废弃，与动作面 `submit` 同源，
+> 免得「只持 `admin:flow` 的自定义角色能建草稿、却在提交处被引擎 403」。9 个内置角色全部持有
+> `flow`，故业务可用面不变。口径表与 403 报文样例见 [`fixtures/README.md`](fixtures/README.md) §4.1。
+
 ## 5. 启动后自检清单（5 分钟）
 
 | # | 命令 / 操作 | 期望 |

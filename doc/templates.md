@@ -30,9 +30,9 @@
 
 | 编号 | 技术项 | 待办 | 责任面 |
 | --- | --- | --- | --- |
-| B-01 | ⑦ 的 `decision_mode` 可空 | 登记节点无决议，`decision_mode` / `pass_threshold` 置 `NULL`；`data-model.md` 4.2 需允许 `node_type = 'archive'` 时为 NULL（或实现写 `'any'` 占位、引擎跳过决议计算） | 后端 + `data-model.md` |
+| B-01 | ⑦ 的 `decision_mode` 可空 | **已关闭（2026-10-04 复核）**：`data-model.md` 4.2 已允许 `node_type = 'archive'` 时 `decision_mode` / `pass_threshold` 为 `NULL`，实现也按 `NULL` 落库（只有非归档节点才会被回填 `any` 占位） | 后端 + `data-model.md` |
 | B-02 | 「不计入审批时长与效率统计」的口径 | 效率报表（PRD REQ-ADMIN-005，P1）的分母与耗时统计需**排除 `node_type = 'archive'` 的节点** | 报表实现 |
-| B-03 | `archive_register` 轨迹动作 | `data-model.md` 6.5 现写 `archive`，须同步为 `archive_register`（见 `enums.md` S-14） | `data-model.md` |
+| B-03 | `archive_register` 轨迹动作 | **已关闭（2026-10-04 复核）**：`data-model.md` 6.5 已是 `archive_register`（旧值 `archive` 标注作废），与 `enums.md` §9 / S-14 一致 | `data-model.md` |
 | B-04 | `heic` / `wps` 预览降级 | 附件白名单 15 种；`heic` 转 `jpg` 预览、`wps` 提示下载 | 前端 + 文件服务 |
 
 ---
@@ -616,11 +616,38 @@
 
 ### 3.3 模板状态机
 
-| 状态 | 中文名 | 允许的操作 | 是否可被新实例使用 |
+| 状态 | 中文名 | 是否可被新实例使用 | 配置可写性 |
 | --- | --- | --- | --- |
-| `draft` | 草稿 | 编辑节点与字段 | 否 |
-| `published` | 已发布 | 只读；如需改配置必须发布新版本 | **是**（同一 `code` 下最多一个 `published` 版本） |
-| `archived` | 已归档 | 只读 | 否（但**在途实例继续执行**） |
+| `draft` | 草稿 | 否 | **唯一可编辑态**：节点增删改、决议模式与阈值、签名策略、Q6/Q7 闸门、名称与表单定义都可写 |
+| `published` | 已发布 | **是**（同一 `code` 下最多一个 `published` 版本） | **只读**；如需改配置必须开新版本再发布 |
+| `archived` | 已归档 | 否（但**在途实例继续执行**，V-05） | **只读**；可由 `restore` 恢复为 `published` |
+
+**状态迁移表**（入口路由与权限见 §4.4；只列对外可用的迁移动作）：
+
+| 当前状态 | 动作 | 结果状态 | 前置守卫 / 拒绝时的错误码 |
+| --- | --- | --- | --- |
+| `draft` | `publish` | `published` | 先跑发布前校验（**同一事务内重跑**，不信任 `/pre-publish-check` 的缓存结果）；不通过 → **400 / `40008`**。成功后同 `code` 的原 `published` 转 `archived` |
+| `draft` | `archive` | `archived` | **刻意允许**：这是「放弃草稿」的唯一出路（`newVersion` 拒绝基于草稿开版本，且没有删除模板的接口，禁掉它就是把守卫做成死锁） |
+| `published` | `publish` | — | **409 / `40906`**（只读）：改配置请先 `POST /versions` 开新草稿 |
+| `published` | `archive` | `archived` | **该 `code` 下唯一 `published` 版本不可归档 → 409 / `40914`**；只有同 `code` 已有其它 `published` 时才允许归档 |
+| `published` | `restore` | `published` | **幂等返回当前视图**（200，不重复写库、不重复审计） |
+| `archived` | `publish` | — | **409 / `40906`**：已归档是**冻结版本**，重新上线走 `restore`（不塞进 `publish`，理由见下） |
+| `archived` | `archive` | `archived` | **幂等返回当前视图**（200，不重复写库、不重复审计） |
+| `archived` | `restore` | `published` | **恢复同样要过发布前校验**（见下）；同 `code` 已有其它 `published` → **409 / `40915`**；校验不过 → **400 / `40008`** |
+| 三个状态之外 | 任意 | — | **400 / `40008`**（`TemplateVersionPolicy#requireKnownStatus`：状态合法性只认三值） |
+
+**两条守卫为什么必须存在（写进契约，避免以后被「顺手放宽」）**：
+
+| 守卫 | 错误码 | 理由 |
+| --- | --- | --- |
+| **唯一 `published` 不可归档** | `40914`（`FLOW_LAST_PUBLISHED_ARCHIVE_DENIED`，HTTP 409） | 归档它 = 该单据类型**无法发起新单据**（§3.3 / V-05 的反面），而 §4.3 禁止删除已产生的模板版本、`draft` 也不能当新版本的复用源；唯一出路是「开新草稿 → 发布」。故在归档入口直接拒绝，响应带 `suggestedAction = publish_new_version_then_archive` 与 `templateId` / `code` / `version` |
+| **恢复需重跑发布前校验** | 校验不过 → **400 / `40008`**；版本冲突 → **409 / `40915`**（`FLOW_RESTORE_CONFLICT`） | `restore` 是上述守卫的**对称恢复路径**（误归档后不必绕道「开新草稿 → 发布」）。恢复 = **重新上线**，必须与被恢复版本的实际配置一起过 R-* 全套规则，否则等于绕过发布前校验 —— 而 `archived` 里确实可能躺着从未通过校验的配置（草稿可被直接归档）。同 `code` 已有其它 `published` 时不能再恢复（§3.3 唯一性），错误文案会指引改走「基于它开新版本后发布」 |
+
+> **恢复不改版本号、不改配置**：只翻转 `status` 一列并按既有口径刷新 `published_at` —— V-08（版本号不得跳号、不得复用）与 V-01（「不修改历史行」针对节点与表单等**配置内容**）都仍然成立。
+>
+> **为什么单开 `restore` 而不是「允许重新 publish 一个 `archived` 版本」**：① 语义单一 —— `publish` 的前置是「草稿 + 发布前校验 + 归档同 `code` 的原 `published`」，把冻结的 `archived` 塞进去会让「对一个不可编辑版本做发布前校验」成为空转，也会让归档联动指向不该被它动的版本；② **可审计** —— 审计动作分别是 `publish_template` 与 `restore_template`，排障时能一眼区分「上线新版本」与「把误归档的版本恢复」。
+>
+> **状态判定分两档**：写配置的入口要求「可编辑」（`TemplateVersionPolicy#assertEditable`，非 `draft` → **409 / `40906`**）；而 `publish` / `archive` / `restore` 三个**迁移**入口只要求「是已知状态」（`requireKnownStatus`）—— 迁移本身必须能作用于只读版本，否则归档与恢复都无从谈起。
 
 ---
 
@@ -658,6 +685,27 @@
 | 复用已删除字段的 `code` | 会让历史数据含义漂移（`forms.md` 明确「字段 code 一经使用不得复用」） |
 | 删除已产生的模板版本 | 在途实例会失去执行依据 |
 | 修改已审批通过单据的字段值 | 内控红线；改主字段只能驳回重提 |
+
+### 4.4 模板 / 版本相关接口（状态迁移入口）
+
+> 路由真源是 `oa-server` 的 `FlowDefinitionController`（类注释里有一张逐行对齐的表）；本节只固化
+> §3.3 状态机对应的**迁移入口**与错误口径。权限统一为 `admin:flow:publish`（发布 / 归档 / 恢复 / 开新版本），
+> 只读入口（模板列表 / 详情 / 节点 / 版本历史 / `locked-by`）为 `admin:flow:template`。
+
+| 方法 | 路径（前缀 `/api/v1`） | 作用 | 失败口径 |
+| --- | --- | --- | --- |
+| `POST` | `/flow-templates/{id}/versions` | 基于**已发布 / 已归档**版本开新草稿（`version + 1`，不修改历史行） | 基于草稿开版本 → `40907`；版本号复用 → `40907`（V-08） |
+| `POST` | `/flow-templates/{id}/publish` | 草稿上线：先跑发布前校验 → 原 `published` 转 `archived` | 非草稿 → `40906`；校验不过 → `40008` |
+| `POST` | `/flow-templates/{id}/archive` | 归档：只阻止**新实例**使用，在途实例继续执行（V-05） | 同 `code` 唯一 `published` → **`40914`**；目标已 `archived` → 幂等 200 |
+| `POST` | `/flow-templates/{id}/restore` | **恢复**：`archived → published`（**本次新增**，与归档守卫对称） | 同 `code` 已有其它 `published` → **`40915`**；非 `archived` → `40906`；校验不过 → `40008`；目标已 `published` → 幂等 200 |
+| `GET` | `/flow-templates/{id}/locked-by` | 在途实例锁版本（AC-09 可见性；行集受调用人**数据域**约束） | 权限 `admin:flow:template` |
+
+**本次新增的两个错误码**（`oa-server` 的 `ErrorCode`，HTTP 状态均为 **409**）：
+
+| 码 | 常量 | 语义与建议动作 |
+| --- | --- | --- |
+| `40914` | `FLOW_LAST_PUBLISHED_ARCHIVE_DENIED` | 该版本是此单据类型**唯一的已发布版本**，归档后该类型将无法发起新单据；请先发布新版本再归档旧版本（`POST /versions` → `/publish`） |
+| `40915` | `FLOW_RESTORE_CONFLICT` | 该单据类型**已有已发布版本**，同一 `code` 下不能存在两个 `published`；如需让此历史版本的配置生效，请基于它开新版本后发布 |
 
 ---
 
@@ -741,6 +789,7 @@
 | --- | --- | --- |
 | V0.4 | 2026-07-09 | 首版：给出四类单据 × 7 节点共 28 行节点配置表与事项单 `flow_node` 种子 JSON；定义 `form_schema_json` 顶层与字段项结构契约（含 `rules[]` 规则类型表）与事项单最小可用完整示例；明确三层版本与 8 条快照规则；给出六步模板变更流程与 4 类禁止事项；建立 `printLabel` / `printVisible` 与 `DESIGN.md` 打印规格的对应关系及四类单据版式映射 |
 | V0.4（业务裁定后修订） | 2026-07-09 | §0 待业务确认项**全部关闭**，改为「定稿默认值」表（T-01–T-08）并新增 §0.1 技术执行项；超时定稿 **② = 48h、其余节点 = 24h**（四类模板与 `flow_node` 种子 JSON 同步）；⑦ `archive_register` 明确**默认「仅登记不审批」**：`decision_mode` / `pass_threshold` 置 `null`、不产生审批决议、不计入审批时长与效率统计、仅留痕 `sys_thread.action = archive_register`；协同任务**每个协同部门一条站内信**；附件 `allowExt` 13 → **15 种**（放行 `heic` / `wps` + 预览降级）；字段 code 统一为 `other_review_depts`（字典类型仍为 `review_dept_other`）；`allow_route` 仅 ②⑤⑥、`allow_jump` 全关闭标为定稿 |
+| V0.4（工程收口后修订） | 2026-10-04 | §3.3 补**状态迁移表**（draft/published/archived 各自允许的动作）与两条守卫的理由（**唯一 `published` 不可归档**、**恢复需重跑发布前校验**）；新增 §4.4 模板/版本迁移接口表与 `restore` 路由、`40914` / `40915` 两个错误码；§0.1 的 B-01（⑦ 决议可空）、B-03（`archive_register` 轨迹动作）经复核在真源与实现两侧均已落地，标注为**已关闭** |
 
 ---
 

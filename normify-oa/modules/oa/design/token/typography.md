@@ -11,8 +11,8 @@ description:
   en: >
       Font families (Inter with PingFang SC / Microsoft YaHei / Noto Sans SC fallbacks, and JetBrains Mono with Consolas for identifiers) and eleven type levels from display 28/600 to button 14/500; 14px body is the default rather than a minimum, numerals are always tabular, hierarchy comes from weight rather than size jumps and Chinese never takes negative letter-spacing.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.700Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.343Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -11,8 +11,8 @@ description:
   en: >
       One field's schema entry: field ID, label, type (text/textarea/number/amount/select/multiselect/date/daterange/user/org/tag/boolean/file/files), required (yes/no/conditional), length, validation, post-submit mutability, default and linkage. A field code is never reused once used.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.720Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.363Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

@@ -62,7 +62,12 @@ public class WorkflowPermissionService {
         return require("发布/归档流程模板版本", FlowConfigPermission.PUBLISH);
     }
 
-    /** 发起侧权限（预检 / 建实例 / 提交 / 读快照）。 */
+    /**
+     * 发起侧**只读/干跑**入口权限（预检 / 列表 / 详情 / 读快照）：{@code flow} ∪ {@code admin:flow}。
+     *
+     * <p>写入口不在此列（2026-10-04 收敛）：建草稿取 {@code flow}（{@link #requirePermission} 传
+     * {@link FlowConfigPermission#FLOW_USE}），提交 / 重提 / 补件取各自 {@code FlowAction} 的动作码。
+     */
     public CurrentUser requireInitiator(String action) {
         CurrentUser principal = requirePrincipal();
         FlowConfigPermission.requireInitiator(isSuperAdmin(principal), permissionCodes(principal), action);

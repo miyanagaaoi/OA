@@ -168,13 +168,14 @@ export interface FlowNodeCreatePayload {
 export interface FlowDecisionPayload {
   decisionMode: FlowDecisionMode
   /**
-   * 阈值**字面量**。
+   * 阈值**字面量**（`"2"` 绝对人数 / `"50%"` 百分比）。
    *
-   * ⚠ 语义陷阱（curl 实测）：后端 `FlowDefinitionService.applyDecision` 只在
-   * `passThreshold != null` 时才写这一列，因此：
-   *   · 传 `null` = **不改动**现有阈值；
-   *   · 传 `""`（空串）= **清空**阈值（后端 `blank → null`）。
-   * 所以「会签 → 或签」必须传 `""`，否则会停在「或签 + 残留阈值」的非法组合上（服务端 40008）。
+   * ⚠ 三态（2026-10-04 统一，**逐字同**后端 `NodeDecisionRequest#passThreshold`）：
+   *   · `null`（字段省略或显式 JSON `null`）= **清空**（落库 `NULL`）；
+   *   · 空串 / 全空白串 = **清空**（与 `null` 同义）；
+   *   · 非空字面量 = **写入**（去首尾空白）。
+   * `thresholdAbsolute` / `thresholdPercent` 任一非空时优先走它们（T-07：绝对人数优先）。
+   * 「会签 → 或签」传 `null` 即可清空，不会停在「或签 + 残留阈值」的非法组合上（服务端 40008）。
    */
   passThreshold: string | null
   /** 绝对人数阈值（与百分比同时给出时**绝对人数优先**，T-07） */

@@ -9,7 +9,10 @@
 --   ② finance_owner      -> sys_org_leader(150,'primary')                 = 301
 --   ③ branch_leader      -> sys_org_leader(12, 'deputy')                  = 302
 --   ④ subsidiary_gm      -> sys_org_leader(12, 'primary')                 = 301
---   ⑤ group_leader       -> sys_org_leader(1,  'primary','economy')       = 303
+--   ⑤ group_leader       -> sys_org_leader(1,  'primary', cat)            = 303
+--                             （cat = 事项类别：business/economy/admin/hr/invest **五类全绑**，
+--                               同一人即可；解析规则⑤ 按发起时的 category 精确匹配，
+--                               只绑一类会让其余四类在 precheck 处因「⑤ 空候选人」被拦）
 --   ⑥ chairman           -> sys_org_leader(1,  'primary', NULL)           = 303
 --   ⑦ archive_register   -> role_code='admin'（无需夹具）
 --
@@ -101,7 +104,11 @@ INSERT INTO sys_org_leader (org_id, user_id, leader_type, duty_title, category, 
   (12,  @u_ca01, 'primary', '公司A 总经理',   NULL,      0, '④ subsidiary_gm'),
   (12,  @u_dl01, 'deputy',  '公司A 分管领导', NULL,      0, '③ branch_leader'),
   (1,   @u_gl01, 'primary', '集团董事长',     NULL,      0, '⑥ chairman'),
+  (1,   @u_gl01, 'primary', '集团分管领导',   'business', 0, '⑤ group_leader（经营线）'),
   (1,   @u_gl01, 'primary', '集团分管领导',   'economy', 0, '⑤ group_leader（经济线）'),
+  (1,   @u_gl01, 'primary', '集团分管领导',   'admin',   0, '⑤ group_leader（行政线）'),
+  (1,   @u_gl01, 'primary', '集团分管领导',   'hr',      0, '⑤ group_leader（人力线）'),
+  (1,   @u_gl01, 'primary', '集团分管领导',   'invest',  0, '⑤ group_leader（投资线）'),
   (150, @u_ca01, 'primary', '财务部负责人',   NULL,      0, '② finance_owner')
 ON DUPLICATE KEY UPDATE
   duty_title = VALUES(duty_title),

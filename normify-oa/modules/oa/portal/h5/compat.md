@@ -11,8 +11,8 @@ description:
   en: >
       Supported browsers: current Chrome, Edge and Safari; the WeChat built-in browser is explicitly not an acceptance target, yet opening the site inside WeChat must stay basically usable (no crash, can log in, can approve); every token is a standard CSS value and fonts fall back to system faces so no external font request can break the page.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.772Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.409Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "doc/prd-0.1.md"

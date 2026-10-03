@@ -11,8 +11,8 @@ description:
   en: >
       Pre-submit field validation: client-side checks are convenience only, while required, length, amount and date rules are always re-validated on the server; on submit the page scrolls to the first failing field; the error state is a semantic-red border with a 12px red message below; an amount of zero or blank blocks submission.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.778Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.413Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "doc/forms.md"

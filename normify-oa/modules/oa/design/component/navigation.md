@@ -11,8 +11,8 @@ description:
   en: >
       The navigation family: the sidebar (224px, or a 64px rail, dark, with a 48px org switcher on top and the user block below), the active item (inverse-surface-1 fill with a 2px primary bar on the left), the four-level org tree node (12px indent per level, 32px tall), the 56px top bar (white with a 1px bottom border and no global search), breadcrumbs and the 60px H5 bottom action bar with safe-area padding.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.691Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.335Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

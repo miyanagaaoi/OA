@@ -11,8 +11,8 @@ description:
   en: >
       Document heading: centred, bold, 16pt with 2px letter spacing and an optional subtitle; the three-column header row such as reporting unit | responsible department | submission time, with centred equal-width label cells.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.714Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.356Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

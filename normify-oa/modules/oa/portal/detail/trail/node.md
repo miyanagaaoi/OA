@@ -11,8 +11,8 @@ description:
   en: >
       The four trail node states: done (white fill, primary-border outline, ink text with a tick icon), current (solid corporate-blue with white text), not reached (white fill, grey text and border) and overdue (white fill, red text and border); connectors are 2px, with completed segments in primary and unfinished segments in hairline.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.769Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.404Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -87,6 +87,16 @@ foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-auth
 > 是 `IFNULL(category,'')` 的**生成列**（`doc/data-model.md` §2.3）—— 这修掉了「唯一键含可空列
 > `category`、MySQL 对 NULL 不去重 → 重复执行不断堆积重复负责人行」的缺陷，
 > 因此负责人链现在是**直接 upsert**，不再需要「归一重复 → 清空 → 重建」的特例。
+>
+> ⚠ **⑤ 集团分管领导按事项类别「五值全绑」**（2026-10-04）：`sys_org_leader(org_id = 1,
+> leader_type = 'primary')` 上除 ⑥ chairman 的 `category IS NULL` 行外，还有 ⑤ 的 **5 行**，
+> `category` 依次为 `business` / `economy` / `admin` / `hr` / `invest`（同一人 `dev_gl01` 即可）。
+> 解析规则⑤（`GroupLeaderRule`）按**发起时的事项类别**精确匹配集团层绑定，
+> 只绑一类时用其余四类发起 matter 单会在 `precheck` 处被「⑤ 空候选人」拦下（`allowed=false`）——
+> 演示与测试都得绕道，故五类全绑。自检：
+> `SELECT category, COUNT(*) FROM sys_org_leader WHERE category IS NOT NULL GROUP BY category;`
+> → **五类各 1**；`99-verify.sql` 的 `leader_chain.45` 期望值随之从 `=2` 改为 **`=6`**
+> （⑥ 1 行 + ⑤ 5 行，同一组织同一 `leader_type`）。
 
 ## 4. 重置库之后如何恢复到「可演示」
 
@@ -106,8 +116,28 @@ oa-deploy\runtime\start-local.cmd
 
 - `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 372`、`flow_template = 4`
 - `sys_org ≥ 13`（含 5 个 `RT-*`）、`sys_user.dev_* = 7`、`sys_user.mtx_* = 5`
-- `sys_org_leader` 上 ①–⑥ 全部可解析 ⇒ 四类单据 precheck `allowed=true`
+- `sys_org_leader` 上 ①–⑥ 全部可解析 ⇒ 四类单据 precheck `allowed=true`（⑤ 集团分管领导**五类业务线全绑**，任意 `category` 都可发起）
 - `information_schema.TRIGGERS`（schema `oa`）**= 4**，且 `UPDATE sys_log WHERE id=1` 报错
+
+### 4.1 发起链路的入口闸门（2026-10-04 口径）
+
+夹具只证明「候选人在位」，证明不了「入口放行」。发起链路的权限口径（单一真源 = 权限码常量）：
+
+| 步骤 | 路由 | 入口闸门 |
+| --- | --- | --- |
+| 发起前预检（只读干跑） | `POST /api/v1/flow-instances/precheck` | `flow` ∪ `admin:flow` |
+| **建草稿** | `POST /api/v1/flow-instances` | **`flow`**（2026-10-04 由 `flow` ∪ `admin:flow` **收紧**，与「发起」这一动作的口径一致） |
+| 提交（草稿 → 审批中） | `POST /api/v1/flow-instances/{id}/submit` | `FlowAction.SUBMIT.permission()` = `flow` |
+| 只读入口（列表 / 详情 / 读快照） | `GET /api/v1/flow-instances[/{id}]`、`GET .../approver-snapshot` | `flow` ∪ `admin:flow` |
+
+> **为什么收紧建草稿**：动作面（`GET /api/v1/flow-actions`）从 `submit` 起，建草稿若放行
+> `admin:flow`，只持它的自定义角色就会「先过入口、再被引擎 403」——入口比动作面宽。
+> 9 个内置角色**全部持有 `flow`**（`company_admin` 亦已在 V4 种子里补齐），因此业务可用面不变。
+> 被挡住的只有「只持 `admin:flow` 的自定义角色」：建草稿直接 **403 / `40301`**，
+> 响应体为 `{"code":40301,"message":"无权执行「发起审批单」：需要权限 flow",…}`
+> （`requiredPermissions` 等排查上下文只写服务端日志，**不进响应体** —— AC-41 错误信息不泄露）。
+>
+> 夹具自检用 `dev_em01`（`employee`，持 `flow`）登录即可发起；`admin` 恒放行（系统管理员）。
 
 ## 5. 与 `.cache/` 的关系
 

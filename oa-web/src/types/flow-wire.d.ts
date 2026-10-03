@@ -216,6 +216,11 @@ export interface WireNodeOrderRequest {
 /** `NodeDecisionRequest` —— `PUT /flow-nodes/{id}/decision` 请求体 */
 export interface WireNodeDecisionRequest {
   decisionMode?: string | null
+  /**
+   * 阈值字面量（`"2"` / `"50%"`）——**三态，逐字同**后端 `NodeDecisionRequest#passThreshold`：
+   * `null`（省略或显式 `null`）= 清空；空串 / 全空白串 = 清空；
+   * 非空字面量 = 写入（去首尾空白）。
+   */
   passThreshold?: string | null
   /** 与 `thresholdPercent` 同时给出时绝对人数优先 */
   thresholdAbsolute?: number | null
@@ -307,13 +312,33 @@ export interface WireCheckRuleView {
   title: string
 }
 
-/** `LockedInstanceView` —— 在途实例锁版本（`GET /flow-templates/{id}/locked-by`；本期后端未实现） */
+/**
+ * `LockedInstanceView` —— 在途实例锁版本（`GET /flow-templates/{id}/locked-by`）。
+ *
+ * 契约对齐（2026-10-04）：后端 `LockedInstanceView` 已**追加** 5 个字段
+ * （`initiatorId` / `initiatorName` / `currentNodeSeq` / `currentNodeName` / `submittedAt`），
+ * 属**纯追加**，旧的 4 个字段语义不变（`bizNo` / `templateVersion` / `status` 在后端为 null 时整个键被省略）。
+ *
+ * ⚠ 前端**暂未消费**该端点（`oa-web` 里没有 locked-by 的调用点，页面也不展示「在途锁定」清单），
+ * 因此这里只做**类型镜像**；`api/flow.ts` 未导出对应的取数函数。日后要在版本历史里渲染
+ * 发起人与当前节点时，直接用下面这 5 个字段即可，无需再改后端。
+ */
 export interface WireLockedInstanceView {
   instanceId: WireId
   bizNo?: string | null
   /** `Integer`（JSON number） */
   templateVersion?: number | null
   status?: string | null
+  /** 发起人 id（`Long` → JSON 字符串）；行集受调用人数据域约束 */
+  initiatorId?: WireId | null
+  /** 发起人姓名（`sys_user.name`；用户已删除时为 null） */
+  initiatorName?: string | null
+  /** 当前节点序号（实例主状态 `approving` 时的当前节点；`Integer` → JSON number） */
+  currentNodeSeq?: number | null
+  /** 当前节点名（该实例当前 seq 的节点实例名；节点实例缺失时为 null） */
+  currentNodeName?: string | null
+  /** 发起（首次提交）时间，格式 `yyyy-MM-dd HH:mm:ss`；未提交时取创建时间 */
+  submittedAt?: string | null
 }
 
 // ================================================================ 审批人解析规则（2a.3）

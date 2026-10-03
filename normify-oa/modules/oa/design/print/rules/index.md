@@ -11,8 +11,8 @@ description:
   en: >
       Print sheets must be plainer than the business UI and the two rule sets may never be mixed: radius is always 0px, shadows are banned outright, the whole table is ruled in 1pt solid lines with an outer frame up to .6mm, no theme colour appears at all, status is written as text (approved, withdrawn) rather than a colour block, type is fixed at 9.5pt body, 8.5pt notes and 16pt heading, numbers use a monospace face and no information may be lost in a black-and-white copy.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.695Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.338Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

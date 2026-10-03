@@ -11,8 +11,8 @@ description:
   en: >
       The handwritten signature pad: 200px tall and full width on H5 (640×200 on desktop) on a canvas-subtle fill with a 1px dashed border and rounded.sm; the prompt Please sign inside the box sits above, with Clear, Use preset signature and Confirm signature below; strokes are 2px ink round-capped smooth curves and Confirm stays disabled until something is drawn.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.773Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.410Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

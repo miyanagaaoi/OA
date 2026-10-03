@@ -11,8 +11,8 @@ description:
   en: >
       Mirrors the paper form: heading, three-column header row, the repeated document-receipt block (up to three segments), the merged group-leader opinion cell and the closing row. Measured height 274mm with about 23mm spare, so added fields require a page-height recheck.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.715Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.357Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

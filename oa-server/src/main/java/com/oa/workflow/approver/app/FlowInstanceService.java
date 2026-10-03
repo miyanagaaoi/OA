@@ -15,6 +15,7 @@ import com.oa.workflow.approver.domain.ApproverSnapshot;
 import com.oa.workflow.approver.infra.FlowInstanceMapper;
 import com.oa.workflow.approver.infra.row.FlowInstanceRow;
 import com.oa.workflow.approver.infra.row.FormDataRow;
+import com.oa.workflow.definition.app.FlowConfigPermission;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
 import com.oa.workflow.definition.domain.FlowDefinitionEnums.TemplateStatus;
 import com.oa.workflow.definition.domain.FlowTemplate;
@@ -99,10 +100,16 @@ public class FlowInstanceService {
      *
      * <p>预检不通过时抛 400（{@link ErrorCode#APPROVER_RESOLUTION_BLOCKED}），
      * 消息里逐条给出「哪个节点、命中哪条规则、缺什么配置」（AC-11 / AC-19）。
+     *
+     * <p><b>闸门 = {@code flow}（与控制器入口同源，2026-10-04 收紧）</b>：本方法作**第二层**兜底，
+     * 判据与 {@code FlowInstanceController#create} 逐字一致 —— 防的是「绕过控制器直调服务」把
+     * 「只持 {@code admin:flow}」的主体放进来（该主体在动作面 {@code submit} 处本就会被拒）。
+     * 改前这里是 {@code requireInitiator}（{@code flow} ∪ {@code admin:flow}），比入口宽。
      */
     @Transactional
     public InstanceView create(CreateInstanceRequest request, CurrentUser principal) {
-        CurrentUser operator = permissionService.requireInitiator("发起审批单");
+        CurrentUser operator = permissionService.requirePermission("发起审批单",
+                FlowConfigPermission.FLOW_USE);
         PrecheckRequest precheckRequest = toPrecheckRequest(request);
         // 预检 + 解析一次完成：快照必须与预检结果**同源**（否则会出现「预检通过但快照为空」）
         ApproverPrecheckService.Resolved resolved = precheckService.resolveForSubmit(precheckRequest, operator);

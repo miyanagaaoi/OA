@@ -11,8 +11,8 @@ description:
   en: >
       When a document is resubmitted the previously reviewed nodes are not kept: node instances, tasks and routing counters from the earlier attempt are cleared according to policy and node instances plus tasks are recreated from node one, so no stale decision is reused.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.805Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.437Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

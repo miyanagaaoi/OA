@@ -10,8 +10,8 @@ description:
   en: >
       Key custody and rotation: keys are never returned by the API, rotation is triggered explicitly and its status is auditable.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.763Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.400Z"
 fingerprint: cd388c1b63faa986678e023bd356b3a20488b7cce089442d72f3e834e463e0a7
 source:
   - path: "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCryptoService.java"

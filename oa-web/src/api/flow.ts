@@ -579,8 +579,13 @@ export async function getFlowNodeDecision(nodeId: string): Promise<FlowNode> {
  * 阈值口径（`doc/templates.md` T-07）：绝对人数与百分比同时给出时**绝对人数优先**，
  * 由 `ThresholdPolicy.compose` 裁决；页面用 `composeThresholdLiteral` 预先合成。
  *
- * ⚠ `passThreshold` 的三态（curl 实测）：`null` = **不改动**、`""` = **清空**、字面量 = 写入。
- * 「会签 → 或签」必须传 `""` 清空，否则节点会停在「或签 + 残留阈值」上被服务端 40008 拒绝。
+ * ⚠ `passThreshold` 的三态（2026-10-04 统一，**逐字同**后端
+ * `NodeDecisionRequest#passThreshold`）：
+ *   · `null`（字段省略或显式 JSON `null`）= **清空**（落库 `NULL`）；
+ *   · 空串 / 全空白串 = **清空**（与 `null` 同义）；
+ *   · 非空字面量（`"2"` / `"50%"`）= **写入**（去首尾空白）。
+ * `thresholdAbsolute` / `thresholdPercent` 任一非空时优先走它们（T-07：绝对人数优先）。
+ * 因此「会签 → 或签」传 `null` 与传 `""` 等价，都不会停在「或签 + 残留阈值」上（服务端 40008）。
  */
 export async function putFlowNodeDecision(nodeId: string, payload: FlowDecisionPayload): Promise<FlowNode> {
   const body: WireNodeDecisionRequest = {

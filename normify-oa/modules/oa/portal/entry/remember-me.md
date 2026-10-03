@@ -11,8 +11,8 @@ description:
   en: >
       The Remember me option on the sign-in page: when ticked the user skips sign-in for seven days and each visit renews the window; when unticked the session dies as soon as the browser closes (REQ-USER-002); the token type and lifetime parameters are an engineering decision, this module only fixes the user-visible behaviour.
       
-revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
-updated_at: "2026-10-03T04:12:20.771Z"
+revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
+updated_at: "2026-10-03T04:41:37.407Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
