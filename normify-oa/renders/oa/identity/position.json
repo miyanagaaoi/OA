@@ -1,16 +1,18 @@
 {
   "schema_version": 1,
   "id": "oa.identity.position",
-  "updated_at": "2026-10-02T08:05:04.521Z",
+  "updated_at": "2026-10-03T01:04:51.133Z",
   "mode": "groups",
   "reading": {
-    "zh": "从左到右：先维护负责人绑定与一人多岗（分管领导按业务线绑定），再由查询与上溯输出审批人候选人；调岗变更汇入事件，但不改动在途单据。",
-    "en": "Left to right: bind leaders and multi-posts first (line leaders by business line), then resolve approver candidates with upward escalation; transfers emit an event without touching in-flight documents."
+    "zh": "从左到右：先绑定负责人与一人多岗（分管领导按业务线），再用两张 CSV 模板批量维护（越域行 fail-closed 整批拒绝），最后由查询与上溯输出审批人候选人；调岗变更汇入事件，但不改动在途单据。",
+    "en": "Left to right: bind leaders and multi-posts, maintain them in bulk through the two CSV templates (out-of-scope rows fail the whole batch), then resolve approver candidates with upward escalation; transfers emit an event without touching in-flight documents."
   },
   "order": [
     "oa.identity.position.leader-bind",
     "oa.identity.position.multi-post",
     "oa.identity.position.line-leader",
+    "oa.identity.position.leader-import",
+    "oa.identity.position.post-import",
     "oa.identity.position.leader-lookup",
     "oa.identity.position.assignment"
   ],
@@ -25,6 +27,17 @@
         "oa.identity.position.leader-bind",
         "oa.identity.position.multi-post",
         "oa.identity.position.line-leader"
+      ]
+    },
+    {
+      "id": "bulk",
+      "title": {
+        "zh": "批量维护",
+        "en": "Bulk Maintenance"
+      },
+      "children": [
+        "oa.identity.position.leader-import",
+        "oa.identity.position.post-import"
       ]
     },
     {

@@ -2,7 +2,6 @@
 uid: 849bd261
 id: oa.authz.visibility.field.contact
 parent: oa.authz.visibility.field
-state: planned
 name: {zh: "联系方式脱敏", en: "Contact Masking"}
 description:
   zh: >
@@ -11,17 +10,23 @@ description:
   en: >
       Phone numbers are masked as 138****8888 in the directory and only the owner or a system admin may see the full value; a single masking contract is exposed for the directory, document detail and H5 surfaces.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.657Z"
-fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.721Z"
+fingerprint: ddc04a36cdc4ba75d3e0a941a2bfc318dd2517641db09187b9c00bd3a779a9e6
 source:
-  - path: "doc/prd-0.1.md"
-    line: 192
-    end_line: 199
-  - path: "doc/data-model.md"
-    line: 59
-    end_line: 83
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/PhoneVisibilityService.java"
+  - path: "oa-server/src/main/java/com/oa/authz/api/FieldPolicyController.java"
 apis:
+  - protocol: http
+    method: GET
+    path: "/api/v1/authz/field-policy/contact"
+    description:
+      zh: >
+          读取联系方式脱敏策略（138****8888 形态与加密算法口径）。
+          
+      en: >
+          Reads the contact masking policy.
+          
   - protocol: rpc
     path: "authz.visibility.mask.phone"
     description:
@@ -30,16 +35,6 @@ apis:
           
       en: >
           Returns a masked or full phone by caller identity.
-          
-  - protocol: http
-    method: GET
-    path: "/api/v1/authz/field-policy/contact"
-    description:
-      zh: >
-          读取联系方式脱敏策略。
-          
-      en: >
-          Reads the contact masking policy.
           
 deps:
   - kind: call

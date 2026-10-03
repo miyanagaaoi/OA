@@ -66,6 +66,14 @@ class AuthzMatrixHttpTest {
 
     private static final long CA_ID = 201L;
 
+    /** 员工甲（mtx_em01，公司A/部门1，分公司管理员数据域内）。 */
+    private static final long EM_A_ID = 204L;
+
+    private static final String EM_B_ACCOUNT = "mtx_em02";
+
+    /** 员工乙的工号（域外，用于验证「工号唯一性 = 系统口径」）。 */
+    private static final String EM_B_EMPLOYEE_NO = "MTX0005";
+
     private static final String ADMIN = "admin";
 
     private static String baseUrl;
@@ -184,28 +192,37 @@ class AuthzMatrixHttpTest {
     }
 
     @Test
-    @DisplayName("导出管控（POST /authz/export-check）：非系统管理员/财务 403；金额列一律不在生效列内")
+    @DisplayName("导出管控（POST /authz/export-check）：非系统管理员/财务 403；列白名单拒绝伪造字段；"
+            + "系统管理员（PRD §5.3 V0.4 口径）可随导出取得金额列")
     void exportCheckRejectsForgedFieldsAndAmounts() {
-        ApiResult admin = post("/api/v1/authz/export-check", ADMIN,
-                "{\"target\":\"instance_list\"}");
+        // PRD §5.3 / AC-18 的原文口径：**金额对非财务类角色不可导出；导出功能本身仅系统管理员与财务角色可用**。
+        // 正确的闸门是「导出入口的角色权限」（非财务角色 403），而不是「把金额从所有人的导出物里一律剔除」
+        // —— 后者会让财务角色也导不出，与 PRD 相悖（`oa.authz.export.amount-enabled` 默认 true 即此口径）。
+        // 因此本测试断言：①入口角色门禁（非管理员/财务 → 403）；②列白名单（伪造字段 → 403 40307）；
+        // ③系统管理员放行且金额随导出下发（amountExported=true）。财务角色的分支由 ExportFieldPolicy 单测覆盖
+        // （本机越权矩阵夹具无 finance_owner 账号，不在这里假装覆盖）。
+        ApiResult admin = post("/api/v1/authz/export-check", ADMIN, "{\"target\":\"instance_list\"}");
         assertThat(admin.status()).isEqualTo(200);
-        JsonNode columns = admin.json().path("data").path("effectiveColumns");
-        assertThat(columns.isArray()).isTrue();
-        for (JsonNode column : columns) {
-            assertThat(column.asText()).as("生效导出列不得含金额列").isNotEqualTo("amount");
-        }
-        assertThat(admin.json().path("data").path("amountExported").asBoolean()).isFalse();
-        assertThat(admin.json().path("data").path("excludedFields").toString()).contains("amount");
+        JsonNode data = admin.json().path("data");
+        assertThat(data.path("effectiveColumns").isArray()).isTrue();
+        assertThat(data.path("amountExportEnabled").asBoolean()).as("运行期开关默认开启").isTrue();
+        assertThat(data.path("amountExported").asBoolean())
+                .as("系统管理员/财务角色可导出金额列（PRD §5.3：导出功能仅这两类角色可用）").isTrue();
+        java.util.List<String> effective = new java.util.ArrayList<>();
+        data.path("effectiveColumns").forEach(node -> effective.add(node.asText()));
+        assertThat(effective).as("生效列含金额列（系统管理员可导出）").contains("amount");
+        assertThat(data.path("reason").asText()).contains("PRD §5.3");
 
-        // 伪造金额列 → 403（直连接口也无法绕过列白名单）
+        // 列白名单在服务端裁决：伪造**不在目标列内**的字段 → 403 / 40307（直连接口也无法绕过列白名单）
         ApiResult forged = post("/api/v1/authz/export-check", ADMIN,
-                "{\"target\":\"instance_list\",\"fields\":[\"biz_no\",\"amount\"]}");
+                "{\"target\":\"instance_list\",\"fields\":[\"biz_no\",\"not_a_column\"]}");
         assertThat(forged.status()).isEqualTo(403);
         assertThat(forged.body()).contains("40307");
 
-        for (String account : new String[] {CA, DL, EM_A}) {
+        // 入口角色门禁：非系统管理员且非财务角色（分公司管理员 / 部门负责人 / 集团分管领导 / 员工）一律 403
+        for (String account : new String[] {CA, DL, GL, EM_A}) {
             assertThat(post("/api/v1/authz/export-check", account, "{\"target\":\"instance_list\"}").status())
-                    .as("角色 %s 不得导出单据列表", account).isEqualTo(403);
+                    .as("角色 %s 不得导出单据列表（金额列因此不可达）", account).isEqualTo(403);
         }
     }
 
@@ -269,6 +286,43 @@ class AuthzMatrixHttpTest {
     }
 
     @Test
+    @DisplayName("人员判重（POST /users、PUT /users/{id}）：域外重复账号/工号必须返回重复业务错误码（409/40902），"
+            + "不得落到数据库唯一键、更不得静默写入")
+    void duplicateAccountAndEmployeeNoAreDetectedAcrossDataScope() {
+        // 背景（阶段 1 收口修复）：账号/工号唯一性是**全局约束**，与调用人的数据域无关。
+        // 修复前：分公司管理员（数据域=公司A）对**域外**账号判重得到 0 →
+        //   · 账号：重复只能由库唯一键 uk_sys_user_account 在 INSERT 时兜住，返回的是数据库层泛化文案
+        //     「数据已存在（唯一约束冲突）」，不带 import-spec 错误码；
+        //   · 工号：sys_user.employee_no **没有**库唯一键 → 域外重复工号被**静默写入**（200）。
+        // 修复后：两条路径都在写库前判出重复，返回 40902 DUPLICATE + 明确的 import-spec 错误码。
+
+        // ① 账号：mtx_em02 属公司B（分公司管理员数据域外）→ 409 + E-USER-002（不是数据库层的泛化文案）
+        ApiResult byAccount = post("/api/v1/identity/users", CA,
+                "{\"account\":\"" + EM_B_ACCOUNT + "\",\"name\":\"越域判重探针\",\"companyId\":12}");
+        assertThat(byAccount.status()).as("域外重复账号必须由业务判重直接拒绝（409），不是 500").isEqualTo(409);
+        assertThat(byAccount.body()).contains("40902").contains("E-USER-002");
+        assertThat(byAccount.body()).as("重复必须由判重给出明确业务错误码，而不是撞库唯一键后的泛化文案")
+                .doesNotContain("唯一约束冲突").doesNotContain("50000");
+
+        // ② 工号（新增路径）：新账号 + 域外工号 MTX0005 → 409 + E-USER-015（修复前会 200 静默写入）
+        ApiResult byEmployeeNo = post("/api/v1/identity/users", CA,
+                "{\"account\":\"mtx_probe01\",\"name\":\"越域工号探针\",\"employeeNo\":\"" + EM_B_EMPLOYEE_NO
+                        + "\",\"companyId\":12}");
+        assertThat(byEmployeeNo.status()).as("域外重复工号必须被拒（工号无库唯一键，漏判即静默重复）").isEqualTo(409);
+        assertThat(byEmployeeNo.body()).contains("40902").contains("E-USER-015");
+
+        // ③ 工号（修改路径）：把数据域**内**的 mtx_em01 改成域外工号 → 同样 409 + E-USER-015
+        ApiResult update = raw("PUT", "/api/v1/identity/users/" + EM_A_ID,
+                "{\"name\":\"员工甲\",\"employeeNo\":\"" + EM_B_EMPLOYEE_NO + "\"}", COOKIES.get(CA));
+        assertThat(update.status()).as("修改路径的判重同样是系统口径").isEqualTo(409);
+        assertThat(update.body()).contains("40902").contains("E-USER-015");
+
+        // ④ 反向证据（两次拒绝都是**写库前**拦截）：夹具人员原样未动
+        assertThat(employeeNoOf("mtx_em01")).as("被拒的修改不得改动夹具人员档案").isEqualTo("MTX0004");
+        assertThat(employeeNoOf("mtx_em02")).isEqualTo(EM_B_EMPLOYEE_NO);
+    }
+
+    @Test
     @DisplayName("未登录（无会话 Cookie）：所有受保护入口 401 —— 网关级兜底")
     void anonymousIsRejected() {
         for (String path : new String[] {"/api/v1/identity/orgs/tree", "/api/v1/identity/users",
@@ -314,6 +368,18 @@ class AuthzMatrixHttpTest {
 
     private ApiResult get(String path, String account) {
         return raw("GET", path, null, COOKIES.get(account));
+    }
+
+    /** 取某账号当前库中的工号（系统管理员视角，用于断言「被拒的写请求确实没落库」）。 */
+    private String employeeNoOf(String account) {
+        JsonNode records = get("/api/v1/identity/users?size=200", ADMIN).json()
+                .path("data").path("records");
+        for (JsonNode row : records) {
+            if (account.equals(row.path("account").asText())) {
+                return row.path("employeeNo").asText();
+            }
+        }
+        throw new IllegalStateException("夹具人员不存在：" + account);
     }
 
     private ApiResult post(String path, String account, String json) {

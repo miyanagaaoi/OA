@@ -10,8 +10,8 @@ description:
   en: >
       Password complexity (8+ characters with letters and digits) validation, salted-hash comparison and password change; passwords and phones are encrypted at rest and never stored in clear text.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.709Z"
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.724Z"
 fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
 source:
   - path: "doc/prd-0.1.md"
@@ -55,7 +55,7 @@ deps:
   - kind: call
     to: oa.identity.user.profile
     from_api: "PUT /api/v1/auth/password"
-    to_api: "PUT /api/v1/identity/users/{id}/password"
+    to_api: "rpc:identity.user.updatePasswordHash"
     label: {zh: "回写新密码哈希", en: "Write new password hash"}
   - kind: call
     to: oa.identity.session.lockout

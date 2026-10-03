@@ -3,6 +3,7 @@ package com.oa.identity.scope;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.oa.common.config.OaProperties;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -48,7 +49,10 @@ class IdentityMapperXmlTest {
                 "insertOrg", "updateOrg", "updateStatus", "updatePathAndDepth", "updateParent", "updateLeaderId"));
         STATEMENTS.put(DIR + "SysUserMapper.xml", List.of(
                 "selectDirectory", "selectUserPage", "selectUserById", "selectDirectoryUsers",
-                "countByEmployeeNo", "countByAccount", "updateUserProfile", "updateUserStatus",
+                "countByEmployeeNo", "countByAccount",
+                // 阶段 1 收口：账号/工号唯一性判重（**系统口径**，故意不带 @dataScope 标记 → 见下方豁免清单断言）
+                "countByAccountSystem", "countByEmployeeNoSystem",
+                "updateUserProfile", "updateUserStatus",
                 // 契约补齐（施工要求第 4/6 条）：子树在职人数 + 主数据导出（仅系统管理员，不分页）
                 "countActiveByOrgPath", "selectForExport",
                 // 受控表 Mapper 不继承 BaseMapper：原 MP 注入的写语句改由 XML 显式声明
@@ -63,6 +67,21 @@ class IdentityMapperXmlTest {
                 "selectRowsByUserId", "selectByUserId", "selectById", "selectByUserAndOrg", "countByOrgId",
                 "insertPosition", "updatePrimary", "updatePosition", "deleteById"));
     }
+
+    /**
+     * 受控表 SELECT 允许「0 个标记」的**唯一窄豁免**清单（阶段 1 收口）：
+     * 账号/工号**唯一性判重**（系统口径）。
+     *
+     * <p>为什么必须豁免：唯一性是全局约束（{@code uk_sys_user_account}），与调用人的数据域无关；
+     * 判重语句一旦织入数据域片段，域外账号/工号判重就会得到 0 —— 重复只能由数据库唯一键兜住
+     * （工号更无库唯一键，会被静默写入）。两条语句只返回 {@code COUNT}、不返回行数据，
+     * 因此是**窄豁免**而非数据域读取旁路（读取限制见 {@code selectUserById/selectUserPage/...}，
+     * 一行未动）。豁免条目必须在 {@code application.yml} 与 {@code OaProperties} 默认值**两处**同时存在，
+     * 否则运行期会被 40303 fail-closed 拒绝。
+     */
+    private static final Map<String, String> SYSTEM_SCOPE_EXEMPT_SELECTS = Map.of(
+            "countByAccountSystem", "com.oa.identity.infra.SysUserMapper.countByAccountSystem",
+            "countByEmployeeNoSystem", "com.oa.identity.infra.SysUserMapper.countByEmployeeNoSystem");
 
     private static String read(String resource) throws Exception {
         try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
@@ -107,6 +126,7 @@ class IdentityMapperXmlTest {
     @Test
     @DisplayName("每条 SELECT 恰好 1 个 @dataScope 标记（0 个会被 fail-closed 拒绝，≥2 个只会替换第一个）")
     void everySelectCarriesExactlyOneMarker() throws Exception {
+        Set<String> exemptSeen = new LinkedHashSet<>();
         for (String resource : STATEMENTS.keySet()) {
             String content = read(resource);
             List<String> blocks = selectBlocks(content);
@@ -114,6 +134,22 @@ class IdentityMapperXmlTest {
             for (String block : blocks) {
                 Matcher idMatcher = ID_ATTR.matcher(block);
                 String id = idMatcher.find() ? idMatcher.group(1) : "(unknown)";
+                String exemptStatementId = SYSTEM_SCOPE_EXEMPT_SELECTS.get(id);
+                if (exemptStatementId != null) {
+                    // 窄豁免（系统口径判重）：只允许 SysUserMapper.xml 的这两条「只读计数」语句；
+                    // 必须真的不带标记，且必须同时列进豁免清单（否则运行期被 40303 拒绝，功能直接不可用）
+                    assertThat(resource).as("%s#%s 是系统口径判重的窄豁免，只允许出现在 SysUserMapper.xml",
+                            resource, id).isEqualTo(DIR + "SysUserMapper.xml");
+                    assertThat(block).as("%s#%s 不得带 @dataScope 标记：判重必须是全库口径，"
+                            + "织入数据域片段即「域外判重得 0」这一缺陷本身", resource, id)
+                            .doesNotContain("@dataScope(");
+                    assertThat(new OaProperties().getScope().getExemptStatementIds())
+                            .as("%s#%s 必须列入 OaProperties 默认豁免清单（application.yml 同步，见 DataScopeMapperGuardTest）",
+                                    resource, id)
+                            .contains(exemptStatementId);
+                    exemptSeen.add(id);
+                    continue;
+                }
                 int markers = block.split("@dataScope\\(", -1).length - 1;
                 assertThat(markers)
                         .as("%s#%s 必须恰好带 1 个 @dataScope 标记", resource, id)
@@ -122,6 +158,9 @@ class IdentityMapperXmlTest {
                         .contains("WHERE 1 = 1");
             }
         }
+        // 豁免面不得悄悄扩大：本次只允许这两条
+        assertThat(exemptSeen).as("允许 0 标记的受控表 SELECT 只有系统口径判重这两条")
+                .containsExactlyInAnyOrderElementsOf(SYSTEM_SCOPE_EXEMPT_SELECTS.keySet());
     }
 
     @Test

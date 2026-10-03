@@ -2,77 +2,77 @@
 uid: 2f494622
 id: oa.admin.org.bulk.import
 parent: oa.admin.org.bulk
-state: planned
-name: {zh: "Excel 批量导入", en: "Excel Bulk Import"}
+name: {zh: "五类模板契约与导入类型清单", en: "Template Contracts & Import Kinds"}
 description:
   zh: >
-      导入组织架构与人员 Excel 模板，按行校验（账号唯一、组织路径存在、必填完整），支持预检-确认-执行三段式并回传失败行明细。
+      五类 CSV 模板的**契约与错误码字典**：五个模板文件（组织/人员/负责人/岗位/角色分配）的权威列定义、逐行错误码（E-*-001..020，含 E-*-020 数据域越权码）与修正建议；kinds 接口把同一份元数据下发给前端，保证五步流水线与模板不会各说各话。
       
   en: >
-      Import the org and user Excel templates with row-level validation (unique account, existing org path, required fields), in a preview-confirm-execute flow that returns failed-row details.
+      The contract of the five CSV templates and their error dictionary: which files exist (org / user / org_leader / user_position / user_role), their exact columns and per-row error codes (E-*-001..020, incl. the E-*-020 data-scope codes) with fix suggestions; the kinds endpoint exposes the same metadata to the UI so the five-step pipeline cannot drift from the templates.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.626Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.725Z"
+fingerprint: 4e4f9da0fc6ef91304cf003737b5802df520dd0939ec9845b1bdda2d914324dc
 source:
-  - path: "doc/prd-0.1.md"
-    line: 435
-    end_line: 435
-  - path: "doc/prd-0.1.md"
-    line: 242
-    end_line: 242
+  - path: "oa-server/src/main/java/com/oa/admin/bulk/ImportKind.java"
+  - path: "oa-server/src/main/java/com/oa/admin/bulk/ImportCodes.java"
+  - path: "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java"
+    line: 240
+    end_line: 254
 apis:
   - protocol: file
-    path: "import/orgs.xlsx"
+    path: "oa-deploy/import/org.csv"
     description:
       zh: >
-          组织架构导入模板文件。
+          组织架构导入模板（UTF-8 BOM CSV，六列）。
           
       en: >
-          Org structure import template file.
+          Org-structure template (org_path, org_name, org_type, parent_path, status, remark).
           
   - protocol: file
-    path: "import/users.xlsx"
+    path: "oa-deploy/import/user.csv"
     description:
       zh: >
-          人员批量导入模板文件。
+          人员导入模板（九列，含 employee_no 与 phone）。
           
       en: >
-          User bulk import template file.
+          User template (nine columns, incl. employee_no and phone).
           
-  - protocol: http
-    method: POST
-    path: "/api/v1/admin/bulk-import/orgs"
+  - protocol: file
+    path: "oa-deploy/import/org_leader.csv"
     description:
       zh: >
-          组织架构批量导入（预检后确认执行）。
+          组织负责人导入模板。
           
       en: >
-          Bulk import org structures after preview confirmation.
+          Org-leader template.
           
-  - protocol: http
-    method: POST
-    path: "/api/v1/admin/bulk-import/users"
+  - protocol: file
+    path: "oa-deploy/import/user_position.csv"
     description:
       zh: >
-          人员批量导入（含角色与任职列）。
+          岗位任职导入模板。
           
       en: >
-          Bulk import users including role and post columns.
+          Post-assignment template.
+          
+  - protocol: file
+    path: "oa-deploy/import/user_role.csv"
+    description:
+      zh: >
+          角色分配导入模板。
+          
+      en: >
+          User-role assignment template.
           
   - protocol: http
     method: GET
-    path: "/api/v1/admin/bulk-import/{job_id}/result"
+    path: "/api/v1/admin/bulk-import/kinds"
     description:
       zh: >
-          查询导入结果与失败行明细。
+          五类导入元数据（kind/label/file/columns/previewRoute/commitRoute）。
           
       en: >
-          Fetch import result with failed-row details.
+          Lists the five import kinds with file, columns and preview/commit routes.
           
-deps:
-  - kind: call
-    to: oa.admin.org.bulk.impact
-    from_api: "POST /api/v1/admin/bulk-import/orgs"
-    label: {zh: "导入前必需的影响面预检", en: "Impact preview before import"}
 ---

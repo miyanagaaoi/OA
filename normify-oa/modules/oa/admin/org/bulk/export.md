@@ -2,70 +2,43 @@
 uid: 36b178c6
 id: oa.admin.org.bulk.export
 parent: oa.admin.org.bulk
-state: planned
-name: {zh: "人员与组织导出", en: "User & Org Export"}
+name: {zh: "导出引擎与审计日志导出", en: "Export Engine & Audit-log Export"}
 description:
   zh: >
-      导出组织架构与人员清单，导出功能仅系统管理员可用；导出内容不含完整手机号，仅管理员可见完整值，导出动作留痕。
+      主数据导出与审计日志导出共用的 CSV 导出引擎：UTF-8 BOM + RFC4180 的表头/行渲染、名称业务路径解析、审计 JSON 内金额键递归剔除；主数据导出仅系统管理员可用且写审计日志。
       
   en: >
-      Export org and user listings; export is available to the system administrator only, omits full mobile numbers, and is written to the audit trail.
+      CSV export engine shared by the master-data exports plus the audit-log export: header and row rendering with UTF-8 BOM and RFC4180 escaping, business-path resolution and recursive redaction of amount keys inside audit JSON; master-data exports are system-admin only and write an audit entry.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.625Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.725Z"
+fingerprint: 2e7b8a7d1c7885b6b85af1520475aad562015db5c8cf18a70a6f742bcea60d5d
 source:
-  - path: "doc/prd-0.1.md"
-    line: 435
-    end_line: 435
-  - path: "doc/prd-0.1.md"
-    line: 195
-    end_line: 196
-  - path: "doc/prd-0.1.md"
-    line: 561
-    end_line: 561
+  - path: "oa-server/src/main/java/com/oa/admin/bulk/BulkExportService.java"
 apis:
-  - protocol: file
-    path: "export/orgs.xlsx"
-    description:
-      zh: >
-          组织架构导出文件。
-          
-      en: >
-          Exported org structure file.
-          
-  - protocol: file
-    path: "export/users.xlsx"
-    description:
-      zh: >
-          人员清单导出文件（手机号脱敏）。
-          
-      en: >
-          Exported user listing with masked phone numbers.
-          
-  - protocol: http
-    method: POST
-    path: "/api/v1/admin/org-exports"
-    description:
-      zh: >
-          创建导出任务（仅系统管理员）。
-          
-      en: >
-          Create an export job (system administrator only).
-          
   - protocol: http
     method: GET
-    path: "/api/v1/admin/org-exports/{export_id}"
+    path: "/api/v1/admin/audit-logs/export"
     description:
       zh: >
-          查询导出任务状态与下载链接。
+          导出审计日志 CSV（金额键递归剔除；仅系统管理员）。
           
       en: >
-          Fetch export job status and download link.
+          Exports the append-only audit log as CSV (amount keys redacted).
+          
+  - protocol: rpc
+    path: "bulk.export.csv"
+    description:
+      zh: >
+          按 UTF-8 BOM + RFC4180 转义渲染 CSV 行（导出物即维护载体）。
+          
+      en: >
+          Renders CSV rows with UTF-8 BOM and RFC4180 escaping.
           
 deps:
   - kind: call
-    to: oa.admin.boundary
-    from_api: "POST /api/v1/admin/org-exports"
-    label: {zh: "导出权限边界校验", en: "Export privilege check"}
+    to: oa.authz.visibility.export
+    from_api: "rpc:bulk.export.csv"
+    to_api: "GET /api/v1/authz/export-policy"
+    label: {zh: "按导出策略裁决生效列", en: "Apply export column policy"}
 ---

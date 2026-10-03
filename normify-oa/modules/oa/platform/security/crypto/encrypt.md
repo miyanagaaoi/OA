@@ -2,7 +2,6 @@
 uid: 29a35127
 id: oa.platform.security.crypto.encrypt
 parent: oa.platform.security.crypto
-state: planned
 name: {zh: "字段级加密", en: "Field Encryption"}
 description:
   zh: >
@@ -11,31 +10,49 @@ description:
   en: >
       Field-level encryption for phone numbers and other PII, with masked values returned by default and full values only for the owner and administrators.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.733Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.722Z"
+fingerprint: c103d3b6295f4a12d2328832a957ca67208b438ec54a683088ac5bcb0a6b38e0
 source:
-  - path: "doc/prd-0.1.md"
-    line: 196
-    end_line: 196
+  - path: "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCipher.java"
+  - path: "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCryptoService.java"
 apis:
-  - protocol: file
-    path: "config/crypto/field-encryption.yml"
-    description:
-      zh: >
-          哪些字段落库加密、响应中如何脱敏的配置。
-          
-      en: >
-          Which fields are encrypted at rest and how they are masked in responses.
-          
   - protocol: http
     method: GET
     path: "/api/v1/admin/crypto/fields"
     description:
       zh: >
-          查询已加密字段及其当前脱敏方式。
+          查询已加密字段及其当前脱敏方式（不返回密钥本体）。
           
       en: >
           Lists encrypted fields and their current masking mode.
+          
+  - protocol: http
+    method: POST
+    path: "/api/v1/admin/crypto/phone-migrate"
+    description:
+      zh: >
+          一次性把库中历史明文手机号加密为密文（幂等）。
+          
+      en: >
+          One-off idempotent migration of legacy clear-text phones to ciphertext.
+          
+  - protocol: rpc
+    path: "crypto.phone.encryptForStore"
+    description:
+      zh: >
+          落库前加密手机号（v1:<keyId>:<iv||ct||tag>）。
+          
+      en: >
+          Encrypts a phone for storage (v1:keyId:iv+ct+tag).
+          
+  - protocol: rpc
+    path: "crypto.phone.decrypt"
+    description:
+      zh: >
+          解密库中手机号；未知 keyId 或被篡改一律 fail-closed。
+          
+      en: >
+          Decrypts a stored phone; unknown keyId or tampering fails closed.
           
 ---

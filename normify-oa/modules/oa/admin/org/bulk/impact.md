@@ -2,7 +2,6 @@
 uid: 318cf18c
 id: oa.admin.org.bulk.impact
 parent: oa.admin.org.bulk
-state: planned
 name: {zh: "受影响在途单据预检", en: "In-Flight Impact Preview"}
 description:
   zh: >
@@ -11,45 +10,22 @@ description:
   en: >
       Before a bulk adjustment such as a reorganisation, produce the list of affected in-flight documents with initiator, current node and snapshot approvers for administrator confirmation.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.625Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.726Z"
+fingerprint: f14582e3acc613af24e1f05d3533b5ef52f9d412505069347d50e921b1fdb382
 source:
-  - path: "doc/prd-0.1.md"
-    line: 242
-    end_line: 242
-  - path: "doc/prd-0.1.md"
-    line: 202
-    end_line: 202
+  - path: "oa-server/src/main/java/com/oa/admin/bulk/BulkImportService.java"
+  - path: "oa-server/src/main/java/com/oa/admin/bulk/ImportReport.java"
 apis:
   - protocol: http
     method: POST
     path: "/api/v1/admin/bulk-import/impact-preview"
     description:
       zh: >
-          生成受影响在途单据清单（不落库）。
+          生成受影响在途单据清单（dry-run，不落库）。
           
       en: >
-          Generate the affected in-flight document list without persisting.
-          
-  - protocol: http
-    method: GET
-    path: "/api/v1/admin/bulk-import/{batch_id}/impact"
-    description:
-      zh: >
-          查询该批次的受影响清单与快照审批人。
-          
-      en: >
-          Fetch the batch's affected list and snapshot approvers.
-          
-  - protocol: file
-    path: "export/bulk-impact/{batch_id}.xlsx"
-    description:
-      zh: >
-          受影响在途单据清单导出件。
-          
-      en: >
-          Exported affected in-flight document list.
+          Generates the affected in-flight document list without persisting.
           
 deps:
   - kind: call

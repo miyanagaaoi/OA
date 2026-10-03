@@ -352,9 +352,17 @@ public class OaProperties {
          * —— 它们等价于给受控表开后门。受控表 Mapper（{@code SysUserMapper}/{@code SysOrgMapper}/
          * {@code SysOrgLeaderMapper}/{@code SysUserPositionMapper}）一律不继承 {@code BaseMapper}，
          * 因此这些注入语句本就不存在，见 {@code SysUserMapper} 类注释。
+         *
+         * <p>唯一的「业务表窄豁免」是账号/工号**唯一性判重**（{@code countByAccountSystem} /
+         * {@code countByEmployeeNoSystem}，阶段 1 收口）：唯一性是全局约束，与数据域无关；
+         * 两条语句只返回 {@code COUNT}、不返回行数据，因此不构成数据域读取旁路
+         * （读取口径 {@code selectUserById/selectUserPage/selectDirectoryUsers/selectForExport}
+         * 一行未动）。守卫：{@code DataScopeMapperGuardTest}。
          */
         private List<String> exemptStatementIds = new ArrayList<>(List.of(
                 "com.oa.identity.infra.SysUserMapper.selectByAccount",
+                "com.oa.identity.infra.SysUserMapper.countByAccountSystem",
+                "com.oa.identity.infra.SysUserMapper.countByEmployeeNoSystem",
                 "com.oa.identity.infra.SysUserSessionMapper",
                 "com.oa.identity.infra.SysLoginLogMapper",
                 "com.oa.authz.infra.DataScopeMapper"

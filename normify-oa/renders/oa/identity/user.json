@@ -1,14 +1,16 @@
 {
   "schema_version": 1,
   "id": "oa.identity.user",
-  "updated_at": "2026-10-02T08:05:03.768Z",
+  "updated_at": "2026-10-03T01:04:56.551Z",
   "mode": "groups",
   "reading": {
-    "zh": "从左到右：先看人员档案与通讯录（手机号默认脱敏），再看批量导入与只读接口两个数据进出通道，最后是离职待办闸门与水印身份要素。",
-    "en": "Left to right: profiles and the directory (phones masked by default), then the two data channels (bulk import, read-only API), and finally the resignation gate and watermark identity elements."
+    "zh": "从左到右：先看人员档案与通讯录（手机号默认脱敏），再看写入前必须通过的账号规则（系统口径判重、初始口令生成），然后是批量导入与只读接口两个数据通道，最后是离职待办闸门与水印身份要素。",
+    "en": "Left to right: profiles and the directory (phones masked by default), the account rules that guard every write (system-scope uniqueness, initial-password generation), the two data channels (bulk import, read-only API), and finally the resignation gate and watermark identity elements."
   },
   "order": [
     "oa.identity.user.profile",
+    "oa.identity.user.uniqueness",
+    "oa.identity.user.initial-password",
     "oa.identity.user.directory",
     "oa.identity.user.import",
     "oa.identity.user.open-api",
@@ -25,6 +27,17 @@
       "children": [
         "oa.identity.user.profile",
         "oa.identity.user.directory"
+      ]
+    },
+    {
+      "id": "rules",
+      "title": {
+        "zh": "账号规则",
+        "en": "Account Rules"
+      },
+      "children": [
+        "oa.identity.user.uniqueness",
+        "oa.identity.user.initial-password"
       ]
     },
     {

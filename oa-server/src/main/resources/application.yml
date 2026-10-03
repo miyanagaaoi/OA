@@ -154,6 +154,11 @@ oa:
     enforce-unmarked-select: true
     exempt-statement-ids:
       - com.oa.identity.infra.SysUserMapper.selectByAccount
+      # 账号/工号唯一性判重（系统口径）：唯一性是全局约束，与数据域无关；只返回 COUNT、不返回行数据，
+      # 不构成数据域旁路（数据域读取限制一行未动）。判重若被数据域裁剪 → 域外重复只能靠数据库唯一键兜住
+      # （工号更无库唯一键，会被静默写入）。守卫：DataScopeMapperGuardTest
+      - com.oa.identity.infra.SysUserMapper.countByAccountSystem
+      - com.oa.identity.infra.SysUserMapper.countByEmployeeNoSystem
       - com.oa.identity.infra.SysUserSessionMapper
       - com.oa.identity.infra.SysLoginLogMapper
       - com.oa.authz.infra.DataScopeMapper

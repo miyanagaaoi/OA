@@ -101,6 +101,11 @@ class DataScopeMapperGuardTest {
                 ids.add(itemMatcher.group(1));
                 continue;
             }
+            // 列表内的**整行注释**（用来说明豁免理由）必须跳过而不是当作列表结束 ——
+            // 否则解析会提前 break，后面的条目全部漏检（守卫静默失效）
+            if (line.trim().startsWith("#")) {
+                continue;
+            }
             // 列表结束（遇到下一个配置键，或缩进回到 key 同级）
             break;
         }
@@ -174,6 +179,68 @@ class DataScopeMapperGuardTest {
         assertThat(exempt).contains("com.oa.identity.infra.SysUserMapper.selectByAccount");
         assertThat(exempt).contains("com.oa.identity.infra.SysLoginLogMapper");
         assertThat(exempt).contains("com.oa.authz.infra.DataScopeMapper");
+    }
+
+    /**
+     * 阶段 1 收口：账号/工号**唯一性判重**（系统口径）是唯一新增的「业务表窄豁免」，必须两处同步且保持窄。
+     *
+     * <p>背景（被判重口径缺陷逼出来的豁免）：唯一性是全局约束（{@code uk_sys_user_account}），
+     * 与调用人的数据域无关。判重语句若织入数据域片段，分公司管理员对**域外**账号/工号判重得到 0，
+     * 重复只能由数据库唯一键在 INSERT 时兜住（文案泛化、不带 import-spec 错误码），
+     * 而 {@code sys_user.employee_no} **没有**库唯一键 → 域外重复工号会被静默写入。
+     *
+     * <p>本测试把「豁免是窄豁免」变成机器可验证的硬约束：
+     * <ol>
+     *   <li>两条语句必须在 {@code application.yml} **与** {@code OaProperties} 默认值里都存在
+     *       （缺一边：配置覆盖时会退回默认值或反之，运行期 40303 直接让增改人员不可用）；</li>
+     *   <li>豁免条目必须是**完整语句 id**，不得退化成 {@code ...SysUserMapper.countBy} 之类的前缀
+     *       （前缀匹配会顺带放行日后新增的同类语句）；</li>
+     *   <li>两条语句只读计数（SQL 里必须有 {@code COUNT(1)}）且不得返回行数据列 —— 这是「不构成
+     *       数据域读取旁路」的可验证形态；数据域**读取**限制由 {@code selectUserById} 等语句承担，一行未动。</li>
+     * </ol>
+     */
+    @Test
+    @DisplayName("系统口径判重语句是窄豁免：yml ∪ 默认值两处都在、完整语句 id、SQL 只读计数")
+    void systemScopeDedupStatementsAreNarrowlyExempted() throws Exception {
+        List<String> accountSystem = List.of("com.oa.identity.infra.SysUserMapper.countByAccountSystem");
+        List<String> employeeNoSystem = List.of("com.oa.identity.infra.SysUserMapper.countByEmployeeNoSystem");
+        List<String> both = new ArrayList<>(accountSystem);
+        both.addAll(employeeNoSystem);
+
+        // ① 两处同步（分别断言，避免「默认值兜底」掩盖 application.yml 漏配）
+        assertThat(ymlExemptStatementIds()).as("application.yml 必须显式列出系统口径判重语句")
+                .containsAll(both);
+        assertThat(new OaProperties().getScope().getExemptStatementIds())
+                .as("OaProperties 默认豁免清单必须同步（只改 yml 时，配置回退仍会让判重被 40303 拒绝）")
+                .containsAll(both);
+
+        // ② 完整语句 id（不是前缀）
+        List<String> exempt = effectiveExemptStatementIds();
+        for (String entry : exempt) {
+            for (String suffix : List.of("SysUserMapper.countBy", "SysUserMapper.count")) {
+                assertThat(entry.endsWith(suffix))
+                        .as("豁免条目 %s 是前缀形态（%s）：会顺带放行日后新增的同类语句，必须写完整语句 id",
+                                entry, suffix)
+                        .isFalse();
+            }
+        }
+
+        // ③ 两条语句的 SQL 只做计数，不返回行数据 → 窄豁免，不是数据域读取旁路
+        String xml;
+        try (InputStream in = new ClassPathResource("mapper/identity/SysUserMapper.xml").getInputStream()) {
+            xml = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        }
+        for (String statementId : both) {
+            String id = statementId.substring(statementId.lastIndexOf('.') + 1);
+            Pattern block = Pattern.compile("<select id=\"" + id + "\"[^>]*>(.*?)</select>", Pattern.DOTALL);
+            Matcher matcher = block.matcher(xml);
+            assertThat(matcher.find()).as("SysUserMapper.xml 必须有 #%s", id).isTrue();
+            String sql = matcher.group(1);
+            assertThat(sql).as("%s 必须是计数语句（COUNT(1)）", id).contains("COUNT(1)");
+            assertThat(sql).as("%s 不得带 @dataScope 标记：判重必须全库口径", id).doesNotContain("@dataScope(");
+            assertThat(sql).as("%s 只允许查这两列，不得返回行数据", id)
+                    .doesNotContain("SELECT u.*").doesNotContain("SELECT *");
+        }
     }
 
     @Test

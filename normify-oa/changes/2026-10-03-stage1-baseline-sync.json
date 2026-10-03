@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "2026-10-03-stage1-baseline-sync",
+  "title": {
+    "en": "Stage 1 (1.6/1.7/1.8) structure-baseline catch-up",
+    "zh": "阶段 1（1.6/1.7/1.8）结构基线追平"
+  },
+  "status": "verified",
+  "intent": {
+    "en": "Catch the Normify structure baseline (normify-oa) up with the code that landed for stage 1: field-level limits and export policy (1.6), AES-256-GCM phone encryption plus key rotation (1.7) and the five-template bulk import/export with the fail-closed E-*-020 data-scope gate (1.8). Planned modules in the affected domains were given their real APIs and source evidence and activated; modules that had no owner (the per-template import strategies, the shared import/export engine, the system-scope uniqueness check and the initial-password generator) were created.",
+    "zh": "把 Normify 结构基线（normify-oa）追平阶段 1 落地的代码：字段级限制与导出策略（1.6）、手机号 AES-256-GCM 加密与密钥轮换（1.7）、五类模板批量导入导出与 E-*-020 数据域 fail-closed 闸门（1.8）。受影响域中仍为 planned 的模块补齐真实 apis 与源码证据并激活；对基线里没有归属的实现（各模板导入策略类、导入导出公共引擎、系统口径判重、初始口令生成）新建模块。"
+  },
+  "modules": {
+    "create": [
+      "oa.identity.position.leader-import",
+      "oa.identity.position.post-import",
+      "oa.authz.rbac.user-role-import",
+      "oa.admin.org.bulk.engine",
+      "oa.identity.user.uniqueness",
+      "oa.identity.user.initial-password"
+    ],
+    "modify": [
+      "oa.authz.visibility.field.amount",
+      "oa.authz.visibility.field.contact",
+      "oa.authz.visibility.export",
+      "oa.authz.visibility.field",
+      "oa.platform.security.crypto.encrypt",
+      "oa.platform.security.crypto.keys",
+      "oa.identity.org.import",
+      "oa.identity.user.import",
+      "oa.identity.user.profile",
+      "oa.identity.session.login.password",
+      "oa.admin.org.bulk.import",
+      "oa.admin.org.bulk.export",
+      "oa.admin.org.bulk.impact",
+      "oa.admin.org.bulk"
+    ]
+  },
+  "acceptance": [
+    "阶段 1（1.6 字段级限制 / 1.7 手机号加密与密钥 / 1.8 五类批量导入导出）落地的路由全部写进叶子模块 apis（protocol=http + 大写 method + 真实 path + 中英简介），不再有指向不存在路由的幻影 API",
+    "已落地模块的 source 指向真实实现文件（含行号），normify_module_refresh({activate:true}) 后 state=active、fingerprint/revision 与工作区一致（normify_sync 的 drift_fingerprints 为空）",
+    "基线缺失归属的模块已补建：五类导入策略类各有归属（负责人/岗位任职/角色分配三张模板新增模块），导入导出公共引擎与系统口径判重/初始口令生成各有独立叶子",
+    "受影响容器层的渲染数据（order/groups/reading）与新增子模块同步更新，无 layout/missing",
+    "normify_validate 0 error；normify_build 与 normify_render 成功，tree.json / normify.html 反映新增模块与路由"
+  ],
+  "note": "本次不改任何源码语义，只做基线追平：15 条新路由 + 源码证据写入 16 个模块；6 个新模块；4 层渲染数据（oa.identity.position / oa.authz.rbac / oa.identity.user / oa.admin.org.bulk）同步。数字口径：模块 520→526，API 865→880。\n结构基线追平完成：6 个新模块（五类模板导入策略归属 + 公共引擎 + 系统口径判重 + 初始口令生成）全部 activated；16 个模块补真实路由与源码证据；4 层渲染数据同步；validate 0 error / build / render 全绿。",
+  "revision": {
+    "before": null,
+    "after": "810e68992bef8dea7b5d5a5b319ada301b87f9b0"
+  },
+  "created_at": "2026-10-03T01:05:52.166Z",
+  "updated_at": "2026-10-03T01:06:02.191Z",
+  "closed_at": "2026-10-03T01:06:02.191Z"
+}

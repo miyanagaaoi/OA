@@ -231,6 +231,9 @@
 | `W-ORG-014` | 部门/科室**未设正职负责人**（审批人候选为空 → 该部门成员发起时被拦截，AC-11） | warning |
 | `W-ORG-016` | 父组织已停用，子节点导入后不可作为发起归属 | warning |
 | `W-ORG-017` | 停用组织下仍有在职人员 | warning |
+| `E-ORG-020` | **数据域越权（fail-closed）**：该行的 `parent_path`（父组织已在库）或 `org_path`（节点已存在）**不在导入人的数据域内**（分公司管理员只能导入本公司子树）→ **整批拒绝**，不做「跳过该行继续导入」 | error |
+
+> **`E-ORG-020` 提示文案口径**（与 `ImportCodes` / `ImportScopeGuard` 一致）：「该行超出当前导入人的数据域（组织路径 `集团/公司B/部门3`），已按 fail-closed 拒绝整批导入」，修正建议「该行超出当前导入人的数据域（分公司管理员只能导入本公司子树），已按 fail-closed 拒绝」。判定用**组织真实路径前缀**（`/12/`），与 `DataScopeContext` 的口径一致；系统管理员（系统口径）不做该判定。
 
 ### 4.3 人员级（`user.csv`）
 
@@ -250,6 +253,7 @@
 | `E-USER-011` | `dept_path` 必须位于 `company_path` 子树内 | error |
 | `E-USER-012` | `remark` ≤255 字符 | error |
 | `E-USER-013` | 账号在库中已存在但姓名不一致（防止误合并到他人账号） | error |
+| `E-USER-020` | **数据域越权（fail-closed）**：`company_path` 或 `dept_path` 指向的组织**不在导入人的数据域内** → **整批拒绝** | error |
 
 ### 4.4 负责人级（`org_leader.csv`）
 
@@ -264,6 +268,7 @@
 | `E-LEAD-007` | `sort` 为 0–9999 整数或留空 | error |
 | `E-LEAD-008` | `business_line` 仅允许填在 `org_type=集团` 的节点上 | error |
 | `E-LEAD-009` | `(org_path, user_account, leader_type, business_line)` 四元组不得重复（对应 `uk_org_leader`） | error |
+| `E-LEAD-020` | **数据域越权（fail-closed）**：该行 `org_path` 的组织，或 `user_account` 所属人员归属的公司，**不在导入人的数据域内** → **整批拒绝** | error |
 
 > **「一级部门/科室只能有一个正职」的判定口径（T-09 已定稿）**：以 **`org_path` + `business_line` 为分组键**，每组至多 1 条 `leader_type=正职`；`business_line` 留空视为同一组。因此「集团」节点可同时存在「经济线正职」与「经营线正职」（PRD 5.1 按业务线绑定分管领导），但同一业务线内不得出现两个正职。
 
@@ -280,6 +285,7 @@
 | `E-POS-007` | `remark` ≤255 字符（`sys_user_position.remark` 列宽） | error |
 | `W-POS-008` | 在职人员的 `user.csv.dept_path` 未在岗位表出现（建议补主岗记录） | warning |
 | `W-POS-009` | 岗位组织不在该员工所属公司子树内（跨公司兼职需确认） | warning |
+| `E-POS-020` | **数据域越权（fail-closed）**：该行 `org_path` 的组织，或 `user_account` 所属人员归属的公司，**不在导入人的数据域内** → **整批拒绝** | error |
 
 ### 4.6 角色分配级（`user_role.csv`）
 
@@ -290,8 +296,17 @@
 | `E-ROLE-003` | **同一 user + role + 空数据域视为同一条**：`(user_account, role_code, scope_org_path)` 不得重复，空 `scope_org_path` 归一为同一组（对应 `uk_sys_user_role (user_id, role_id, scope_org_key)`，`scope_org_key = IFNULL(scope_org_id, 0)`；**MySQL 唯一键对 NULL 不去重，故 NULL 按 0 参与唯一键**）——**导入校验与库约束完全一致** | error |
 | `E-ROLE-004` | `scope_org_path` 非空时必须能在 `org.csv` 中解析（空 = 按角色默认数据域） | error |
 | `E-ROLE-005` | `remark` ≤255 字符（**落库** `sys_user_role.remark VARCHAR(255)`，T-15 已落地） | error |
+| `E-ROLE-020` | **数据域越权（fail-closed）**：`user_account` 所属人员归属的公司，或非空 `scope_org_path` 指向的组织，**不在导入人的数据域内** → **整批拒绝** | error |
 
 > 角色分配**不校验人员状态**（离职人员的历史角色由后台清理）；但 `user_account` 不存在于 `user.csv` 时仍按 `E-ROLE-002` 拒绝。
+
+> **数据域越权（`E-*-020`）的统一口径（阶段 1 收口定稿）**
+> 1. **fail-closed，整批拒绝**：任一数据行越域即判定整批失败（与 §5.3 阶段 B 同一处置），**不做「跳过越域行、其余照常导入」**——跳过会让调用方以为导入成功，属静默放行（`ImportScopeGuard` 类注释即此约定）。
+> 2. **判定主体是「导入人的数据域」**：分公司流程管理员 = 本公司子树 ∪ 本部门子树 ∪ 归口部门子树；系统管理员走**系统口径**（`DataScopeContext.isBypass()`），不受该组错误码约束。
+> 3. **判定用组织真实路径前缀**（`/12/`），不是名称路径（`集团/公司A`）——名称可改，真实路径不可伪造。
+> 4. **与库读取口径的关系**：导入的解析查库在**系统口径**下执行（否则分公司管理员看不到域外组织，会得到 `E-ORG-002`「父路径不存在」这类**误导性**错误），授权判定因此集中在 `ImportScopeGuard` 逐行显式执行；即「读得到、但写不进去」，错误码必须说清是数据域问题。
+> 5. 号段：`020` 为数据域越权专用码，五类模板各占一个（`E-ORG-020` / `E-USER-020` / `E-LEAD-020` / `E-POS-020` / `E-ROLE-020`），**不复用、不改义**；`021–029` 预留。
+> 6. **不由 CLI 校验器判定**：越权与否取决于**调用人的数据域**，`tools/check-import-csv.js`（离线、无调用人上下文）无法判定，故这五个码不在其覆盖范围（见 §4.8 / §11.1），由服务端 dry-run 逐行执行。
 
 ### 4.7 跨文件与规则一览（可自动判定的全部硬约束）
 
@@ -309,7 +324,7 @@
 
 ### 4.8 校验器与规则的对应关系（详细用法与退出码见 §11.1）
 
-[`../tools/check-import-csv.js`](../tools/check-import-csv.js) 覆盖 §4.1–§4.6 中标注为「文件内可判定」的**全部规则**（五份文件；即除 `E-ORG-010`、`E-USER-009`、`E-USER-013`、`W-ORG-014` 四项需查库/查流程的规则外全部覆盖）。四项**服务端/后台**规则由导入程序在 dry-run 阶段执行（§6.2），校验器不臆测。
+[`../tools/check-import-csv.js`](../tools/check-import-csv.js) 覆盖 §4.1–§4.6 中标注为「文件内可判定」的**全部规则**（五份文件；即除 `E-ORG-010`、`E-USER-009`、`E-USER-013`、`W-ORG-014` 四项需查库/查流程的规则，以及五个 `E-*-020` 数据域越权码外全部覆盖）。五类**服务端/后台**规则由导入程序在 dry-run 阶段执行（§6.2），校验器不臆测；`E-*-020` 依赖**调用人的数据域**，离线校验器没有该上下文，故一律由服务端逐行判定。
 
 ## 5. 错误报告格式
 
@@ -340,15 +355,21 @@
 | `E-LEAD` | 组织负责人（`sys_org_leader`） | §4.4 |
 | `E-POS` | 岗位任职（`sys_user_position`） | §4.5 |
 | `E-ROLE` | 角色分配（`sys_user_role` ＋ `sys_role.code`） | §4.6 |
+| `E-{ORG\|USER\|LEAD\|POS\|ROLE}-020` | **数据域越权**（行超出导入人数据域 → fail-closed **整批拒绝**；系统管理员不受此约束） | §4.2–§4.6、§5.3 |
 
 **码段分配约定**：`E-ORG-001..019`、`E-USER-001..019`、`E-LEAD-001..019`、`E-POS-001..019`、`E-ROLE-001..019` 为保留段；已分配码见 §4，未分配号段预留给后续规则（**不复用、不改义**，与 `enums.md` §0.1 维护规则一致）。
+
+**`-020` 号段（阶段 1 收口新增，五类模板各一个）**：`E-ORG-020` / `E-USER-020` / `E-LEAD-020` / `E-POS-020` / `E-ROLE-020` 统一表示**数据域越权**，语义与触发条件见 §4.2–§4.6 各自的表格行与统一口径说明。三条硬约定：
+1. **级别一律 `error`**（不是 warning）：越域行不是「可疑数据」，而是**调用人无权写入的数据**；若降级为 warning，就会在 §5.3 阶段 B 被放行，等于给越权留通道。
+2. **处置一律「整批拒绝 + 错误零落库」**：与 `E-ORG-010` / `E-USER-009` 等服务端规则同属阶段 A 发现的 error，任一命中即阶段 B 判定整批失败。
+3. **提示文案必须点明「数据域」二字并给出越域的组织路径**：不得复用 `E-ORG-002`（父路径不存在）或 `E-USER-005`（公司路径解析失败）——那些会让人误以为是数据错误，实际是权限边界。文案模板：「该行超出当前导入人的数据域（组织路径 `集团/公司B/部门3`），已按 fail-closed 拒绝整批导入」。
 
 ### 5.3 「全量校验后再导入」与事务边界
 
 | 阶段 | 行为 | 失败处置 |
 | --- | --- | --- |
-| **阶段 A：全量校验** | 逐行跑 §4 全部规则（含服务端查库规则） | 收集**全部**错误，不提前中断；报告须列全 |
-| **阶段 B：判定** | 只要存在 ≥1 个 `error` → 判定整批失败 | **整批不落库**（`BEGIN … ROLLBACK`），库内数据保持导入前状态 |
+| **阶段 A：全量校验** | 逐行跑 §4 全部规则（含服务端查库规则，**含逐行数据域判定 `E-*-020`**） | 收集**全部**错误，不提前中断；报告须列全 |
+| **阶段 B：判定** | 只要存在 ≥1 个 `error` → 判定整批失败（**含任意一条 `E-*-020` 数据域越权**） | **整批不落库**（`BEGIN … ROLLBACK`），库内数据保持导入前状态 |
 | **阶段 C：导入** | 全部 `error` 为 0 时，在**单个事务**内按 §2.1 顺序写四张表 | 事务内任一步失败 → `ROLLBACK`，返回失败行与原因 |
 | **阶段 D：留痕** | 无论成功失败，写 `sys_log`（`action=import_org_user`、`target_type=org_import`、`before_json`/`after_json`、行数统计） | 失败批次同样留痕 |
 **为什么必须整批事务**：组织树是 `sys_org.parent_id` 自引用树 ＋ `sys_user.company_id`/`org_id` 外键；半批落库会产生**断链的孤儿节点**与**归属错误的人员**，比"什么也没导入"更难恢复。
@@ -532,7 +553,7 @@
 | 导出文件 | 列 | 与导入模板的差异 |
 | --- | --- | --- |
 | `org.csv` | `org_path,org_name,org_type,parent_path,status,remark` | 无差异；`remark` 取自 `sys_org.remark` |
-| `user.csv` | `account,employee_no,name,phone,email,company_path,dept_path,status,remark` | 无差异；`phone` 按导出人角色脱敏（§9.2） |
+| `user.csv` | `account,employee_no,name,phone,email,company_path,dept_path,status,remark` | 无差异；`phone` **不脱敏**（主数据导出的**显式例外**，见 §9.2.1） |
 | `org_leader.csv` | `org_path,user_account,leader_type,sort,business_line,remark` | 无差异 |
 | `user_position.csv` | `user_account,org_path,post_name,is_primary,remark` | 无差异 |
 | `user_role.csv` | `user_account,role_code,scope_org_path,remark` | 无差异（`remark` 取自 `sys_user_role.remark`） |
@@ -546,7 +567,37 @@
 | 主数据（组织 / 人员 / 负责人 / 岗位 / 角色分配）导出 | **仅系统管理员**可导出（REQ-ADMIN-001「用户与组织管理」的兜底角色）；导出内容与 §9.1 的模板列完全一致 |
 | 单据与金额类导出 | **按 PRD 5.3 执行**：「合同金额、资金金额对非财务类角色只读展示，**不可导出**；**导出功能仅系统管理员与财务角色可用**」 |
 | 口径说明（T-11 已定稿） | 两类导出**分组治理、互不覆盖**：主数据看「是否系统管理员」，单据/金额看「是否系统管理员或财务角色」。`enums.md` **S-12** 记录的差异（PRD 5.3/9.1 曾写「导出仅系统管理员」，V0.4 更新为「系统管理员与财务角色」）按本口径收敛 |
-| 留痕与脱敏 | 每次导出写 `sys_log`（`action=export`、`target_type=org_import`、导出人、IP、行数、文件哈希）；非系统管理员不可导出主数据，系统管理员导出 `phone` 时不脱敏（导出物即用于数据维护，且已有权限与留痕约束） |
+| 留痕与脱敏 | 每次导出写 `sys_log`（`action=export`、`target_type=org_import`、导出人、IP、行数、文件哈希）；非系统管理员不可导出主数据；系统管理员导出主数据时 `phone` **不脱敏**（见下方「§9.2.1 显式例外」） |
+
+#### 9.2.1 往返约束的**显式例外**：主数据导出的 `phone` 不脱敏（阶段 1 收口定稿）
+
+**例外内容**：主数据（组织 / 人员 / 负责人 / 岗位 / 角色分配）导出中，**`user.csv` 的 `phone` 列输出完整明文手机号，不做 `138****8888` 脱敏**。
+
+**为什么必须是例外（而不是可选行为）**：`phone` 在 `user.csv` 中是**必填列**且受 §4.3 `E-USER-003`（11 位大陆手机号格式 `^1[3-9]\d{9}$`）约束。若导出物写脱敏值，则 §9.1 的往返闭环（导出 → 修改 → 再导入）**必然失败**：再导入时每一行都会报 `E-USER-003`（`138****8888` 不是合法手机号），该文件不可能被校验器直接通过，AC-57 的「导出全覆盖导入字段」反向验收同时失效。因此「主数据导出不脱敏」是**往返导入可还原**的必要条件，属于 §9.1 往返约束的**唯一例外**，且仅限主数据导出。
+
+**三条限定（缺一不可）**：
+
+| # | 限定 | 落地形态 |
+| --- | --- | --- |
+| ① | **仅系统管理员可取**：`GET /api/v1/identity/users/export` 要求角色 `admin`，权限码 `admin:user:export`；其他角色一律 **403 / 40305 `EXPORT_DENIED`** | 服务层 `UserService#exportCsv` 判定 `ForceReasonPolicy.ADMIN_ROLE`；越权矩阵测试断言 5 个非管理员角色全部 403 |
+| ② | **导出行为必写审计日志**（REQ-AUTH-003）：每次导出落 `sys_log`（`action=export`、导出人、IP、行数） | `BulkImportController` 三条模板导出与 `UserController/OrgController` 主数据导出均标 `@Audited(action="export", ...)` |
+| ③ | **脱敏仍由唯一实现 `PhoneVisibilityService` 负责，导出走其 `exportPlain` 且内含二次鉴权** | `UserService#exportCsv` 调 `phoneVisibility.exportPlain(principal, cipher)`；该方法**先解密**（库中是 AES-256-GCM 密文，直接写库值会把密文写进 CSV）并**内部再次校验系统管理员**——调用方无法绕过，也不会出现「密文进 CSV」或「第二份脱敏实现」两种漂移 |
+
+**与 PRD §5.3「通讯录他人手机号显示 `138****8888`」不矛盾**：两者约束的是**不同路径**——PRD §5.3 约束的是**展示路径**（通讯录 / 人员列表 / 单据详情 / H5 等界面渲染，必须脱敏，唯一实现仍是 `PhoneVisibilityService#display`），本文档 §9.2.1 约束的是**数据维护导出路径**（导出物是「拿去修改后再导入」的维护载体，不是展示载体）。即：**同一个手机号，界面上一律 `138****8888`，系统管理员导出的维护文件里是完整值**；两条口径由同一个服务类的两个方法分别承载（`display` / `exportPlain`），不存在第二份判定逻辑。
+
+> 反向说明：**不存在**「导出到界面/接口响应里出现明文」的旁路——脱敏与否只在 `PhoneVisibilityService` 内按「调用人是否系统管理员 + 用途是展示还是导出」决定；任何新增展示入口都必须走 `display`。
+
+### 9.3 金额导出口径（按 PRD §5.3 / AC-18）
+
+| 项目 | 口径 |
+| --- | --- |
+| 金额对**非财务类角色** | **不可导出**：这类角色在**导出入口**即被 **403 `EXPORT_DENIED`** 拒绝，不存在「导出物里恰好少一列」这种弱保证；此外审计日志 JSON（`before_json` / `after_json`）内的金额键**无条件递归剔除**（`redactAmountKeys`，解析失败则整列占位 fail-closed） |
+| **导出功能本身** | **仅系统管理员与财务角色可用**（PRD §5.3 / AC-18 原文）；其他角色调用任一导出入口 → **403** |
+| 实现开关 | `oa.authz.export.amount-enabled`（布尔，**默认 `true`**）：置 `false` 时**一律剔除**金额列（连系统管理员/财务角色也拿不到，用于临时收紧）；置 `true` 时金额随系统管理员与财务角色的导出物下发 |
+| 闸门位置 | **角色门禁在导出入口**（控制器/服务层的导出授权点），不通过则 **403 `EXPORT_DENIED` / `EXPORT_FIELD_DENIED`**；不得把闸门做成「把金额从所有人（含财务角色）的导出物里一律剔除」——那会让财务角色也导不出，与 PRD §5.3 相悖 |
+| 预检接口 | `POST /api/v1/authz/export-check`：按角色与目标（`target`）返回 `effectiveColumns` / `amountExported` / `excludedFields`，供前端在导出前**预检生效列**；伪造列白名单外的字段（如 `fields:["biz_no","not_a_column"]`）→ **403 / 40307 `EXPORT_FIELD_DENIED`**（列白名单在服务端裁决，界面无法绕过） |
+| 审计留痕 | 金额导出同样写 `sys_log`（REQ-AUTH-003），与 §9.2 主数据导出一致 |
+| 与 §9.2.1 的关系 | 两条口径**互不覆盖**：主数据看「是否系统管理员」（`phone` 例外见 §9.2.1），单据/金额看「是否系统管理员或财务角色」（金额列对非财务角色不可达） |
 
 ## 10. 裁定结论
 
@@ -596,5 +647,64 @@
 | V1.1 | 2026-10-02 | **业务裁定后修订**：①补 `user.csv` 的 `employee_no` 列（必填 + 唯一，映射 DDL 既有列 `sys_user.employee_no`，水印 REQ-USER-004 / AC-44），校验器同步新增 `E-USER-014`（必填 + 格式）/ `E-USER-015`（唯一）；②`business_line` 改为事项类别五值中文标签（示例「财务」→「经济」），明确「财务分管领导 ≡ 经济类分管领导」；③T-03 定稿为随机口令 + 加密清单线下分发 + 首登改密 + 5 次失败锁 15 分钟；④T-11 定稿为「主数据仅系统管理员 / 单据与金额按 PRD 5.3」分组治理；⑤T-01、T-04、T-05、T-08、T-09、T-10、T-12、T-13 全部按建议定稿，T-02 作废 |
 | V1.2 | 2026-10-02 | **收尾修订**：①T-07 定稿——四表 `remark VARCHAR(255) NULL` 已落地，模板 `remark` 列由「仅写 `sys_log`」改为**落库**，新增 `E-LEAD-010` / `E-POS-007` 长度校验，`E-ORG-013` / `E-USER-012` 文案对齐列宽；②T-14 定稿——**新增第五张模板 `user_role.csv`**（角色分配），纳入第 ⑤ 步与校验器 `requiredFiles`，新增 §2.3 角色集白名单（可配置 `IMPORT_ROLE_CODES`）、§3.6 逐列说明、§4.6 校验规则（`E-ROLE-001` ~ `E-ROLE-005`）、§9.1 导出列；③§4.6–§4.8 与 §3.7 章节重编号 |
 | V1.3 | 2026-10-02 | **T-15 / T-16 定稿，本文档「仍待确认项」清零**：①T-15——`sys_user_role` 补 `remark VARCHAR(255) NULL`（模板 `remark` 全部落库），并把唯一键加固为 `(user_id, role_id, scope_org_key)`（`scope_org_key = IFNULL(scope_org_id,0)` STORED），修复「可空列使唯一键对 NULL 不去重」的完整性漏洞，§3.6/§3.7/§4.6/§6.1/§9.1 同步；②T-16——**以 `data-model.md` 3.1 `sys_role.code` 为唯一权威角色码集**（9 个码），§2.3 角色集表、`user_role.csv` 示例与校验器默认白名单全部对齐，保留 `IMPORT_ROLE_CODES` 覆盖能力 |
+| V1.4 | 2026-10-03 | **阶段 1（1.6/1.7/1.8）实现追平，规格与实现对齐**：①新增数据域越权错误码号段 `E-ORG-020` / `E-USER-020` / `E-LEAD-020` / `E-POS-020` / `E-ROLE-020`（fail-closed **整批拒绝**），写入 §4.2–§4.6（含触发列与提示文案口径）、§4.6 后的统一口径说明、§5.2 码段约定与 §5.3 阶段 A/B；②§9.2.1 **新增显式例外**——主数据导出的 `phone` 不脱敏（往返导入可还原的必要条件），附三条限定（仅系统管理员 `admin:user:export` / 导出写审计 `REQ-AUTH-003` / 脱敏唯一实现 `PhoneVisibilityService#exportPlain` 内含二次鉴权），并说明与 PRD §5.3 展示路径口径不矛盾；③**新增 §9.3 金额导出口径**（按 PRD §5.3 / AC-18：非财务角色不可导出、导出功能仅系统管理员与财务角色、`oa.authz.export.amount-enabled`、角色门禁在导出入口、`POST /authz/export-check` 预检生效列）；④§9.1 `user.csv` 行同步为「`phone` 不脱敏（见 §9.2.1）」；⑤**新增 §11.3 本阶段落地的 HTTP 路由清单**（五类导入 preview/commit、四个导出入口、`/authz/field-policy/*`、`/authz/export-check|export-policy`、`/admin/crypto/*`、`/admin/keys*`） |
 
 > **交叉引用**：行为语义见 [`prd-0.1.md`](prd-0.1.md)（5.1 / 5.3 / 5.4 / 5.5 / REQ-ADMIN-001 / AC-11 / AC-12 / AC-57）；表结构见 [`data-model.md`](data-model.md)（2.1–2.4、3.1–3.2）；枚举见 [`enums.md`](enums.md)（§10.1、§1.1）；排期见 [`dev-plan-v0.3.md`](dev-plan-v0.3.md)（0.6、1.8）；模板与校验器见 [`../oa-deploy/import/`](../oa-deploy/import/) 与 [`../tools/check-import-csv.js`](../tools/check-import-csv.js)。
+
+### 11.3 本阶段落地的 HTTP 路由清单（阶段 1 · 1.6 / 1.7 / 1.8）
+
+> 口径：**本节是「实现追平规格」的对照表**——每一行都是**真实注册并实测通过**的路由（实测证据见 `AuthzMatrixHttpTest`）；表格里的「错误码」指业务错误码（HTTP 状态码见括号）。**未在本表出现的路由视为尚未实现**，不得据本文档假设其存在。
+
+#### 11.3.1 五类批量导入（第 ①②③④⑤ 步，§2.1 顺序不可调换）
+
+| 模板（§3） | 预检（dry-run，不落库） | 执行（单事务，错误零落库） |
+| --- | --- | --- |
+| ① `org.csv` | `POST /api/v1/identity/orgs/import/preview` | `POST /api/v1/identity/orgs/import` |
+| ② `user.csv` | `POST /api/v1/identity/users/import/preview` | `POST /api/v1/identity/users/import` |
+| ③ `org_leader.csv` | `POST /api/v1/identity/org-leaders/import/preview` | `POST /api/v1/identity/org-leaders/import` |
+| ④ `user_position.csv` | `POST /api/v1/identity/user-positions/import/preview` | `POST /api/v1/identity/user-positions/import` |
+| ⑤ `user_role.csv` | `POST /api/v1/identity/user-roles/import/preview` | `POST /api/v1/identity/user-roles/import` |
+
+| 辅助接口 | 说明 |
+| --- | --- |
+| `POST /api/v1/admin/bulk-import/impact-preview` | 受影响在途单据清单预检（§7，dry-run 不落库；参数 `kind` ∈ 五类） |
+| `GET  /api/v1/admin/bulk-import/kinds` | 五类导入元数据（`kind` / `label` / `file` / `columns` / `previewRoute` / `commitRoute`），供前端渲染五步流水线 |
+
+- **入参两种形态**：`multipart/form-data` 的 `file` 字段（浏览器上传），或直接把 CSV 作为请求体（`curl --data-binary @org.csv`，便于脚本化）；文件必须是 **UTF-8 BOM** 的 CSV（§4.1 `E-ENC-001`）。
+- **权限**：系统管理员或分公司流程管理员；分公司管理员逐行受数据域约束，越域行 → `E-*-020` **整批拒绝**（fail-closed）。
+- **失败码**：存在 error → `400 / 40005 IMPORT_VALIDATION_FAILED`（整批已拒绝）；文件本身不合法 → `400 / 40006 IMPORT_FILE_INVALID`；同一时刻已有导入在进行 → `409 / 40905 IMPORT_IN_PROGRESS`（§6.4 分布式锁）。
+- **留痕**：全部走 `@Audited`；commit 的响应体含**仅本次返回**的初始口令，故 `recordAfter=false`（口令绝不进审计日志，T-03）。
+
+#### 11.3.2 导出入口（§9）
+
+| 导出物 | 路由 | 权限（§9.2 / §9.2.1） |
+| --- | --- | --- |
+| 组织主数据 `org.csv` | `GET /api/v1/identity/orgs/export` | 仅系统管理员 |
+| 人员主数据 `user.csv` | `GET /api/v1/identity/users/export` | 仅系统管理员（权限码 `admin:user:export`；`phone` **不脱敏**，§9.2.1） |
+| 负责人 `org_leader.csv` | `GET /api/v1/identity/org-leaders/export` | 仅系统管理员 |
+| 岗位任职 `user_position.csv` | `GET /api/v1/identity/user-positions/export` | 仅系统管理员 |
+| 角色分配 `user_role.csv` | `GET /api/v1/identity/user-roles/export` | 仅系统管理员 |
+| 审计日志 `audit-log.csv` | `GET /api/v1/admin/audit-logs/export` | 仅系统管理员（金额键递归剔除，§9.3） |
+
+非授权角色 → **403 / 40305 `EXPORT_DENIED`**（手改 URL 直连接口同样被拒）。
+
+#### 11.3.3 字段级限制与导出策略（阶段 1.6）
+
+| 路由 | 说明 | 关键错误码 |
+| --- | --- | --- |
+| `GET  /api/v1/authz/field-policy/amount` | 读取金额字段对**当前角色**的读写策略 | — |
+| `GET  /api/v1/authz/field-policy/contact` | 读取联系方式脱敏策略（`138****8888` 形态与加密算法口径） | — |
+| `POST /api/v1/authz/field-policy/assert-write` | **写闸门**：按「状态白名单 ∧ 角色金额规则」判定本次表单写入是否放行（非财务角色写金额 → 拒绝） | `403 / 40306 AMOUNT_READ_ONLY`、`403 / 40304 FIELD_WRITE_DENIED` |
+| `POST /api/v1/authz/export-check` | 导出前预检：返回 `effectiveColumns` / `amountExported` / `excludedFields`（§9.3） | `403 / 40307 EXPORT_FIELD_DENIED` |
+| `GET  /api/v1/authz/export-policy` | 读取导出目标的权威列清单与限制 | `403 / 40305 EXPORT_DENIED` |
+
+#### 11.3.4 敏感字段加密与密钥管理（阶段 1.7）
+
+| 路由 | 说明 | 备注 |
+| --- | --- | --- |
+| `GET  /api/v1/admin/crypto/fields` | 已加密字段与当前脱敏方式（**不返回密钥本体**） | 仅系统管理员 |
+| `POST /api/v1/admin/crypto/phone-migrate` | 一次性把库中**历史明文**手机号加密为密文（**幂等**：`migrated=5 → 0`） | 仅系统管理员；密钥缺失时启动期即 fail-fast（`500 / 50003 CRYPTO_KEY_UNAVAILABLE`） |
+| `GET  /api/v1/admin/keys` | 密钥状态：活动 `keyId` + 可用 `keyId` 列表（**永不下发密钥本体**） | 仅系统管理员 |
+| `POST /api/v1/admin/keys/rotate` | 密钥轮换：把非活动 `keyId` 的密文收敛到活动密钥（幂等） | 仅系统管理员 |
+
+非系统管理员访问 `/api/v1/admin/**` 一律 **403**（越权矩阵测试对 5 个非管理员角色逐一断言）。

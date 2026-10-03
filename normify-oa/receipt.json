@@ -2,20 +2,20 @@
   "schema_version": 1,
   "ok": true,
   "project": "normify-oa",
-  "compiled_at": "2026-10-02T10:56:39.092Z",
+  "compiled_at": "2026-10-03T01:06:02.846Z",
   "stats": {
     "tree_count": 1,
-    "module_count": 520,
-    "leaf_count": 378,
-    "api_count": 865,
-    "dep_count": 528,
+    "module_count": 526,
+    "leaf_count": 384,
+    "api_count": 880,
+    "dep_count": 535,
     "cross_tree_dep_count": 0,
     "max_depth": 6,
     "layout_count": 142,
-    "planned_count": 479,
+    "planned_count": 467,
     "deprecated_count": 0,
     "policy_rule_count": 2,
-    "change_count": 1,
+    "change_count": 2,
     "open_change_count": 0
   },
   "warnings": {
@@ -24,19 +24,19 @@
   },
   "artifacts": {
     "tree.json": {
-      "sha256": "0105057e0c4d16fd3da28856c152ab062d0b640c7b1eadf937569211a800f4c1",
-      "bytes": 1639378
+      "sha256": "164f18b4e023e616b480c7d79fed4dc33a07edd78e6f8dfe47b85d3e3afbab9c",
+      "bytes": 1667922
     },
     "outline.md": {
-      "sha256": "bc31180e8724d21f9717ae7be95f273fcada5e4c434beea081d836d5fba3e34f",
-      "bytes": 153153
+      "sha256": "196957227b21807e0a01483e56f4b57ed466c882afa4f46e5b5ab493e3e956e1",
+      "bytes": 154933
     },
     "api-index.json": {
-      "sha256": "682d9f50b56b7fb12b1cac03418228b82f040c5bf130a29a11510ce254229b0a",
-      "bytes": 68758
+      "sha256": "dd3c31c89007547e438f341e95d74c4fb34698a9d4b81b2b3d6b36182bcb2afd",
+      "bytes": 69947
     },
     "receipt.json": {
-      "sha256": "58b6d8d7242b5253404204fafa5ee4fdaa129436e9cc1829c364e7a99be4df9b",
+      "sha256": "e95b45080cbf615c3520c0eb5805dae054043967d745c624bd444245fee36d36",
       "bytes": 971
     }
   }

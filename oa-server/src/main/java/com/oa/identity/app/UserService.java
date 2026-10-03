@@ -69,6 +69,16 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li><b>交接</b>：本期只返回待办清单 + 审计留痕，**不联动流程引擎**
  *       （{@code flow_task} 尚无完整实现，接入点见 {@code DefaultInFlightChecker}）。</li>
  * </ol>
+ *
+ * <h2>唯一性判重 = 系统口径（阶段 1 收口）</h2>
+ * <p>{@link #create} / {@link #update} 的账号与工号判重一律走
+ * {@link SysUserMapper#countByAccountSystem} / {@link SysUserMapper#countByEmployeeNoSystem}
+ * ——<b>判重不受数据域裁剪</b>（唯一性是全局约束，与「调用人能看到谁」无关），命中即以
+ * {@link ErrorCode#DUPLICATE}（409 / 40902）返回明确业务错误码，并指向
+ * import-spec {@code E-USER-002} / {@code E-USER-015}。这两条语句的 {@code @dataScope}
+ * 豁免理由与守卫见 {@link SysUserMapper} 与 {@code DataScopeMapperGuardTest}。
+ * <p><b>数据域读取限制未放宽</b>：本类的所有**读**路径（列表 / 通讯录 / 详情 / 导出）仍走带
+ * {@code @dataScope} 标记的语句，域外人员一律 404 或过滤为空。
  */
 @Service
 public class UserService {
@@ -246,8 +256,12 @@ public class UserService {
             throw new BizException(ErrorCode.PARAM_INVALID,
                     "账号需 8–64 位、以字母开头，仅含字母/数字/下划线/点/连字符（import-spec E-USER-001）");
         }
-        if (userMapper.countByAccount(account, null) > 0) {
-            throw new BizException(ErrorCode.DUPLICATE, "登录账号已存在（import-spec E-USER-002）");
+        if (userMapper.countByAccountSystem(account, null) > 0) {
+            // **系统口径**判重（阶段 1 收口）：账号唯一性是全局约束（uk_sys_user_account），
+            // 与调用人的数据域无关；带数据域的判重会让分公司管理员漏判域外账号，
+            // 重复只能由数据库唯一键兜住（文案泛化、不带 import-spec 错误码）
+            throw new BizException(ErrorCode.DUPLICATE,
+                    "登录账号已存在（账号唯一性为系统级约束，与数据域无关；import-spec E-USER-002）");
         }
         String employeeNo = blankToNull(request.employeeNo());
         if (employeeNo != null) {
@@ -255,8 +269,10 @@ public class UserService {
                 throw new BizException(ErrorCode.PARAM_INVALID,
                         "工号仅允许字母、数字与连字符且不超过 32 字符（import-spec E-USER-014）");
             }
-            if (userMapper.countByEmployeeNo(employeeNo, null) > 0) {
-                throw new BizException(ErrorCode.DUPLICATE, "工号已存在，需全库唯一（import-spec E-USER-015）");
+            if (userMapper.countByEmployeeNoSystem(employeeNo, null) > 0) {
+                // 工号**没有**库唯一键：判重一旦被数据域裁剪，域外重复工号会被静默写入（工号进水印）
+                throw new BizException(ErrorCode.DUPLICATE,
+                        "工号已存在，需全库唯一（系统级约束，与数据域无关；import-spec E-USER-015）");
             }
         }
         SysOrg company = requireCompany(request.companyId());
@@ -341,8 +357,10 @@ public class UserService {
                 throw new BizException(ErrorCode.PARAM_INVALID,
                         "工号仅允许字母、数字与连字符且不超过 32 字符（import-spec E-USER-014）");
             }
-            if (userMapper.countByEmployeeNo(employeeNo, id) > 0) {
-                throw new BizException(ErrorCode.DUPLICATE, "工号已存在，需全库唯一（import-spec E-USER-015）");
+            if (userMapper.countByEmployeeNoSystem(employeeNo, id) > 0) {
+                // 同 create：工号唯一性是系统级约束，必须用系统口径判重（否则域外重复会被静默写入）
+                throw new BizException(ErrorCode.DUPLICATE,
+                        "工号已存在，需全库唯一（系统级约束，与数据域无关；import-spec E-USER-015）");
             }
         }
         if (targetStatus == UserStatus.DISABLED && !UserStatus.DISABLED.code().equals(existing.getStatus())) {

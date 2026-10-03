@@ -10,9 +10,9 @@ description:
   en: >
       User profiles and login accounts: name, employee number (for watermarking), primary org and company, position, employment status, salted password hash and encrypted phone; phones are never stored in clear text.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.712Z"
-fingerprint: 4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.724Z"
+fingerprint: 84bf081dede93e7fbb4441f7c61d6f55c96c8e79cb48ead91d5b41d8207533f8
 source:
   - path: "doc/data-model.md"
     line: 59
@@ -20,13 +20,14 @@ source:
   - path: "doc/prd-0.1.md"
     line: 133
     end_line: 142
+  - path: "oa-server/src/main/java/com/oa/identity/app/UserService.java"
 apis:
   - protocol: http
     method: GET
     path: "/api/v1/identity/users"
     description:
       zh: >
-          查询人员列表。
+          查询人员列表（数据域过滤）。
           
       en: >
           Lists users.
@@ -36,30 +37,29 @@ apis:
     path: "/api/v1/identity/users"
     description:
       zh: >
-          新建人员与账号。
+          新建人员与账号（账号/工号判重为系统口径；初始口令仅本次返回）。
           
       en: >
-          Creates a user and account.
+          Creates a user and account; account/employee-no uniqueness is system-scope.
           
   - protocol: http
     method: PUT
     path: "/api/v1/identity/users/{id}"
     description:
       zh: >
-          修改人员信息与在职状态。
+          修改人员信息与在职状态（含停用闸门）。
           
       en: >
           Updates profile and employment status.
           
-  - protocol: http
-    method: PUT
-    path: "/api/v1/identity/users/{id}/password"
+  - protocol: rpc
+    path: "identity.user.updatePasswordHash"
     description:
       zh: >
-          重设密码（写入加盐哈希）。
+          回写口令哈希（本人改密入口调用；只存 BCrypt 哈希，永不落明文）。
           
       en: >
-          Resets the password hash.
+          Writes a new password hash for a user (self-service change; hash only, never plaintext).
           
   - protocol: mysql
     path: "sys_user"

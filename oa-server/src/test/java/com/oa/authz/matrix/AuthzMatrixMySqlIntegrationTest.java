@@ -59,7 +59,8 @@ import org.junit.jupiter.api.Test;
  *   <tr><td>导出</td><td>{@code selectForExport}</td></tr>
  *   <tr><td>换 id 参数（详情）</td><td>{@code selectUserById}</td></tr>
  *   <tr><td>组织子树人数</td><td>{@code countActiveByOrgPath}</td></tr>
- *   <tr><td>唯一性校验（账号/工号）</td><td>{@code countByAccount} / {@code countByEmployeeNo}</td></tr>
+ *   <tr><td>唯一性判重（数据域口径 vs <b>系统口径</b>）</td><td>{@code countByAccount} / {@code countByEmployeeNo}（域外=0，读取限制未放宽）
+ *       ↔ {@code countByAccountSystem} / {@code countByEmployeeNoSystem}（域外=1，判重不看数据域）</td></tr>
  *   <tr><td>单据列表（实例类）</td><td>{@code com.oa.matrix.MatrixMapper.countInstances}</td></tr>
  *   <tr><td>直连裸查询（无标记）</td><td>{@code com.oa.matrix.MatrixMapper.countUsersBare} → <b>40303</b></td></tr>
  * </table>
@@ -89,6 +90,16 @@ class AuthzMatrixMySqlIntegrationTest {
     private static final String ACTIVE_BY_PATH = "com.oa.identity.infra.SysUserMapper.countActiveByOrgPath";
     private static final String BY_ACCOUNT = "com.oa.identity.infra.SysUserMapper.countByAccount";
     private static final String BY_EMPLOYEE_NO = "com.oa.identity.infra.SysUserMapper.countByEmployeeNo";
+    /**
+     * 账号/工号**唯一性判重**（系统口径，阶段 1 收口）。
+     *
+     * <p>两条语句故意不带 {@code @dataScope} 标记（判重 = 全库口径），列入
+     * {@code oa.scope.exempt-statement-ids}；本测试在**已认证**上下文里执行它们，
+     * 既验证「重复能被判出来」，也验证「豁免在运行期真的生效」（否则 40303）。
+     */
+    private static final String BY_ACCOUNT_SYSTEM = "com.oa.identity.infra.SysUserMapper.countByAccountSystem";
+    private static final String BY_EMPLOYEE_NO_SYSTEM =
+            "com.oa.identity.infra.SysUserMapper.countByEmployeeNoSystem";
     private static final String INSTANCES = "com.oa.matrix.MatrixMapper.countInstances";
     private static final String INSTANCE_IDS = "com.oa.matrix.MatrixMapper.selectInstanceIds";
     private static final String USERS = "com.oa.matrix.MatrixMapper.countUsers";
@@ -229,13 +240,35 @@ class AuthzMatrixMySqlIntegrationTest {
         assertThat(byId(EM_A)).isNotNull();
         assertThat(byId(EM_B)).isNull();
         assertThat(byId(CA)).isNull();
-        // 唯一性校验也受数据域收敛：查域外账号得到 0（**已知口径**，见交付说明「跨域唯一性校验」）
+        // ① 数据域**读取**限制未被放宽（回归防线）：带数据域的判重语句查域外账号/工号仍得到 0
         Integer outsideAccount = session.selectOne(BY_ACCOUNT, param("account", "mtx_em02", "excludeId", null));
         assertThat(outsideAccount).isZero();
-        // 工号同理（域外工号查不到 → 不会拿它做「已存在」判定）
         Integer outsideEmployeeNo = session.selectOne(BY_EMPLOYEE_NO,
                 param("employeeNo", "MTX0005", "excludeId", null));
         assertThat(outsideEmployeeNo).isZero();
+
+        // ② 判重口径 = **系统口径**（阶段 1 收口修复）：唯一性是全局约束，与数据域无关 ——
+        //    域外账号/工号同样能判出重复（返回 > 0），于是 UserService 返回明确业务错误码
+        //    40902 DUPLICATE，而不是：
+        //      · 账号：落到库唯一键 uk_sys_user_account 上，只得到一句数据库层的泛化文案；
+        //      · 工号：sys_user.employee_no **没有**库唯一键，域外重复会被**静默写入**。
+        //    两条语句不带 @dataScope 标记，这里是在**已认证**上下文（employee/SELF）里执行：
+        //    能跑通本身就证明 oa.scope.exempt-statement-ids 的窄豁免在运行期生效（否则 40303）。
+        Integer outsideAccountSystem = session.selectOne(BY_ACCOUNT_SYSTEM,
+                param("account", "mtx_em02", "excludeId", null));
+        assertThat(outsideAccountSystem).as("系统口径判重必须看得见域外账号（否则只能靠库唯一键兜住）")
+                .isEqualTo(1);
+        Integer outsideEmployeeNoSystem = session.selectOne(BY_EMPLOYEE_NO_SYSTEM,
+                param("employeeNo", "MTX0005", "excludeId", null));
+        assertThat(outsideEmployeeNoSystem).as("系统口径判重必须看得见域外工号（工号无库唯一键，漏判=静默重复）")
+                .isEqualTo(1);
+        // excludeId 语义：排除自身后不再算重复（更新本人档案不应误报）
+        Integer employeeNoSelf = session.selectOne(BY_EMPLOYEE_NO_SYSTEM,
+                param("employeeNo", "MTX0005", "excludeId", EM_B));
+        assertThat(employeeNoSelf).isZero();
+        Integer accountSelf = session.selectOne(BY_ACCOUNT_SYSTEM,
+                param("account", "mtx_em02", "excludeId", EM_B));
+        assertThat(accountSelf).isZero();
     }
 
     @Test

@@ -2,7 +2,6 @@
 uid: 7b524e04
 id: oa.authz.visibility.field.amount
 parent: oa.authz.visibility.field
-state: planned
 name: {zh: "金额字段只读", en: "Amount Field Read-only"}
 description:
   zh: >
@@ -11,16 +10,13 @@ description:
   en: >
       Contract and fund amounts are read-only for non-finance roles and cannot be exported; Finance roles and system administrators may export, and every export is logged. The rule is hard-coded in phase one and does not depend on field-level configuration.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.656Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.720Z"
+fingerprint: 29146e055831a1c7fe631ae245079de418d031c8e860cc4c8bf2fc2f84fb48f6
 source:
-  - path: "doc/prd-0.1.md"
-    line: 192
-    end_line: 199
-  - path: "doc/prd-0.1.md"
-    line: 546
-    end_line: 561
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/AmountFieldPolicy.java"
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/FormFieldWriteGuard.java"
+  - path: "oa-server/src/main/java/com/oa/authz/api/FieldPolicyController.java"
 apis:
   - protocol: http
     method: GET
@@ -31,6 +27,16 @@ apis:
           
       en: >
           Reads the amount policy of the caller's roles.
+          
+  - protocol: http
+    method: POST
+    path: "/api/v1/authz/field-policy/assert-write"
+    description:
+      zh: >
+          写闸门：按「状态白名单 ∧ 角色金额规则」判定本次表单写入是否放行。
+          
+      en: >
+          Write gate: state whitelist AND role rule decide whether this form write is allowed.
           
   - protocol: rpc
     path: "authz.field.isAmountReadonly"

@@ -1,16 +1,17 @@
 {
   "schema_version": 1,
   "id": "oa.authz.rbac",
-  "updated_at": "2026-10-02T08:05:10.770Z",
+  "updated_at": "2026-10-03T01:04:51.437Z",
   "mode": "groups",
   "reading": {
-    "zh": "从左到右：先定角色与权限树，再把角色授予用户、把权限与组织节点授予角色（逐级勾选），最后由有效权限计算产出菜单，所有变更写入权限变更日志。",
-    "en": "Left to right: define roles and the permission tree, then assign roles to users and permissions plus org nodes to roles (ticked level by level), compute effective permissions, and log every change."
+    "zh": "从左到右：先定角色与权限树，再把角色授予用户（单条分配 + user_role.csv 批量分配，唯一键口径与库约束一致），把权限与组织节点授予角色，最后由有效权限计算产出菜单，所有变更写入权限变更日志。",
+    "en": "Left to right: define roles and the permission tree, assign roles to users (single assignment plus the user_role.csv bulk channel, matching the database unique key), grant permissions and org nodes to roles, compute effective permissions and log every change."
   },
   "order": [
     "oa.authz.rbac.role",
     "oa.authz.rbac.permission-tree",
     "oa.authz.rbac.user-role",
+    "oa.authz.rbac.user-role-import",
     "oa.authz.rbac.grant",
     "oa.authz.rbac.effective",
     "oa.authz.rbac.change-log"
@@ -35,6 +36,7 @@
       },
       "children": [
         "oa.authz.rbac.user-role",
+        "oa.authz.rbac.user-role-import",
         "oa.authz.rbac.grant"
       ]
     },

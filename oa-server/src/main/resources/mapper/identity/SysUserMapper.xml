@@ -189,6 +189,49 @@
     </if>
   </select>
 
+  <!--
+    ============================================================================
+    账号 / 工号唯一性判重（**系统口径**）—— 本文件里**唯一**两条不带 @dataScope 标记的 SELECT
+    ============================================================================
+    阶段 1 收口修复的缺陷：唯一性是**全局约束**（库内 uk_sys_user_account），与调用人的数据域无关。
+    原先 UserService.create/update 用带数据域的 countByAccount / countByEmployeeNo 判重，于是
+    分公司管理员对**数据域外**的账号/工号判重得到 0：
+      · 账号：重复只能由 uk_sys_user_account 在 INSERT 时兜住 → 报错来自数据库层（文案泛化、
+        不带 import-spec 错误码），审计里留下一次「数据库异常」；
+      · 工号：sys_user.employee_no **没有**库唯一键 → 域外重复工号被**静默写入**（工号进签名/水印，
+        是不可接受的数据污染）。
+    因此判重必须走下面两条**系统口径专用语句**：
+
+      1) 故意不写 /* @dataScope(table=sys_user, alias=u) */ 标记 —— 判重语义 = 「全库是否存在该账号/工号」，
+         织入数据域片段会直接改变判重结果（即缺陷本身）；
+      2) 两条语句整体列入 oa.scope.exempt-statement-ids（application.yml + OaProperties 默认值两处，
+         守卫见 DataScopeMapperGuardTest#systemScopeDedupStatementsAreNarrowlyExempted）；
+      3) **不是数据域旁路**：只返回 COUNT，不返回任何行数据、不参与读取口径；数据域读取限制
+         （selectUserById / selectUserPage / selectDirectoryUsers / selectForExport）一行未动。
+         豁免的是「读一列计数」，不是 selectOne/selectList 那样的宽豁免。
+      4) 不过滤 deleted_at：与 uk_sys_user_account（覆盖全部行，含软删除行）同一口径，
+         使重复判定稳定给出明确业务错误码（409 / 40902 + import-spec E-USER-002 / E-USER-015），
+         而不是偶尔落到数据库唯一键上。
+    ============================================================================
+  -->
+  <select id="countByAccountSystem" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user u
+    WHERE u.account = #{account}
+    <if test="excludeId != null">
+      AND u.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
+  <select id="countByEmployeeNoSystem" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user u
+    WHERE u.employee_no = #{employeeNo}
+    <if test="excludeId != null">
+      AND u.id &lt;&gt; #{excludeId}
+    </if>
+  </select>
+
   <!-- ============================== 写 ============================== -->
 
   <update id="updateUserProfile" parameterType="com.oa.identity.domain.SysUser">

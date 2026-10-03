@@ -82,11 +82,68 @@ public interface SysUserMapper {
                                   @Param("orgPathPrefix") String orgPathPrefix,
                                   @Param("companyId") Long companyId);
 
-    /** 工号唯一性校验（import-spec E-USER-015；{@code excludeId} 用于更新时排除自身）。 */
+    /**
+     * 工号唯一性校验（**数据域口径**：只查调用人可见范围，import-spec E-USER-015）。
+     *
+     * <p><b>本语句不是「唯一性判定的正确口径」</b>：工号唯一性是**全系统**约束，与数据域无关。
+     * 需要判重时请用 {@link #countByEmployeeNoSystem}（系统口径）；本语句只保留给
+     * 「按数据域逐行裁决」的调用点（批量导入的行级校验，越域行已先被
+     * {@code ImportScopeGuard} 以 {@code E-*-020} 整批拒绝）。
+     *
+     * @param excludeId 更新时排除自身（{@code null} = 不排除）
+     */
     int countByEmployeeNo(@Param("employeeNo") String employeeNo, @Param("excludeId") Long excludeId);
 
-    /** 账号唯一性校验（import-spec E-USER-002）。 */
+    /**
+     * 账号唯一性校验（**数据域口径**：只查调用人可见范围，import-spec E-USER-002）。
+     *
+     * <p>同上：判重请用 {@link #countByAccountSystem}。本语句保留的价值是「域外账号查不到」
+     * 这一**可断言的证据**（越权矩阵测试用它证明数据域读取限制没有被放宽）。
+     */
     int countByAccount(@Param("account") String account, @Param("excludeId") Long excludeId);
+
+    // ---------------------------------------------------------------- 唯一性判重（系统口径，阶段 1 收口）
+
+    /**
+     * 账号唯一性判重（<b>系统口径</b>：不受数据域裁剪，{@code sys_user.account} 为全库唯一）。
+     *
+     * <p><b>为什么必须是系统口径</b>（2026-10 收口修复的缺陷）：唯一性是**全局约束**
+     * （库内 {@code uk_sys_user_account}），与「调用人能看到哪些人」无关。若用带数据域的
+     * {@link #countByAccount} 判重，分公司管理员对**数据域外**的账号判重会得到 0 —— 重复账号
+     * 只能由数据库唯一键在 INSERT 时兜住：错误来自数据库层（文案泛化、不带 import-spec 错误码），
+     * 而**工号没有库唯一键**（见 {@code 01-schema.sql} 的 {@code sys_user}），越域重复更会被静默写入。
+     *
+     * <p><b>{@code @dataScope} 豁免理由</b>：本语句<b>故意不写</b>
+     * {@code /* @dataScope(table=sys_user, alias=u) *}{@code /} 标记 —— 判重的语义就是
+     * 「全库有没有这个账号」，织入数据域片段会直接改变判重结果（即缺陷本身）。因此它必须列入
+     * {@code oa.scope.exempt-statement-ids}（{@code application.yml} 与 {@code OaProperties} 默认值
+     * **两处**都要有，由 {@code DataScopeMapperGuardTest} 守住）。
+     *
+     * <p><b>为什么不构成数据域旁路</b>：本语句只返回 {@code COUNT}，不返回任何行数据、不参与任何读取口径；
+     * 数据域读取限制（{@link #selectUserById} / {@link #selectUserPage} / {@link #selectDirectoryUsers} /
+     * {@link #selectForExport}）一行未动。豁免的是一条「读一列计数」的窄语句，不是宽豁免
+     * （参见 {@code DataScopeMapperGuardTest} 对 {@code selectOne/selectList/...} 一类宽豁免的禁令）。
+     *
+     * <p><b>口径细节</b>：**不过滤 {@code deleted_at}** —— 库唯一键 {@code uk_sys_user_account}
+     * 覆盖全部行（含软删除行），判重与库约束保持同一口径，重复时才能稳定给出明确业务错误码
+     * （409 / 40902），而不是偶尔落到数据库唯一键上。
+     *
+     * @param excludeId 更新时排除自身（{@code null} = 不排除）
+     */
+    int countByAccountSystem(@Param("account") String account, @Param("excludeId") Long excludeId);
+
+    /**
+     * 工号唯一性判重（<b>系统口径</b>，口径与 {@link #countByAccountSystem} 完全一致）。
+     *
+     * <p>import-spec E-USER-015 要求「工号全库唯一」，而 {@code sys_user.employee_no}
+     * **没有**库唯一键：判重一旦被数据域裁剪，域外重复工号就会被静默写入（工号进签名/水印，
+     * 属于不可接受的数据污染）。因此人工新增/修改人员（{@code UserService.create/update}）
+     * 必须用本语句判重。
+     *
+     * <p>{@code @dataScope} 豁免理由同 {@link #countByAccountSystem}（只读计数、不返回行、
+     * 已列入豁免清单）。
+     */
+    int countByEmployeeNoSystem(@Param("employeeNo") String employeeNo, @Param("excludeId") Long excludeId);
 
     /** 更新人员档案（不含口令与状态：状态走 {@link #updateUserStatus}，口令走认证模块）。 */
     int updateUserProfile(SysUser user);

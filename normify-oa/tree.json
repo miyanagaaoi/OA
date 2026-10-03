@@ -8,20 +8,20 @@
         "root_uid": "6396d753"
       }
     ],
-    "compiled_at": "2026-10-02T10:56:39.092Z",
+    "compiled_at": "2026-10-03T01:06:02.846Z",
     "stats": {
       "tree_count": 1,
-      "module_count": 520,
-      "leaf_count": 378,
-      "api_count": 865,
-      "dep_count": 528,
+      "module_count": 526,
+      "leaf_count": 384,
+      "api_count": 880,
+      "dep_count": 535,
       "cross_tree_dep_count": 0,
       "max_depth": 6,
       "layout_count": 142,
-      "planned_count": 479,
+      "planned_count": 467,
       "deprecated_count": 0,
       "policy_rule_count": 2,
-      "change_count": 1,
+      "change_count": 2,
       "open_change_count": 0
     }
   },
@@ -46,9 +46,9 @@
       "updated_at": "2026-10-02T09:05:00Z",
       "fingerprint": "pending",
       "aggregate": {
-        "descendant_count": 519,
+        "descendant_count": 525,
         "own_api_count": 0,
-        "inherited_api_count": 865,
+        "inherited_api_count": 880,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -84,9 +84,9 @@
       "updated_at": "2026-10-02T10:53:53.625Z",
       "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
       "aggregate": {
-        "descendant_count": 64,
+        "descendant_count": 65,
         "own_api_count": 0,
-        "inherited_api_count": 128,
+        "inherited_api_count": 129,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -759,7 +759,7 @@
         "own_api_count": 0,
         "inherited_api_count": 17,
         "dep_out": 0,
-        "dep_in": 11
+        "dep_in": 10
       }
     },
     "oa.admin.boundary.fallback": {
@@ -2854,9 +2854,9 @@
       "updated_at": "2026-10-02T10:53:53.626Z",
       "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
       "aggregate": {
-        "descendant_count": 13,
+        "descendant_count": 14,
         "own_api_count": 0,
-        "inherited_api_count": 35,
+        "inherited_api_count": 36,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -2867,7 +2867,6 @@
       "parent": "oa.admin.org",
       "tree": "oa",
       "depth": 4,
-      "state": "planned",
       "name": {
         "zh": "批量导入导出",
         "en": "Bulk Import & Export"
@@ -2893,15 +2892,105 @@
           "end_line": 196
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.626Z",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.726Z",
       "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
       "aggregate": {
-        "descendant_count": 3,
+        "descendant_count": 4,
         "own_api_count": 0,
-        "inherited_api_count": 12,
+        "inherited_api_count": 13,
         "dep_out": 0,
         "dep_in": 0
+      }
+    },
+    "oa.admin.org.bulk.engine": {
+      "uid": "b6e17a35",
+      "id": "oa.admin.org.bulk.engine",
+      "parent": "oa.admin.org.bulk",
+      "tree": "oa",
+      "depth": 5,
+      "name": {
+        "zh": "批量导入导出引擎",
+        "en": "Bulk Import/Export Engine"
+      },
+      "description": {
+        "zh": "五类模板共用的导入导出引擎：CSV 解析与 RFC4180 转义、全量校验报告（行号 + 列 + 错误码 + 修正建议）、**错误零落库的单事务**与按业务键幂等 upsert、导入互斥（oa:import:* 分布式锁），以及**逐行数据域 fail-closed 闸门**（E-ORG/USER/LEAD/POS/ROLE-020：越域行即整批拒绝，不做静默跳过）。\n",
+        "en": "The shared engine behind all five templates: CSV parsing with RFC4180 escaping, a full validation report (line, column, error code, fix suggestion), a single transaction with zero rows written on error, idempotent upsert by business key, an import mutex (oa:import:* lock) and the per-row fail-closed data-scope gate (E-ORG/USER/LEAD/POS/ROLE-020: one out-of-scope row rejects the whole batch instead of being silently skipped).\n"
+      },
+      "source": [
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/BulkImportService.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/CsvTable.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/ImportReport.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/ImportScopeGuard.java"
+        }
+      ],
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.719Z",
+      "fingerprint": "00c5ccf651c6912c3604e7db2fbaf4689b8d576f5f81f7f2f069f3ab8b7144d0",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "bulk.pipeline.preview",
+          "description": {
+            "zh": "全量校验（dry-run）：解析 + 逐行规则 + 数据域闸门，返回逐行发现与整批判定。\n",
+            "en": "Full validation (dry-run): parse, per-row rules and the data-scope gate, returning findings and the batch verdict.\n"
+          },
+          "key": "rpc:bulk.pipeline.preview"
+        },
+        {
+          "protocol": "rpc",
+          "path": "bulk.pipeline.commit",
+          "description": {
+            "zh": "确认执行：单事务幂等 upsert；存在 error 时整批拒绝、错误零落库。\n",
+            "en": "Commit: single-transaction idempotent upsert; any error rejects the whole batch with zero rows written.\n"
+          },
+          "key": "rpc:bulk.pipeline.commit"
+        },
+        {
+          "protocol": "rpc",
+          "path": "bulk.pipeline.lock",
+          "description": {
+            "zh": "导入互斥锁（同一时刻只允许一个导入任务，占用冲突返回 40905）。\n",
+            "en": "Import mutex: only one import at a time; contention yields 40905.\n"
+          },
+          "key": "rpc:bulk.pipeline.lock"
+        },
+        {
+          "protocol": "rpc",
+          "path": "bulk.pipeline.assertRowInScope",
+          "description": {
+            "zh": "逐行数据域断言：越域即追加 E-XXX-020 并判定整批失败。\n",
+            "en": "Per-row data-scope assertion: out-of-scope rows raise E-XXX-020 and fail the batch.\n"
+          },
+          "key": "rpc:bulk.pipeline.assertRowInScope"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "oa.admin.org.bulk.import",
+          "from_api": "rpc:bulk.pipeline.preview",
+          "to_api": "GET /api/v1/admin/bulk-import/kinds",
+          "label": {
+            "zh": "按导入类型取模板与列定义",
+            "en": "Resolve template by kind"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 4,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 5
       }
     },
     "oa.admin.org.bulk.export": {
@@ -2910,90 +2999,59 @@
       "parent": "oa.admin.org.bulk",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
-        "zh": "人员与组织导出",
-        "en": "User & Org Export"
+        "zh": "导出引擎与审计日志导出",
+        "en": "Export Engine & Audit-log Export"
       },
       "description": {
-        "zh": "导出组织架构与人员清单，导出功能仅系统管理员可用；导出内容不含完整手机号，仅管理员可见完整值，导出动作留痕。\n",
-        "en": "Export org and user listings; export is available to the system administrator only, omits full mobile numbers, and is written to the audit trail.\n"
+        "zh": "主数据导出与审计日志导出共用的 CSV 导出引擎：UTF-8 BOM + RFC4180 的表头/行渲染、名称业务路径解析、审计 JSON 内金额键递归剔除；主数据导出仅系统管理员可用且写审计日志。\n",
+        "en": "CSV export engine shared by the master-data exports plus the audit-log export: header and row rendering with UTF-8 BOM and RFC4180 escaping, business-path resolution and recursive redaction of amount keys inside audit JSON; master-data exports are system-admin only and write an audit entry.\n"
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 435,
-          "end_line": 435
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 195,
-          "end_line": 196
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 561,
-          "end_line": 561
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/BulkExportService.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.625Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.725Z",
+      "fingerprint": "2e7b8a7d1c7885b6b85af1520475aad562015db5c8cf18a70a6f742bcea60d5d",
       "apis": [
-        {
-          "protocol": "file",
-          "path": "export/orgs.xlsx",
-          "description": {
-            "zh": "组织架构导出文件。\n",
-            "en": "Exported org structure file.\n"
-          },
-          "key": "file:export/orgs.xlsx"
-        },
-        {
-          "protocol": "file",
-          "path": "export/users.xlsx",
-          "description": {
-            "zh": "人员清单导出文件（手机号脱敏）。\n",
-            "en": "Exported user listing with masked phone numbers.\n"
-          },
-          "key": "file:export/users.xlsx"
-        },
-        {
-          "protocol": "http",
-          "method": "POST",
-          "path": "/api/v1/admin/org-exports",
-          "description": {
-            "zh": "创建导出任务（仅系统管理员）。\n",
-            "en": "Create an export job (system administrator only).\n"
-          },
-          "key": "POST /api/v1/admin/org-exports"
-        },
         {
           "protocol": "http",
           "method": "GET",
-          "path": "/api/v1/admin/org-exports/{export_id}",
+          "path": "/api/v1/admin/audit-logs/export",
           "description": {
-            "zh": "查询导出任务状态与下载链接。\n",
-            "en": "Fetch export job status and download link.\n"
+            "zh": "导出审计日志 CSV（金额键递归剔除；仅系统管理员）。\n",
+            "en": "Exports the append-only audit log as CSV (amount keys redacted).\n"
           },
-          "key": "GET /api/v1/admin/org-exports/{export_id}"
+          "key": "GET /api/v1/admin/audit-logs/export"
+        },
+        {
+          "protocol": "rpc",
+          "path": "bulk.export.csv",
+          "description": {
+            "zh": "按 UTF-8 BOM + RFC4180 转义渲染 CSV 行（导出物即维护载体）。\n",
+            "en": "Renders CSV rows with UTF-8 BOM and RFC4180 escaping.\n"
+          },
+          "key": "rpc:bulk.export.csv"
         }
       ],
       "deps": [
         {
           "kind": "call",
-          "to": "oa.admin.boundary",
-          "from_api": "POST /api/v1/admin/org-exports",
+          "to": "oa.authz.visibility.export",
+          "from_api": "rpc:bulk.export.csv",
+          "to_api": "GET /api/v1/authz/export-policy",
           "label": {
-            "zh": "导出权限边界校验",
-            "en": "Export privilege check"
+            "zh": "按导出策略裁决生效列",
+            "en": "Apply export column policy"
           },
           "cross_tree": false
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 4,
+        "own_api_count": 2,
         "inherited_api_count": 0,
         "dep_out": 1,
         "dep_in": 0
@@ -3005,7 +3063,6 @@
       "parent": "oa.admin.org.bulk",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
         "zh": "受影响在途单据预检",
         "en": "In-Flight Impact Preview"
@@ -3016,48 +3073,25 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 242,
-          "end_line": 242
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/BulkImportService.java"
         },
         {
-          "path": "doc/prd-0.1.md",
-          "line": 202,
-          "end_line": 202
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/ImportReport.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.625Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.726Z",
+      "fingerprint": "f14582e3acc613af24e1f05d3533b5ef52f9d412505069347d50e921b1fdb382",
       "apis": [
         {
           "protocol": "http",
           "method": "POST",
           "path": "/api/v1/admin/bulk-import/impact-preview",
           "description": {
-            "zh": "生成受影响在途单据清单（不落库）。\n",
-            "en": "Generate the affected in-flight document list without persisting.\n"
+            "zh": "生成受影响在途单据清单（dry-run，不落库）。\n",
+            "en": "Generates the affected in-flight document list without persisting.\n"
           },
           "key": "POST /api/v1/admin/bulk-import/impact-preview"
-        },
-        {
-          "protocol": "http",
-          "method": "GET",
-          "path": "/api/v1/admin/bulk-import/{batch_id}/impact",
-          "description": {
-            "zh": "查询该批次的受影响清单与快照审批人。\n",
-            "en": "Fetch the batch's affected list and snapshot approvers.\n"
-          },
-          "key": "GET /api/v1/admin/bulk-import/{batch_id}/impact"
-        },
-        {
-          "protocol": "file",
-          "path": "export/bulk-impact/{batch_id}.xlsx",
-          "description": {
-            "zh": "受影响在途单据清单导出件。\n",
-            "en": "Exported affected in-flight document list.\n"
-          },
-          "key": "file:export/bulk-impact/{batch_id}.xlsx"
         }
       ],
       "deps": [
@@ -3074,10 +3108,10 @@
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 3,
+        "own_api_count": 1,
         "inherited_api_count": 0,
         "dep_out": 1,
-        "dep_in": 1
+        "dep_in": 0
       }
     },
     "oa.admin.org.bulk.import": {
@@ -3086,98 +3120,93 @@
       "parent": "oa.admin.org.bulk",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
-        "zh": "Excel 批量导入",
-        "en": "Excel Bulk Import"
+        "zh": "五类模板契约与导入类型清单",
+        "en": "Template Contracts & Import Kinds"
       },
       "description": {
-        "zh": "导入组织架构与人员 Excel 模板，按行校验（账号唯一、组织路径存在、必填完整），支持预检-确认-执行三段式并回传失败行明细。\n",
-        "en": "Import the org and user Excel templates with row-level validation (unique account, existing org path, required fields), in a preview-confirm-execute flow that returns failed-row details.\n"
+        "zh": "五类 CSV 模板的**契约与错误码字典**：五个模板文件（组织/人员/负责人/岗位/角色分配）的权威列定义、逐行错误码（E-*-001..020，含 E-*-020 数据域越权码）与修正建议；kinds 接口把同一份元数据下发给前端，保证五步流水线与模板不会各说各话。\n",
+        "en": "The contract of the five CSV templates and their error dictionary: which files exist (org / user / org_leader / user_position / user_role), their exact columns and per-row error codes (E-*-001..020, incl. the E-*-020 data-scope codes) with fix suggestions; the kinds endpoint exposes the same metadata to the UI so the five-step pipeline cannot drift from the templates.\n"
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 435,
-          "end_line": 435
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/ImportKind.java"
         },
         {
-          "path": "doc/prd-0.1.md",
-          "line": 242,
-          "end_line": 242
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/ImportCodes.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java",
+          "line": 240,
+          "end_line": 254
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.626Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.725Z",
+      "fingerprint": "4e4f9da0fc6ef91304cf003737b5802df520dd0939ec9845b1bdda2d914324dc",
       "apis": [
         {
           "protocol": "file",
-          "path": "import/orgs.xlsx",
+          "path": "oa-deploy/import/org.csv",
           "description": {
-            "zh": "组织架构导入模板文件。\n",
-            "en": "Org structure import template file.\n"
+            "zh": "组织架构导入模板（UTF-8 BOM CSV，六列）。\n",
+            "en": "Org-structure template (org_path, org_name, org_type, parent_path, status, remark).\n"
           },
-          "key": "file:import/orgs.xlsx"
+          "key": "file:oa-deploy/import/org.csv"
         },
         {
           "protocol": "file",
-          "path": "import/users.xlsx",
+          "path": "oa-deploy/import/user.csv",
           "description": {
-            "zh": "人员批量导入模板文件。\n",
-            "en": "User bulk import template file.\n"
+            "zh": "人员导入模板（九列，含 employee_no 与 phone）。\n",
+            "en": "User template (nine columns, incl. employee_no and phone).\n"
           },
-          "key": "file:import/users.xlsx"
+          "key": "file:oa-deploy/import/user.csv"
         },
         {
-          "protocol": "http",
-          "method": "POST",
-          "path": "/api/v1/admin/bulk-import/orgs",
+          "protocol": "file",
+          "path": "oa-deploy/import/org_leader.csv",
           "description": {
-            "zh": "组织架构批量导入（预检后确认执行）。\n",
-            "en": "Bulk import org structures after preview confirmation.\n"
+            "zh": "组织负责人导入模板。\n",
+            "en": "Org-leader template.\n"
           },
-          "key": "POST /api/v1/admin/bulk-import/orgs"
+          "key": "file:oa-deploy/import/org_leader.csv"
         },
         {
-          "protocol": "http",
-          "method": "POST",
-          "path": "/api/v1/admin/bulk-import/users",
+          "protocol": "file",
+          "path": "oa-deploy/import/user_position.csv",
           "description": {
-            "zh": "人员批量导入（含角色与任职列）。\n",
-            "en": "Bulk import users including role and post columns.\n"
+            "zh": "岗位任职导入模板。\n",
+            "en": "Post-assignment template.\n"
           },
-          "key": "POST /api/v1/admin/bulk-import/users"
+          "key": "file:oa-deploy/import/user_position.csv"
+        },
+        {
+          "protocol": "file",
+          "path": "oa-deploy/import/user_role.csv",
+          "description": {
+            "zh": "角色分配导入模板。\n",
+            "en": "User-role assignment template.\n"
+          },
+          "key": "file:oa-deploy/import/user_role.csv"
         },
         {
           "protocol": "http",
           "method": "GET",
-          "path": "/api/v1/admin/bulk-import/{job_id}/result",
+          "path": "/api/v1/admin/bulk-import/kinds",
           "description": {
-            "zh": "查询导入结果与失败行明细。\n",
-            "en": "Fetch import result with failed-row details.\n"
+            "zh": "五类导入元数据（kind/label/file/columns/previewRoute/commitRoute）。\n",
+            "en": "Lists the five import kinds with file, columns and preview/commit routes.\n"
           },
-          "key": "GET /api/v1/admin/bulk-import/{job_id}/result"
-        }
-      ],
-      "deps": [
-        {
-          "kind": "call",
-          "to": "oa.admin.org.bulk.impact",
-          "from_api": "POST /api/v1/admin/bulk-import/orgs",
-          "label": {
-            "zh": "导入前必需的影响面预检",
-            "en": "Impact preview before import"
-          },
-          "cross_tree": false
+          "key": "GET /api/v1/admin/bulk-import/kinds"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 5,
+        "own_api_count": 6,
         "inherited_api_count": 0,
-        "dep_out": 1,
-        "dep_in": 0
+        "dep_out": 0,
+        "dep_in": 1
       }
     },
     "oa.admin.org.roleassign": {
@@ -7174,9 +7203,9 @@
       "updated_at": "2026-10-02T10:53:53.650Z",
       "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
       "aggregate": {
-        "descendant_count": 22,
+        "descendant_count": 23,
         "own_api_count": 0,
-        "inherited_api_count": 47,
+        "inherited_api_count": 51,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -7211,9 +7240,9 @@
       "updated_at": "2026-10-02T10:53:53.652Z",
       "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
       "aggregate": {
-        "descendant_count": 8,
+        "descendant_count": 9,
         "own_api_count": 0,
-        "inherited_api_count": 24,
+        "inherited_api_count": 27,
         "dep_out": 0,
         "dep_in": 4
       }
@@ -7904,6 +7933,86 @@
         "dep_in": 2
       }
     },
+    "oa.authz.rbac.user-role-import": {
+      "uid": "9c42f0d8",
+      "id": "oa.authz.rbac.user-role-import",
+      "parent": "oa.authz.rbac",
+      "tree": "oa",
+      "depth": 4,
+      "name": {
+        "zh": "角色分配批量导入导出",
+        "en": "User-Role Bulk Import & Export"
+      },
+      "description": {
+        "zh": "角色分配模板（user_role.csv）的预检与执行：role_code 必须命中已初始化角色集（E-ROLE-001，导入不创建角色），(user_account, role_code, scope_org_path) 不得重复（E-ROLE-003，与库唯一键 uk_sys_user_role(user_id, role_id, scope_org_key) 完全一致，空数据域按 0 归一），并受 E-ROLE-020 数据域闸门约束；确认后单事务幂等 upsert sys_user_role；同列口径导出（仅系统管理员）。\n",
+        "en": "Preview and commit for the user_role.csv template: role_code must hit the initialised role set (E-ROLE-001; import never creates roles), (user_account, role_code, scope_org_path) must be unique (E-ROLE-003, exactly matching uk_sys_user_role(user_id, role_id, scope_org_key), empty scope normalised to 0) and the E-ROLE-020 data-scope gate applies; then idempotently upsert sys_user_role in one transaction; a matching export (system admin only) is provided.\n"
+      },
+      "source": [
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/strategy/UserRoleImportStrategy.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java",
+          "line": 152,
+          "end_line": 164
+        }
+      ],
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.718Z",
+      "fingerprint": "88327b4b36a96e6763bfd037d931545e5ebbdd51674512ea9fb681dbfebacef6",
+      "apis": [
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/identity/user-roles/import/preview",
+          "description": {
+            "zh": "角色分配模板预检（dry-run，不落库）。\n",
+            "en": "Dry-run preview of the user-role template.\n"
+          },
+          "key": "POST /api/v1/identity/user-roles/import/preview"
+        },
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/identity/user-roles/import",
+          "description": {
+            "zh": "确认后执行角色分配批量导入（单事务）。\n",
+            "en": "Commits the user-role import in one transaction.\n"
+          },
+          "key": "POST /api/v1/identity/user-roles/import"
+        },
+        {
+          "protocol": "http",
+          "method": "GET",
+          "path": "/api/v1/identity/user-roles/export",
+          "description": {
+            "zh": "导出角色分配 CSV（仅系统管理员）。\n",
+            "en": "Exports user-role assignments as CSV (system admin only).\n"
+          },
+          "key": "GET /api/v1/identity/user-roles/export"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "oa.admin.org.bulk.engine",
+          "from_api": "POST /api/v1/identity/user-roles/import",
+          "to_api": "rpc:bulk.pipeline.commit",
+          "label": {
+            "zh": "复用导入引擎（校验/落库/锁）",
+            "en": "Reuse the bulk-import engine"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 3,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
     "oa.authz.scope": {
       "uid": "1c2e4d34",
       "id": "oa.authz.scope",
@@ -8385,7 +8494,7 @@
       "aggregate": {
         "descendant_count": 6,
         "own_api_count": 0,
-        "inherited_api_count": 10,
+        "inherited_api_count": 11,
         "dep_out": 0,
         "dep_in": 11
       }
@@ -8396,7 +8505,6 @@
       "parent": "oa.authz.visibility",
       "tree": "oa",
       "depth": 4,
-      "state": "planned",
       "name": {
         "zh": "导出管控",
         "en": "Export Control"
@@ -8407,26 +8515,25 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 192,
-          "end_line": 199
+          "path": "oa-server/src/main/java/com/oa/authz/visibility/ExportFieldPolicy.java"
         },
         {
-          "path": "doc/prd-0.1.md",
-          "line": 546,
-          "end_line": 561
+          "path": "oa-server/src/main/java/com/oa/authz/visibility/ExportTarget.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/authz/api/ExportPolicyController.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.656Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.721Z",
+      "fingerprint": "63fa18ff9ca66c0f45990c27a387c64888ebedfc529d3ac0d11ce477c6a02a5d",
       "apis": [
         {
           "protocol": "http",
           "method": "POST",
           "path": "/api/v1/authz/export-check",
           "description": {
-            "zh": "导出前鉴权（角色与字段范围）。\n",
+            "zh": "导出前鉴权（角色 + 字段范围）。\n",
             "en": "Authorises an export by role and field.\n"
           },
           "key": "POST /api/v1/authz/export-check"
@@ -8436,7 +8543,7 @@
           "method": "GET",
           "path": "/api/v1/authz/export-policy",
           "description": {
-            "zh": "读取导出权限与字段限制策略。\n",
+            "zh": "读取各导出目标的权威列清单与限制。\n",
             "en": "Reads the export policy.\n"
           },
           "key": "GET /api/v1/authz/export-policy"
@@ -8471,7 +8578,7 @@
         "own_api_count": 2,
         "inherited_api_count": 0,
         "dep_out": 2,
-        "dep_in": 0
+        "dep_in": 1
       }
     },
     "oa.authz.visibility.field": {
@@ -8480,7 +8587,6 @@
       "parent": "oa.authz.visibility",
       "tree": "oa",
       "depth": 4,
-      "state": "planned",
       "name": {
         "zh": "字段级限制",
         "en": "Field-level Limits"
@@ -8501,13 +8607,13 @@
           "end_line": 561
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.657Z",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.722Z",
       "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
       "aggregate": {
         "descendant_count": 2,
         "own_api_count": 0,
-        "inherited_api_count": 4,
+        "inherited_api_count": 5,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -8518,7 +8624,6 @@
       "parent": "oa.authz.visibility.field",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
         "zh": "金额字段只读",
         "en": "Amount Field Read-only"
@@ -8529,19 +8634,18 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 192,
-          "end_line": 199
+          "path": "oa-server/src/main/java/com/oa/authz/visibility/AmountFieldPolicy.java"
         },
         {
-          "path": "doc/prd-0.1.md",
-          "line": 546,
-          "end_line": 561
+          "path": "oa-server/src/main/java/com/oa/authz/visibility/FormFieldWriteGuard.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/authz/api/FieldPolicyController.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.656Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.720Z",
+      "fingerprint": "29146e055831a1c7fe631ae245079de418d031c8e860cc4c8bf2fc2f84fb48f6",
       "apis": [
         {
           "protocol": "http",
@@ -8552,6 +8656,16 @@
             "en": "Reads the amount policy of the caller's roles.\n"
           },
           "key": "GET /api/v1/authz/field-policy/amount"
+        },
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/authz/field-policy/assert-write",
+          "description": {
+            "zh": "写闸门：按「状态白名单 ∧ 角色金额规则」判定本次表单写入是否放行。\n",
+            "en": "Write gate: state whitelist AND role rule decide whether this form write is allowed.\n"
+          },
+          "key": "POST /api/v1/authz/field-policy/assert-write"
         },
         {
           "protocol": "rpc",
@@ -8585,7 +8699,7 @@
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 2,
+        "own_api_count": 3,
         "inherited_api_count": 0,
         "dep_out": 2,
         "dep_in": 1
@@ -8597,7 +8711,6 @@
       "parent": "oa.authz.visibility.field",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
         "zh": "联系方式脱敏",
         "en": "Contact Masking"
@@ -8608,20 +8721,26 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 192,
-          "end_line": 199
+          "path": "oa-server/src/main/java/com/oa/authz/visibility/PhoneVisibilityService.java"
         },
         {
-          "path": "doc/data-model.md",
-          "line": 59,
-          "end_line": 83
+          "path": "oa-server/src/main/java/com/oa/authz/api/FieldPolicyController.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.657Z",
-      "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.721Z",
+      "fingerprint": "ddc04a36cdc4ba75d3e0a941a2bfc318dd2517641db09187b9c00bd3a779a9e6",
       "apis": [
+        {
+          "protocol": "http",
+          "method": "GET",
+          "path": "/api/v1/authz/field-policy/contact",
+          "description": {
+            "zh": "读取联系方式脱敏策略（138****8888 形态与加密算法口径）。\n",
+            "en": "Reads the contact masking policy.\n"
+          },
+          "key": "GET /api/v1/authz/field-policy/contact"
+        },
         {
           "protocol": "rpc",
           "path": "authz.visibility.mask.phone",
@@ -8630,16 +8749,6 @@
             "en": "Returns a masked or full phone by caller identity.\n"
           },
           "key": "rpc:authz.visibility.mask.phone"
-        },
-        {
-          "protocol": "http",
-          "method": "GET",
-          "path": "/api/v1/authz/field-policy/contact",
-          "description": {
-            "zh": "读取联系方式脱敏策略。\n",
-            "en": "Reads the contact masking policy.\n"
-          },
-          "key": "GET /api/v1/authz/field-policy/contact"
         }
       ],
       "deps": [
@@ -17648,9 +17757,9 @@
       "updated_at": "2026-10-02T10:53:53.701Z",
       "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
       "aggregate": {
-        "descendant_count": 29,
+        "descendant_count": 33,
         "own_api_count": 0,
-        "inherited_api_count": 75,
+        "inherited_api_count": 84,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -17781,7 +17890,6 @@
       "parent": "oa.identity.org",
       "tree": "oa",
       "depth": 4,
-      "state": "planned",
       "name": {
         "zh": "组织批量调整导入",
         "en": "Org Bulk Import"
@@ -17792,19 +17900,17 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 234,
-          "end_line": 244
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/strategy/OrgImportStrategy.java"
         },
         {
-          "path": "doc/prd-0.1.md",
-          "line": 433,
-          "end_line": 440
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java",
+          "line": 88,
+          "end_line": 100
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.702Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.723Z",
+      "fingerprint": "7bb92a80b24e289b9e08e5bb8eb2e2a9d0622db51d25785e6647cafe86b27fd4",
       "apis": [
         {
           "protocol": "http",
@@ -17861,6 +17967,17 @@
           "cross_tree": false
         },
         {
+          "kind": "call",
+          "to": "oa.admin.org.bulk.engine",
+          "from_api": "POST /api/v1/identity/orgs/import",
+          "to_api": "rpc:bulk.pipeline.commit",
+          "label": {
+            "zh": "复用导入引擎（校验/落库/锁）",
+            "en": "Reuse the bulk-import engine"
+          },
+          "cross_tree": false
+        },
+        {
           "kind": "dataflow",
           "to": "oa.workflow.runtime",
           "label": {
@@ -17874,7 +17991,7 @@
         "descendant_count": 0,
         "own_api_count": 3,
         "inherited_api_count": 0,
-        "dep_out": 3,
+        "dep_out": 4,
         "dep_in": 0
       }
     },
@@ -18242,9 +18359,9 @@
       "updated_at": "2026-10-02T10:53:53.704Z",
       "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
       "aggregate": {
-        "descendant_count": 5,
+        "descendant_count": 7,
         "own_api_count": 0,
-        "inherited_api_count": 17,
+        "inherited_api_count": 23,
         "dep_out": 0,
         "dep_in": 2
       }
@@ -18449,6 +18566,86 @@
         "inherited_api_count": 0,
         "dep_out": 2,
         "dep_in": 3
+      }
+    },
+    "oa.identity.position.leader-import": {
+      "uid": "7d1a4c92",
+      "id": "oa.identity.position.leader-import",
+      "parent": "oa.identity.position",
+      "tree": "oa",
+      "depth": 4,
+      "name": {
+        "zh": "负责人批量导入导出",
+        "en": "Org-Leader Bulk Import & Export"
+      },
+      "description": {
+        "zh": "组织负责人模板（org_leader.csv）的预检与执行：逐行解析 (org_path, user_account, leader_type, business_line)，先跑全量校验（含 E-LEAD-020 数据域闸门与「同组织同业务线至多一个正职」），确认后在单事务内幂等 upsert sys_org_leader；并提供同列口径的导出（仅系统管理员，用于往返维护）。\n",
+        "en": "Preview and commit for the org-leader template (org_leader.csv): parse (org_path, user_account, leader_type, business_line), run the full validation pass (E-LEAD-020 data-scope gate plus the one-primary-per-org-and-line rule), then idempotently upsert sys_org_leader in one transaction; a matching export (system admin only) supports round-trip maintenance.\n"
+      },
+      "source": [
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/strategy/OrgLeaderImportStrategy.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java",
+          "line": 120,
+          "end_line": 132
+        }
+      ],
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.717Z",
+      "fingerprint": "7256282b6e6fbf115d51815fc8594f204a04670751c5590947254f4bf3727f36",
+      "apis": [
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/identity/org-leaders/import/preview",
+          "description": {
+            "zh": "负责人模板预检（dry-run，不落库；返回逐行错误码与整批判定）。\n",
+            "en": "Dry-run preview of the org-leader template (no writes; returns per-row codes and the batch verdict).\n"
+          },
+          "key": "POST /api/v1/identity/org-leaders/import/preview"
+        },
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/identity/org-leaders/import",
+          "description": {
+            "zh": "确认后执行负责人批量导入（单事务；错误零落库）。\n",
+            "en": "Commits the org-leader import in one transaction (zero rows on error).\n"
+          },
+          "key": "POST /api/v1/identity/org-leaders/import"
+        },
+        {
+          "protocol": "http",
+          "method": "GET",
+          "path": "/api/v1/identity/org-leaders/export",
+          "description": {
+            "zh": "导出负责人模板同列口径的 CSV（仅系统管理员）。\n",
+            "en": "Exports org leaders as a template-aligned CSV (system admin only).\n"
+          },
+          "key": "GET /api/v1/identity/org-leaders/export"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "oa.admin.org.bulk.engine",
+          "from_api": "POST /api/v1/identity/org-leaders/import",
+          "to_api": "rpc:bulk.pipeline.commit",
+          "label": {
+            "zh": "复用导入引擎（校验/落库/锁）",
+            "en": "Reuse the bulk-import engine"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 3,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
       }
     },
     "oa.identity.position.leader-lookup": {
@@ -18737,6 +18934,86 @@
         "inherited_api_count": 0,
         "dep_out": 2,
         "dep_in": 5
+      }
+    },
+    "oa.identity.position.post-import": {
+      "uid": "5e83b7a1",
+      "id": "oa.identity.position.post-import",
+      "parent": "oa.identity.position",
+      "tree": "oa",
+      "depth": 4,
+      "name": {
+        "zh": "岗位任职批量导入导出",
+        "en": "Post Assignment Bulk Import & Export"
+      },
+      "description": {
+        "zh": "岗位任职模板（user_position.csv）的预检与执行：校验 (user_account, org_path) 不得重复（uk_user_org，E-POS-004）、每人至多一个主岗（E-POS-005）与 E-POS-020 数据域闸门；确认后单事务 upsert sys_user_position，并把主岗同步回 sys_user.position；同列口径导出（仅系统管理员）。\n",
+        "en": "Preview and commit for the user_position.csv template: enforce unique (user_account, org_path) (uk_user_org, E-POS-004), at most one primary post per person (E-POS-005) and the E-POS-020 data-scope gate; then upsert sys_user_position in one transaction and mirror the primary post into sys_user.position; a matching export (system admin only) is provided.\n"
+      },
+      "source": [
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/strategy/UserPositionImportStrategy.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java",
+          "line": 136,
+          "end_line": 148
+        }
+      ],
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.717Z",
+      "fingerprint": "c495f617ae85329f4ef3aba77f178c3a545740fd5d83bb748ae25e44dfcfce36",
+      "apis": [
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/identity/user-positions/import/preview",
+          "description": {
+            "zh": "岗位任职模板预检（dry-run，不落库）。\n",
+            "en": "Dry-run preview of the post-assignment template.\n"
+          },
+          "key": "POST /api/v1/identity/user-positions/import/preview"
+        },
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/identity/user-positions/import",
+          "description": {
+            "zh": "确认后执行岗位任职批量导入（单事务）。\n",
+            "en": "Commits the post-assignment import in one transaction.\n"
+          },
+          "key": "POST /api/v1/identity/user-positions/import"
+        },
+        {
+          "protocol": "http",
+          "method": "GET",
+          "path": "/api/v1/identity/user-positions/export",
+          "description": {
+            "zh": "导出岗位任职 CSV（仅系统管理员）。\n",
+            "en": "Exports post assignments as CSV (system admin only).\n"
+          },
+          "key": "GET /api/v1/identity/user-positions/export"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "oa.admin.org.bulk.engine",
+          "from_api": "POST /api/v1/identity/user-positions/import",
+          "to_api": "rpc:bulk.pipeline.commit",
+          "label": {
+            "zh": "复用导入引擎（校验/落库/锁）",
+            "en": "Reuse the bulk-import engine"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 3,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
       }
     },
     "oa.identity.session": {
@@ -19264,8 +19541,8 @@
           "end_line": 83
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.709Z",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.724Z",
       "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
       "apis": [
         {
@@ -19304,7 +19581,7 @@
           "kind": "call",
           "to": "oa.identity.user.profile",
           "from_api": "PUT /api/v1/auth/password",
-          "to_api": "PUT /api/v1/identity/users/{id}/password",
+          "to_api": "rpc:identity.user.updatePasswordHash",
           "label": {
             "zh": "回写新密码哈希",
             "en": "Write new password hash"
@@ -19443,9 +19720,9 @@
       "updated_at": "2026-10-02T10:53:53.711Z",
       "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
       "aggregate": {
-        "descendant_count": 6,
+        "descendant_count": 8,
         "own_api_count": 0,
-        "inherited_api_count": 18,
+        "inherited_api_count": 21,
         "dep_out": 0,
         "dep_in": 13
       }
@@ -19549,7 +19826,6 @@
       "parent": "oa.identity.user",
       "tree": "oa",
       "depth": 4,
-      "state": "planned",
       "name": {
         "zh": "人员批量导入导出",
         "en": "User Bulk Import"
@@ -19560,19 +19836,17 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 433,
-          "end_line": 440
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/strategy/UserImportStrategy.java"
         },
         {
-          "path": "doc/prd-0.1.md",
-          "line": 234,
-          "end_line": 244
+          "path": "oa-server/src/main/java/com/oa/admin/bulk/api/BulkImportController.java",
+          "line": 104,
+          "end_line": 116
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.710Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.723Z",
+      "fingerprint": "0d926276edc133b5faf063ca8b494521d02f00a762f9dc601c276b71886ffba9",
       "apis": [
         {
           "protocol": "http",
@@ -19627,13 +19901,78 @@
             "en": "Write multi-post records"
           },
           "cross_tree": false
+        },
+        {
+          "kind": "call",
+          "to": "oa.admin.org.bulk.engine",
+          "from_api": "POST /api/v1/identity/users/import",
+          "to_api": "rpc:bulk.pipeline.commit",
+          "label": {
+            "zh": "复用导入引擎（校验/落库/锁）",
+            "en": "Reuse the bulk-import engine"
+          },
+          "cross_tree": false
         }
       ],
       "aggregate": {
         "descendant_count": 0,
         "own_api_count": 3,
         "inherited_api_count": 0,
-        "dep_out": 2,
+        "dep_out": 3,
+        "dep_in": 0
+      }
+    },
+    "oa.identity.user.initial-password": {
+      "uid": "a83c5e7b",
+      "id": "oa.identity.user.initial-password",
+      "parent": "oa.identity.user",
+      "tree": "oa",
+      "depth": 4,
+      "name": {
+        "zh": "初始口令生成",
+        "en": "Initial Password Generation"
+      },
+      "description": {
+        "zh": "新增人员与批量导入（user.csv 第 ② 步）共用的初始口令生成：随机 ≥8 位且**必然**同时含字母与数字（REQ-NFR-005），生成后再用口令策略自校验；口令只在本次响应返回一次，落库只存 BCrypt 哈希，首次登录强制改密（import-spec T-03），不通过邮件明文发送。\n",
+        "en": "Initial-password generation shared by manual user creation and the user.csv bulk import: random, at least 8 characters and guaranteed to contain both letters and digits (REQ-NFR-005), then self-checked against the password policy; returned exactly once in the response, stored only as a BCrypt hash, with forced change on first login (import-spec T-03) and never mailed in clear text.\n"
+      },
+      "source": [
+        {
+          "path": "oa-server/src/main/java/com/oa/identity/app/InitialPasswordGenerator.java"
+        }
+      ],
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.719Z",
+      "fingerprint": "79970c212718a599d15647cd2da192d40d444c22f36c9471b7097ebfdffe241c",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "identity.user.generateInitialPassword",
+          "description": {
+            "zh": "生成并自校验初始口令（一次性下发）。\n",
+            "en": "Generates and self-validates an initial password for one-time hand-over.\n"
+          },
+          "key": "rpc:identity.user.generateInitialPassword"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "reference",
+          "to": "oa.identity.user.profile",
+          "from_api": "rpc:identity.user.generateInitialPassword",
+          "to_api": "POST /api/v1/identity/users",
+          "label": {
+            "zh": "人员新增与导入共用",
+            "en": "Shared by create and import"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
         "dep_in": 0
       }
     },
@@ -19729,18 +20068,21 @@
           "path": "doc/prd-0.1.md",
           "line": 133,
           "end_line": 142
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/identity/app/UserService.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.712Z",
-      "fingerprint": "4421092e639ef98e9cd4aac53b5975054268b604256d140e3544a8a3c2ba5551",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.724Z",
+      "fingerprint": "84bf081dede93e7fbb4441f7c61d6f55c96c8e79cb48ead91d5b41d8207533f8",
       "apis": [
         {
           "protocol": "http",
           "method": "GET",
           "path": "/api/v1/identity/users",
           "description": {
-            "zh": "查询人员列表。\n",
+            "zh": "查询人员列表（数据域过滤）。\n",
             "en": "Lists users.\n"
           },
           "key": "GET /api/v1/identity/users"
@@ -19750,8 +20092,8 @@
           "method": "POST",
           "path": "/api/v1/identity/users",
           "description": {
-            "zh": "新建人员与账号。\n",
-            "en": "Creates a user and account.\n"
+            "zh": "新建人员与账号（账号/工号判重为系统口径；初始口令仅本次返回）。\n",
+            "en": "Creates a user and account; account/employee-no uniqueness is system-scope.\n"
           },
           "key": "POST /api/v1/identity/users"
         },
@@ -19760,20 +20102,19 @@
           "method": "PUT",
           "path": "/api/v1/identity/users/{id}",
           "description": {
-            "zh": "修改人员信息与在职状态。\n",
+            "zh": "修改人员信息与在职状态（含停用闸门）。\n",
             "en": "Updates profile and employment status.\n"
           },
           "key": "PUT /api/v1/identity/users/{id}"
         },
         {
-          "protocol": "http",
-          "method": "PUT",
-          "path": "/api/v1/identity/users/{id}/password",
+          "protocol": "rpc",
+          "path": "identity.user.updatePasswordHash",
           "description": {
-            "zh": "重设密码（写入加盐哈希）。\n",
-            "en": "Resets the password hash.\n"
+            "zh": "回写口令哈希（本人改密入口调用；只存 BCrypt 哈希，永不落明文）。\n",
+            "en": "Writes a new password hash for a user (self-service change; hash only, never plaintext).\n"
           },
-          "key": "PUT /api/v1/identity/users/{id}/password"
+          "key": "rpc:identity.user.updatePasswordHash"
         },
         {
           "protocol": "mysql",
@@ -19803,7 +20144,7 @@
         "own_api_count": 5,
         "inherited_api_count": 0,
         "dep_out": 1,
-        "dep_in": 13
+        "dep_in": 15
       }
     },
     "oa.identity.user.resign": {
@@ -19894,6 +20235,72 @@
         "own_api_count": 3,
         "inherited_api_count": 0,
         "dep_out": 2,
+        "dep_in": 0
+      }
+    },
+    "oa.identity.user.uniqueness": {
+      "uid": "2f9d6c04",
+      "id": "oa.identity.user.uniqueness",
+      "parent": "oa.identity.user",
+      "tree": "oa",
+      "depth": 4,
+      "name": {
+        "zh": "账号与工号唯一性判重（系统口径）",
+        "en": "Account & Employee-No Uniqueness (System Scope)"
+      },
+      "description": {
+        "zh": "人员新增/修改时的账号与工号判重：唯一性是**全局约束**（uk_sys_user_account），与调用人数据域无关，因此走**系统口径**专用语句（countByAccountSystem / countByEmployeeNoSystem）而不是数据域过滤语句；命中重复返回 409 / 40902，文案指向 import-spec E-USER-002 / E-USER-015，不再落到数据库唯一键上，也避免工号（**无库唯一键**）被静默写入。两条判重语句只读计数、不返回行数据，已列入 oa.scope.exempt-statement-ids 窄豁免——数据域读取限制一行未动。\n",
+        "en": "Account and employee-number uniqueness checks use system-scope statements (countByAccountSystem / countByEmployeeNoSystem), because uniqueness is a global constraint (uk_sys_user_account) unrelated to the caller's data scope. A hit returns 409 / 40902 citing import-spec E-USER-002 / E-USER-015, so employee numbers (which have no unique key) can no longer be silently duplicated. Both statements read only a COUNT; data-scope read limits are unchanged.\n"
+      },
+      "source": [
+        {
+          "path": "oa-server/src/main/java/com/oa/identity/app/UserService.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/identity/infra/SysUserMapper.java"
+        }
+      ],
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.719Z",
+      "fingerprint": "cc417de0db1956a860697daa53b1b8bff5d6c4c0e7ccf5e8dadbd6a635ccacf0",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "identity.user.assertAccountUnique",
+          "description": {
+            "zh": "账号全库唯一断言（系统口径，不分数据域）。\n",
+            "en": "Asserts the account is globally unique (system scope, ignores data scope).\n"
+          },
+          "key": "rpc:identity.user.assertAccountUnique"
+        },
+        {
+          "protocol": "rpc",
+          "path": "identity.user.assertEmployeeNoUnique",
+          "description": {
+            "zh": "工号全库唯一断言（系统口径；工号无库唯一键，必须在此拦截）。\n",
+            "en": "Asserts the employee number is globally unique (system scope; there is no database unique key for it).\n"
+          },
+          "key": "rpc:identity.user.assertEmployeeNoUnique"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "reference",
+          "to": "oa.identity.user.profile",
+          "from_api": "rpc:identity.user.assertAccountUnique",
+          "to_api": "POST /api/v1/identity/users",
+          "label": {
+            "zh": "服务于人员档案新增/修改",
+            "en": "Backs profile create/update"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 2,
+        "inherited_api_count": 0,
+        "dep_out": 1,
         "dep_in": 0
       }
     },
@@ -22747,7 +23154,7 @@
       "aggregate": {
         "descendant_count": 25,
         "own_api_count": 0,
-        "inherited_api_count": 34,
+        "inherited_api_count": 35,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -23562,7 +23969,7 @@
       "aggregate": {
         "descendant_count": 8,
         "own_api_count": 0,
-        "inherited_api_count": 12,
+        "inherited_api_count": 13,
         "dep_out": 0,
         "dep_in": 5
       }
@@ -23600,7 +24007,7 @@
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
-        "inherited_api_count": 6,
+        "inherited_api_count": 7,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -23611,7 +24018,6 @@
       "parent": "oa.platform.security.crypto",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
         "zh": "字段级加密",
         "en": "Field Encryption"
@@ -23622,38 +24028,58 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 196,
-          "end_line": 196
+          "path": "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCipher.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCryptoService.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.733Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.722Z",
+      "fingerprint": "c103d3b6295f4a12d2328832a957ca67208b438ec54a683088ac5bcb0a6b38e0",
       "apis": [
-        {
-          "protocol": "file",
-          "path": "config/crypto/field-encryption.yml",
-          "description": {
-            "zh": "哪些字段落库加密、响应中如何脱敏的配置。\n",
-            "en": "Which fields are encrypted at rest and how they are masked in responses.\n"
-          },
-          "key": "file:config/crypto/field-encryption.yml"
-        },
         {
           "protocol": "http",
           "method": "GET",
           "path": "/api/v1/admin/crypto/fields",
           "description": {
-            "zh": "查询已加密字段及其当前脱敏方式。\n",
+            "zh": "查询已加密字段及其当前脱敏方式（不返回密钥本体）。\n",
             "en": "Lists encrypted fields and their current masking mode.\n"
           },
           "key": "GET /api/v1/admin/crypto/fields"
+        },
+        {
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/admin/crypto/phone-migrate",
+          "description": {
+            "zh": "一次性把库中历史明文手机号加密为密文（幂等）。\n",
+            "en": "One-off idempotent migration of legacy clear-text phones to ciphertext.\n"
+          },
+          "key": "POST /api/v1/admin/crypto/phone-migrate"
+        },
+        {
+          "protocol": "rpc",
+          "path": "crypto.phone.encryptForStore",
+          "description": {
+            "zh": "落库前加密手机号（v1:<keyId>:<iv||ct||tag>）。\n",
+            "en": "Encrypts a phone for storage (v1:keyId:iv+ct+tag).\n"
+          },
+          "key": "rpc:crypto.phone.encryptForStore"
+        },
+        {
+          "protocol": "rpc",
+          "path": "crypto.phone.decrypt",
+          "description": {
+            "zh": "解密库中手机号；未知 keyId 或被篡改一律 fail-closed。\n",
+            "en": "Decrypts a stored phone; unknown keyId or tampering fails closed.\n"
+          },
+          "key": "rpc:crypto.phone.decrypt"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 2,
+        "own_api_count": 4,
         "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 0
@@ -23709,7 +24135,6 @@
       "parent": "oa.platform.security.crypto",
       "tree": "oa",
       "depth": 5,
-      "state": "planned",
       "name": {
         "zh": "密钥管理",
         "en": "Key Management"
@@ -23720,48 +24145,40 @@
       },
       "source": [
         {
-          "path": "doc/prd-0.1.md",
-          "line": 535,
-          "end_line": 535
+          "path": "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCryptoService.java"
+        },
+        {
+          "path": "oa-server/src/main/java/com/oa/platform/security/api/CryptoAdminController.java"
         }
       ],
-      "revision": "995f830121c4ff56f7e42231c23bd7e008a484bd",
-      "updated_at": "2026-10-02T10:53:53.733Z",
-      "fingerprint": "7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1",
+      "revision": "810e68992bef8dea7b5d5a5b319ada301b87f9b0",
+      "updated_at": "2026-10-03T01:05:54.722Z",
+      "fingerprint": "cd388c1b63faa986678e023bd356b3a20488b7cce089442d72f3e834e463e0a7",
       "apis": [
-        {
-          "protocol": "http",
-          "method": "POST",
-          "path": "/api/v1/admin/keys/rotate",
-          "description": {
-            "zh": "触发加密字段的密钥轮换。\n",
-            "en": "Triggers a key rotation for encrypted fields.\n"
-          },
-          "key": "POST /api/v1/admin/keys/rotate"
-        },
         {
           "protocol": "http",
           "method": "GET",
           "path": "/api/v1/admin/keys",
           "description": {
-            "zh": "查询密钥状态（不返回密钥本体）。\n",
+            "zh": "查询密钥状态（活动 keyId + 可用 keyId 列表，永不下发密钥本体）。\n",
             "en": "Reads key status without exposing key material.\n"
           },
           "key": "GET /api/v1/admin/keys"
         },
         {
-          "protocol": "file",
-          "path": "config/crypto/key-rotation.yml",
+          "protocol": "http",
+          "method": "POST",
+          "path": "/api/v1/admin/keys/rotate",
           "description": {
-            "zh": "轮换周期与密钥版本保留策略。\n",
-            "en": "Rotation cadence and key-version retention policy.\n"
+            "zh": "密钥轮换：把非活动 keyId 的密文收敛到活动密钥（幂等）。\n",
+            "en": "Converges ciphertext onto the active key (idempotent).\n"
           },
-          "key": "file:config/crypto/key-rotation.yml"
+          "key": "POST /api/v1/admin/keys/rotate"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 3,
+        "own_api_count": 2,
         "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 0
@@ -34915,9 +35332,7 @@
     "file:config/application.yml": "oa.platform.deploy.config.environment",
     "file:config/configurable-items.yml": "oa.platform.deploy.config.runtime-items",
     "file:config/contract-field-mapping.yml": "oa.integration.contract.mapping",
-    "file:config/crypto/field-encryption.yml": "oa.platform.security.crypto.encrypt",
     "file:config/crypto/hash-policy.yml": "oa.platform.security.crypto.hash",
-    "file:config/crypto/key-rotation.yml": "oa.platform.security.crypto.keys",
     "file:config/db/index-plan.yml": "oa.platform.perf.tuning.index-plan",
     "file:config/open-api-clients.yml": "oa.integration.masterdata.credential",
     "file:config/security/password-policy.yml": "oa.platform.security.password.policy",
@@ -34937,22 +35352,22 @@
     "file:export/audit/operation-log/{yyyy}/{mm}.csv": "oa.audit.oplog.query",
     "file:export/audit/security-log/{yyyy}/{mm}.csv": "oa.audit.security.review",
     "file:export/authz-changes.csv": "oa.admin.authz.changelog",
-    "file:export/bulk-impact/{batch_id}.xlsx": "oa.admin.org.bulk.impact",
     "file:export/contracts/{instance_id}.pdf": "oa.integration.contract.export",
     "file:export/dict-items.xlsx": "oa.admin.dict.delivery.spreadsheet",
-    "file:export/orgs.xlsx": "oa.admin.org.bulk.export",
     "file:export/reports/approver-efficiency.csv": "oa.admin.report.approver.efficiency",
     "file:export/reports/flow-volume.csv": "oa.admin.report.export",
     "file:export/reports/reject-reasons.csv": "oa.admin.report.reject.reason",
-    "file:export/users.xlsx": "oa.admin.org.bulk.export",
     "file:export/warehouse/{yyyy}/{mm}/documents.csv": "oa.integration.warehouse.extract.partition",
     "file:export/warehouse/schema/{version}.json": "oa.integration.warehouse.schema",
     "file:export/workbench-selected.csv": "oa.portal.workbench.batch",
     "file:import/dict-items.xlsx": "oa.admin.dict.delivery.spreadsheet",
-    "file:import/orgs.xlsx": "oa.admin.org.bulk.import",
-    "file:import/users.xlsx": "oa.admin.org.bulk.import",
     "file:logo-180.png": "oa.design.token.color.brand",
     "file:logs/gateway/access.log": "oa.integration.gateway.error",
+    "file:oa-deploy/import/org_leader.csv": "oa.admin.org.bulk.import",
+    "file:oa-deploy/import/org.csv": "oa.admin.org.bulk.import",
+    "file:oa-deploy/import/user_position.csv": "oa.admin.org.bulk.import",
+    "file:oa-deploy/import/user_role.csv": "oa.admin.org.bulk.import",
+    "file:oa-deploy/import/user.csv": "oa.admin.org.bulk.import",
     "file:print/field-label-map.json": "oa.design.print.field-map",
     "file:print/footer-bar.html": "oa.design.print.header-footer",
     "file:print/mono-copy-checklist.md": "oa.design.print.rules.mono-copy",
@@ -35011,12 +35426,12 @@
     "file:tools/validate-design-md.js": "oa.design.a11y.contrast",
     "GET /api/v1/admin/admin-actions": "oa.admin.boundary.trace",
     "GET /api/v1/admin/approver-rules": "oa.admin.flow.approver",
+    "GET /api/v1/admin/audit-logs/export": "oa.admin.org.bulk.export",
     "GET /api/v1/admin/authz-changes": "oa.admin.authz.changelog",
     "GET /api/v1/admin/authz-changes/{change_id}": "oa.admin.authz.changelog",
     "GET /api/v1/admin/backup/jobs": "oa.platform.backup.retention",
     "GET /api/v1/admin/boundary/rules": "oa.admin.boundary.guard.doc",
-    "GET /api/v1/admin/bulk-import/{batch_id}/impact": "oa.admin.org.bulk.impact",
-    "GET /api/v1/admin/bulk-import/{job_id}/result": "oa.admin.org.bulk.import",
+    "GET /api/v1/admin/bulk-import/kinds": "oa.admin.org.bulk.import",
     "GET /api/v1/admin/config-items": "oa.platform.deploy.config.runtime-items",
     "GET /api/v1/admin/crypto/fields": "oa.platform.security.crypto.encrypt",
     "GET /api/v1/admin/data-scope/matrix": "oa.admin.authz.scope.preview",
@@ -35036,7 +35451,6 @@
     "GET /api/v1/admin/flow-templates/{template_id}/versions": "oa.admin.flow.template.publish",
     "GET /api/v1/admin/form-templates/{form_type}": "oa.admin.flow.form",
     "GET /api/v1/admin/keys": "oa.platform.security.crypto.keys",
-    "GET /api/v1/admin/org-exports/{export_id}": "oa.admin.org.bulk.export",
     "GET /api/v1/admin/orgs": "oa.admin.org.tree.node",
     "GET /api/v1/admin/orgs/{org_id}/inflight-check": "oa.admin.org.tree.disable",
     "GET /api/v1/admin/orgs/{org_id}/leaders": "oa.admin.org.tree.leader",
@@ -35249,6 +35663,7 @@
     "GET /api/v1/gateway/trace/{trace_id}": "oa.integration.gateway.error",
     "GET /api/v1/identity/directory": "oa.identity.user.directory",
     "GET /api/v1/identity/leaders/lines": "oa.identity.position.line-leader",
+    "GET /api/v1/identity/org-leaders/export": "oa.identity.position.leader-import",
     "GET /api/v1/identity/orgs/{id}/ancestors": "oa.identity.org.path",
     "GET /api/v1/identity/orgs/{id}/descendants": "oa.identity.org.path",
     "GET /api/v1/identity/orgs/{id}/in-flight-check": "oa.identity.org.state",
@@ -35259,6 +35674,8 @@
     "GET /api/v1/identity/orgs/search": "oa.identity.org.cascader",
     "GET /api/v1/identity/orgs/selector": "oa.identity.org.cascader",
     "GET /api/v1/identity/orgs/tree": "oa.identity.org.node",
+    "GET /api/v1/identity/user-positions/export": "oa.identity.position.post-import",
+    "GET /api/v1/identity/user-roles/export": "oa.authz.rbac.user-role-import",
     "GET /api/v1/identity/users": "oa.identity.user.profile",
     "GET /api/v1/identity/users/{id}/assignment-history": "oa.identity.position.assignment",
     "GET /api/v1/identity/users/{id}/leader-of": "oa.identity.position.leader-lookup",
@@ -35413,8 +35830,7 @@
     "POST /api/v1/admin/backup/jobs": "oa.platform.backup.daily",
     "POST /api/v1/admin/backup/restore-drills": "oa.platform.backup.drill",
     "POST /api/v1/admin/bulk-import/impact-preview": "oa.admin.org.bulk.impact",
-    "POST /api/v1/admin/bulk-import/orgs": "oa.admin.org.bulk.import",
-    "POST /api/v1/admin/bulk-import/users": "oa.admin.org.bulk.import",
+    "POST /api/v1/admin/crypto/phone-migrate": "oa.platform.security.crypto.encrypt",
     "POST /api/v1/admin/data-scope/preview": "oa.admin.authz.scope.preview",
     "POST /api/v1/admin/delegations/{role_id}/check": "oa.admin.authz.tree.delegate",
     "POST /api/v1/admin/dict-cache/refresh": "oa.admin.dict.delivery.cache",
@@ -35430,7 +35846,6 @@
     "POST /api/v1/admin/form-templates/{form_type}/validate": "oa.admin.flow.form",
     "POST /api/v1/admin/instances/{instance_id}/terminate": "oa.admin.boundary.guard.verdict",
     "POST /api/v1/admin/keys/rotate": "oa.platform.security.crypto.keys",
-    "POST /api/v1/admin/org-exports": "oa.admin.org.bulk.export",
     "POST /api/v1/admin/orgs": "oa.admin.org.tree.node",
     "POST /api/v1/admin/orgs/{org_id}/disable": "oa.admin.org.tree.disable",
     "POST /api/v1/admin/orgs/{org_id}/enable": "oa.admin.org.tree.disable",
@@ -35487,6 +35902,7 @@
     "POST /api/v1/auth/unlock": "oa.identity.session.lockout",
     "POST /api/v1/authz/cache/invalidate": "oa.authz.rbac.effective",
     "POST /api/v1/authz/export-check": "oa.authz.visibility.export",
+    "POST /api/v1/authz/field-policy/assert-write": "oa.authz.visibility.field.amount",
     "POST /api/v1/authz/permissions": "oa.authz.rbac.permission-tree",
     "POST /api/v1/authz/roles": "oa.authz.rbac.role",
     "POST /api/v1/authz/scope-preview": "oa.authz.scope.filter",
@@ -35612,6 +36028,8 @@
     "POST /api/v1/gateway/rate-limit/check": "oa.integration.gateway.ratelimit",
     "POST /api/v1/gateway/scope-filter": "oa.integration.gateway.authz.scope",
     "POST /api/v1/gateway/write-guard": "oa.integration.gateway.authz.write-guard",
+    "POST /api/v1/identity/org-leaders/import": "oa.identity.position.leader-import",
+    "POST /api/v1/identity/org-leaders/import/preview": "oa.identity.position.leader-import",
     "POST /api/v1/identity/orgs": "oa.identity.org.node",
     "POST /api/v1/identity/orgs/{id}/disable": "oa.identity.org.state",
     "POST /api/v1/identity/orgs/{id}/enable": "oa.identity.org.state",
@@ -35619,6 +36037,10 @@
     "POST /api/v1/identity/orgs/{id}/move": "oa.identity.org.path",
     "POST /api/v1/identity/orgs/import": "oa.identity.org.import",
     "POST /api/v1/identity/orgs/import/preview": "oa.identity.org.import",
+    "POST /api/v1/identity/user-positions/import": "oa.identity.position.post-import",
+    "POST /api/v1/identity/user-positions/import/preview": "oa.identity.position.post-import",
+    "POST /api/v1/identity/user-roles/import": "oa.authz.rbac.user-role-import",
+    "POST /api/v1/identity/user-roles/import/preview": "oa.authz.rbac.user-role-import",
     "POST /api/v1/identity/users": "oa.identity.user.profile",
     "POST /api/v1/identity/users/{id}/handover": "oa.identity.user.resign",
     "POST /api/v1/identity/users/{id}/positions": "oa.identity.position.multi-post",
@@ -35726,7 +36148,6 @@
     "PUT /api/v1/identity/orgs/{id}": "oa.identity.org.node",
     "PUT /api/v1/identity/orgs/{id}/leaders/{leaderId}": "oa.identity.position.leader-bind",
     "PUT /api/v1/identity/users/{id}": "oa.identity.user.profile",
-    "PUT /api/v1/identity/users/{id}/password": "oa.identity.user.profile",
     "PUT /api/v1/notifications/cc/{id}/read": "oa.notify.cc.read",
     "PUT /api/v1/notifications/inbox/{id}/read": "oa.notify.inbox.read",
     "PUT /api/v1/notifications/inbox/read-all": "oa.notify.inbox.read",
@@ -35748,9 +36169,20 @@
     "rpc:authz.visibility.canApprove": "oa.authz.visibility.readonly-state",
     "rpc:authz.visibility.mask.phone": "oa.authz.visibility.field.contact",
     "rpc:authz.visibility.routingCheck": "oa.authz.visibility.routing",
+    "rpc:bulk.export.csv": "oa.admin.org.bulk.export",
+    "rpc:bulk.pipeline.assertRowInScope": "oa.admin.org.bulk.engine",
+    "rpc:bulk.pipeline.commit": "oa.admin.org.bulk.engine",
+    "rpc:bulk.pipeline.lock": "oa.admin.org.bulk.engine",
+    "rpc:bulk.pipeline.preview": "oa.admin.org.bulk.engine",
+    "rpc:crypto.phone.decrypt": "oa.platform.security.crypto.encrypt",
+    "rpc:crypto.phone.encryptForStore": "oa.platform.security.crypto.encrypt",
     "rpc:db.trigger.flow_signature.no_delete": "oa.sign.record.immutable.trigger",
     "rpc:db.trigger.flow_signature.no_update": "oa.sign.record.immutable.trigger",
-    "rpc:identity.position.resolveLeader": "oa.identity.position.leader-lookup"
+    "rpc:identity.position.resolveLeader": "oa.identity.position.leader-lookup",
+    "rpc:identity.user.assertAccountUnique": "oa.identity.user.uniqueness",
+    "rpc:identity.user.assertEmployeeNoUnique": "oa.identity.user.uniqueness",
+    "rpc:identity.user.generateInitialPassword": "oa.identity.user.initial-password",
+    "rpc:identity.user.updatePasswordHash": "oa.identity.user.profile"
   },
   "edges": [
     {
@@ -36185,14 +36617,27 @@
       }
     },
     {
-      "from": "oa.admin.org.bulk.export",
-      "from_api": "POST /api/v1/admin/org-exports",
-      "to": "oa.admin.boundary",
+      "from": "oa.admin.org.bulk.engine",
+      "from_api": "rpc:bulk.pipeline.preview",
+      "to": "oa.admin.org.bulk.import",
+      "to_api": "GET /api/v1/admin/bulk-import/kinds",
       "kind": "call",
       "cross_tree": false,
       "label": {
-        "zh": "导出权限边界校验",
-        "en": "Export privilege check"
+        "zh": "按导入类型取模板与列定义",
+        "en": "Resolve template by kind"
+      }
+    },
+    {
+      "from": "oa.admin.org.bulk.export",
+      "from_api": "rpc:bulk.export.csv",
+      "to": "oa.authz.visibility.export",
+      "to_api": "GET /api/v1/authz/export-policy",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "按导出策略裁决生效列",
+        "en": "Apply export column policy"
       }
     },
     {
@@ -36204,17 +36649,6 @@
       "label": {
         "zh": "统计受影响在途实例",
         "en": "Collect in-flight instances"
-      }
-    },
-    {
-      "from": "oa.admin.org.bulk.import",
-      "from_api": "POST /api/v1/admin/bulk-import/orgs",
-      "to": "oa.admin.org.bulk.impact",
-      "kind": "call",
-      "cross_tree": false,
-      "label": {
-        "zh": "导入前必需的影响面预检",
-        "en": "Impact preview before import"
       }
     },
     {
@@ -37264,6 +37698,18 @@
       "label": {
         "zh": "校验被授权人",
         "en": "Validate grantee"
+      }
+    },
+    {
+      "from": "oa.authz.rbac.user-role-import",
+      "from_api": "POST /api/v1/identity/user-roles/import",
+      "to": "oa.admin.org.bulk.engine",
+      "to_api": "rpc:bulk.pipeline.commit",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "复用导入引擎（校验/落库/锁）",
+        "en": "Reuse the bulk-import engine"
       }
     },
     {
@@ -38475,6 +38921,18 @@
     {
       "from": "oa.identity.org.import",
       "from_api": "POST /api/v1/identity/orgs/import",
+      "to": "oa.admin.org.bulk.engine",
+      "to_api": "rpc:bulk.pipeline.commit",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "复用导入引擎（校验/落库/锁）",
+        "en": "Reuse the bulk-import engine"
+      }
+    },
+    {
+      "from": "oa.identity.org.import",
+      "from_api": "POST /api/v1/identity/orgs/import",
       "to": "oa.identity.org.node",
       "to_api": "POST /api/v1/identity/orgs",
       "kind": "call",
@@ -38599,6 +39057,18 @@
       }
     },
     {
+      "from": "oa.identity.position.leader-import",
+      "from_api": "POST /api/v1/identity/org-leaders/import",
+      "to": "oa.admin.org.bulk.engine",
+      "to_api": "rpc:bulk.pipeline.commit",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "复用导入引擎（校验/落库/锁）",
+        "en": "Reuse the bulk-import engine"
+      }
+    },
+    {
       "from": "oa.identity.position.leader-lookup",
       "from_api": "GET /api/v1/identity/orgs/{id}/leader-candidates",
       "to": "oa.identity.org.path",
@@ -38680,6 +39150,18 @@
       "label": {
         "zh": "校验在职人员",
         "en": "Validate user"
+      }
+    },
+    {
+      "from": "oa.identity.position.post-import",
+      "from_api": "POST /api/v1/identity/user-positions/import",
+      "to": "oa.admin.org.bulk.engine",
+      "to_api": "rpc:bulk.pipeline.commit",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "复用导入引擎（校验/落库/锁）",
+        "en": "Reuse the bulk-import engine"
       }
     },
     {
@@ -38778,7 +39260,7 @@
       "from": "oa.identity.session.login.password",
       "from_api": "PUT /api/v1/auth/password",
       "to": "oa.identity.user.profile",
-      "to_api": "PUT /api/v1/identity/users/{id}/password",
+      "to_api": "rpc:identity.user.updatePasswordHash",
       "kind": "call",
       "cross_tree": false,
       "label": {
@@ -38825,6 +39307,18 @@
     {
       "from": "oa.identity.user.import",
       "from_api": "POST /api/v1/identity/users/import",
+      "to": "oa.admin.org.bulk.engine",
+      "to_api": "rpc:bulk.pipeline.commit",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "复用导入引擎（校验/落库/锁）",
+        "en": "Reuse the bulk-import engine"
+      }
+    },
+    {
+      "from": "oa.identity.user.import",
+      "from_api": "POST /api/v1/identity/users/import",
       "to": "oa.identity.position.multi-post",
       "to_api": "POST /api/v1/identity/users/{id}/positions",
       "kind": "call",
@@ -38844,6 +39338,18 @@
       "label": {
         "zh": "批量落库人员",
         "en": "Persist imported users"
+      }
+    },
+    {
+      "from": "oa.identity.user.initial-password",
+      "from_api": "rpc:identity.user.generateInitialPassword",
+      "to": "oa.identity.user.profile",
+      "to_api": "POST /api/v1/identity/users",
+      "kind": "reference",
+      "cross_tree": false,
+      "label": {
+        "zh": "人员新增与导入共用",
+        "en": "Shared by create and import"
       }
     },
     {
@@ -38890,6 +39396,18 @@
       "label": {
         "zh": "查询名下待办并转办/改派",
         "en": "List and reassign tasks"
+      }
+    },
+    {
+      "from": "oa.identity.user.uniqueness",
+      "from_api": "rpc:identity.user.assertAccountUnique",
+      "to": "oa.identity.user.profile",
+      "to_api": "POST /api/v1/identity/users",
+      "kind": "reference",
+      "cross_tree": false,
+      "label": {
+        "zh": "服务于人员档案新增/修改",
+        "en": "Backs profile create/update"
       }
     },
     {
@@ -42089,17 +42607,50 @@
     "oa.admin.org.bulk": {
       "schema_version": 1,
       "id": "oa.admin.org.bulk",
-      "updated_at": "2026-10-02T08:03:52.094Z",
-      "mode": "grid",
-      "max_columns": 3,
+      "updated_at": "2026-10-03T01:04:56.248Z",
+      "mode": "groups",
       "reading": {
-        "zh": "从左到右：先预检受影响的在途单据，再执行批量导入，最后走仅管理员可用的导出。",
-        "en": "Left to right: preview the affected in-flight documents first, then execute the bulk import, and finally export through the administrator-only path."
+        "zh": "从左到右：先预检受影响的在途单据，再看五类模板契约与错误码字典，然后交给导入引擎（全量校验报告、单事务幂等 upsert、逐行数据域 fail-closed 闸门），最后走仅管理员可用的导出。",
+        "en": "Left to right: preview the affected in-flight documents, read the five template contracts, run the shared import engine (validation report, single-transaction idempotent upsert, per-row fail-closed data-scope gate), then export through the administrator-only path."
       },
       "order": [
         "oa.admin.org.bulk.impact",
         "oa.admin.org.bulk.import",
+        "oa.admin.org.bulk.engine",
         "oa.admin.org.bulk.export"
+      ],
+      "groups": [
+        {
+          "id": "preflight",
+          "title": {
+            "zh": "预检",
+            "en": "Preflight"
+          },
+          "children": [
+            "oa.admin.org.bulk.impact"
+          ]
+        },
+        {
+          "id": "pipeline",
+          "title": {
+            "zh": "模板与引擎",
+            "en": "Template & Engine"
+          },
+          "children": [
+            "oa.admin.org.bulk.import",
+            "oa.admin.org.bulk.engine"
+          ]
+        },
+        {
+          "id": "output",
+          "title": {
+            "zh": "导出",
+            "en": "Export"
+          },
+          "children": [
+            "oa.admin.org.bulk.export"
+          ]
+        }
       ]
     },
     "oa.admin.org.staff": {
@@ -42556,16 +43107,17 @@
     "oa.authz.rbac": {
       "schema_version": 1,
       "id": "oa.authz.rbac",
-      "updated_at": "2026-10-02T08:05:10.770Z",
+      "updated_at": "2026-10-03T01:04:51.437Z",
       "mode": "groups",
       "reading": {
-        "zh": "从左到右：先定角色与权限树，再把角色授予用户、把权限与组织节点授予角色（逐级勾选），最后由有效权限计算产出菜单，所有变更写入权限变更日志。",
-        "en": "Left to right: define roles and the permission tree, then assign roles to users and permissions plus org nodes to roles (ticked level by level), compute effective permissions, and log every change."
+        "zh": "从左到右：先定角色与权限树，再把角色授予用户（单条分配 + user_role.csv 批量分配，唯一键口径与库约束一致），把权限与组织节点授予角色，最后由有效权限计算产出菜单，所有变更写入权限变更日志。",
+        "en": "Left to right: define roles and the permission tree, assign roles to users (single assignment plus the user_role.csv bulk channel, matching the database unique key), grant permissions and org nodes to roles, compute effective permissions and log every change."
       },
       "order": [
         "oa.authz.rbac.role",
         "oa.authz.rbac.permission-tree",
         "oa.authz.rbac.user-role",
+        "oa.authz.rbac.user-role-import",
         "oa.authz.rbac.grant",
         "oa.authz.rbac.effective",
         "oa.authz.rbac.change-log"
@@ -42590,6 +43142,7 @@
           },
           "children": [
             "oa.authz.rbac.user-role",
+            "oa.authz.rbac.user-role-import",
             "oa.authz.rbac.grant"
           ]
         },
@@ -43841,16 +44394,18 @@
     "oa.identity.position": {
       "schema_version": 1,
       "id": "oa.identity.position",
-      "updated_at": "2026-10-02T08:05:04.521Z",
+      "updated_at": "2026-10-03T01:04:51.133Z",
       "mode": "groups",
       "reading": {
-        "zh": "从左到右：先维护负责人绑定与一人多岗（分管领导按业务线绑定），再由查询与上溯输出审批人候选人；调岗变更汇入事件，但不改动在途单据。",
-        "en": "Left to right: bind leaders and multi-posts first (line leaders by business line), then resolve approver candidates with upward escalation; transfers emit an event without touching in-flight documents."
+        "zh": "从左到右：先绑定负责人与一人多岗（分管领导按业务线），再用两张 CSV 模板批量维护（越域行 fail-closed 整批拒绝），最后由查询与上溯输出审批人候选人；调岗变更汇入事件，但不改动在途单据。",
+        "en": "Left to right: bind leaders and multi-posts, maintain them in bulk through the two CSV templates (out-of-scope rows fail the whole batch), then resolve approver candidates with upward escalation; transfers emit an event without touching in-flight documents."
       },
       "order": [
         "oa.identity.position.leader-bind",
         "oa.identity.position.multi-post",
         "oa.identity.position.line-leader",
+        "oa.identity.position.leader-import",
+        "oa.identity.position.post-import",
         "oa.identity.position.leader-lookup",
         "oa.identity.position.assignment"
       ],
@@ -43865,6 +44420,17 @@
             "oa.identity.position.leader-bind",
             "oa.identity.position.multi-post",
             "oa.identity.position.line-leader"
+          ]
+        },
+        {
+          "id": "bulk",
+          "title": {
+            "zh": "批量维护",
+            "en": "Bulk Maintenance"
+          },
+          "children": [
+            "oa.identity.position.leader-import",
+            "oa.identity.position.post-import"
           ]
         },
         {
@@ -43942,14 +44508,16 @@
     "oa.identity.user": {
       "schema_version": 1,
       "id": "oa.identity.user",
-      "updated_at": "2026-10-02T08:05:03.768Z",
+      "updated_at": "2026-10-03T01:04:56.551Z",
       "mode": "groups",
       "reading": {
-        "zh": "从左到右：先看人员档案与通讯录（手机号默认脱敏），再看批量导入与只读接口两个数据进出通道，最后是离职待办闸门与水印身份要素。",
-        "en": "Left to right: profiles and the directory (phones masked by default), then the two data channels (bulk import, read-only API), and finally the resignation gate and watermark identity elements."
+        "zh": "从左到右：先看人员档案与通讯录（手机号默认脱敏），再看写入前必须通过的账号规则（系统口径判重、初始口令生成），然后是批量导入与只读接口两个数据通道，最后是离职待办闸门与水印身份要素。",
+        "en": "Left to right: profiles and the directory (phones masked by default), the account rules that guard every write (system-scope uniqueness, initial-password generation), the two data channels (bulk import, read-only API), and finally the resignation gate and watermark identity elements."
       },
       "order": [
         "oa.identity.user.profile",
+        "oa.identity.user.uniqueness",
+        "oa.identity.user.initial-password",
         "oa.identity.user.directory",
         "oa.identity.user.import",
         "oa.identity.user.open-api",
@@ -43966,6 +44534,17 @@
           "children": [
             "oa.identity.user.profile",
             "oa.identity.user.directory"
+          ]
+        },
+        {
+          "id": "rules",
+          "title": {
+            "zh": "账号规则",
+            "en": "Account Rules"
+          },
+          "children": [
+            "oa.identity.user.uniqueness",
+            "oa.identity.user.initial-password"
           ]
         },
         {
@@ -45744,6 +46323,15 @@
         "en": "OA architecture baseline: planned module tree"
       },
       "updated_at": "2026-10-02T08:08:48.814Z"
+    },
+    {
+      "id": "2026-10-03-stage1-baseline-sync",
+      "status": "verified",
+      "title": {
+        "en": "Stage 1 (1.6/1.7/1.8) structure-baseline catch-up",
+        "zh": "阶段 1（1.6/1.7/1.8）结构基线追平"
+      },
+      "updated_at": "2026-10-03T01:06:02.191Z"
     }
   ]
 }

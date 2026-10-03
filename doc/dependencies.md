@@ -64,11 +64,23 @@
 | `org.flywaydb:flyway-core` | **9.22.3** | 版本化迁移 V1~V4 |
 | `org.flywaydb:flyway-mysql` | 9.22.3 | MySQL 方言支持 |
 | `org.springframework.security:spring-security-crypto` | **6.2.8** | **仅 BCrypt**，不引入完整 `spring-boot-starter-security`（否则默认拦截全部请求） |
-| `spring-boot-starter-test` | 3.2.12 | JUnit 5 + Mockito + AssertJ（**当前基线 268 个测试全绿**） |
+| `spring-boot-starter-test` | 3.2.12 | JUnit 5 + Mockito + AssertJ（**当前基线 313 个测试全绿**） |
 | `spring-boot-maven-plugin` | 3.2.12 | `spring-boot:run` / 可执行 jar |
 | `maven-surefire-plugin` | 3.1.2 | 测试执行 |
 
 **明确不使用**：JPA/Hibernate（`data-model.md` 的 SQL 可控性优先）、完整 Spring Security（见上）、Lombok（未引入，实体手写 getter/setter 以保证可读与可控）。
+
+### 2.1 阶段 1.6 / 1.7 / 1.8 引入的第三方依赖：**无**
+
+| 阶段 | 内容 | 新增第三方依赖 |
+| --- | --- | --- |
+| 1.6 | 字段级限制（金额只读 / 金额导出剔除 / 手机号脱敏展示） | **无**：纯 JDK（`java.util.regex` / `String`）+ 既有 Spring Web |
+| 1.7 | 手机号 AES-256-GCM 字段级加密与密钥轮换 | **无**：只用 JDK 内置 `javax.crypto`（`AES/GCM/NoPadding`、`SecureRandom`、`Base64`）+ 既有 `spring-security-crypto`（BCrypt，§2 已列） |
+| 1.8 | 五类批量导入（组织 / 人员 / 负责人 / 岗位 / 角色分配）与主数据导出 | **无**：CSV 解析与序列化由本仓库自研（`com.oa.admin.bulk.CsvTable` + `com.oa.identity.app.CsvSupport`，RFC4180 转义 + UTF-8 BOM） |
+
+**为什么不需要 Apache POI**：`import-spec.md` **T-13 已定稿「CSV（UTF-8 BOM）为权威格式」**，五个模板（`org.csv` / `user.csv` / `org_leader.csv` / `user_position.csv` / `user_role.csv`）与导出物都是 CSV，可一键另存 `.xlsx` 供业务填报；服务端因此**只解析 CSV**，既不引入 `org.apache.poi:*`（POI 会带来数十个传递依赖与 CVE 面），也不把 `.xlsx` 的解析差异（日期/公式/合并单元格）带进校验口径。
+
+**将来若确需在服务端直读 `.xlsx`**（业务坚持上传 Excel 而非 CSV）：再评估 `org.apache.poi:poi-ooxml:5.2.5`（与 Spring Boot 3.2 兼容线），届时按 §7「版本锁定与升级策略」登记版本、限制在**导入入口的格式适配层**内使用（解析后统一转成同一套 CSV 行模型，校验/落库逻辑不变），并同步更新本节与 `import-spec.md` T-13。
 
 ---
 

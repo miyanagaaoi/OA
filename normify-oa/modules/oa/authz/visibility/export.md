@@ -2,7 +2,6 @@
 uid: 85da69eb
 id: oa.authz.visibility.export
 parent: oa.authz.visibility
-state: planned
 name: {zh: "导出管控", en: "Export Control"}
 description:
   zh: >
@@ -11,23 +10,20 @@ description:
   en: >
       Export is restricted to system admins and amount fields cannot be exported by non-finance roles; every export is authorised up front so the UI cannot be bypassed by calling the API directly.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.656Z"
-fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.721Z"
+fingerprint: 63fa18ff9ca66c0f45990c27a387c64888ebedfc529d3ac0d11ce477c6a02a5d
 source:
-  - path: "doc/prd-0.1.md"
-    line: 192
-    end_line: 199
-  - path: "doc/prd-0.1.md"
-    line: 546
-    end_line: 561
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/ExportFieldPolicy.java"
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/ExportTarget.java"
+  - path: "oa-server/src/main/java/com/oa/authz/api/ExportPolicyController.java"
 apis:
   - protocol: http
     method: POST
     path: "/api/v1/authz/export-check"
     description:
       zh: >
-          导出前鉴权（角色与字段范围）。
+          导出前鉴权（角色 + 字段范围）。
           
       en: >
           Authorises an export by role and field.
@@ -37,7 +33,7 @@ apis:
     path: "/api/v1/authz/export-policy"
     description:
       zh: >
-          读取导出权限与字段限制策略。
+          读取各导出目标的权威列清单与限制。
           
       en: >
           Reads the export policy.

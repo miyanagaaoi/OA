@@ -2,7 +2,6 @@
 uid: 0c66801c
 id: oa.admin.org.bulk
 parent: oa.admin.org
-state: planned
 name: {zh: "批量导入导出", en: "Bulk Import & Export"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Excel-based bulk import of org structures and users (for reorganisations), presenting the affected in-flight documents before the import is confirmed; users and orgs can be exported, and export is limited to the system administrator.
       
-revision: 995f830121c4ff56f7e42231c23bd7e008a484bd
-updated_at: "2026-10-02T10:53:53.626Z"
+revision: 810e68992bef8dea7b5d5a5b319ada301b87f9b0
+updated_at: "2026-10-03T01:05:54.726Z"
 fingerprint: 7872b306824e7e0aec72e7e778da11de4bba5c2f41495b6a049266a26da5e9b1
 source:
   - path: "doc/prd-0.1.md"
