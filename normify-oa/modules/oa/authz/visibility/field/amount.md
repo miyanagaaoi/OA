@@ -10,8 +10,8 @@ description:
   en: >
       Contract and fund amounts are read-only for non-finance roles and cannot be exported; Finance roles and system administrators may export, and every export is logged. The rule is hard-coded in phase one and does not depend on field-level configuration.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.245Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.596Z"
 fingerprint: 29146e055831a1c7fe631ae245079de418d031c8e860cc4c8bf2fc2f84fb48f6
 source:
   - path: "oa-server/src/main/java/com/oa/authz/visibility/AmountFieldPolicy.java"

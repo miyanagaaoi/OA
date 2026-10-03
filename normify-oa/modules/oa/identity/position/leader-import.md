@@ -10,8 +10,8 @@ description:
   en: >
       Preview and commit for the org-leader template (org_leader.csv): parse (org_path, user_account, leader_type, business_line), run the full validation pass (E-LEAD-020 data-scope gate plus the one-primary-per-org-and-line rule), then idempotently upsert sys_org_leader in one transaction; a matching export (system admin only) supports round-trip maintenance.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.319Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.660Z"
 fingerprint: 7256282b6e6fbf115d51815fc8594f204a04670751c5590947254f4bf3727f36
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/strategy/OrgLeaderImportStrategy.java"

@@ -11,8 +11,8 @@ description:
   en: >
       A4 print layout for all four document types, matching the group's existing paper forms: the group contract routing sheet and fund approval sheet at group level, the internal approval sheet at subsidiary level; no colour blocks, radius or shadows, information must survive black-and-white copying, content limited to a 297mm page height.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.291Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.641Z"
 fingerprint: a704b11dfb09e375e9b90b2f19f26f32e8d5b1e3b582a00abd3741ae5448f332
 source:
   - path: "doc/forms.md"

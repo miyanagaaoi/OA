@@ -11,8 +11,8 @@ description:
   en: >
       The intended seal type links to the seal & certificate form: contract name, counterparty and amount are compared against approved seal records, and repeated seal use on the same contract raises a warning (non-blocking, for approvers' reference).
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.275Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.628Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

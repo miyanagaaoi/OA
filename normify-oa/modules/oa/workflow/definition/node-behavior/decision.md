@@ -11,8 +11,8 @@ description:
   en: >
       Writes and resolves decision_mode (any-sign default / countersign / sequential) and pass_threshold (percentage such as "50%" or absolute such as "2"; absolute wins when both are set). The post-rejection destination is fixed to "back to the initiator" in phase 1, with no per-node configuration (any one rejection in a countersign/collaboration task rejects that node; per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4).
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.424Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.735Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"

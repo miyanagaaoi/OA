@@ -11,8 +11,8 @@ description:
   en: >
       The five semantic status colours (success, warning, error, info, neutral), each paired with a light surface; they apply only to status badges, flow nodes, risk notices and validation messages, never to decorative categorisation, and badges are always light fill with a same-hue dark text rather than a saturated block.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.267Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.622Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

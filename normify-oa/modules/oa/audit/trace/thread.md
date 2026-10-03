@@ -6,13 +6,13 @@ state: planned
 name: {zh: "轨迹事件写入", en: "Trail Event Writer"}
 description:
   zh: >
-      审批轨迹只追加写入：记录轨迹顺序、动作（提交/通过/驳回/转办/加签/流转/回退/补件/撤回/终止/归档/抄送）、节点实例、意见以及操作人姓名与职务快照，防止改名后轨迹失真。
+      审批轨迹只追加写入：记录轨迹顺序、动作（提交/通过/驳回/流转/回退/补充材料请求/补充材料提交/转办/改派/加签/撤回/终止/跳过/归档登记/抄送）、节点实例、意见以及操作人姓名与职务快照，防止改名后轨迹失真。
       
   en: >
-      Append-only approval trail writer: sequence, action (submit/approve/reject/transfer/add-sign/route/return/supplement/withdraw/terminate/archive/cc), node instance, opinion and actor name/position snapshots so later renames cannot distort the trail.
+      Append-only approval trail writer: sequence, action (submit/approve/reject/route/rollback/supplement_request/supplement_submit/transfer/reassign/add_sign/withdraw/terminate/skip/archive_register/cc), node instance, opinion and actor name/position snapshots so later renames cannot distort the trail.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.229Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:23:25.501Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"

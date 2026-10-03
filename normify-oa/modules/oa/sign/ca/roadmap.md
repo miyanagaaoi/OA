@@ -11,8 +11,8 @@ description:
   en: >
       Capability switches and protocol slots for introducing a third-party CA in phase two: only the sign/verify interaction is added, leaving the data model, hash scope and audit chain untouched.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.402Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.718Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

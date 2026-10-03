@@ -11,8 +11,8 @@ description:
   en: >
       Persists the node instance status enum (pending/active/waiting_supplement/approved/rejected/skipped/returned/cancelled, per doc/enums.md section 5) together with the frozen candidate snapshot approver_ids_json, decision mode, pass_threshold, returned_count and supplement_requested (the single writer of that table).
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.451Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.757Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"

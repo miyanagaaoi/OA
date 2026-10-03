@@ -10,8 +10,8 @@ description:
   en: >
       Ticks a role's menu/button/api permission codes level by level in the permission tree (parents drag children) with bulk grant and revoke; every change is written to the permission change log.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.233Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.581Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"

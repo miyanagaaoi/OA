@@ -85,7 +85,7 @@
 | 签名策略 `sign_policy` | `required`（⑤⑥ 默认）/ `optional` / `none` | 强制签名节点不签名不可提交 |
 | 流转动作 `flow_routing.action_type` | `route`（流转）/ `return_node`（回退上一节点）/ `back_home`（回到本部门，**不计入** `routing_count`） | `routing_count` 上限 5 |
 | 补件状态 `flow_supplement.status` | `pending` / `submitted` / `overdue` / `cancelled` | `supplement_round` 1..3，请求时即占位 |
-| 轨迹动作 `sys_thread.action` | `submit` / `approve` / `reject` / `transfer` / `reassign` / `addsign` / `route` / `return_node` / `back_home` / `supplement_request` / `supplement_submit` / `withdraw` / `terminate` / `archive` / `cc` / `skip` | `skip` ＝ 财务节点因不涉及费用被跳过 |
+| 轨迹动作 `sys_thread.action` | `submit` / `approve` / `reject` / `route` / `rollback` / `back_home` / `supplement_request` / `supplement_submit` / `transfer` / `reassign` / `add_sign` / `withdraw` / `terminate` / `skip` / `archive_register` / `cc` | 共 16 值，与 `enums.md` §9 一致；`skip` ＝ 财务节点因不涉及费用被跳过；**废弃值**：`addsign` → `add_sign`、`return_node` → `rollback`、`archive` → `archive_register` |
 | 消息类型 `sys_message.msg_type` | `todo` / `rejected` / `withdrawn` / `collaboration`（协同任务产生）/ `timeout` / `supplement`（待补件）/ `result` / `cc` | 一期**无推送通道**，仅站内信与邮件；邮件模板由同一 `msg_type` 决定 |
 | 计数列 | `flow_instance.routing_count`（≤5）/ `supplement_count`（≤3）/ `flow_node_instance.returned_count`（≤2）/ `supplement_requested`（≤1） | 闸门断言的四个直接证据 |
 | 编号规则 | `biz_no` ＝ `OA-{四位年}-{六位流水}`；组织 `path` ＝ `/1/110/111/112/` | 单号按年重置 |
@@ -201,7 +201,7 @@
 > **超时基线（与本表一致，已按 `templates.md` §1.0 定稿）**：② = **48h**，其余节点（①③④⑤⑥⑦）= **24h**；⑦ 为登记节点，无决议模式与阈值，**不计入审批时长与效率统计**。
 
 - 四类模板的 ①③④⑦ 配置**完全相同**；② 的跳过条件**仅事项单存在**（资金/合同/印鉴恒为「涉及」，不可跳过）；⑤⑥ 强制签名。
-- **节点⑦ 默认「仅登记不审批」**（`templates.md` §1.1、`enums.md`）：不产生审批决议（轨迹 `action='archive'`，无 `approve`）、**不计入审批时长与审批人效率统计**、`sign_policy=none`；仅登记与留痕。用例见 TC-FLOW-077。
+- **节点⑦ 默认「仅登记不审批」**（`templates.md` §1.1、`enums.md`）：不产生审批决议（轨迹 `action='archive_register'`，无 `approve`）、**不计入审批时长与审批人效率统计**、`sign_policy=none`；仅登记与留痕。用例见 TC-FLOW-077。
 - 上表是 [`templates.md`](templates.md) §1.1~1.5 的**测试准备摘要**；如与该文档冲突，**以 `templates.md` 为准**（差异按 P1 缺陷处理）。
 - **用例专用模板变体**（在四类基线模板之外额外发布，基线保持不动）：`matter-v1-allsign`（节点② 改 `all` + `pass_threshold="2"`，候选人 U-20/U-21/U-22）、`contract-v1-jump`（节点③ `allow_jump=true`）、`matter-v1-timeout`（节点② `timeout_hours=24`、`timeout_cc_superior=1`，用于超时催办的快速验证——基线为 48h）。
 
@@ -410,7 +410,7 @@
 | TC-FLOW-050 | PRD 7.2（联动） | 单据停在节点④，另有 1 个协同任务在途 | 以 U-31 驳回 | 实例 → `rejected`；同节点其余任务 → `auto_closed`；其余节点实例（含协同）→ `cancelled`；站内信通知发起人 1 条 | P1 | 二 | 单据 OA-2026-230011 |
 | TC-FLOW-051 | PRD 6.1 / REQ-FLOW-001 | — | 分别发起金额 `1.00` 与 `99,999,999,999.99` 的两张资金单 | 两张单据的节点序列、审批人完全一致（金额**不参与路由**）；金额仅作字段展示，≥100 万时同时显示万元换算 | P1 | 二 | 单据 OA-2026-230012/013 |
 | TC-FLOW-052 | REQ-FLOW-012 | ① 事项单「涉及费用＝是」但金额留空；② 以无权组织节点（公司B）成员身份构造发起请求 | 分别提交 | ① 被拒并逐项提示缺失的必填字段（服务端二次校验生效）；② 被拒，提示无权限在该组织节点发起；两种情况均不产生 `flow_instance` 记录 | P1 | 二 | — |
-| TC-FLOW-077 | AC-04 / AC-60 / `templates.md` §1.1（⑦ 仅登记不审批） | 单据已通过节点⑥，停在节点⑦（审批人＝系统管理员 U-40 沈管，`role_code=admin`） | ① 以 U-40（系统管理员）打开待办，检查操作条；② 点「登记完成」；③ 查询该节点的任务、轨迹与报表 | ① 操作条**只有登记动作**，无「同意/驳回」决议按钮（`sign_policy=none`）；② 单据 `status='approved'`、节点⑦ 实例 `approved`；③ `sys_thread` 仅 1 条 `action='archive'`（**不产生 `approve` 记录**）、`flow_signature` 无该节点记录；④ 节点⑦ **不计入**审批人效率与平均审批耗时统计（报表中该节点耗时与决议数均不体现），但登记动作在 `sys_log` 完整留痕 | P1 | 二 | 单据 OA-2026-230014 |
+| TC-FLOW-077 | AC-04 / AC-60 / `templates.md` §1.1（⑦ 仅登记不审批） | 单据已通过节点⑥，停在节点⑦（审批人＝系统管理员 U-40 沈管，`role_code=admin`） | ① 以 U-40（系统管理员）打开待办，检查操作条；② 点「登记完成」；③ 查询该节点的任务、轨迹与报表 | ① 操作条**只有登记动作**，无「同意/驳回」决议按钮（`sign_policy=none`）；② 单据 `status='approved'`、节点⑦ 实例 `approved`；③ `sys_thread` 仅 1 条 `action='archive_register'`（**不产生 `approve` 记录**）、`flow_signature` 无该节点记录；④ 节点⑦ **不计入**审批人效率与平均审批耗时统计（报表中该节点耗时与决议数均不体现），但登记动作在 `sys_log` 完整留痕 | P1 | 二 | 单据 OA-2026-230014 |
 
 ### 3.5 数据域与流转可见性（AUTH）
 

@@ -11,8 +11,8 @@ description:
   en: >
       Mail triggers for new tasks, rejection, timeout reminders and final approval; dispatch is asynchronous and a failure never blocks the approval flow — it is the only proactive channel.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.358Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.687Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

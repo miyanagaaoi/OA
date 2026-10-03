@@ -11,8 +11,8 @@ description:
   en: >
       Fund reason `title` (text ≤60, required), category `category` (select, configurable, defaults to economy, does not drive routing) and requested amount `amount` (amount, required, > 0; zero or empty blocks submission), stored as DECIMAL(18,2).
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.279Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.633Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

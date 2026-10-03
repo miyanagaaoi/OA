@@ -11,8 +11,8 @@ description:
   en: >
       A4 portrait 210mm × 297mm; `@page { size: A4; margin: 0 }` with content padding 12mm 12mm 10mm giving a 186mm measure; at 9.5pt/1.42 roughly 55 lines per page; overflow paginates by row with the table head repeated and page numbers as 第 N 页 / 共 M 页; a three-column footer carries system and document name, number with template version and generation time, and the page number; screen preview renders 1:1 in millimetres; paper and margins use mm/pt only.
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.291Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.641Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -42,7 +42,7 @@
 | 编号 | 技术项 | 待办 | 责任面 |
 | --- | --- | --- | --- |
 | A-01 | `flow_node.decision_mode` 的可空性 | ⑦为登记节点，`decision_mode` / `pass_threshold` 置 `NULL`；`data-model.md` 4.2 需允许 `node_type = 'archive'` 时 `decision_mode` 为 NULL（或由实现写 `'any'` 占位、引擎跳过决议计算） | 后端 + `data-model.md` |
-| A-02 | `sys_thread.action` 取值 | ⑦留痕动作定稿为 `archive_register`；`data-model.md` 6.5 现写 `archive`，须同步（见 S-14） | `data-model.md` |
+| A-02 | `sys_thread.action` 取值 | ⑦留痕动作定稿为 `archive_register`；`data-model.md` 6.5 **本轮核对已为 `archive_register`**（原写 `archive`，见 S-14），`test-cases.md` L88 / §7 说明 / TC-FLOW-077 三处旧值 `archive` 亦已同步 | `data-model.md` + `test-cases.md` |
 | A-03 | `heic` / `wps` 预览降级 | `heic` 服务端转 `jpg` 后预览、`wps` 提示下载查看；**不影响上传白名单** | 前端 + 文件服务 |
 | A-04 | `sub_status` 存量值 | `data-model.md` 5.1 现写 `supplement`，须改为 `pending_supplement`（见 S-05） | `data-model.md` |
 
@@ -66,7 +66,7 @@
 | S-14 | `data-model.md` 6.5 | 轨迹动作 `archive` | `archive_register`（⑦留痕动作，与节点码同名） | 建库前替换 |
 | S-15 | `forms.md` 6.3 / 6.5 | 合同类型拆为「采购 / 销售」；证照类型 5 值；无 `cert_seal` | 定稿：合同类型**保留单一「购销」**（不拆）；`cert_seal`（证照章）与 `cert_borrow`（证照借用）**并存**；证照类型 5 值（**不含开户许可证**） | 由主控在 V0.4 回写 `forms.md`；字典侧以 `doc/dict-seed.md` §2/§3/§4 为准 |
 
-> **同步状态（本轮核对）**：S-04、S-06、S-07、S-08、S-09、S-11 已在 `data-model.md` 同步；S-01 已在 `forms.md` 6.1 同步（`business`）。**仍为旧值、需回写**：S-05（`data-model.md` 5.1 `sub_status = 'supplement'`）、S-14（`data-model.md` 6.5 `archive`）、S-15（`forms.md` 6.3/6.5）。S-02、S-03、S-12、S-13 以主控 V0.4 正文为准。
+> **同步状态（本轮核对）**：S-04、S-06、S-07、S-08、S-09、S-11 已在 `data-model.md` 同步；S-01 已在 `forms.md` 6.1 同步（`business`）。**S-14 已完成**（`data-model.md` 6.5 `action` 注释已是 `archive_register`，`test-cases.md` 三处旧值同步为 `archive_register`）。**仍为旧值、需回写**：S-05（`data-model.md` 5.1 `sub_status = 'supplement'`）、S-15（`forms.md` 6.3/6.5）。S-02、S-03、S-12、S-13 以主控 V0.4 正文为准。
 
 ---
 

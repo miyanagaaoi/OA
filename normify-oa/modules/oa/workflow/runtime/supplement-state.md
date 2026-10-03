@@ -11,8 +11,8 @@ description:
   en: >
       "Awaiting supplement" is an instance sub-status rather than a rejection: on entry sub_status=supplement, the current node waits, its tasks can no longer be approved and the initiator is notified; only attachments and notes stay writable (main fields read-only), submission returns to the requesting node and the round never counts as a rejection (REQ-FLOW-023).
       
-revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
-updated_at: "2026-10-03T02:09:10.453Z"
+revision: c22d447e6e63ccb0edfd9624026f21e8d1413077
+updated_at: "2026-10-03T02:20:07.757Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
