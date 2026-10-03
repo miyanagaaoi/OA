@@ -10,9 +10,9 @@ description:
   en: >
       Attachments live in a private dir (default ~/.oa/attachments, outside the repo; override oa.attachment.root), sharded by yyyy/MM/dd plus a random name, atomically renamed from a .part file; only the relative path is stored. No static mapping exists, so storage_path has no reachable URL. Download and preview need auth plus the data scope (controlled table flow_attachment, one @dataScope marker per SELECT, filtered via flow_instance). Downloads are always attachment; only jpeg/png/pdf may inline.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.458Z"
-fingerprint: a26aa8ca604ec190735d2a8ab67b7b57db287a455a984e8f4560305edecb3256
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.286Z"
+fingerprint: f51e73e0efc55924d9ecc441480a34501d51cbc674130bc97dfbc58ed18992d0
 source:
   - path: "doc/forms.md"
   - path: "doc/data-model.md"

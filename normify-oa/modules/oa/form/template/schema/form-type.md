@@ -10,9 +10,9 @@ description:
   en: >
       Template composition for the four document types (matter/fund/contract/seal): form template plus process template, distinguished by composition rather than branching; template versions and publishing; started documents are unaffected by later template changes.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.461Z"
-fingerprint: 2abb03285e16884914f60eb0591090d90ed9568386362e96d42d3d5d3f7fc573
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.290Z"
+fingerprint: 447a6d7de4912dfca6fec7d8b69cacef9cdbd6fc7b8d1329770fb38b69600a7b
 source:
   - path: "doc/forms.md"
   - path: "doc/prd-0.1.md"

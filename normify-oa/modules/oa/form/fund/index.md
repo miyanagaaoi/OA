@@ -10,9 +10,9 @@ description:
   en: >
       Fund approval form (form_type=fund): amount mandatory in DECIMAL(18,2) with two decimals and a 100-million ceiling, attachments mandatory, plus planned-category and payment-ownership fields that are stored but do not affect routing in phase one; amount shown with ten-thousand conversion and not exportable by non-finance roles.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.438Z"
-fingerprint: 111970a3de850577c50a2c0254a85c2a87b19da17721cb2151b24d076a34d427
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.266Z"
+fingerprint: 060532396b1821e0d352f291faf1be366eda1dcbfffdca66a6a6643e1c335dda
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/fund/FundFormRules.java"

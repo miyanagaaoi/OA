@@ -10,9 +10,9 @@ description:
   en: >
       Computes the writable field set per document state and blocks out-of-scope writes: while awaiting supplement all main fields are read-only and changes must go through reject → edit → resubmit; state comes from the process instance.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.468Z"
-fingerprint: 8cb8ee719ee014a8f11e4e86597e356444ff53a872cea106c704e314271bd8af
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.295Z"
+fingerprint: 2592e6e2d0e272e8eb3c8a2ee8d3a0d6c4829981ece9483baa17bc91eb61c636
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/writemodel/FormStateWriteGuard.java"

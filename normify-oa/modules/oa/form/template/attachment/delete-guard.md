@@ -10,9 +10,9 @@ description:
   en: >
       Two gates for deleting an attachment: identity (only the uploader or a system administrator, otherwise 40310) and the state window (the three-state whitelist is reused; deletable in draft and pending-supplement, 40304 while approving or closed). The physical file is removed before the metadata row: a failed file delete raises 50004 and rolls the transaction back (metadata kept, retry possible), so an unreferenced file can never linger.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.455Z"
-fingerprint: ae86cc3ec8cfd217e9edc2d09edef921a87215feecd71c217f1f2fda6d633285
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.283Z"
+fingerprint: 8ab58cc56f45ce0c0663a9f6fe9cb3bc5eca4d203713a3a26182b4aa04d22f03
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/attachment/app/AttachmentService.java"

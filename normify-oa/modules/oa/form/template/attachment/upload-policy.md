@@ -10,9 +10,9 @@ description:
   en: >
       Three limits plus a per-request cap: ≤50MB per file, ≤20 files per upload, ≤filePolicy.maxCount per field (20 by default), ≤50 attachments per document including supplements. Format is judged three ways: 9 forbidden formats first (blacklist wins), then the 15 allowed formats (wps/heic included), then a dangerous declared-MIME list, then magic-number sniffing that must match the extension; file names are stripped of paths and .., with display name kept separate from the random storage name.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.459Z"
-fingerprint: fef487217b82b4a893cea05e8502fa512aaf9ff7a2f294856ff491c0bb6913c8
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.287Z"
+fingerprint: 78edbefa0efd187778985fab00624fd0718633b7852fdb0cfa12e4ff96de4a13
 source:
   - path: "doc/forms.md"
   - path: "doc/enums.md"

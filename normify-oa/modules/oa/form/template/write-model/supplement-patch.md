@@ -10,9 +10,9 @@ description:
   en: >
       The write channel while awaiting supplement: only `attachments` and `supplement_note` are writable; `supplement_note` (≥5 and ≤500 characters) lands in `flow_supplement.submitted_note` and enters the approval trail, with attachments stored per round.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.468Z"
-fingerprint: a5033f25b7d8f0482e18cc8dd361b23e4f3335e361d405a3652cb457322bafb6
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.295Z"
+fingerprint: d2b7f5c2c0d01f03ccdc1861dd8edb4f8b9717fa1658b7e0272c77eb1d9c1073
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

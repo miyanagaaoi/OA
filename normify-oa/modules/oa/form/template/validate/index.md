@@ -10,9 +10,9 @@ description:
   en: >
       All required, length, amount, date, file and conditional-required checks run server-side; front-end checks are convenience only. Validation is schema-driven and shared by all four document types.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.465Z"
-fingerprint: 6e14c5ad0b2cf549f0c43e7c9fe35cfb03e170647f10edffd410e2d59dfc175f
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.293Z"
+fingerprint: bdb91b00a74dd9c529e441a612bea2e10c7b406083daf38475d402c152d16cad
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

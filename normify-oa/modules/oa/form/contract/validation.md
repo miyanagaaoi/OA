@@ -10,9 +10,9 @@ description:
   en: >
       Contract-specific validation: name ≤80, credit code of 18 digits/uppercase letters, amount > 0, term end ≥ start, the note required when the type is other, and at least one contract-text attachment; all server-side.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.433Z"
-fingerprint: 11bbd3786554d3a51174104886249a6056f8dfcab3ecd74c3806daca8830ed3c
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.260Z"
+fingerprint: c14f7489435d0e876ea4b033efad2c125892a4a658c31f166cf61f66f8ecfc8b
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/contract/ContractFormRules.java"

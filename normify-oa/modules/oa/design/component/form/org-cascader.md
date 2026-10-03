@@ -10,8 +10,8 @@ description:
   en: >
       The organisation picker: a four-level cascade from group to company to department to section, 240px wide per level with search; it only renders nodes inside the caller's data scope — out-of-scope nodes are invisible rather than disabled, so the picker cannot be used to probe the org chart.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.421Z"
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.249Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

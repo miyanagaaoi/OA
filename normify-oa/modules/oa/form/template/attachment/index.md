@@ -10,9 +10,9 @@ description:
   en: >
       Shared attachment rules: ≤50MB per file, ≤20 files per upload, ≤50 per document including supplements, 15 allowed formats, 9 forbidden formats (extension plus declared MIME plus content sniffing); private on-premise storage with authorized downloads and no direct links; supplement round marking. Upload/download/delete are all server-enforced - attachments are never a write channel that bypasses the three-state whitelist.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.456Z"
-fingerprint: e5a290728afe5b9391a5a7e5173e0ad14fddc5f2ae7ee4fb1f13441bbc123ebb
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.284Z"
+fingerprint: 44ff60f59106640ffba662c0760e27077ca5b805cd336a61dfb7068a60fd999e
 source:
   - path: "doc/forms.md"
   - path: "doc/enums.md"

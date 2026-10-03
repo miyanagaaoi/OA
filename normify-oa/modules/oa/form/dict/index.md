@@ -10,9 +10,9 @@ description:
   en: >
       Dictionary options used by all forms - matter category, contract type, seal type, certificate type, payment ownership and planned category - maintained by admins at runtime without code changes; category values are configurable and historical documents keep the chosen value.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.433Z"
-fingerprint: 350a147c920a2bb4616252fa7969d626a2a793f4b99f9f83707013fc98c1a7d7
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.261Z"
+fingerprint: 90607856d87728d4f78aca5048f8a486389f9004f87617d538f296824d19d2fa
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/dict/FormDictService.java"

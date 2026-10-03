@@ -10,9 +10,9 @@ description:
   en: >
       The payee account is sensitive: stored encrypted rather than in clear text; masked as `****1234` in lists and detail; the full value is visible only to finance roles and admins and is never exportable.
       
-revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
-updated_at: "2026-10-03T07:42:28.440Z"
-fingerprint: 091ca7fdba75e4e5ff0c54416754b08765c6583901b13e54b81ce19a71da6f6d
+revision: fb862dbb9a22f7ff0c7fedd0607eb431a9de3a50
+updated_at: "2026-10-03T07:50:07.268Z"
+fingerprint: ae6cd7a4a4e007c42a3316ba71407fb8fc89c210ab10d536a86b2e438be54ecb
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
