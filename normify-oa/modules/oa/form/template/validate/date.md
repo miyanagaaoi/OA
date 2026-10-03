@@ -2,7 +2,6 @@
 uid: 11960a55
 id: oa.form.template.validate.date
 parent: oa.form.template.validate
-state: planned
 name: {zh: "日期与区间校验", en: "Date Validation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Dates must not precede today (some fields must not precede the initiation date) and a date range's end must be ≥ its start; messages are 「{标签}不能早于今天」 and 「结束日期不能早于开始日期」.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.355Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

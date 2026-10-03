@@ -6,6 +6,8 @@ import com.oa.common.error.ErrorCode;
 import com.oa.common.json.JsonText;
 import com.oa.common.scope.DataScopeContext;
 import com.oa.common.security.CurrentUser;
+import com.oa.form.app.FormDataService;
+import com.oa.form.template.schema.FormSchema;
 import com.oa.workflow.approver.api.dto.ApproverDtos.CreateInstanceRequest;
 import com.oa.workflow.approver.api.dto.ApproverDtos.InstanceView;
 import com.oa.workflow.approver.api.dto.ApproverDtos.PrecheckRequest;
@@ -55,8 +57,11 @@ import org.springframework.transaction.annotation.Transactional;
  *       —— <b>已由 {@code com.oa.workflow.runtime.app.FlowEngineService} 完成</b>；</li>
  *   <li>{@code TODO(2a.5)}：或签/会签/依次的决议执行与驳回（意见 ≥5 字）
  *       —— <b>已由 {@code com.oa.workflow.task.domain.TaskDecisionPolicy} + 引擎完成</b>；</li>
- *   <li>{@code TODO(2b)}：表单字段的服务端二次校验与写入白名单（本服务只落最小的
- *       {@code form_data} 行，{@code fields_json} 原样保存）。</li>
+ *   <li>{@code TODO(2b)}：表单字段的服务端二次校验与写入白名单
+ *       —— <b>已由 {@code com.oa.form.app.FormDataService#prepareDraft} 在 {@link #create} 内消费</b>：
+ *       建草稿前按**该模板版本**的 {@code form_schema_json} 做一次服务端校验（未知字段/类型/长度/
+ *       枚举/金额定点），并把归一化后的字段与 {@code schema_version} 一并固化
+ *       （doc/templates.md §3.2 V-03 / doc/forms.md §11.2）。</li>
  * </ul>
  */
 @Service
@@ -72,6 +77,8 @@ public class FlowInstanceService {
     private final FlowTemplateMapper templateMapper;
     private final WorkflowPermissionService permissionService;
     private final AuditLogWriter auditLogWriter;
+    private final com.oa.form.template.schema.FormSchemaService formSchemaService;
+    private final com.oa.form.app.FormDataService formDataService;
     private final Long financeDeptId;
     private final String financeDeptName;
 
@@ -81,6 +88,8 @@ public class FlowInstanceService {
                                FlowTemplateMapper templateMapper,
                                WorkflowPermissionService permissionService,
                                AuditLogWriter auditLogWriter,
+                               com.oa.form.template.schema.FormSchemaService formSchemaService,
+                               com.oa.form.app.FormDataService formDataService,
                                com.oa.common.config.OaProperties properties) {
         this.precheckService = precheckService;
         this.directory = directory;
@@ -88,6 +97,8 @@ public class FlowInstanceService {
         this.templateMapper = templateMapper;
         this.permissionService = permissionService;
         this.auditLogWriter = auditLogWriter;
+        this.formSchemaService = formSchemaService;
+        this.formDataService = formDataService;
         this.financeDeptId = properties.getScope().getFinanceDeptId();
         this.financeDeptName = properties.getScope().getFinanceDeptName() == null
                 ? "财务部" : properties.getScope().getFinanceDeptName();
@@ -136,13 +147,26 @@ public class FlowInstanceService {
                 template.getVersion(), context, resolved.resolutions());
         String snapshotJson = ApproverSnapshotCodec.write(snapshot);
 
+        // ------------------------------------------------------------------
+        // 2b.1 服务端二次校验（**建草稿这条既有入口同样受约束**）：
+        //   · 按**该模板版本**的 form_schema_json 逐字段校验（未知字段/类型/长度/枚举/金额定点）；
+        //   · 归一化（模板默认值 + linkage.clearWhen）后固化，并把 schema_version 一并写入
+        //     （doc/templates.md §3.2 V-03：「提交时固化字段定义与值」）；
+        //   · 校验不通过 → 400 FORM_VALIDATION_FAILED，**一行都不落库**。
+        // ------------------------------------------------------------------
+        Map<String, Object> payload = payloadOf(request);
+        FormSchema schema = formSchemaService.forTemplate(template.getId(), template.getVersion());
+        FormDataService.PreparedPayload prepared = formDataService.prepareDraft(schema, payload);
+
         FormDataRow formData = new FormDataRow();
         formData.setBizNo(bizNo);
         formData.setFormType(template.getFormType());
-        formData.setFieldsJson(fieldsJson(request, context));
-        formData.setSchemaVersion(template.getVersion());
+        formData.setFieldsJson(prepared.fieldsJson());
+        formData.setSchemaVersion(prepared.schemaVersion());
         formData.setCreatorId(context.initiatorId());
         instanceMapper.insertFormData(formData);
+        // 敏感字段（资金单收款账号）单独密文落列，**不进 fields_json**（doc/data-model.md §8.2）
+        formDataService.afterDraftCreated(formData.getId(), prepared);
 
         FlowInstanceRow instance = new FlowInstanceRow();
         instance.setBizNo(bizNo);
@@ -329,7 +353,7 @@ public class FlowInstanceService {
         }
     }
 
-    private static String fieldsJson(CreateInstanceRequest request, RuleRequest context) {
+    private static Map<String, Object> payloadOf(CreateInstanceRequest request) {
         Map<String, Object> fields = new LinkedHashMap<>();
         if (request != null && request.formValues() != null) {
             fields.putAll(request.formValues());
@@ -337,7 +361,7 @@ public class FlowInstanceService {
         if (request != null && request.fields() != null) {
             fields.putAll(request.fields());
         }
-        return fields.isEmpty() ? "{}" : JsonText.write(fields);
+        return fields;
     }
 
     private static PrecheckRequest toPrecheckRequest(CreateInstanceRequest request) {

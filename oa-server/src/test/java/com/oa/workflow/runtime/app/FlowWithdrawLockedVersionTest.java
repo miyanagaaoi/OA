@@ -108,7 +108,8 @@ class FlowWithdrawLockedVersionTest {
         engine = new FlowEngineService(instanceMapper, nodeInstanceMapper, mock(FlowTaskMapper.class),
                 mock(FlowRuntimeMapper.class), mock(FlowRoutingMapper.class), gateService,
                 mock(FlowThreadWriter.class), gate, mock(ApproverDirectory.class),
-                mock(AuditLogWriter.class), mock(FlowInstanceService.class));
+                mock(AuditLogWriter.class), mock(FlowInstanceService.class),
+                mock(com.oa.form.app.FormSubmitGate.class));
 
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(INITIATOR_ID, "emp11", "员工乙", "T511", 135L, 12L,

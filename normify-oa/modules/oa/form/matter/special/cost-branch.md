@@ -2,7 +2,6 @@
 uid: 334fab86
 id: oa.form.matter.special.cost-branch
 parent: oa.form.matter.special
-state: planned
 name: {zh: "涉及费用分支与节点跳过", en: "Cost Branch & Node Skip"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       involve_cost is the only routing criterion in phase one: when no, node ② finance review is skipped with status skipped and no todo, yet the document's central-ownership field still records the finance department for reporting and audit; the trail records that the finance node was skipped. Amounts never drive routing.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.342Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:34.400Z"
 fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
 source:
   - path: "doc/forms.md"

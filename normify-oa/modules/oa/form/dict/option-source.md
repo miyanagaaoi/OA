@@ -2,7 +2,6 @@
 uid: 4a307d4e
 id: oa.form.dict.option-source
 parent: oa.form.dict
-state: planned
 name: {zh: "字典项来源与后台维护", en: "Dictionary Item Source"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Dictionary items are maintained in the admin console and stored in `sys_dict_item` (REQ-ADMIN-004); new options need no release. Forms read enabled items through a cache that is invalidated when the console changes them.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.324Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

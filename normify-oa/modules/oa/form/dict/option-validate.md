@@ -2,7 +2,6 @@
 uid: 63f63a17
 id: oa.form.dict.option-validate
 parent: oa.form.dict
-state: planned
 name: {zh: "字典取值校验", en: "Dictionary Value Validation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Validates values against the bound dictionary at submission: the code must exist among enabled items, disabled or unknown codes are rejected, and multi-select values are de-duplicated; submitted documents display the snapshotted names regardless of later dictionary edits.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.324Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

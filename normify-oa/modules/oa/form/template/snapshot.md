@@ -2,7 +2,6 @@
 uid: 2b683d99
 id: oa.form.template.snapshot
 parent: oa.form.template
-state: planned
 name: {zh: "提交快照与模板版本", en: "Submission Snapshot"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       On submission the `form_schema_json` version and `fields_json` are frozen into `form_data`, so later template changes never affect in-flight documents; the server accepts amounts only as strings or fixed-point numbers.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.355Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

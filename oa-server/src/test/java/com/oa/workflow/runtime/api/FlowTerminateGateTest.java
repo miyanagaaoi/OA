@@ -192,7 +192,8 @@ class FlowTerminateGateTest {
 
         FlowEngineService realEngine = new FlowEngineService(instanceMapper, nodeInstanceMapper, taskMapper,
                 runtimeMapper, routingMapper, mock(FlowGateService.class), mock(FlowThreadWriter.class),
-                gate, mock(ApproverDirectory.class), auditLogWriter, instanceService);
+                gate, mock(ApproverDirectory.class), auditLogWriter, instanceService,
+                mock(com.oa.form.app.FormSubmitGate.class));
 
         assertThatThrownBy(() -> realEngine.terminate(INSTANCE_ID, REASON))
                 .isInstanceOf(BizException.class)

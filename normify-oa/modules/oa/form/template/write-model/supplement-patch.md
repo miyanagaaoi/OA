@@ -2,7 +2,6 @@
 uid: 1cdf6de6
 id: oa.form.template.write-model.supplement-patch
 parent: oa.form.template.write-model
-state: planned
 name: {zh: "补件写入", en: "Supplement Write"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The write channel while awaiting supplement: only `attachments` and `supplement_note` are writable; `supplement_note` (≥5 and ≤500 characters) lands in `flow_supplement.submitted_note` and enters the approval trail, with attachments stored per round.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.357Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

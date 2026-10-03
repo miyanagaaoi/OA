@@ -2,7 +2,6 @@
 uid: 4855b377
 id: oa.form.fund.special.plan-category
 parent: oa.form.fund.special
-state: planned
 name: {zh: "计划类别（一期只存不用）", en: "Plan Category (Store Only)"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Plan category `plan_category` (checkbox per 6.7: in-plan/out-of-plan, defaults to in-plan); phase one stores the value without any flow logic and prints it as ☑/☐ per the paper form; it gains business meaning only when phase-two plan management ships.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.339Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:34.400Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

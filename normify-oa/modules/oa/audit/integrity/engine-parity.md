@@ -11,8 +11,8 @@ description:
   en: >
       Captures the difference between MySQL triggers and PostgreSQL rules/REVOKE for immutability, and maintains the per-engine DDL scripts so append-only constraints survive a database migration.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.267Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:55:35.452Z"
 fingerprint: 4e545cc1c566ce9e10c8fb0b82fc64bfd49ae277034ea19e5092531bb0c1231e
 source:
   - path: "doc/data-model.md"

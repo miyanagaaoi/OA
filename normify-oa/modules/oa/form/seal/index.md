@@ -2,7 +2,6 @@
 uid: 3e4c6f59
 id: oa.form.seal
 parent: oa.form
-state: planned
 name: {zh: "印鉴证照审批单", en: "Seal & Certificate Form"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Seal and certificate approval form (form_type=seal): seal or certificate type, purpose, usage period and return status tracking, with the group Finance department still acting as the central owner node.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.351Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:34.400Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

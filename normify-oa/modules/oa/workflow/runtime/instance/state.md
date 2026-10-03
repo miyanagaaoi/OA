@@ -11,8 +11,8 @@ description:
   en: >
       Reads and writes instance status with guarded transitions: persists the draft/approving/approved/rejected/withdrawn/terminated enum plus the supplement sub-status (only approving may carry it) and broadcasts a status-changed event for notification and audit consumers.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.435Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:55:35.611Z"
 fingerprint: 06cb98ae93ba59a5716fa191b94af0a4ddc4f8a19f41d71a41adcc39f3ee37a7
 source:
   - path: "doc/prd-0.1.md"

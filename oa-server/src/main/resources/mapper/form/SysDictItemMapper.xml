@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  数据字典 Mapper（sys_dict_item）· 2b.4
+  ============================================================================
+  纪律（与 FlowTemplateMapper 同口径）：
+    · sys_dict_item **不是**数据域受控表（配置数据）→ SELECT **不得**带 @dataScope 标记；
+      织入数据域片段会按调用人的单据可见范围裁剪字典，下拉框在域外直接空掉。
+    · 不继承 BaseMapper：只用显式语句，避免 MP 注入的隐式语句把配置数据带进业务读路径。
+    · 排序口径：sort_no ASC, id ASC —— doc/dict-seed.md 的「排序」列即 sort_no（other=999 排最后）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.form.dict.infra.SysDictItemMapper">
+
+  <resultMap id="DictItemResultMap" type="com.oa.form.dict.infra.SysDictItemRow">
+    <result property="dictType" column="dict_type"/>
+    <result property="itemCode" column="item_code"/>
+    <result property="itemName" column="item_name"/>
+    <result property="itemNameEn" column="item_name_en"/>
+    <result property="sortNo" column="sort_no"/>
+    <result property="status" column="status"/>
+    <result property="remark" column="remark"/>
+  </resultMap>
+
+  <select id="selectEnabledByType" resultMap="DictItemResultMap">
+    SELECT d.dict_type, d.item_code, d.item_name, d.item_name_en, d.sort_no, d.status, d.remark
+    FROM sys_dict_item d
+    WHERE d.dict_type = #{dictType}
+      AND d.status = 'active'
+    ORDER BY d.sort_no ASC, d.id ASC
+  </select>
+
+  <select id="selectAllByType" resultMap="DictItemResultMap">
+    SELECT d.dict_type, d.item_code, d.item_name, d.item_name_en, d.sort_no, d.status, d.remark
+    FROM sys_dict_item d
+    WHERE d.dict_type = #{dictType}
+    ORDER BY d.sort_no ASC, d.id ASC
+  </select>
+
+  <select id="countByType" resultType="java.util.LinkedHashMap">
+    SELECT d.dict_type AS dictType, COUNT(1) AS itemCount
+    FROM sys_dict_item d
+    GROUP BY d.dict_type
+    ORDER BY d.dict_type ASC
+  </select>
+
+</mapper>

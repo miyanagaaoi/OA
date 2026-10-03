@@ -123,7 +123,8 @@ class FlowEngineInitiatorGateTest {
         engine = new FlowEngineService(instanceMapper, mock(FlowNodeInstanceMapper.class),
                 mock(FlowTaskMapper.class), mock(FlowRuntimeMapper.class), mock(FlowRoutingMapper.class),
                 mock(FlowGateService.class), mock(FlowThreadWriter.class), gate,
-                mock(ApproverDirectory.class), mock(AuditLogWriter.class), mock(FlowInstanceService.class));
+                mock(ApproverDirectory.class), mock(AuditLogWriter.class), mock(FlowInstanceService.class),
+                mock(com.oa.form.app.FormSubmitGate.class));
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(principalId, "u" + principalId, "用户" + principalId,
                         "T" + principalId, 135L, 12L, Set.of("employee"), Set.of(), false))
@@ -208,7 +209,8 @@ class FlowEngineInitiatorGateTest {
         engine = new FlowEngineService(instanceMapper, mock(FlowNodeInstanceMapper.class),
                 mock(FlowTaskMapper.class), mock(FlowRuntimeMapper.class), mock(FlowRoutingMapper.class),
                 mock(FlowGateService.class), mock(FlowThreadWriter.class), gate,
-                mock(ApproverDirectory.class), mock(AuditLogWriter.class), mock(FlowInstanceService.class));
+                mock(ApproverDirectory.class), mock(AuditLogWriter.class), mock(FlowInstanceService.class),
+                mock(com.oa.form.app.FormSubmitGate.class));
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(OTHER_USER_ID, "admin2", "管理员", "T502", 135L, 12L,
                         Set.of("admin"), Set.of(), false))

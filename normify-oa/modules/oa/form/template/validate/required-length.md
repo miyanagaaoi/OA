@@ -2,7 +2,6 @@
 uid: "10421368"
 id: oa.form.template.validate.required-length
 parent: oa.form.template.validate
-state: planned
 name: {zh: "必填与长度校验", en: "Required & Length Validation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Required checks (empty string and all-whitespace count as empty) and max-length checks, with the messages 「请填写{标签}」 and 「{标签}不能超过 {N} 个字符」; Chinese counts by character.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.356Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

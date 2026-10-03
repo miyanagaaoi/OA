@@ -129,6 +129,7 @@ public class FlowEngineService {
     private final ApproverDirectory directory;
     private final AuditLogWriter auditLogWriter;
     private final FlowInstanceService instanceService;
+    private final com.oa.form.app.FormSubmitGate formSubmitGate;
 
     public FlowEngineService(FlowInstanceMapper instanceMapper,
                              FlowNodeInstanceMapper nodeInstanceMapper,
@@ -140,7 +141,8 @@ public class FlowEngineService {
                              WorkflowPermissionService permissionService,
                              ApproverDirectory directory,
                              AuditLogWriter auditLogWriter,
-                             FlowInstanceService instanceService) {
+                             FlowInstanceService instanceService,
+                             com.oa.form.app.FormSubmitGate formSubmitGate) {
         this.instanceMapper = instanceMapper;
         this.nodeInstanceMapper = nodeInstanceMapper;
         this.taskMapper = taskMapper;
@@ -152,6 +154,7 @@ public class FlowEngineService {
         this.directory = directory;
         this.auditLogWriter = auditLogWriter;
         this.instanceService = instanceService;
+        this.formSubmitGate = formSubmitGate;
     }
 
     // ================================================================ 提交 / 重提 / 回到草稿
@@ -182,6 +185,13 @@ public class FlowEngineService {
                     "只有草稿状态的单据可以提交，当前状态：" + status.code()
                             + "（已驳回/已撤回请先调用 reopen 或 resubmit）");
         }
+        // ------------------------------------------------------------------
+        // 2b.1 / 2b.3 表单提交闸门：按**实例锁定版本**的 form_schema_json 做 SUBMIT 档二次校验，
+        // 不通过即 400 FORM_VALIDATION_FAILED（含全部失败项），**状态一行未动**
+        // （markSubmitted 在其后）。依据：doc/forms.md §1.1「必填 = 不填能否提交」、
+        // §3「金额为 0 或空时禁止提交（PRD 13.2）· 提交前必须通过」、§11.2。
+        // ------------------------------------------------------------------
+        String formGateEvidence = formSubmitGate.assertSubmittable(instance);
         ApproverSnapshot snapshot = readSnapshot(instance);
         List<SnapshotNode> nodes = orderedNodes(snapshot);
         if (nodes.isEmpty()) {
@@ -220,7 +230,8 @@ public class FlowEngineService {
                 reason == null || reason.isBlank() ? "提交审批" : reason);
         auditLogWriter.appendAsCurrentUser("submit", "instance", instanceId, null,
                 "{\"reason\":" + JsonText.write(reason == null ? "" : reason)
-                        + ",\"firstNodeSeq\":" + firstSeq + "}", null, null);
+                        + ",\"firstNodeSeq\":" + firstSeq
+                        + ",\"formGate\":" + JsonText.write(formGateEvidence) + "}", null, null);
         log.info("引擎提交：operator={} instanceId={} 首节点={} 节点实例数={}",
                 actor.account(), instanceId, firstSeq, nodes.size());
         return FlowInstanceService.toView(requireInstance(instanceId));

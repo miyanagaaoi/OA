@@ -70,7 +70,12 @@ class DataScopeMapperGuardTest {
             // flow_node_instance 不是受控表但同守「只用显式语句」的纪律）
             "com.oa.workflow.runtime.infra.FlowNodeInstanceMapper",
             "com.oa.workflow.runtime.infra.FlowTaskMapper",
-            "com.oa.workflow.runtime.infra.FlowRuntimeMapper");
+            "com.oa.workflow.runtime.infra.FlowRuntimeMapper",
+            // 阶段 2b.1：表单数据读写（form_data 是受控表；每条 SELECT 恰好 1 个 @dataScope 标记）
+            "com.oa.form.infra.FormDataMapper",
+            // 阶段 2b.4：数据字典（sys_dict_item **不是**受控表 —— 配置数据不织入数据域，
+            // 但保持同一纪律：不继承 BaseMapper、只走显式语句）
+            "com.oa.form.dict.infra.SysDictItemMapper");
 
     /** 非业务数据表（会话注册表）：整体豁免，是 BaseMapper 的唯一合法持有者。 */
     private static final String EXEMPT_MAPPER = "com.oa.identity.infra.SysUserSessionMapper";

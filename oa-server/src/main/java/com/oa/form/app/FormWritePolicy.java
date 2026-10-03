@@ -22,7 +22,13 @@ import java.util.Set;
  * </table>
  *
  * <b>唯一例外</b>：印鉴证照单（{@code form_type = seal}）的 {@code return_status} / {@code return_date}
- * 在「审批中」与「待补件」态下，**仅发起人与节点⑦（归档登记）可改**；其余角色/节点仍全只读。
+ * 在「审批中」态下，**仅发起人与节点⑦（归档登记）可改**；其余角色/节点仍全只读。
+ * <b>待补件态不适用该例外</b>（2026-10-04 修正）：{@code doc/forms.md} §5 的例外边界表原文写
+ * 「待补件 | 发起人 | 仅 {@code attachments} + {@code supplement_note} | **一律只读**——
+ * {@code return_status} / {@code return_date} 在待补件期**同样只读**」，§7 对照表同口径
+ * （「补件可写字段 … 附件 + 补件说明（**归还状态/归还日期在此阶段也只读**）」），
+ * 可执行用例见 {@code doc/test-cases.md} TC-FORM-013「待补件期归还状态同样只读
+ * （三态例外仅在「审批中」生效）」。
  *
  * <p>本类只做判定，不做持久化；调用方（{@code form} 领域的应用服务）必须在入库前调用
  * {@link #assertWritable} 或 {@link #filterWritable}，把越权字段直接剥掉 —— 前端只读仅是体验，不是边界。
@@ -125,8 +131,11 @@ public final class FormWritePolicy {
         }
         if (effectiveState == FormState.PENDING_SUPPLEMENT) {
             result.addAll(SUPPLEMENT_FIELDS);
+            // 待补件期**不**追加 SEAL_RETURN_FIELDS：forms.md §5 / §7 与 TC-FORM-013 明确
+            // 「归还状态/归还日期在待补件期同样只读」（例外仅在「审批中」生效）。
+            return result;
         }
-        // 唯一例外：印鉴单归还状态/日期（审批中 / 待补件态下，仅发起人与节点⑦可改）
+        // 唯一例外：印鉴单归还状态/日期（**仅「审批中」态**，且仅发起人与节点⑦可改）
         if (formType == FormType.SEAL && (isInitiator || isArchiveNode)) {
             result.addAll(SEAL_RETURN_FIELDS);
         }

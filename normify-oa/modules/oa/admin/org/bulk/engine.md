@@ -10,8 +10,8 @@ description:
   en: >
       The shared engine behind all five templates: CSV parsing with RFC4180 escaping, a full validation report (line, column, error code, fix suggestion), a single transaction with zero rows written on error, idempotent upsert by business key, an import mutex (oa:import:* lock) and the per-row fail-closed data-scope gate (E-ORG/USER/LEAD/POS/ROLE-020: one out-of-scope row rejects the whole batch instead of being silently skipped).
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.252Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:55:35.427Z"
 fingerprint: 00c5ccf651c6912c3604e7db2fbaf4689b8d576f5f81f7f2f069f3ab8b7144d0
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/BulkImportService.java"

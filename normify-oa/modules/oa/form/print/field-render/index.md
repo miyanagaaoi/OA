@@ -11,8 +11,8 @@ description:
   en: >
       The sheet renders fields by their attributes: printLabel (falling back to the screen label), printVisible (default true), ☑/☐ rendering for single and multi-select fields, and monospaced thousands-separated amounts and numbers.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.344Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:55:35.520Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

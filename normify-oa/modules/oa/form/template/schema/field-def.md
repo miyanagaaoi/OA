@@ -2,7 +2,6 @@
 uid: 07f675b0
 id: oa.form.template.schema.field-def
 parent: oa.form.template.schema
-state: planned
 name: {zh: "字段定义结构", en: "Field Definition Structure"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       One field's schema entry: field ID, label, type (text/textarea/number/amount/select/multiselect/date/daterange/user/org/tag/boolean/file/files), required (yes/no/conditional), length, validation, post-submit mutability, default and linkage. A field code is never reused once used.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.354Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

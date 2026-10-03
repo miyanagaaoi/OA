@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  表单数据 Mapper（form_data）· 2b.1 / 2b.4
+  ============================================================================
+  受控表纪律（与 FlowTaskMapper / FlowRoutingMapper 逐字同口径）：
+    · form_data 登记在 oa.scope.tables（kind=INSTANCE），但**过滤主体恒为 flow_instance**：
+      DataScopeSqlBuilder 生成的是「alias.initiator_id / alias.initiator_org_path /
+      alias.initiator_company_id」这一族条件，form_data 表**没有**这些列。
+      因此所有 SELECT 都 JOIN flow_instance i ON i.form_data_id = f.id，
+      标记写成 /* @dataScope(table=flow_instance, alias=i) */；
+      —— 写成 table=form_data 会拼出 f.initiator_id → 运行期 BadSqlGrammar
+      （2026-10-03 实测：Unknown column 'f.initiator_id' in 'where clause'）。
+    · 标记位置必须在完整布尔表达式处（"WHERE 1 = 1" 之后），否则拦截器无法替换；
+    · 域外实例查不到（按 404 处理），而不是报错、也不是系统口径全量；
+    · countApprovedInstanceByBizNo 是「关联合同单号必须存在且已通过」的全局唯一性判定：
+      语句保留标记、由调用方在 DataScopeContext.system() 下执行（片段退化为 1=1）；
+    · 写语句（update）不需要标记（拦截器只约束 SELECT）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.form.infra.FormDataMapper">
+
+  <resultMap id="FormDataFullResultMap" type="com.oa.form.infra.row.FormDataFullRow">
+    <id property="id" column="id"/>
+    <result property="formType" column="form_type"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="fieldsJson" column="fields_json"/>
+    <result property="payeeAccountCipher" column="payee_account_cipher"/>
+    <result property="schemaVersion" column="schema_version"/>
+    <result property="creatorId" column="creator_id"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <sql id="FormDataColumns">
+    f.id, f.form_type, f.biz_no, f.fields_json, f.payee_account_cipher, f.schema_version,
+    f.creator_id, f.created_at, f.updated_at
+  </sql>
+
+  <select id="selectFormDataById" resultMap="FormDataFullResultMap">
+    SELECT <include refid="FormDataColumns"/>
+    FROM form_data f
+    JOIN flow_instance i ON i.form_data_id = f.id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND f.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectFormDataByBizNo" resultMap="FormDataFullResultMap">
+    SELECT <include refid="FormDataColumns"/>
+    FROM form_data f
+    JOIN flow_instance i ON i.form_data_id = f.id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND f.biz_no = #{bizNo}
+    LIMIT 1
+  </select>
+
+  <select id="selectPayeeAccountCipher" resultType="java.lang.String">
+    SELECT f.payee_account_cipher
+    FROM form_data f
+    JOIN flow_instance i ON i.form_data_id = f.id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND f.id = #{id}
+    LIMIT 1
+  </select>
+
+  <!--
+    关联合同单号的存在性判定（唯一性 → 全局口径）。
+    过滤主体是 flow_instance（i）→ 恰好 1 个标记；不返回行数据，只返回计数。
+  -->
+  <select id="countApprovedInstanceByBizNo" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND i.biz_no = #{bizNo}
+      AND i.status = 'approved'
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <update id="updateFieldsJson">
+    UPDATE form_data
+    SET fields_json = #{fieldsJson},
+        schema_version = #{schemaVersion},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="updatePayeeAccountCipher">
+    UPDATE form_data
+    SET payee_account_cipher = #{cipher},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="clearPayeeAccountCipher">
+    UPDATE form_data
+    SET payee_account_cipher = NULL,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+</mapper>

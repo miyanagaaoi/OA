@@ -118,7 +118,7 @@ class FlowWithdrawWindowTest {
         instanceService = mock(FlowInstanceService.class);
         engine = new FlowEngineService(instanceMapper, nodeInstanceMapper, taskMapper, runtimeMapper,
                 routingMapper, gateService, threadWriter, gate, mock(ApproverDirectory.class),
-                auditLogWriter, instanceService);
+                auditLogWriter, instanceService, mock(com.oa.form.app.FormSubmitGate.class));
 
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(INITIATOR_ID, "emp01", "员工甲", "T501", 135L, 12L,

@@ -2,7 +2,6 @@
 uid: 8f8c431a
 id: oa.form.seal.validation
 parent: oa.form.seal
-state: planned
 name: {zh: "印鉴单校验规则", en: "Seal Form Validation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Seal-specific validation: reason ≤60, purpose ≥5 (≥20 when external) and ≤500, copy count an integer 1–999, usage start not earlier than today, end ≥ start, `cert_name` required when seal_type is certificate borrow, and `return_date` required when the status is returned; all server-side.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.352Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:34.400Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

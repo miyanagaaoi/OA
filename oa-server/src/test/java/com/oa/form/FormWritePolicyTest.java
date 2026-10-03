@@ -64,20 +64,32 @@ class FormWritePolicyTest {
     }
 
     @Test
-    @DisplayName("唯一例外：印鉴单 return_status/return_date 仅发起人与节点⑦可改（审批中/待补件态）")
+    @DisplayName("唯一例外：印鉴单 return_status/return_date 仅在「审批中」态对发起人与节点⑦可写")
     void sealReturnFieldsException() {
-        // 发起人
+        // 发起人（审批中）
         assertThat(FormWritePolicy.writableFields(FormState.APPROVING, FormType.SEAL, true, false, SEAL_FIELDS))
                 .containsExactlyInAnyOrder(FormWritePolicy.FIELD_RETURN_STATUS, FormWritePolicy.FIELD_RETURN_DATE);
-        // 节点⑦（归档登记）
+        // 节点⑦（归档登记，审批中）
         assertThat(FormWritePolicy.writableFields(FormState.APPROVING, FormType.SEAL, false, true, SEAL_FIELDS))
                 .containsExactlyInAnyOrder(FormWritePolicy.FIELD_RETURN_STATUS, FormWritePolicy.FIELD_RETURN_DATE);
         // 非发起人且非节点⑦ → 无权
         assertThat(FormWritePolicy.writableFields(FormState.APPROVING, FormType.SEAL, false, false, SEAL_FIELDS)).isEmpty();
-        // 待补件态下，例外字段与补件字段同时可写
-        assertThat(FormWritePolicy.writableFields(FormState.PENDING_SUPPLEMENT, FormType.SEAL, true, false, SEAL_FIELDS))
-                .containsExactlyInAnyOrder(FormWritePolicy.FIELD_ATTACHMENTS, FormWritePolicy.FIELD_SUPPLEMENT_NOTE,
-                        FormWritePolicy.FIELD_RETURN_STATUS, FormWritePolicy.FIELD_RETURN_DATE);
+    }
+
+    @Test
+    @DisplayName("例外边界（2026-10-04 修正）：待补件期归还字段**同样只读**（TC-FORM-013）")
+    void sealReturnFieldsAreReadOnlyWhileAwaitingSupplement() {
+        // forms.md §5 例外边界表：「待补件 | 发起人 | 仅 attachments + supplement_note | 一律只读
+        // —— return_status / return_date 在待补件期同样只读」；§7 对照表同口径；
+        // 可执行用例 doc/test-cases.md TC-FORM-013。改前这里错误地放行了两个归还字段。
+        assertThat(FormWritePolicy.writableFields(FormState.PENDING_SUPPLEMENT, FormType.SEAL, true, true, SEAL_FIELDS))
+                .as("待补件期可写字段**只有** attachments + supplement_note")
+                .containsExactlyInAnyOrder(FormWritePolicy.FIELD_ATTACHMENTS, FormWritePolicy.FIELD_SUPPLEMENT_NOTE);
+
+        assertThatThrownBy(() -> FormWritePolicy.assertWritable("return_status",
+                FormState.PENDING_SUPPLEMENT, FormType.SEAL, true, true, SEAL_FIELDS))
+                .isInstanceOf(BizException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FIELD_WRITE_DENIED);
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
 import com.oa.common.json.JsonText;
 import com.oa.common.security.CurrentUser;
+import com.oa.form.template.schema.FormSchemaParser;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.CheckItemView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.CheckRuleView;
 import com.oa.workflow.definition.api.dto.FlowDefinitionDtos.DecisionResolveView;
@@ -212,7 +213,10 @@ public class FlowDefinitionService {
         created.setVersion(nextVersion);
         created.setStatus(TemplateStatus.DRAFT.code());
         created.setNodeCount(nodeCount);
-        created.setFormSchemaJson(base.getFormSchemaJson());
+        // 表单与流程**共用同一版本号**（doc/templates.md §2.1 / §3.2 V-08）：克隆出来的
+        // form_schema_json 自称的 schema_version 必须改写为新版本号，否则该版本一发布，
+        // 表单引擎会在每次建草稿时按「版本不一致」拒绝（2b.1，2026-10-03 运行期实测命中）。
+        created.setFormSchemaJson(FormSchemaParser.syncSchemaVersion(base.getFormSchemaJson(), nextVersion));
         created.applyGatePolicy(base.gatePolicy());
         created.setCreatedBy(operator.id());
         created.setUpdatedBy(operator.id());
@@ -241,6 +245,20 @@ public class FlowDefinitionService {
         templateMapper.archiveOtherPublished(template.getCode(), templateId, operator.id());
         templateMapper.updateNodeCount(templateId, nodes.size(), operator.id());
         templateMapper.updateStatus(templateId, TemplateStatus.PUBLISHED.code(), operator.id());
+
+        // 2b.1 一致性披露（**只告警不阻断**）：form_schema_json 自称的 schema_version 必须等于本行版本号
+        // （doc/templates.md §2.1 / §3.2 V-08）。不一致时**不阻断发布**（发布前校验的 R-* 规则里没有这一条，
+        // 加硬闸门会让 2a 既有的最小夹具无法发布），但必须让运维看得见 ——
+        // 因为后果是「该单据类型建草稿全部 40008」，属于当天不可用的级别。
+        Integer declaredVersion = FormSchemaParser.declaredSchemaVersion(template.getFormSchemaJson());
+        if (template.getFormSchemaJson() != null && !template.getFormSchemaJson().isBlank()
+                && (declaredVersion == null || !declaredVersion.equals(template.getVersion()))) {
+            log.warn("模板 code={} v{}（templateId={}）的 form_schema_json 自称 schema_version={}，"
+                            + "与版本号不一致（doc/templates.md §2.1 / §3.2 V-08）；"
+                            + "发布后该单据类型的建草稿会被 40008 拒绝（表单引擎按版本一致性 fail-closed），"
+                            + "请修正模板的表单定义或基于它重开版本（开新版本时会自动同步 schema_version）",
+                    template.getCode(), template.getVersion(), templateId, declaredVersion);
+        }
 
         log.info("流程模板发布：operator={} code={} v{} templateId={} reason={} 原 published 版本已转 archived（在途实例不受影响）",
                 operator.account(), template.getCode(), template.getVersion(), templateId,

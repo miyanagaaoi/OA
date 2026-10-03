@@ -23,7 +23,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
         "com.oa.workflow.definition.infra",
         "com.oa.workflow.approver.infra",
         // 阶段 2a.4 / 2a.5：运行时状态机（节点实例 / 任务 / 流转链 / 补件 / 轨迹 / 抄送）
-        "com.oa.workflow.runtime.infra"
+        "com.oa.workflow.runtime.infra",
+        // 阶段 2b.1 / 2b.4：表单数据读写（form_data，受控表）与数据字典（sys_dict_item，配置数据）
+        "com.oa.form.infra",
+        "com.oa.form.dict.infra"
 })
 public class OaApplication {
 

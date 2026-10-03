@@ -4,6 +4,8 @@ import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
 import com.oa.workflow.definition.domain.FlowGateEnums.TimeoutAction;
 import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 流程模板（表 {@code flow_template}，doc/data-model.md §4.1）。
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
  * {@link FlowGatePolicy}（键位与语义表见 doc/templates.md §1.7 / §1.8）。
  */
 public class FlowTemplate {
+
+    private static final Logger log = LoggerFactory.getLogger(FlowTemplate.class);
 
     private Long id;
     private String code;
@@ -202,7 +206,34 @@ public class FlowTemplate {
                 supplementDeadlineDays,
                 supplementDeadlineType == null ? null : DeadlineType.of(supplementDeadlineType).orElse(null),
                 onSupplementTimeout == null ? null : TimeoutAction.of(onSupplementTimeout).orElse(null),
-                withdrawWindow == null ? null : WithdrawWindow.of(withdrawWindow).orElse(null));
+                withdrawWindowEnum(withdrawWindow));
+    }
+
+    /**
+     * 撤回窗口列 → 枚举，**非法值必须留下 WARN（含原始值）**。
+     *
+     * <p>背景（2026-10-04 微修）：该列原先写作 {@code WithdrawWindow.of(withdrawWindow).orElse(null)}，
+     * 于是一个绕过 DB {@code chk_flow_template_gates} 硬改进去的非法字符串会被**静默**映射成
+     * {@code NULL} —— 而 {@code NULL} 的语义是「取默认口径 {@code until_finance_approved}」
+     * （doc/templates.md §1.8）。二者在行为上都是 fail-open（退化为默认口径，这是**可接受**的），
+     * 但「静默」不可接受：管理员手改过的数据会在无人知情的情况下按另一种口径裁决撤回。
+     * 因此这里只补**可观测性**，取值语义与降级行为一字未改。
+     */
+    private WithdrawWindow withdrawWindowEnum(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        java.util.Optional<WithdrawWindow> parsed = WithdrawWindow.of(raw);
+        if (parsed.isPresent()) {
+            return parsed.get();
+        }
+        log.warn("flow_template.withdraw_window 取值非法（原始值=\"{}\"），已按 NULL 处理并退化到默认口径 {}；"
+                        + "合法取值为 {} / {}。出现本日志说明 DB 约束 chk_flow_template_gates 被绕过"
+                        + "（或数据被直接改写），请核对模板 id={} 的配置来源。",
+                raw, WithdrawWindow.defaultWindow().code(),
+                WithdrawWindow.UNTIL_FINANCE_APPROVED.code(), WithdrawWindow.UNTIL_FINANCE_STARTED.code(),
+                id);
+        return null;
     }
 
     /** 写入闸门配置（{@code null} 表示「不限/不设时限/取默认撤回窗口」，枚举按 {@code code()} 落库）。 */

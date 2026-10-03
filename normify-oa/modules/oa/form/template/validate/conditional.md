@@ -2,7 +2,6 @@
 uid: 137904d4
 id: oa.form.template.validate.conditional
 parent: oa.form.template.validate
-state: planned
 name: {zh: "条件必填校验", en: "Conditional Required Validation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Non-empty checks gated by dependency fields: involve_cost=是 → amount/cost_bearer, contract_type=其他 → contract_type_other, seal_type=证照借用 → cert_name, return_status=已归还 → return_date; message 「{标签}为必填」.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.355Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

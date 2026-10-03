@@ -166,7 +166,7 @@ class FlowWithdrawCcGateTest {
         FlowInstanceService instanceService = mock(FlowInstanceService.class);
         FlowEngineService service = new FlowEngineService(instanceMapper, nodeInstanceMapper, taskMapper,
                 runtimeMapper, routingMapper, gateService, threadWriter, gate, mock(ApproverDirectory.class),
-                auditLogWriter, instanceService);
+                auditLogWriter, instanceService, mock(com.oa.form.app.FormSubmitGate.class));
         return new EngineFixture(service, instanceMapper, nodeInstanceMapper, taskMapper, runtimeMapper,
                 routingMapper, gateService, threadWriter, auditLogWriter, instanceService);
     }

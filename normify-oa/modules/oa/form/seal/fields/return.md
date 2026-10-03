@@ -2,7 +2,6 @@
 uid: 8c080a27
 id: oa.form.seal.fields.return
 parent: oa.form.seal.fields
-state: planned
 name: {zh: "归还字段组", en: "Return Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Return status `return_status` (select, required, default pending, editable during approval but only by the archive node) and return time `return_date` (datetime, required when the status is returned, editable during approval).
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.350Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:34.400Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

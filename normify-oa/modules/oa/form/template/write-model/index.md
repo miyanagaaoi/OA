@@ -2,7 +2,6 @@
 uid: 13f2d711
 id: oa.form.template.write-model
 parent: oa.form.template
-state: planned
 name: {zh: "三态读写模型", en: "Three-State Write Model"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Field read/write rights across the three lifecycle stages (draft fully writable, in-approval fully read-only, awaiting supplement only attachments and the supplement note). The server enforces a state whitelist rather than trusting greyed-out UI; amount and account fields add role-based masking.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.356Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

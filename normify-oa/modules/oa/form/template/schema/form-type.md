@@ -2,7 +2,6 @@
 uid: 07fbb9b9
 id: oa.form.template.schema.form-type
 parent: oa.form.template.schema
-state: planned
 name: {zh: "四类单据模板", en: "Four Document Templates"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Template composition for the four document types (matter/fund/contract/seal): form template plus process template, distinguished by composition rather than branching; template versions and publishing; started documents are unaffected by later template changes.
       
-revision: 257a32acb48c626488a22291ada46052401b64c8
-updated_at: "2026-10-03T05:17:27.354Z"
+revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
+updated_at: "2026-10-03T05:58:25.720Z"
 fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
 source:
   - path: "doc/forms.md"
