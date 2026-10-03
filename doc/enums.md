@@ -30,7 +30,7 @@
 | 编号 | 原待确认事项 | 定稿结论（落地位置） | 状态 |
 | --- | --- | --- | --- |
 | E-01 | 事项类别「经营」的 code 命名 | 定稿 `business`（§10.1）；存量 `operate` 按 §14 迁移 | **已关闭** |
-| E-02 | 归档登记节点（⑦）的审批人角色码与是否审批 | 角色码 `finance_clerk`（财务部内勤）；⑦**默认「仅登记不审批」**——不产生审批决议、不需要决议模式与阈值、不计入审批时长与效率统计，仅留痕（`sys_thread.action = archive_register`）；可按模板配置改为需审批（§2） | **已关闭** |
+| E-02 | 归档登记节点（⑦）的审批人角色码与是否审批 | 角色码 `admin`（系统管理员）；⑦**默认「仅登记不审批」**——不产生审批决议、不需要决议模式与阈值、不计入审批时长与效率统计，仅留痕（`sys_thread.action = archive_register`）；可按模板配置改为需审批（§2）。**口径说明**：一期⑦归档登记由系统管理员承担（REQ-ADMIN-003 只定义 9 个内置角色，无档案管理员角色）；二期如引入档案管理员再调整（参数口径见 `templates.md` §1.1/§1.6） | **已关闭** |
 | E-03 | 协同/会签任务的消息类型粒度 | 保留 `collaboration`（§8）；**每个协同部门产生一条站内信**（N 个协同部门 = N 条 `collaboration` 站内信），同时每个部门各产生 `todo` 待办 | **已关闭** |
 | E-04 | 节点实例「已退回」是否终态 | **非终态**（§5）：上一节点重审通过后本节点回到 `active` | **已关闭** |
 | E-05 | 附件轮次 `round` 上限 | 沿用 `0..3`（§12.3），与「全单补件 ≤3 次」一致 | **已关闭** |
@@ -147,7 +147,7 @@
 | `subsidiary_gm` | 子公司总经理 | Subsidiary GM Resolver | 取发起人所属公司的总经理 | `flow_node.approver_rule` |
 | `group_leader` | 集团分管领导 | Group Executive Resolver | 按事项类别匹配集团层业务线绑定的分管领导 | `flow_node.approver_rule` |
 | `chairman` | 董事长 | Chairman Resolver | 取集团董事长（唯一） | `flow_node.approver_rule` |
-| `designated` | 指定人员或角色 | Designated User or Role | 由 IT 部门在流程设计器中固定指定；参数存 `approver_param`，形如 `{"user_ids":[1001,1002]}` 或 `{"role_code":"finance_clerk"}` | `flow_node.approver_rule` + `approver_param` |
+| `designated` | 指定人员或角色 | Designated User or Role | 由 IT 部门在流程设计器中固定指定；参数存 `approver_param`，形如 `{"user_ids":[1001,1002]}` 或 `{"role_code":"admin"}` | `flow_node.approver_rule` + `approver_param` |
 | `initiator_pick` | 发起人自选 | Initiator Pick | 发起时由发起人从通讯录中选择候选人 | `flow_node.approver_rule` |
 | `collab_dept_leader` | 协同部门负责人 | Collaboration Dept Leader | **仅用于②的并行子任务组**；由②的审批人在审批时勾选协同部门，系统对每个被勾选部门取该部门负责人 | `flow_node.approver_rule`（并行子任务） |
 

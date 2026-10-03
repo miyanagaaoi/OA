@@ -11,8 +11,8 @@ description:
   en: >
       Maps field types to UI controls and renders them: text/textarea/number/amount/select/multiselect/date/daterange/user/org/tag/boolean/file/files; amount controls are monospaced and right-aligned, file controls reuse the shared upload rules.
       
-revision: 112ab0a1d46779714029044fc8e0b46627804f30
-updated_at: "2026-10-03T01:51:21.594Z"
+revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
+updated_at: "2026-10-03T02:09:10.303Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

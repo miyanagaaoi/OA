@@ -11,8 +11,8 @@ description:
   en: >
       Dates must not precede today (some fields must not precede the initiation date) and a date range's end must be ≥ its start; messages are 「{标签}不能早于今天」 and 「结束日期不能早于开始日期」.
       
-revision: 112ab0a1d46779714029044fc8e0b46627804f30
-updated_at: "2026-10-03T01:51:21.596Z"
+revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
+updated_at: "2026-10-03T02:09:10.307Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

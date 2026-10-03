@@ -474,7 +474,7 @@
       - oa.workflow.designer.canvas [计划] — 画布编排与节点顺序 / Canvas Orchestration & Node Order — 图形化流程设计器的画布层：读取模板节点图、节点增删与顺序调整、连线预览；编排结果写回 flow_node 定义，仅允许在草稿版本上编辑（REQ-FLOW-008… — [模块 1 · API 5]
       - oa.workflow.designer.node-editor [计划] — 节点属性面板 / Node Property Panel — 设计器节点属性面板：选择审批人解析规则、配置决议模式与通过阈值、签名是否强制、超时时长、是否允许加签/跳转，统一透传到节点行为配置与规则声明（REQ-FLOW-… — [模块 1 · API 3]
       - oa.workflow.designer.publish [计划] — 版本发布走管理后台 / Publish via Admin Console — 设计成果的发布链路：校验通过后生成待发布版本、提交发布申请，由管理后台完成发布并记录变更前后值与操作人；已发起实例仍按旧版本执行（REQ-FLOW-006、RE… — [模块 1 · API 3]
-      - oa.workflow.designer.validation [计划] — 发布前校验 / Pre-Publish Validation — 发布前校验：主干节点连续性、审批人规则必填、会签阈值合法、会签须定义驳回即终止或回退、超时 ≥24h、跳过条件字段存在、规则不致候选人恒空、决议模式完整；任一项… — [模块 1 · API 3]
+      - oa.workflow.designer.validation [计划] — 发布前校验 / Pre-Publish Validation — 发布前校验：主干节点连续性、审批人规则必填、会签阈值合法、超时 ≥24h、跳过条件字段存在、规则不致候选人恒空、决议模式完整；**驳回后的去向不参与节点级校验*… — [模块 1 · API 3]
     - oa.workflow.exception [计划] — 异常路径 / Exception Paths — 异常路径：驳回固定回到发起人（不允许空白驳回）、会签/协同驳回后其余任务自动关闭、仅发起人可在节点②通过前撤回、重提时重新解析快照与模板版本、管理员与集团分管领… — [模块 11 · API 18]
       - oa.workflow.exception.cascade [计划] — 驳回联动关闭 / Rejection Cascade & Closing — 驳回发生后的联动关闭：会签节点中任一人驳回即节点立即驳回、其余未处理任务自动关闭（REQ-FLOW-015）；任一协同部门驳回则单据回到发起人，其余协同任务自动… — [模块 3 · API 4]
         - oa.workflow.exception.cascade.collaboration [计划] — 协同部门驳回联动 / Collaboration Rejection Cascade — 任一协同部门驳回 → 单据回到发起人，其余协同任务（其他协同部门的任务组）自动关闭；协同任务的驳回视同该并行子任务的驳回，不等待其余协同部门完成。 — [模块 1 · API 2]

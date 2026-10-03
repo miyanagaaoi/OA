@@ -11,8 +11,8 @@ description:
   en: >
       Writes and resolves decision_mode (any-sign default / countersign / sequential) and pass_threshold (percentage such as "50%" or absolute such as "2"; absolute wins when both are set). The post-rejection destination is fixed to "back to the initiator" in phase 1, with no per-node configuration (any one rejection in a countersign/collaboration task rejects that node; per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4).
       
-revision: 112ab0a1d46779714029044fc8e0b46627804f30
-updated_at: "2026-10-03T01:51:21.694Z"
+revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
+updated_at: "2026-10-03T02:09:10.424Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
@@ -27,20 +27,20 @@ apis:
     path: "/api/v1/flow-nodes/{node_id}/decision"
     description:
       zh: >
-          读取节点决议模式、阈值与驳回策略。
+          读取节点决议模式与通过阈值（**一期不提供驳回去向的读接口**：驳回后去向固定为「回到发起人」，不做节点级配置，节点级属二期）。
           
       en: >
-          Reads the node decision mode, threshold and reject policy.
+          Reads the node decision mode and pass threshold (phase 1 exposes NO reject-routing read endpoint: reject always returns to the initiator, no per-node config; phase 2).
           
   - protocol: http
     method: PUT
     path: "/api/v1/flow-nodes/{node_id}/decision"
     description:
       zh: >
-          写入决议模式、通过阈值与驳回即终止/回退。
+          写入决议模式与通过阈值（**一期不提供驳回去向的写接口**：「驳回即终止/回退」等节点级驳回去向属二期，见 doc/prd-0.1.md §5.4）。
           
       en: >
-          Writes decision mode, pass threshold and reject-terminate/return.
+          Writes the decision mode and pass threshold (phase 1 exposes NO reject-routing write endpoint: per-node reject terminate/return belongs to phase 2, PRD 5.4).
           
   - protocol: http
     method: POST

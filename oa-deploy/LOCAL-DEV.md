@@ -86,3 +86,5 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 | 触发器只建成 3/4，`UPDATE sys_log` 能成功 | 触发器脚本注释里出现**字面量双斜杠**被当作分隔符，吞掉了一条 `CREATE TRIGGER`。解析器已改为**行锚定切分 + 条数自检**（不一致直接拒绝启动）；生成器注释也已改写 |
 | 浏览器登录 `403 Invalid CORS request`，而 curl 正常 | dev 允许来源与 Vite 实际端口不一致（历史：允许 5173，实际 5273）。`application-dev.yml` 的 `oa.web.allowed-origins` 必须与 `oa-web/vite.config.ts` 的 `server.port` 对齐；Vite 代理同时把 `Origin` 改写为后端自身来源（与生产同源反代一致） |
 | 接口 500 且日志 `No value specified for parameter 1` | 数据域拦截器织入带参片段后**丢掉了原有参数映射**。现实现为「在原 BoundSql 上原位插入 `Mode.IN` 映射」，并有 `DataScopeParameterBindingTest` 等 11 条测试守着 |
+| 删除 Flyway 迁移后应用仍报 `1060 Duplicate column name` | Maven **不会清理** `oa-server/target/classes/db/migration/` 下的陈旧副本，而 `spring-boot:run` 用的正是 `target/classes` → **新旧迁移混跑**（被删的迁移会继续执行）。删迁移后必须 `mvn clean`，或手工删掉该目录下的副本 |
+| 同父节点下重名组织被允许（仅日志提示，不阻断）→ 期望「重名被拒」是**误解** | **这是预期行为**：唯一性由 `sys_org.path`（id 路径 `/1/12/135/`）保证；业务键 `org_path`（名称路径）在同父同名时**只告警不阻断**（[`import-spec.md`](../doc/import-spec.md) §3.2、`OrgService#warnSiblingName`）。判重请看 `path`，不要看 `name` |

@@ -215,11 +215,11 @@ class NodeDefinitionValidatorTest {
         assertThat(NodeDefinitionValidator.violations(designated, template))
                 .anyMatch(problem -> problem.message().contains("必须给出 approver_param"));
 
-        designated.setApproverParam("{\"user_ids\":[1],\"role_code\":\"finance_clerk\"}");
+        designated.setApproverParam("{\"user_ids\":[1],\"role_code\":\"admin\"}");
         assertThat(NodeDefinitionValidator.violations(designated, template))
                 .anyMatch(problem -> problem.message().contains("不得同时给出"));
 
-        designated.setApproverParam("{\"role_code\":\"finance_clerk\"}");
+        designated.setApproverParam("{\"role_code\":\"admin\"}");
         assertThat(NodeDefinitionValidator.violations(designated, template)).isEmpty();
 
         FlowNode trunkWithCollabRule = nodes.get(2);

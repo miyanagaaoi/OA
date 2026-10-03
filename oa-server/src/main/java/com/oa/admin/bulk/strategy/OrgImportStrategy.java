@@ -280,9 +280,7 @@ public class OrgImportStrategy implements ImportStrategy {
         int added = 0;
         int updated = 0;
         int skipped = 0;
-        int sequence = 0;
         for (OrgImportRow row : ordered) {
-            sequence++;
             String parentRealPath = null;
             Long parentId = null;
             if (!row.parentPath.isEmpty()) {
@@ -311,8 +309,10 @@ public class OrgImportStrategy implements ImportStrategy {
                 org.setParentId(parentId);
                 org.setOrgType(row.type.code());
                 org.setName(row.orgName);
-                // 占位路径：path 依赖自增 id，且 uk_sys_org_path 唯一 -> 用「运算符 id + 序号」保证事务内不撞
-                org.setPath("/pending-" + context.operatorId() + "-" + sequence + "/");
+                // 占位路径：path 依赖自增 id，且 uk_sys_org_path 唯一 -> 必须用**全局随机串**，
+                // 不能用「运算符 id + 行序号」（同一运算符并发导入会取到同一序号，直接撞唯一键）。
+                // 口径唯一，勿在别处重写：与 OrgService#create 共用 OrgHierarchy#temporaryPath。
+                org.setPath(OrgHierarchy.temporaryPath());
                 org.setDepth(depth);
                 org.setStatus(row.orgStatus.code());
                 org.setRemark(blankToNull(row.remark));

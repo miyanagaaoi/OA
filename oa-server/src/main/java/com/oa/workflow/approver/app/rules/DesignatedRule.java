@@ -18,8 +18,9 @@ import java.util.List;
  * <ul>
  *   <li>doc/prd-0.1.md §5.4：「指定人员/角色 —— IT部门在流程设计器中固定指定」；</li>
  *   <li>doc/enums.md §3 {@code designated}：参数存 {@code approver_param}，形如
- *       {@code {"user_ids":[1001,1002]}} 或 {@code {"role_code":"finance_clerk"}}；</li>
- *   <li>doc/templates.md §1.1 ⑦ 的参数：{@code {"role_code":"finance_clerk"}}（财务部内勤角色）。</li>
+ *       {@code {"user_ids":[1001,1002]}} 或 {@code {"role_code":"admin"}}；</li>
+ *   <li>doc/templates.md §1.1 ⑦ 的参数：{@code {"role_code":"admin"}}（系统管理员角色；一期⑦ 由
+ *       系统管理员承担 —— REQ-ADMIN-003 只定义 9 个内置角色，无档案管理员角色）。</li>
  * </ul>
  *
  * <p>两种参数**二选一**（同时给出属配置错误，由 {@code NodeDefinitionValidator} 在设计期拦下）：

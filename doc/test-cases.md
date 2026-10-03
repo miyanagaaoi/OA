@@ -150,7 +150,7 @@
 | U-20 | 李财 | G-FIN | `finance_owner`（财务部负责人） | 节点② 审批人、流转发起人 |
 | U-21 | 秦副 | G-FIN | `finance_owner`（副职） | 会签候选人 |
 | U-22 | 许核 | G-FIN | `finance_owner`（核算岗） | 会签候选人 |
-| U-23 | 孙内 | G-FIN | `finance_owner`（内勤） | 节点⑦ 归档登记（`designated`） |
+| U-23 | 孙内 | G-FIN | `finance_owner`（内勤） | 印鉴单归还状态例外验证（**不再承担节点⑦ 归档登记**：⑦ 的 `approver_param.role_code=admin`，候选人为系统管理员） |
 | U-24 | 张经 | G-ED | `dept_leader`（经发部） | **流转承接方可见性验证**（唯一有判别力的角色） |
 | U-25 | 王人 | G-HR | `dept_leader`（人力资源部） | 并行协同/会签部门 |
 | U-26 | 赵办 | G-GO | `dept_leader`（集团办） | 并行协同部门 |
@@ -196,7 +196,7 @@
 | 4 | `subsidiary_gm` | 子公司总经理 | `subsidiary_gm` | `any` | NULL | `optional` | 24 | true | false | false | — |
 | 5 | `group_leader` | 集团分管领导 | `group_leader`（按业务线匹配） | `any` | NULL | **`required`** | 24 | true | false | **true** | — |
 | 6 | `chairman` | 集团董事长 | `chairman` | `any` | NULL | **`required`** | 24 | true | false | **true** | — |
-| 7 | `archive_register` | 归档登记（集团处理部门流转） | `designated`（`approver_param.role_code=finance_clerk` → U-23 孙内） | **不适用（`NULL`）** | NULL | `none`（仅登记不审批） | 24 | false | false | false | — |
+| 7 | `archive_register` | 归档登记（集团处理部门流转） | `designated`（`approver_param.role_code=admin` → 系统管理员 U-40 沈管；本机夹具工号 `10086`） | **不适用（`NULL`）** | NULL | `none`（仅登记不审批） | 24 | false | false | false | — |
 
 > **超时基线（与本表一致，已按 `templates.md` §1.0 定稿）**：② = **48h**，其余节点（①③④⑤⑥⑦）= **24h**；⑦ 为登记节点，无决议模式与阈值，**不计入审批时长与效率统计**。
 
@@ -225,7 +225,7 @@
 | U-01 王甲 | `Oa@2026test` | PC | 节点① 审批人 | 兼任 `finance_owner` 时用于去重验证（须恢复） |
 | U-20 李财 | `Oa@2026test` | PC | 节点② 审批人、流转发起人、财务导出 | 会签场景为候选人 1 |
 | U-21 秦副 / U-22 许核 | `Oa@2026test` | PC | 会签候选人 2/3 | 仅用于 `matter-v1-allsign` |
-| U-23 孙内 | `Oa@2026test` | PC | 节点⑦ 归档登记 | 印鉴单归还状态例外验证 |
+| U-23 孙内 | `Oa@2026test` | PC | 印鉴单归还状态例外验证 | 节点⑦ 归档登记自 132f2f5 起由系统管理员承担（`role_code=admin`），U-23 不再是 ⑦ 审批人 |
 | U-24 张经 | `Oa@2026test` | PC | 流转承接方可见性 | 财务部无判别力，故用经发部 |
 | U-25 王人 / U-26 赵办 | `Oa@2026test` | PC | 并行协同部门负责人 | 协同任务组 |
 | U-27 钱分 / U-28 周分 | `Oa@2026test` | PC | 节点⑤（按业务线区分） | 均需**强制签名**（强制签名设备需可手写） |
@@ -410,7 +410,7 @@
 | TC-FLOW-050 | PRD 7.2（联动） | 单据停在节点④，另有 1 个协同任务在途 | 以 U-31 驳回 | 实例 → `rejected`；同节点其余任务 → `auto_closed`；其余节点实例（含协同）→ `cancelled`；站内信通知发起人 1 条 | P1 | 二 | 单据 OA-2026-230011 |
 | TC-FLOW-051 | PRD 6.1 / REQ-FLOW-001 | — | 分别发起金额 `1.00` 与 `99,999,999,999.99` 的两张资金单 | 两张单据的节点序列、审批人完全一致（金额**不参与路由**）；金额仅作字段展示，≥100 万时同时显示万元换算 | P1 | 二 | 单据 OA-2026-230012/013 |
 | TC-FLOW-052 | REQ-FLOW-012 | ① 事项单「涉及费用＝是」但金额留空；② 以无权组织节点（公司B）成员身份构造发起请求 | 分别提交 | ① 被拒并逐项提示缺失的必填字段（服务端二次校验生效）；② 被拒，提示无权限在该组织节点发起；两种情况均不产生 `flow_instance` 记录 | P1 | 二 | — |
-| TC-FLOW-077 | AC-04 / AC-60 / `templates.md` §1.1（⑦ 仅登记不审批） | 单据已通过节点⑥，停在节点⑦（U-23 孙内） | ① 以 U-23 打开待办，检查操作条；② 点「登记完成」；③ 查询该节点的任务、轨迹与报表 | ① 操作条**只有登记动作**，无「同意/驳回」决议按钮（`sign_policy=none`）；② 单据 `status='approved'`、节点⑦ 实例 `approved`；③ `sys_thread` 仅 1 条 `action='archive'`（**不产生 `approve` 记录**）、`flow_signature` 无该节点记录；④ 节点⑦ **不计入**审批人效率与平均审批耗时统计（报表中该节点耗时与决议数均不体现），但登记动作在 `sys_log` 完整留痕 | P1 | 二 | 单据 OA-2026-230014 |
+| TC-FLOW-077 | AC-04 / AC-60 / `templates.md` §1.1（⑦ 仅登记不审批） | 单据已通过节点⑥，停在节点⑦（审批人＝系统管理员 U-40 沈管，`role_code=admin`） | ① 以 U-40（系统管理员）打开待办，检查操作条；② 点「登记完成」；③ 查询该节点的任务、轨迹与报表 | ① 操作条**只有登记动作**，无「同意/驳回」决议按钮（`sign_policy=none`）；② 单据 `status='approved'`、节点⑦ 实例 `approved`；③ `sys_thread` 仅 1 条 `action='archive'`（**不产生 `approve` 记录**）、`flow_signature` 无该节点记录；④ 节点⑦ **不计入**审批人效率与平均审批耗时统计（报表中该节点耗时与决议数均不体现），但登记动作在 `sys_log` 完整留痕 | P1 | 二 | 单据 OA-2026-230014 |
 
 ### 3.5 数据域与流转可见性（AUTH）
 

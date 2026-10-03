@@ -2,7 +2,7 @@
   "schema_version": 1,
   "ok": true,
   "project": "normify-oa",
-  "compiled_at": "2026-10-03T02:04:37.013Z",
+  "compiled_at": "2026-10-03T02:12:08.062Z",
   "stats": {
     "tree_count": 1,
     "module_count": 526,
@@ -24,19 +24,19 @@
   },
   "artifacts": {
     "tree.json": {
-      "sha256": "43e9294bab484d195beed074fea633fac20f4383f14716a2965cd195e7e9e7e2",
-      "bytes": 1668208
+      "sha256": "7f48ba7fbab5002c7578d574da3bdbf7ad13c229a6263af40bf8fe305c7c0965",
+      "bytes": 1668962
     },
     "outline.md": {
-      "sha256": "196957227b21807e0a01483e56f4b57ed466c882afa4f46e5b5ab493e3e956e1",
-      "bytes": 154933
+      "sha256": "a01cce649db86533903f6ab7a269a1aa40798277170d58ba88fadf4baad45a8f",
+      "bytes": 154927
     },
     "api-index.json": {
       "sha256": "dd3c31c89007547e438f341e95d74c4fb34698a9d4b81b2b3d6b36182bcb2afd",
       "bytes": 69947
     },
     "receipt.json": {
-      "sha256": "fb45c91975255b9ad94de9b30118e61ef2c9989bd3bd1d409b8cad736952a877",
+      "sha256": "9043146d26229e0caf56bc99328d407cc2ad1bb0115c57b076e525dad704a50f",
       "bytes": 971
     }
   }

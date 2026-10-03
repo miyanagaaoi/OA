@@ -54,7 +54,7 @@ class ApproverRulesTest {
                 .primary(1L, 1L)
                 .category(1L, "economy", 205L)
                 .primary(210L, 206L)
-                .role("finance_clerk", 209L);
+                .role("admin", 209L);
     }
 
     private static RuleRequest initiatorInSection() {
@@ -244,7 +244,7 @@ class ApproverRulesTest {
     @Test
     @DisplayName("⑦ designated：role_code 取角色下的在职用户；角色为空 → 拦截")
     void designatedByRoleCode() {
-        JsonNode param = JsonText.read("{\"role_code\":\"finance_clerk\"}");
+        JsonNode param = JsonText.read("{\"role_code\":\"admin\"}");
         NodeConfig config = new NodeConfig(null, 7, "archive_register", "归档登记", "archive",
                 "designated", param, null, null, "none", 24, Boolean.FALSE, Boolean.FALSE,
                 Boolean.FALSE, Boolean.FALSE, null);

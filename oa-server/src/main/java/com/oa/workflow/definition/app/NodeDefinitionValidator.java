@@ -145,7 +145,7 @@ public final class NodeDefinitionValidator {
             if (rule.requiresParam() && (node.getApproverParam() == null || node.getApproverParam().isBlank())) {
                 problems.add(DefinitionProblem.of(PrePublishChecker.R_APPROVER_RULE, label,
                         "规则「" + rule.code() + "」必须给出 approver_param（如 {\"user_ids\":[1001]} 或 "
-                                + "{\"role_code\":\"finance_clerk\"}）"));
+                                + "{\"role_code\":\"admin\"}）"));
             }
             if (rule == ApproverRule.DESIGNATED) {
                 problems.addAll(validateDesignatedParam(node.getApproverParam(), label));

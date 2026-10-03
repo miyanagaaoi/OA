@@ -11,8 +11,8 @@ description:
   en: >
       A4 portrait at 210×297mm; @page margin 0 with the type area controlled by 12mm/12mm/10mm content padding, giving 186mm of usable width; at 9.5pt body with 1.42 line height a page holds about 55 lines; each document is one page by default, spilling row by row with a repeating thead; the screen preview renders at true millimetre size. Full implementation lives in DESIGN.print-a4.html.
       
-revision: 112ab0a1d46779714029044fc8e0b46627804f30
-updated_at: "2026-10-03T01:51:21.569Z"
+revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
+updated_at: "2026-10-03T02:09:10.264Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

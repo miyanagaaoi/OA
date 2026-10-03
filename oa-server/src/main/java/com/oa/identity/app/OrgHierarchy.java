@@ -129,6 +129,25 @@ public final class OrgHierarchy {
         return childPath(null, id);
     }
 
+    /**
+     * 落库用的**临时 path**（仅在同一事务内短暂存在，回填真实 path 前对外不可见）。
+     *
+     * <p>为什么必须是随机串，而不是「运算符 id + 行序号」：{@code sys_org.path} 上有唯一键
+     * {@code uk_sys_org_path}，而「不同父节点下同名组织」是**合法业务**
+     * （import-spec §3.2：同父重名也允许，仅告警不阻断），两个并发请求取到同一序号即
+     * {@code DuplicateKeyException}（500）。
+     *
+     * <p>前缀 {@code pending-} 与真实 path（纯数字段 {@code /1/12/135/}）在字符集上不可能冲突；
+     * 长度固定 42 &lt; {@code sys_org.path VARCHAR(255)} 列宽。
+     *
+     * <p><b>唯一口径，勿在别处重写</b>：{@code OrgService#create} 与
+     * {@code OrgImportStrategy#commit} 必须共用本方法 —— 历史上导入侧自写「运算符 id + 行序号」，
+     * 同一运算符并发导入会撞 {@code uk_sys_org_path}。
+     */
+    public static String temporaryPath() {
+        return "/pending-" + java.util.UUID.randomUUID().toString().replace("-", "") + "/";
+    }
+
     /** 把任意写法（{@code 1/12}、{@code /1/12}、{@code /1/12/}）归一为 {@code /1/12/}。 */
     public static String normalize(String path) {
         if (path == null || path.isBlank()) {

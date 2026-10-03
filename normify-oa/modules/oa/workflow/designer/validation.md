@@ -6,13 +6,13 @@ state: planned
 name: {zh: "发布前校验", en: "Pre-Publish Validation"}
 description:
   zh: >
-      发布前校验：主干节点连续性、审批人规则必填、会签阈值合法、会签须定义驳回即终止或回退、超时 ≥24h、跳过条件字段存在、规则不致候选人恒空、决议模式完整；任一项不通过即阻止发布并给出具体原因。
+      发布前校验：主干节点连续性、审批人规则必填、会签阈值合法、超时 ≥24h、跳过条件字段存在、规则不致候选人恒空、决议模式完整；**驳回后的去向不参与节点级校验**——一期固定为「回到发起人」，不做节点级配置（节点级驳回去向属二期，见 doc/prd-0.1.md §5.4）；任一项不通过即阻止发布并给出具体原因。
       
   en: >
-      Pre-publish validation: trunk node continuity, mandatory approver rule, valid countersign threshold, explicit reject-terminate/return for countersign, timeout ≥24h, skip-condition field existence, no rule that always yields an empty candidate set and complete decision modes; any failure blocks publishing with a concrete reason.
+      Pre-publish validation: trunk node continuity, mandatory approver rule, valid countersign threshold, timeout ≥24h, skip-condition field existence, no rule that always yields an empty candidate set and complete decision modes; the post-rejection destination is NOT part of per-node validation — phase 1 fixes it to "back to the initiator" with no per-node configuration (per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4); any failure blocks publishing with a concrete reason.
       
-revision: 112ab0a1d46779714029044fc8e0b46627804f30
-updated_at: "2026-10-03T01:51:21.699Z"
+revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
+updated_at: "2026-10-03T02:09:10.430Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

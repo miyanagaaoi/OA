@@ -11,8 +11,8 @@ description:
   en: >
       Payment belong values: current_month (default), current_year and prior_year; the print sheet presents them as the paper form's three-way choice, and phase one uses them for no aging or budget-execution statistics.
       
-revision: 112ab0a1d46779714029044fc8e0b46627804f30
-updated_at: "2026-10-03T01:51:21.579Z"
+revision: 132f2f51c4aae5754c6b7e000d979f87a56fe10a
+updated_at: "2026-10-03T02:09:10.277Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

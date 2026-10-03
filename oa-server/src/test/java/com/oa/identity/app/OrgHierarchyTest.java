@@ -188,4 +188,41 @@ class OrgHierarchyTest {
         assertThatThrownBy(() -> OrgHierarchy.businessPath(List.of("集团"), " "))
                 .isInstanceOf(BizException.class);
     }
+
+    // ---------------------------------------------------------------- 临时 path（唯一口径）
+
+    @Test
+    @DisplayName("临时 path：格式固定 /pending-<32hex>/，且不可能与真实 path（纯数字段）冲突")
+    void temporaryPathFormat() {
+        String temp = OrgHierarchy.temporaryPath();
+        assertThat(temp).matches("^/pending-[0-9a-f]{32}/$");
+        assertThat(temp).isEqualTo(OrgHierarchy.normalize(temp));
+        // 真实 path 全是纯数字段（/1/12/135/）；占位 path 的唯一段是 pending-<hex>，非数字 → 字符集上不可能相等
+        assertThat(OrgHierarchy.segments(temp)).hasSize(1);
+        assertThat(OrgHierarchy.segments(temp).get(0)).doesNotMatch("\\d+");
+        // 长度必须远小于 sys_org.path VARCHAR(255)
+        assertThat(temp.length()).isLessThan(255);
+    }
+
+    @Test
+    @DisplayName("临时 path：并发调用全局唯一（uk_sys_org_path 的并发安全前提）")
+    void temporaryPathIsUniqueUnderConcurrency() throws Exception {
+        int threads = 8;
+        int perThread = 250;
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(threads);
+        java.util.Set<String> all = java.util.concurrent.ConcurrentHashMap.newKeySet();
+        java.util.List<java.util.concurrent.Future<?>> futures = new java.util.ArrayList<>();
+        for (int t = 0; t < threads; t++) {
+            futures.add(pool.submit(() -> {
+                for (int i = 0; i < perThread; i++) {
+                    all.add(OrgHierarchy.temporaryPath());
+                }
+            }));
+        }
+        for (java.util.concurrent.Future<?> future : futures) {
+            future.get(30, java.util.concurrent.TimeUnit.SECONDS);
+        }
+        pool.shutdown();
+        assertThat(all).hasSize(threads * perThread);
+    }
 }

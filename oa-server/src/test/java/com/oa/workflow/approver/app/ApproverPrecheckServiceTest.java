@@ -74,7 +74,7 @@ class ApproverPrecheckServiceTest {
                 .primary(1L, 1L)
                 .category(1L, "economy", 205L)
                 .primary(210L, 206L)
-                .role("finance_clerk", 209L);
+                .role("admin", 209L);
 
         templateMapper = mock(FlowTemplateMapper.class);
         nodeMapper = mock(FlowNodeMapper.class);
@@ -147,7 +147,7 @@ class ApproverPrecheckServiceTest {
                 .primary(12L, 204L)
                 .category(1L, "economy", 205L)
                 .primary(210L, 206L)
-                .role("finance_clerk", 209L);
+                .role("admin", 209L);
         OaProperties properties = new OaProperties();
         ApproverPrecheckService brokenService = new ApproverPrecheckService(
                 new ApproverResolutionService(new ApproverRuleRegistry(properties), properties), broken,
@@ -188,7 +188,7 @@ class ApproverPrecheckServiceTest {
                 .primary(12L, 204L)
                 .category(1L, "economy", 205L)
                 .primary(210L, 206L)
-                .role("finance_clerk", 209L);
+                .role("admin", 209L);
         OaProperties properties = new OaProperties();
         ApproverPrecheckService brokenService = new ApproverPrecheckService(
                 new ApproverResolutionService(new ApproverRuleRegistry(properties), properties), broken,
@@ -231,7 +231,7 @@ class ApproverPrecheckServiceTest {
                 .deputy(12L, 203L)
                 .primary(1L, 1L)
                 .category(1L, "economy", 205L)
-                .role("finance_clerk", 209L);
+                .role("admin", 209L);
         OaProperties properties = new OaProperties();
         ApproverPrecheckService noFinance = new ApproverPrecheckService(
                 new ApproverResolutionService(new ApproverRuleRegistry(properties), properties), noFinanceLeader,
@@ -355,7 +355,7 @@ class ApproverPrecheckServiceTest {
                 .primary(1L, 1L)
                 .category(1L, "economy", 205L)
                 .primary(210L, 206L)
-                .role("finance_clerk", 209L);
+                .role("admin", 209L);
         OaProperties properties = new OaProperties();
         ApproverPrecheckService changedService = new ApproverPrecheckService(
                 new ApproverResolutionService(new ApproverRuleRegistry(properties), properties), changed,

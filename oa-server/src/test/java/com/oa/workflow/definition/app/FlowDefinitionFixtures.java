@@ -71,7 +71,7 @@ public final class FlowDefinitionFixtures {
         nodes.add(node(templateId, NodeCode.CHAIRMAN, "集团董事长", "chairman", null,
                 DecisionMode.ANY.code(), null, SignPolicy.REQUIRED, 24, true, true, null));
         FlowNode archive = node(templateId, NodeCode.ARCHIVE_REGISTER, "归档登记", "designated",
-                "{\"role_code\":\"finance_clerk\"}", null, null, SignPolicy.NONE, 24, false, false, null);
+                "{\"role_code\":\"admin\"}", null, null, SignPolicy.NONE, 24, false, false, null);
         archive.setNodeType(NodeType.ARCHIVE.code());
         nodes.add(archive);
         return nodes;
