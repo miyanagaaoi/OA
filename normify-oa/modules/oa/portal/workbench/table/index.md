@@ -11,8 +11,8 @@ description:
   en: >
       The list body follows PRD 13.2: a full-width data table with an overlay detail — all columns expanded (including a current-node column), 44px rows, sticky header, frozen first column (number/type) and frozen right action column; no column merging and no permanent detail pane, preserving vertical comparison of amount, node and time.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.661Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.782Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "doc/prd-0.1.md"

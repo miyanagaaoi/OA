@@ -11,8 +11,8 @@ description:
   en: >
       H5 touch and control sizing: every clickable element and control is at least 44px tall (spacing.control-h5) and lists become card lists rather than tables; form fields are single-column with the label above the control; body text stays 14px so larger targets do not cost density.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.653Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.774Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

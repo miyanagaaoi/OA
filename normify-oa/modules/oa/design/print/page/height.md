@@ -11,8 +11,8 @@ description:
   en: >
       Measured heights against the 297mm limit: the group contract routing sheet 274mm, the fund approval sheet 242mm, the subsidiary internal sheet with 13 records 270mm and the seal-and-licence sheet 205mm; P1 and P3 have little headroom, so more than roughly 15 trail records overflow one page and must then break across pages with a repeating header.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.575Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.695Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

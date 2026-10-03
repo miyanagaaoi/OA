@@ -11,8 +11,8 @@ description:
   en: >
       Payment method `pay_method` (select per 6.2), planned pay date `pay_date` (date not earlier than today), linked contract number `contract_ref` (text ≤40, must be an approved document number when present) and urgency `urgent` (boolean, defaults to no; yes enables the urgent marker and higher reminder frequency).
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.587Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.706Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

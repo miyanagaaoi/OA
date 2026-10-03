@@ -10,8 +10,8 @@ description:
   en: >
       RBAC roles/permission tree plus a data-scope layer: subsidiary isolation, group function-department visibility by ownership category and routing chain (Q13), routing-chain visibility, and field-level limits (read-only amounts with export limited to admins and Finance, masked phones).
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.556Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.677Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"

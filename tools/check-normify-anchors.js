@@ -21,9 +21,15 @@
  *   2. 每条 doc 引用都要有对应锚点条目：正文 `## 证据锚点` 里存在 path 相同的条目，
  *      否则 error；条目存在但标注「锚点待定」记 warning（不阻断）。
  *   3. 锚点必须真的存在于该文档：锚点文本（去掉反引号包裹与尾部「（§…）」说明）能在
- *      该 doc 文件里找到，找不到即 error。
- *   4. 锚点唯一性：锚点在文档中出现 0 次 → error（同 3）；>1 次 → warning（提示换更精确锚点）。
- *      产线文档里 REQ 编号天然被「定义处 + 验收处 + 追溯表」多处引用，这类 warning 属预期；
+ *      该 doc 文件里找到，找不到即 error。出现次数按**词边界**统计（锚点首/尾是 ASCII 词
+ *      字符时两侧不得再是词字符），否则 `CREATE TABLE sys_role` 会把
+ *      `CREATE TABLE sys_role_org_node` 当作重复命中，产生假重复。
+ *   4. 锚点唯一性（**只对「自由文本锚点」判**）：锚点在文档中出现 0 次 → error（同 3）；
+ *      非 `REQ-*` 的锚点（章节标题原文 / `CREATE TABLE <表名>` 等自由文本）出现 >1 次 → warning
+ *      （提示改用更精确的锚点）；`REQ-*` 编号锚点**只断言存在性（≥1 次），不判唯一性**。
+ *      理由：REQ 编号在产线文档里天然被「定义处 + 验收处（10.x）+ 追溯表（11 章）」多处引用，
+ *      这是**正常的文档结构**、不是歧义；给它们记永久 warning 会让告警长期挂红，
+ *      而**永久 warning 会训练人忽略警告**，真正表示歧义的重复反而被淹没。
  *      输出按 (文档, 锚点) 聚合，避免刷屏。
  *   5. 输出 { ok, errors, warnings, stats } 结构；有 error 时 exit 1。
  *
@@ -134,13 +140,27 @@ function parseAnchors(body) {
   return { found: true, entries };
 }
 
+const WORD_CHAR = /[A-Za-z0-9_]/;
+
+/**
+ * 统计锚点在文档中的出现次数。
+ * 边界规则：锚点首/尾是 ASCII 词字符时，匹配两侧不得再是词字符 —— 否则
+ * `CREATE TABLE sys_role` 会把 `CREATE TABLE sys_role_org_node` 也算进去（假重复）。
+ * 中文章节标题（首尾非词字符，如 `### 6.1 事项类别…）`）按纯子串计数。
+ */
 function countOccurrences(haystack, needle) {
   if (!needle) return 0;
+  const leftBound = WORD_CHAR.test(needle[0]);
+  const rightBound = WORD_CHAR.test(needle[needle.length - 1]);
   let n = 0, i = 0;
   for (;;) {
     const j = haystack.indexOf(needle, i);
     if (j < 0) break;
-    n++; i = j + needle.length;
+    const okLeft = !leftBound || j === 0 || !WORD_CHAR.test(haystack[j - 1]);
+    const end = j + needle.length;
+    const okRight = !rightBound || end >= haystack.length || !WORD_CHAR.test(haystack[end]);
+    if (okLeft && okRight) n++;
+    i = j + 1; // 允许重叠匹配，只影响计数完备性
   }
   return n;
 }
@@ -266,8 +286,11 @@ function main() {
     }
   }
 
-  // 聚合唯一性 warning
-  const dupes = [...agg.values()].filter(x => x.count > 1).sort((a, b) => b.count - a.count);
+  // 聚合唯一性 warning：只判「自由文本锚点」；REQ 编号只断言存在性（≥1 次），不判唯一性
+  const REQ_ANCHOR = /^REQ-[A-Z]+-\d+$/;
+  const all = [...agg.values()];
+  const reqRepeated = all.filter(x => x.count > 1 && REQ_ANCHOR.test(x.anchor));
+  const dupes = all.filter(x => x.count > 1 && !REQ_ANCHOR.test(x.anchor)).sort((a, b) => b.count - a.count);
   for (const d of dupes) {
     warnings.push({
       code: 'anchor/not-unique', path: d.path, anchor: d.anchor, occurrences: d.count, modules: [...d.modules].sort(),
@@ -275,6 +298,9 @@ function main() {
       fix: '若需唯一定位，改用更精确的锚点（例如带小节号的标题原文）'
     });
   }
+  // 供证据与审计：被豁免（多次出现但不告警）的 REQ 锚点数量
+  stats.anchorsRepeatedNonReq = dupes.length;
+  stats.reqAnchorsRepeatedExempted = reqRepeated.length;
   stats.uniqueAnchors = agg.size;
   stats.docFiles = docCache.size;
 
@@ -294,6 +320,7 @@ function main() {
     console.log('  扫描模块 : ' + stats.modulesScanned + '（含 doc 引用 ' + stats.modulesWithDocRefs + '，doc 引用条目 ' + stats.docRefs + '）');
     console.log('  锚点节   : ' + stats.anchorSections + '；锚点条目 ' + stats.anchorEntries + '（已解析 ' + stats.anchorsResolved + '，待定 ' + stats.anchorsPending + '）');
     console.log('  唯一锚点 : ' + stats.uniqueAnchors + '；涉及文档 ' + stats.docFiles);
+    console.log('  唯一性豁免: REQ 编号锚点多次出现 ' + stats.reqAnchorsRepeatedExempted + ' 例（只判存在性，不告警）；自由文本重复 ' + stats.anchorsRepeatedNonReq + ' 例（告警）');
     if (errors.length) {
       console.log('\nERROR（' + errors.length + '）：');
       for (const e of errors) console.log('  [' + e.code + '] ' + (e.module ? e.module + ' | ' : '') + (e.path ? e.path + ' | ' : '') + (e.anchor ? JSON.stringify(e.anchor) + ' | ' : '') + e.message);

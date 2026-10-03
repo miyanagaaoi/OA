@@ -11,8 +11,8 @@ description:
   en: >
       The overlay footer action bar (60px tall, buttons right-aligned): approve, reject, route to another department, revert to previous node, return to own department, request more material, terminate, transfer and print; exactly one primary button, destructive actions need a second confirmation naming action and object, and while awaiting material the document is read-only for every other role.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.645Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.767Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

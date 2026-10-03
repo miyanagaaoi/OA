@@ -11,8 +11,8 @@ description:
   en: >
       Resolves all node candidates once at submission and freezes them into flow_instance.approver_snapshot_json (template_version / parsed_at / basis / nodes with evidence): later transfers, resignations or org changes never alter in-flight instances; resubmission re-resolves the snapshot while the old one stays in the audit log (REQ-FLOW-011/017).
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.675Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.797Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/data-model.md"

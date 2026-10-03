@@ -10,8 +10,8 @@ description:
   en: >
       Excel-based bulk import of org structures and users (for reorganisations), presenting the affected in-flight documents before the import is confirmed; users and orgs can be exported, and export is limited to the system administrator.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.506Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.654Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

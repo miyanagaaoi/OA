@@ -11,8 +11,8 @@ description:
   en: >
       The contract sheet merges the executives' and chairman's opinions into one cell with 5–6mm between them; the closing rows are the document return plus seal & certificate administration row for contracts and the system-linkage row (linked number and approval chain) for funds; the other joint-review departments line is kept as a dictionary-driven multi-select that can be hidden if dropped.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.595Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.714Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

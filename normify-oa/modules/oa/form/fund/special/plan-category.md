@@ -11,8 +11,8 @@ description:
   en: >
       Plan category `plan_category` (checkbox per 6.7: in-plan/out-of-plan, defaults to in-plan); phase one stores the value without any flow logic and prints it as ☑/☐ per the paper form; it gains business meaning only when phase-two plan management ships.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.588Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.706Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

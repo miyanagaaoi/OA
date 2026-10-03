@@ -11,12 +11,11 @@ description:
   en: >
       Site-wide HTTPS with modern cipher suites, HSTS and security response headers, and private storage that refuses direct attachment links without authentication.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.645Z"
-fingerprint: a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.766Z"
+fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-  - path: "doc/forms.md"
 apis:
   - protocol: file
     path: "deploy/nginx/tls.conf"
@@ -40,4 +39,3 @@ apis:
 
 ## 证据锚点
 - `doc/prd-0.1.md` → `REQ-NFR-005`（§第9章 非功能需求）
-- `doc/forms.md`（锚点待定：§1.4 附件通用限制）

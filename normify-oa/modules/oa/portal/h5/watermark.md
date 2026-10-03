@@ -11,8 +11,8 @@ description:
   en: >
       The watermark layer shared by H5 and the detail page: name plus employee number, 5%–8% opacity, rotated -24° and tiled every 240×160px at caption size; it covers the screen without intercepting events (pointer-events none) and must never cover the bottom action bar buttons or form values.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.654Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.774Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

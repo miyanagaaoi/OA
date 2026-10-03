@@ -10,8 +10,8 @@ description:
   en: >
       Login with password complexity rules and 5-attempt lockout; remember-me sessions valid for seven days with automatic renewal; multi-device login with a configurable cap (default three, earliest device evicted); login logging.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.613Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.732Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

@@ -11,8 +11,8 @@ description:
   en: >
       A rejection requires an opinion of at least five characters, blank rejections are forbidden. After rejection the destination is always the initiator, with no choice offered to the approver: the instance becomes rejected and the initiator may modify and resubmit or terminate. Rejections are written to the trail and to the rejection record used for the rejection-rate report.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.682Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.804Z"
 fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"

@@ -10,8 +10,8 @@ description:
   en: >
       Provides the name plus employee-number watermark elements and style parameters (5–8% opacity, -24° rotation, 240x160px spacing, never covering buttons or form values) for the H5 and document-detail surfaces.
       
-revision: 939b76191ad354700ff099851baf5cadf4a0db09
-updated_at: "2026-10-03T04:05:58.620Z"
+revision: 44fc7aba1c7e884ffa3553faf31bfce974b388a9
+updated_at: "2026-10-03T04:12:20.739Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "doc/prd-0.1.md"
