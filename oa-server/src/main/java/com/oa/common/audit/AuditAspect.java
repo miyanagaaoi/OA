@@ -3,6 +3,7 @@ package com.oa.common.audit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oa.common.scope.DataScopeContext;
 import com.oa.common.security.CurrentUser;
+import com.oa.common.web.TraceIds;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -30,8 +31,18 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * <p>记录内容：操作人（当前登录人快照）、动作、目标、变更前/后 JSON、客户端 IP、User-Agent。
  * 敏感键（口令、手机号、收款账号、令牌）一律以 {@code ***} 落库，**明文永不出现在审计日志**。
  *
- * <p>失败隔离：业务方法抛异常时，先写一条带错误摘要的审计记录再原样抛出；审计写入本身的异常
+ * <p>失败隔离：业务方法抛异常时，先写一条带**结构化错误摘要**的审计记录再原样抛出；审计写入本身的异常
  * 由 {@link AuditLogWriter} 吞掉并记 ERROR，绝不影响业务流程。
+ *
+ * <p><b>JSON 列铁律</b>：写入 {@code sys_log.before_json/after_json} 的文本**任何路径下都必须是合法 JSON**。
+ * 异常路径尤其如此：旧实现用字符串拼接把异常 message 直接塞进 JSON 字面量（只把 {@code "} 换成 {@code '}），
+ * 而 message 里的**换行 / 制表符 / 反斜杠**（MyBatis、JDBC、{@code NestedServletException} 的消息里极其常见）
+ * 会让文本**不再是合法 JSON**，MySQL 以
+ * {@code ERROR 3140 (22032): Invalid JSON text: "Invalid encoding in string." at position N in value for column 'sys_log.after_json'}
+ * 拒绝写入（2026-10 运行期实测复现）。现在改为：异常路径只记**结构化摘要**
+ * （{@code error}/{@code errorType}/{@code message}/{@code traceId}/{@code cause}/{@code stack}），
+ * 由 Jackson 完成转义——堆栈只作为**普通 JSON 字符串字段**出现，绝不当 JSON 结构拼；
+ * 长度超限统一走 {@link #truncateJson}（退化为合法 JSON 包装）。
  */
 @Aspect
 @Component
@@ -46,6 +57,16 @@ public class AuditAspect {
     ));
 
     private static final int MAX_JSON_LENGTH = 4000;
+
+    /** 异常 message 落库上限（**先截断再序列化**，避免截断 JSON 本身）。 */
+    private static final int MAX_ERROR_MESSAGE_LENGTH = 300;
+
+    /** 结构化堆栈摘要的帧数上限与字符上限（堆栈只作 JSON **字符串**字段）。 */
+    private static final int MAX_STACK_FRAMES = 25;
+    private static final int MAX_STACK_LENGTH = 800;
+
+    /** cause（若有）message 的落库上限。 */
+    private static final int MAX_CAUSE_LENGTH = 120;
 
     private final AuditLogWriter auditLogWriter;
     private final ObjectMapper objectMapper;
@@ -225,9 +246,65 @@ public class AuditAspect {
         return builder.toString();
     }
 
-    private static String errorJson(Throwable ex) {
-        String message = ex.getMessage() == null ? "" : ex.getMessage().replace("\"", "'");
-        return "{\"error\":\"" + ex.getClass().getSimpleName() + "\",\"message\":\"" + truncate(message, 300) + "\"}";
+    /**
+     * 异常路径的 {@code after_json}：**结构化摘要**，永远合法 JSON。
+     *
+     * <p>字段：
+     * <ul>
+     *   <li>{@code error}：异常简单类名（沿用旧键名，下游检索口径不变）；</li>
+     *   <li>{@code errorType}：异常全限定名（便于按包定位）；</li>
+     *   <li>{@code message}：异常 message（先按**字符**截断到
+     *       {@value #MAX_ERROR_MESSAGE_LENGTH}，再交给 Jackson 转义）；</li>
+     *   <li>{@code traceId}：链路追踪号（{@link TraceIds#current()}，无则省略）——
+     *       与 HTTP 响应体 {@code traceId}、服务端日志可对上；</li>
+     *   <li>{@code cause}：直接原因的类型与 message（截断，无则省略）；</li>
+     *   <li>{@code stack}：**截断后的堆栈摘要**，只是 JSON 字符串字段（换行照常写入字符串内部，
+     *       由 Jackson 转义成 {@code \n}），绝不被当作 JSON 结构拼进文本。</li>
+     * </ul>
+     *
+     * <p>整串最后过 {@link #toJson}：长度超限退化为合法 JSON 包装，因此
+     * {@code JSON_VALID(after_json)} 恒为 1。
+     */
+    private String errorJson(Throwable ex) {
+        if (ex == null) {
+            return null;
+        }
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("error", ex.getClass().getSimpleName());
+        payload.put("errorType", ex.getClass().getName());
+        payload.put("message", truncate(ex.getMessage(), MAX_ERROR_MESSAGE_LENGTH));
+        String traceId = TraceIds.current();
+        if (traceId != null && !traceId.isBlank()) {
+            payload.put("traceId", traceId);
+        }
+        Throwable cause = ex.getCause();
+        if (cause != null) {
+            payload.put("cause", cause.getClass().getName() + ": "
+                    + truncate(cause.getMessage(), MAX_CAUSE_LENGTH));
+        }
+        payload.put("stack", stackSummary(ex));
+        return toJson(payload);
+    }
+
+    /**
+     * 堆栈摘要（**字符串**，不是 JSON 数组）：只保留前 {@value #MAX_STACK_FRAMES} 帧，
+     * 并在 {@value #MAX_STACK_LENGTH} 字符处截断。它写入 {@code after_json.stack}，
+     * 由 Jackson 负责把换行转义成 {@code \n}。
+     */
+    private static String stackSummary(Throwable ex) {
+        StackTraceElement[] frames = ex.getStackTrace();
+        StringBuilder builder = new StringBuilder();
+        int limit = Math.min(frames.length, MAX_STACK_FRAMES);
+        for (int i = 0; i < limit; i++) {
+            if (i > 0) {
+                builder.append('\n');
+            }
+            builder.append("\tat ").append(frames[i]);
+        }
+        if (frames.length > limit) {
+            builder.append("\n\t... ").append(frames.length - limit).append(" more");
+        }
+        return truncate(builder.toString(), MAX_STACK_LENGTH);
     }
 
     private static String truncate(String value, int max) {

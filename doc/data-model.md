@@ -711,13 +711,14 @@ CREATE TABLE sys_thread (
   actor_id         BIGINT UNSIGNED NULL,
   actor_name       VARCHAR(50)      NULL COMMENT '快照姓名（防止改名后轨迹失真）',
   actor_position   VARCHAR(50)      NULL COMMENT '快照职务',
-  action           VARCHAR(32)  NOT NULL COMMENT 'submit=提交 approve=通过 reject=驳回 route=流转 rollback=回退上一节点 back_home=回到本部门 supplement_request=请求补件 supplement_submit=提交补件 transfer=转办 reassign=改派 add_sign=加签 withdraw=撤回 terminate=终止 skip=跳过（仅事项单②：不涉及费用，财务节点跳过留痕） archive_register=归档登记（⑦，默认仅登记不审批） cc=抄送；共 16 值，与 enums.md §9 一致（旧值 addsign→add_sign、return_node→rollback、archive→archive_register 作废）',
+  action           VARCHAR(32)  NOT NULL COMMENT 'submit=提交 approve=通过 reject=驳回 route=流转 rollback=回退上一节点 back_home=回到本部门 supplement_request=请求补件 supplement_submit=提交补件 transfer=转办 reassign=改派 add_sign=加签 withdraw=撤回 terminate=终止 skip=跳过（仅事项单②：不涉及费用，财务节点跳过留痕） archive_register=归档登记（⑦，默认仅登记不审批） return_register=归还登记（印鉴单 AC-28 例外：发起人或节点⑦登记归还状态，不推进流程；2026-10-04 由 archive_register 拆出） cc=抄送；共 17 值，与 enums.md §9 一致（旧值 addsign→add_sign、return_node→rollback、archive→archive_register 作废）',
   opinion          VARCHAR(1000)    NULL,
   signature_id     BIGINT UNSIGNED  NULL,
   created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_thread_instance (instance_id, seq),
-  CONSTRAINT fk_thread_instance FOREIGN KEY (instance_id) REFERENCES flow_instance (id)
+  CONSTRAINT fk_thread_instance FOREIGN KEY (instance_id) REFERENCES flow_instance (id),
+  CONSTRAINT chk_thread_action CHECK (action IN ('submit','approve','reject','route','rollback','back_home','supplement_request','supplement_submit','transfer','reassign','add_sign','withdraw','terminate','skip','archive_register','return_register','cc'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='审批轨迹';
 
 -- ============================================================

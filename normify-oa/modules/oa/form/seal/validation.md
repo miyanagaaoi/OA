@@ -10,11 +10,12 @@ description:
   en: >
       Seal-specific validation: reason ≤60, purpose ≥5 (≥20 when external) and ≤500, copy count an integer 1–999, usage start not earlier than today, end ≥ start, `cert_name` required when seal_type is certificate borrow, and `return_date` required when the status is returned; all server-side.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:34.400Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.216Z"
+fingerprint: d89254a4a362eeecf74041196101e27dfc2da4a3cda4140ddf808eea93895c61
 source:
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/seal/SealFormRules.java"
 apis:
   - protocol: http
     method: POST

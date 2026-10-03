@@ -10,12 +10,14 @@ description:
   en: >
       The write channel while awaiting supplement: only `attachments` and `supplement_note` are writable; `supplement_note` (≥5 and ≤500 characters) lands in `flow_supplement.submitted_note` and enters the approval trail, with attachments stored per round.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:25.720Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.229Z"
+fingerprint: a5033f25b7d8f0482e18cc8dd361b23e4f3335e361d405a3652cb457322bafb6
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/app/FormWritePolicy.java"
+  - path: "oa-server/src/main/java/com/oa/form/template/writemodel/FormStateWriteGuard.java"
 apis:
   - protocol: http
     method: POST

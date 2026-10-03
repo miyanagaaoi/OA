@@ -10,11 +10,12 @@ description:
   en: >
       Dates must not precede today (some fields must not precede the initiation date) and a date range's end must be ≥ its start; messages are 「{标签}不能早于今天」 and 「结束日期不能早于开始日期」.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:25.720Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.224Z"
+fingerprint: 62ea7ca553b4e803442ba645ef98904f0f93d665e8d913b230518a472b4491d7
 source:
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/template/validate/FormPayloadValidator.java"
 apis:
   - protocol: http
     method: POST

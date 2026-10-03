@@ -11,8 +11,8 @@ description:
   en: >
       Payment belong `payment_belong` (checkbox per 6.8: current month/year/prior years, defaults to current month); phase one stores it without flow logic and prints it in the paper form's wording; phase two uses it for aging and budget-execution statistics.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:55:35.515Z"
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.198Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

@@ -66,7 +66,7 @@ class FlowLinkageTest {
     }
 
     @Test
-    @DisplayName("自由跳转的中间节点同样落 skip（16 值里没有 jump），理由里带目标序号")
+    @DisplayName("自由跳转的中间节点同样落 skip（17 值里没有 jump），理由里带目标序号")
     void jumpSkipped() {
         FlowLinkage.SkipCascade cascade = FlowLinkage.jumpSkipped("分公司分管领导", 5);
         assertThat(cascade.nodeStatus()).isEqualTo(NodeStatus.SKIPPED);

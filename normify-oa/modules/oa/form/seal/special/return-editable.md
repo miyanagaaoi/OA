@@ -10,12 +10,14 @@ description:
   en: >
       `return_status` and `return_date` are the only main fields editable during approval because they record a later fact (whether the certificate was returned) and are filled by archive node ⑦; the exception must be registered explicitly in the server-side state whitelist, and marking returned requires a return time.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:34.400Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.215Z"
+fingerprint: a5033f25b7d8f0482e18cc8dd361b23e4f3335e361d405a3652cb457322bafb6
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/template/writemodel/FormStateWriteGuard.java"
+  - path: "oa-server/src/main/java/com/oa/form/app/FormWritePolicy.java"
 apis:
   - protocol: http
     method: POST

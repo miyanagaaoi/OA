@@ -17,7 +17,7 @@ import org.springframework.core.io.ClassPathResource;
  *
  * <p>断言的关键点：每个动作的权限码都**真实存在于**权限种子 {@code V4__permissions.sql}
  * （避免「代码里写了一个没人持有的权限码」导致动作永远 403）；
- * 轨迹动作必须落在 16 个定稿值内；必填原因/意见下限与 PRD 一致。
+ * 轨迹动作必须落在 17 个定稿值内；必填原因/意见下限与 PRD 一致。
  */
 class FlowActionTest {
 
@@ -39,22 +39,22 @@ class FlowActionTest {
     }
 
     @Test
-    @DisplayName("轨迹动作必须是 16 个定稿值之一（唯一例外：reopen 无对应轨迹值，仅写审计）")
+    @DisplayName("轨迹动作必须是 17 个定稿值之一（唯一例外：reopen 无对应轨迹值，仅写审计）")
     void threadActionsInValueDomain() {
         Set<String> codes = ThreadAction.codes();
         for (FlowAction action : FlowAction.values()) {
             if (action == FlowAction.REOPEN) {
-                assertThat(action.threadAction()).as("reopen 在 16 值里没有对应轨迹动作").isNull();
+                assertThat(action.threadAction()).as("reopen 在 17 值里没有对应轨迹动作").isNull();
                 continue;
             }
             assertThat(action.threadAction()).as("%s 必须有轨迹动作", action.code()).isNotNull();
-            assertThat(codes).as("%s 的轨迹动作 %s 必须在 16 值内", action.code(), action.threadAction())
+            assertThat(codes).as("%s 的轨迹动作 %s 必须在 17 值内", action.code(), action.threadAction())
                     .contains(action.threadAction().code());
         }
     }
 
     @Test
-    @DisplayName("跳转在轨迹上落 skip（16 值无 jump）；流转/回退/终止/加签/跳转 均必填原因")
+    @DisplayName("跳转在轨迹上落 skip（17 值无 jump）；流转/回退/终止/加签/跳转 均必填原因")
     void reasonAndThreadMapping() {
         assertThat(FlowAction.JUMP.threadAction()).isEqualTo(ThreadAction.SKIP);
         for (FlowAction action : new FlowAction[] {FlowAction.ROLLBACK, FlowAction.ROUTE,

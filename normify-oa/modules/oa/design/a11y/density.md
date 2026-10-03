@@ -11,8 +11,8 @@ description:
   en: >
       The density baseline: 14px body is the default and not a minimum (going to 16px would cut a screen of pending items from twelve to eight), table rows are 44px with a 36px compact variant, controls are 32px tall and cards pad 24px; hierarchy comes from weights 600/500/400 rather than size jumps, and no 700 or 800 headings are introduced.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:55:35.496Z"
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.171Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

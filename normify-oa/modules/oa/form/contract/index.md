@@ -10,12 +10,14 @@ description:
   en: >
       Contract approval form (form_type=contract): counterparty, contract type, amount and period fields plus a mandatory contract text attachment; subject also to the fund-style read-only and non-exportable amount rules; group-level output uses the group contract routing sheet.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:34.400Z"
-fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.188Z"
+fingerprint: 6b2db13db8a7fb57e8464435023d3c5af9187057be705b9d0408ba13f44918fe
 source:
   - path: "doc/forms.md"
   - path: "doc/prd-0.1.md"
+  - path: "oa-server/src/main/java/com/oa/form/contract/ContractFormRules.java"
+  - path: "oa-server/src/main/java/com/oa/form/api/FormRuleController.java"
 ---
 
 ## 证据锚点

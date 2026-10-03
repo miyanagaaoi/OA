@@ -10,11 +10,13 @@ description:
   en: >
       Seal and certificate approval form (form_type=seal): seal or certificate type, purpose, usage period and return status tracking, with the group Finance department still acting as the central owner node.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:34.400Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.213Z"
+fingerprint: 971ed7577a5a47159f10307c4dc0341d9dea43cb3e3424c6b6abb9d06b71f0ce
 source:
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/seal/SealFormRules.java"
+  - path: "oa-server/src/main/java/com/oa/form/api/FormRuleController.java"
 ---
 
 ## 证据锚点

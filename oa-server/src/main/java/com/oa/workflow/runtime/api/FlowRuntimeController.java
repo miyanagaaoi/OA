@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/runtime}</td><td><b>运行态总览</b>（三层状态 + 轨迹 + 流转链 + 补件 + 抄送 + Q6 剩余）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/node-instances}</td><td>节点实例清单</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/task-list}</td><td>该单全部任务</td></tr>
- *   <tr><td>GET</td><td>{@code /flow-instances/{id}/thread}</td><td>审批轨迹（16 值动作）</td></tr>
+ *   <tr><td>GET</td><td>{@code /flow-instances/{id}/thread}</td><td>审批轨迹（17 值动作）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/routing}</td><td>流转链</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/supplements}</td><td>补件记录（含 Q7 应完成时间）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/cc}</td><td>抄送记录</td></tr>

@@ -21,8 +21,8 @@ import java.util.Set;
  *   <li>doc/templates.md §0 T-08：V0.4 定稿「全部节点 {@code allow_jump = false}」。</li>
  * </ul>
  *
- * <h2>轨迹口径（16 值约束）</h2>
- * <p>doc/enums.md §9 的 16 个定稿值中**没有** {@code jump}，而跳转的语义就是「跳过中间节点」，
+ * <h2>轨迹口径（17 值约束）</h2>
+ * <p>doc/enums.md §9 的 17 个定稿值中**没有** {@code jump}，而跳转的语义就是「跳过中间节点」，
  * 因此：被跳过的节点（含当前节点与中间节点）一律落 {@code sys_thread.action = skip}
  * （理由文案里带走目标节点序号）；审计日志（{@code sys_log.action}，自由文本列）另记 {@code jump}。
  */

@@ -10,13 +10,15 @@ description:
   en: >
       Shared amount rules: > 0, at most two decimals, ≤ 99,999,999,999.99, stored as DECIMAL(18,2) fixed point, never persisted after float arithmetic; the error message is 「金额必须大于 0 且最多两位小数」; amounts never drive routing.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:25.720Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.222Z"
+fingerprint: 3ef469b210725e3bef328ba0764e1996fde76cdd28e339766155172d9a4e1cf7
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/template/validate/AmountText.java"
+  - path: "oa-server/src/main/java/com/oa/form/template/validate/FormPayloadValidator.java"
 apis:
   - protocol: http
     method: POST

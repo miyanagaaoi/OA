@@ -231,7 +231,14 @@ public class FormDataService {
      *
      * <p>只接受 {@code return_status} / {@code return_date} 两个键（其余键一律 40304/40308），
      * 校验闭环后落库，并按 {@code doc/forms.md} §5 末「只写入审批轨迹与审计日志」写
-     * {@code sys_thread}（动作码 {@code archive_register}，见本方法注释末尾的待决策说明）。
+     * {@code sys_thread}。
+     *
+     * <p><b>轨迹动作 = {@link ThreadAction#RETURN_REGISTER}（{@code return_register}）</b>——
+     * 2026-10-04 裁定：16 → 17 值新增该动作码，**不再**复用 {@code archive_register}。
+     * 理由：轨迹是**用户可见**的，「归还登记」显示成「归档登记」是误导；节点⑦的
+     * 「归档登记」动作本身仍用 {@code archive_register}（见 {@code FlowAction.ARCHIVE_REGISTER}）。
+     * 登记主体可以是**发起人**（审批中）或**节点⑦归档登记人**，两者落同一个动作码、不同 actor。
+     * 真源：{@code doc/enums.md} §9（{@code return_register} 行）、{@code doc/forms.md} §5、AC-28。
      */
     @Transactional
     public Map<String, Object> registerSealReturn(Long instanceId, Map<String, Object> payload) {
@@ -272,7 +279,7 @@ public class FormDataService {
         String before = describeReturn(stored);
         String after = describeReturn(merged);
         threadWriter.appendAsCurrentUser(instanceId, currentNodeInstanceId(instance),
-                ThreadAction.ARCHIVE_REGISTER,
+                ThreadAction.RETURN_REGISTER,
                 String.format("归还登记：%s → %s；归还状态变更不触发流程推进（doc/forms.md §5）", before, after));
         auditLogWriter.appendAsCurrentUser("seal_return_register", "form_data", instance.getFormDataId(),
                 JsonText.write(Map.of("return", before)), JsonText.write(Map.of("return", after)), null, null);

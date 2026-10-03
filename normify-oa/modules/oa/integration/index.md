@@ -11,8 +11,8 @@ description:
   en: >
       Unified API gateway and auth. Phase one exposes read-only org/user queries (no external writes), integrates the contract system later, and standardises archive data for warehouse extraction.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:55:35.549Z"
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.249Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * 审批轨迹行（{@code sys_thread}，doc/data-model.md §6.5）。
  *
- * <p>{@code action} 取 doc/enums.md §9 的 **16 个定稿值**（{@code RuntimeEnums.ThreadAction}）；
+ * <p>{@code action} 取 doc/enums.md §9 的 **17 个定稿值**（{@code RuntimeEnums.ThreadAction}）；
  * {@code actor_name} / {@code actor_position} 是**快照**（防止改名后轨迹失真）。
  * 轨迹只追加、不可改、不可删（enums.md §9）。
  */

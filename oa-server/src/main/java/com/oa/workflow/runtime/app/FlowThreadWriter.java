@@ -19,8 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
  * <h2>纪律</h2>
  * <ol>
  *   <li><b>只追加</b>：本类没有任何 UPDATE/DELETE 路径（轨迹 ≥10 年不可篡改，enums.md §9）；</li>
- *   <li><b>只能落 16 个定稿值</b>：{@link ThreadAction} 是唯一值域（旧值 {@code addsign} /
- *       {@code return_node} / {@code archive} 一律无法经本类写入）；</li>
+ *   <li><b>只能落 17 个定稿值</b>：{@link ThreadAction} 是唯一值域（旧值 {@code addsign} /
+ *       {@code return_node} / {@code archive} 一律无法经本类写入；{@code return_register} 是
+ *       2026-10-04 为印鉴单归还登记新增的第 17 个值）；</li>
  *   <li><b>动作名必填</b>：{@code action} 为空即 500 级配置错误（宁可失败也不留一条看不懂的轨迹）；</li>
  *   <li><b>快照姓名与职务</b>：{@code actor_name} / {@code actor_position} 存**当时**的值，
  *       之后改名/调岗不影响历史轨迹；</li>
@@ -45,7 +46,7 @@ public class FlowThreadWriter {
      * @param instanceId     所属实例
      * @param nodeInstanceId 相关节点实例（实例级动作传 {@code null}）
      * @param actor          操作人（可为 {@code null}：系统动作，如补件超时催办）
-     * @param action         轨迹动作（16 值之一）
+     * @param action         轨迹动作（17 值之一）
      * @param opinion        意见/说明（可空）
      */
     @Transactional

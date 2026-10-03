@@ -228,7 +228,7 @@ com.oa
 | 2 | `flow_instance.owner_dept_id` | data-model 注释为「归口部门，**恒为集团财务部**」，而需求又要求用 `owner_dept_id = :financeDeptId` 作财务部可见性口径 → 会放开全部单据 | 该分支默认关闭（`oa.scope.finance-owner-dept-branch-enabled`），保留可配置开关；已按 PRD §5.3 用 `form_type IN ('fund','contract','seal')` 表达「归口类别」 |
 | 3 | `sys_thread` 不可篡改 | tech-design §5.5 写「触发器拒绝 `sys_log`/`flow_signature`/`sys_thread` 的 UPDATE/DELETE」，data-model §8.1 与 `01-schema.sql` 只建了 4 个触发器（`sys_thread` 仅应用层约束） | 迁移脚本（主控维护）只含 4 个触发器；骨架对 `sys_thread` 未加触发器，按 data-model 口径执行 |
 | 4 | `sys_log.target_type` | DDL 注释值域为 `instance/task/user/role/permission/template/org/dict`，但登出/踢出设备需要记录会话 | 骨架使用 `session`（DDL 注释未列），建议把值域补全 |
-| 5 | `sys_log.action` | DDL 注释是示例串（`login/logout/create/…`），没有像 `sys_thread.action` 那样的 16 值定稿与 CHECK | 骨架只使用注释中出现过的动作码，建议补定稿 |
+| 5 | `sys_log.action` | DDL 注释是示例串（`login/logout/create/…`），没有像 `sys_thread.action` 那样的 17 值定稿与 CHECK | 骨架只使用注释中出现过的动作码，建议补定稿 |
 | 6 | `sys_role.data_scope = group_category` | 该口径同时被「财务部（归口）」与「集团分管领导（按业务线类别）」使用，但两者可见范围规则不同（前者还有流转链与在途承接） | 骨架按「财务部口径」实现（`DataScopeContext.categories` 已装载分管类别，SQL 细分留待阶段 2 与越权用例一起落） |
 | 7 | `oa.session.store=memory` | 配置项存在，但 `SessionStore.InMemory` 仅为单测/降级预留，未装配为 Bean | 生产只支持 `redis`；如需降级需自行加装配（tech-design §2 的降级路径） |
 | 8 | 分页上限 | 文档未给单页最大条数 | 骨架取 500（`MybatisConfig.MAX_PAGE_SIZE`），可在阶段 2 与前端约定后固化 |

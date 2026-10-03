@@ -10,12 +10,15 @@ description:
   en: >
       Dictionary items are maintained in the admin console and stored in `sys_dict_item` (REQ-ADMIN-004); new options need no release. Forms read enabled items through a cache that is invalidated when the console changes them.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:25.720Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.192Z"
+fingerprint: 1f14f50c0c4545be3b96c65f5f40341ecf4e49415d066868fdef0952efd0fe26
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/dict/FormDictService.java"
+  - path: "oa-server/src/main/java/com/oa/form/dict/infra/SysDictItemMapper.java"
+  - path: "oa-server/src/main/java/com/oa/form/dict/infra/SysDictItemRow.java"
 apis:
   - protocol: http
     method: GET

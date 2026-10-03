@@ -130,7 +130,7 @@ public final class RuntimeDtos {
     ) {
     }
 
-    /** 轨迹视图（16 值动作 + 中文名）。 */
+    /** 轨迹视图（17 值动作 + 中文名）。 */
     public record ThreadView(
             Integer seq,
             String action,

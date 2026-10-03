@@ -10,13 +10,14 @@ description:
   en: >
       Once the initiator picks the category, no approval node may change it; the only remedy for a wrong classification is rejecting back to the initiator. Category values come from admin-configured dictionary items, no longer determine central ownership, and serve only as a label and reporting dimension.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:34.400Z"
-fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.203Z"
+fingerprint: 2cd70094f1f0ca58486a7545a207061d4af024e2dd777b6b42c457a39f8ec430
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
   - path: "doc/prd-0.1.md"
+  - path: "oa-server/src/main/java/com/oa/form/matter/MatterFormRules.java"
 apis:
   - protocol: http
     method: POST

@@ -11,9 +11,10 @@ import java.util.Optional;
  *   <li>{@link InstanceStatus} / {@link SubStatus}：doc/enums.md §4（含 §4.1「回到草稿规则」）；</li>
  *   <li>{@link NodeStatus}：doc/enums.md §5「节点实例状态」；</li>
  *   <li>{@link TaskStatus}：doc/enums.md §6「任务状态」；</li>
- *   <li>{@link ThreadAction}：doc/enums.md §9「审批轨迹动作」—— 13 + 3 = <b>16</b> 个值
+ *   <li>{@link ThreadAction}：doc/enums.md §9「审批轨迹动作」—— 13 + 4 = <b>17</b> 个值
  *       （**没有** {@code jump} / {@code reopen} 值：跳转在轨迹上落 {@code skip}，
- *       档案口径见 {@link FlowAction#JUMP()}）；</li>
+ *       档案口径见 {@link FlowAction#JUMP()}；{@code return_register} 是 2026-10-04 为印鉴单
+ *       **归还登记**新增的值，与节点⑦的 {@code archive_register} 语义不同）；</li>
  *   <li>{@link RoutingAction}：doc/enums.md §7「流转动作」（{@code route} / {@code rollback} / {@code back_home}，
  *       旧值 {@code return_node} 作废）；</li>
  *   <li>{@link AddSignType}：doc/data-model.md §5.3 {@code flow_task.add_sign_type} 的 CHECK（{@code pre} / {@code post}）。</li>
@@ -203,9 +204,9 @@ public final class RuntimeEnums {
         }
     }
 
-    // ================================================================ 轨迹动作（16 值）
+    // ================================================================ 轨迹动作（17 值）
 
-    /** {@code sys_thread.action}（doc/enums.md §9）：13 + 3 = **16** 个定稿值。 */
+    /** {@code sys_thread.action}（doc/enums.md §9）：13 + 4 = **17** 个定稿值。 */
     public enum ThreadAction {
 
         /** {@code submit}：发起人提交（含驳回后重新提交）。 */
@@ -238,6 +239,15 @@ public final class RuntimeEnums {
         SKIP("跳过"),
         /** {@code archive_register}：⑦ 归档登记（**仅留痕、不产生审批决议**；旧值 {@code archive} 作废）。 */
         ARCHIVE_REGISTER("归档登记"),
+        /**
+         * {@code return_register}：印鉴单**归还登记**（AC-28 / {@code doc/forms.md} §5 三态读写模型的唯一例外）。
+         *
+         * <p>语义：登记 {@code return_status} / {@code return_date}（证照是否已归还属**事后事实**），
+         * 主体可以是**发起人**，也可以是**节点⑦归档登记人**；**不推进流程**，只写轨迹与审计日志。
+         * 与 {@link #ARCHIVE_REGISTER} 严格区分：后者是节点⑦「归档登记」这个动作本身。
+         * 2026-10-04 裁定新增（16 → 17 值）——轨迹面向用户，把「归还登记」显示成「归档登记」是误导。
+         */
+        RETURN_REGISTER("归还登记"),
         /** {@code cc}：抄送记录（**不产生审批决议、不产生待办**）。 */
         CC("抄送");
 
@@ -259,7 +269,7 @@ public final class RuntimeEnums {
             return byCode(values(), code);
         }
 
-        /** 16 个定稿值的码集合（用于「值域一致性」断言）。 */
+        /** 17 个定稿值的码集合（用于「值域一致性」断言）。 */
         public static java.util.Set<String> codes() {
             java.util.Set<String> codes = new java.util.LinkedHashSet<>();
             for (ThreadAction action : values()) {

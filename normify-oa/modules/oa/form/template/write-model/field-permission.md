@@ -10,13 +10,16 @@ description:
   en: >
       Masks or hides amount and account fields per role: contract and fund amounts are read-only and non-exportable for non-finance roles (export is admin-only); the payee account shows `****1234` by default with the full value only for finance roles and admins. Phase one hardcodes these rules without per-field whitelists.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:25.720Z"
-fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.226Z"
+fingerprint: df4e85fb53dbee7f3a7bfcd0c18da8975ffe593d9b42943f129d40a350ee17b8
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
   - path: "doc/prd-0.1.md"
+  - path: "oa-server/src/main/java/com/oa/form/app/FormWritePolicy.java"
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/FormFieldWriteGuard.java"
+  - path: "oa-server/src/main/java/com/oa/authz/visibility/AmountFieldPolicy.java"
 apis:
   - protocol: http
     method: GET

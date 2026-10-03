@@ -11,8 +11,8 @@ description:
   en: >
       On-premise deployment with no public dependencies, capacity targets (300+ users, 80 concurrent, 30 TPS, pages under 2s), security policy (HTTPS, password rules, lockout, encrypted PII), daily backups and restore drills.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:55:35.564Z"
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.269Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -4,10 +4,10 @@
 -- 生成器: tools/gen-init-sql.js sha256=4ff51bba65ea
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（可安全重跑生成器）。
 -- 请勿手工编辑本文件：改文档后重跑本脚本。
--- 真源文档: doc/data-model.md sha256=1b412b0d7b55
+-- 真源文档: doc/data-model.md sha256=2870228b95c4
 --
 -- 执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。
--- 包含：建表 28 张、索引 61 个、CHECK 11 个、外键若干、不可篡改触发器 4 个。
+-- 包含：建表 28 张、索引 61 个、CHECK 12 个、外键若干、不可篡改触发器 4 个。
 -- 不可篡改：sys_log 与 flow_signature 由数据库触发器拒绝 UPDATE 与 DELETE（AC-20）；
 --           sys_thread（审批轨迹）一期由应用层只追加约束 + 审计校验保证（见 doc/data-model.md 8.1）。
 -- 注意：触发器使用 mysql 客户端语法 DELIMITER //（Flyway 不识别，接入时需拆分为独立迁移或在启动时用 JDBC 创建）。
@@ -644,13 +644,14 @@ CREATE TABLE sys_thread (
   actor_id         BIGINT UNSIGNED NULL,
   actor_name       VARCHAR(50)      NULL COMMENT '快照姓名（防止改名后轨迹失真）',
   actor_position   VARCHAR(50)      NULL COMMENT '快照职务',
-  action           VARCHAR(32)  NOT NULL COMMENT 'submit=提交 approve=通过 reject=驳回 route=流转 rollback=回退上一节点 back_home=回到本部门 supplement_request=请求补件 supplement_submit=提交补件 transfer=转办 reassign=改派 add_sign=加签 withdraw=撤回 terminate=终止 skip=跳过（仅事项单②：不涉及费用，财务节点跳过留痕） archive_register=归档登记（⑦，默认仅登记不审批） cc=抄送；共 16 值，与 enums.md §9 一致（旧值 addsign→add_sign、return_node→rollback、archive→archive_register 作废）',
+  action           VARCHAR(32)  NOT NULL COMMENT 'submit=提交 approve=通过 reject=驳回 route=流转 rollback=回退上一节点 back_home=回到本部门 supplement_request=请求补件 supplement_submit=提交补件 transfer=转办 reassign=改派 add_sign=加签 withdraw=撤回 terminate=终止 skip=跳过（仅事项单②：不涉及费用，财务节点跳过留痕） archive_register=归档登记（⑦，默认仅登记不审批） return_register=归还登记（印鉴单 AC-28 例外：发起人或节点⑦登记归还状态，不推进流程；2026-10-04 由 archive_register 拆出） cc=抄送；共 17 值，与 enums.md §9 一致（旧值 addsign→add_sign、return_node→rollback、archive→archive_register 作废）',
   opinion          VARCHAR(1000)    NULL,
   signature_id     BIGINT UNSIGNED  NULL,
   created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_thread_instance (instance_id, seq),
-  CONSTRAINT fk_thread_instance FOREIGN KEY (instance_id) REFERENCES flow_instance (id)
+  CONSTRAINT fk_thread_instance FOREIGN KEY (instance_id) REFERENCES flow_instance (id),
+  CONSTRAINT chk_thread_action CHECK (action IN ('submit','approve','reject','route','rollback','back_home','supplement_request','supplement_submit','transfer','reassign','add_sign','withdraw','terminate','skip','archive_register','return_register','cc'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='审批轨迹';
 
 -- ============================================================

@@ -10,11 +10,12 @@ description:
   en: >
       On submission the `form_schema_json` version and `fields_json` are frozen into `form_data`, so later template changes never affect in-flight documents; the server accepts amounts only as strings or fixed-point numbers.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:25.720Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.221Z"
+fingerprint: df9d0e44bd2a0db6ef4145ab59af6fe7496facc3a76e4e369b6c8991eb537192
 source:
   - path: "doc/forms.md"
+  - path: "oa-server/src/main/java/com/oa/form/template/snapshot/FormSnapshotService.java"
 apis:
   - protocol: http
     method: POST

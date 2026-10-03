@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  *
  * <p>三条硬约束：① 节点开关默认关闭（{@code allow_jump=false} 无入口）；
  * ② 只能向后跳（退回历史节点要走「回退上一节点」）；③ 原因必填。
- * 轨迹口径：16 值里没有 {@code jump}，被跳过的节点一律落 {@code skip}。
+ * 轨迹口径：17 值里没有 {@code jump}，被跳过的节点一律落 {@code skip}。
  */
 class JumpPolicyTest {
 

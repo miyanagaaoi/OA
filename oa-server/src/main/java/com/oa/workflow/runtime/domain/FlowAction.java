@@ -15,9 +15,9 @@ import java.util.Optional;
  * （{@code flow} 与 {@code flow:task:*} 一族，见该文件第 169–229 行的 {@code sys_permission} 种子），
  * 因此**不需要**新增权限码：动作面与授权面天然对齐。
  *
- * <h2>轨迹动作的映射（16 值约束下的两个刻意选择）</h2>
+ * <h2>轨迹动作的映射（17 值约束下的两个刻意选择）</h2>
  * <ol>
- *   <li><b>自由跳转</b>（{@link #JUMP}）：doc/enums.md §9 的 16 个定稿值里**没有</b> {@code jump}，
+ *   <li><b>自由跳转</b>（{@link #JUMP}）：doc/enums.md §9 的 17 个定稿值里**没有</b> {@code jump}，
  *       而跳转的语义就是「跳过中间节点」，因此轨迹落 {@code skip}（{@link ThreadAction#SKIP}），
  *       理由文案里带走目标节点序号；审计日志另记 {@code jump}（{@code sys_log.action} 是自由文本列）。</li>
  *   <li><b>回到草稿</b>（驳回/撤回后重提，见 {@link #REOPEN}）：同样无对应轨迹值
@@ -111,7 +111,7 @@ public enum FlowAction {
         return permission;
     }
 
-    /** 轨迹动作（{@code sys_thread.action} 的 16 值之一；{@link #REOPEN} 为 {@code null}）。 */
+    /** 轨迹动作（{@code sys_thread.action} 的 17 值之一；{@link #REOPEN} 为 {@code null}）。 */
     public ThreadAction threadAction() {
         return threadAction;
     }

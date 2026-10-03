@@ -10,13 +10,15 @@ description:
   en: >
       involve_cost is the only routing criterion in phase one: when no, node ② finance review is skipped with status skipped and no todo, yet the document's central-ownership field still records the finance department for reporting and audit; the trail records that the finance node was skipped. Amounts never drive routing.
       
-revision: c758a5ce22cb282c4b7c7462f8c4c29ee3818a73
-updated_at: "2026-10-03T05:58:34.400Z"
-fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
+revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
+updated_at: "2026-10-03T06:13:00.204Z"
+fingerprint: 9109adf58d95348fe6fdef6b9bfb14a566386b7fddbc6b28cd58986d52653dd7
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"
   - path: "doc/prd-0.1.md"
+  - path: "oa-server/src/main/java/com/oa/form/matter/MatterFormRules.java"
+  - path: "oa-server/src/main/java/com/oa/workflow/runtime/domain/FlowLinkage.java"
 apis:
   - protocol: http
     method: POST

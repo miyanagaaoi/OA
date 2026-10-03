@@ -96,16 +96,26 @@ class RuntimeEnumsTest {
     }
 
     @Test
-    @DisplayName("轨迹动作共 16 个定稿值；不含废弃值 archive/addsign/return_node")
-    void threadActionsAreExactlySixteen() {
-        assertThat(ThreadAction.values()).hasSize(16);
+    @DisplayName("轨迹动作共 17 个定稿值；不含废弃值 archive/addsign/return_node；含归还登记 return_register")
+    void threadActionsAreExactlySeventeen() throws Exception {
+        assertThat(ThreadAction.values()).hasSize(17);
         Set<String> codes = ThreadAction.codes();
         assertThat(codes).containsExactlyInAnyOrder(
                 "submit", "approve", "reject", "route", "rollback", "back_home",
                 "supplement_request", "supplement_submit", "transfer", "reassign",
-                "add_sign", "withdraw", "terminate", "skip", "archive_register", "cc");
+                "add_sign", "withdraw", "terminate", "skip", "archive_register",
+                "return_register", "cc");
         assertThat(codes).doesNotContain("archive", "addsign", "return_node", "jump", "reopen");
         assertThat(ThreadAction.ARCHIVE_REGISTER.code()).isEqualTo("archive_register");
+        assertThat(ThreadAction.RETURN_REGISTER.code()).isEqualTo("return_register");
+        assertThat(ThreadAction.RETURN_REGISTER.label())
+                .as("轨迹面向用户：归还登记必须显示为「归还登记」，不得显示成「归档登记」")
+                .isEqualTo("归还登记");
+        assertThat(ThreadAction.ARCHIVE_REGISTER.label()).isEqualTo("归档登记");
+        // DDL 同步：列注释与 CHECK 约束都必须含新值（enums.md §9 → data-model.md 6.5 → V1__schema.sql）
+        String ddl = read("db/migration/V1__schema.sql");
+        assertThat(ddl).contains("return_register").contains("共 17 值");
+        assertThat(ddl).contains("chk_thread_action").contains("'return_register'");
     }
 
     @Test

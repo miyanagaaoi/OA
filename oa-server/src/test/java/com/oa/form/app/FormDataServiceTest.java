@@ -6,7 +6,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.oa.authz.visibility.FormFieldWriteGuard;
@@ -36,6 +39,7 @@ import com.oa.platform.security.crypto.PhoneCipher;
 import com.oa.workflow.approver.infra.FlowInstanceMapper;
 import com.oa.workflow.approver.infra.row.FlowInstanceRow;
 import com.oa.workflow.runtime.app.FlowThreadWriter;
+import com.oa.workflow.runtime.domain.RuntimeEnums.ThreadAction;
 import com.oa.workflow.runtime.infra.FlowNodeInstanceMapper;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -64,6 +68,7 @@ class FormDataServiceTest {
     private FlowInstanceMapper instanceMapper;
     private FlowNodeInstanceMapper nodeInstanceMapper;
     private FormDataMapper formDataMapper;
+    private FlowThreadWriter threadWriter;
     private AtomicReference<Map<String, Object>> capturedPayload;
     private final Map<String, FormSchema> schemas = FormSchemaFixtures.schemas();
 
@@ -97,6 +102,7 @@ class FormDataServiceTest {
         });
         AuditLogWriter auditLogWriter = new AuditLogWriter(mock(AuditLogMapper.class));
         FlowThreadWriter threadWriter = mock(FlowThreadWriter.class);
+        this.threadWriter = threadWriter;
 
         service = new FormDataService(schemaService, formDataMapper, instanceMapper, nodeInstanceMapper,
                 snapshotService, validator, registry, writeGuard, dictService, phoneCipher, auditLogWriter,
@@ -270,6 +276,12 @@ class FormDataServiceTest {
         assertThat(saved).containsEntry("instanceId", INSTANCE_ID);
         assertThat(capturedPayload.get()).containsEntry("return_status", "returned")
                 .containsEntry("return_date", "2099-02-01");
+        // 2026-10-04 裁定：归还登记的轨迹动作码是 return_register（16 → 17 值），
+        // 不再复用节点⑦的 archive_register —— 轨迹面向用户，不得把「归还登记」显示成「归档登记」。
+        verify(threadWriter).appendAsCurrentUser(eq(INSTANCE_ID), any(),
+                eq(ThreadAction.RETURN_REGISTER), anyString());
+        verify(threadWriter, never()).appendAsCurrentUser(anyLong(), any(),
+                eq(ThreadAction.ARCHIVE_REGISTER), anyString());
     }
 
     // ================================================================ 拒绝样例
