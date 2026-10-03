@@ -65,6 +65,40 @@ public interface FlowInstanceMapper {
     /** 回填当前节点序号（2a.4 运行时使用；本工作包只写首次提交值）。 */
     int updateCurrentNodeSeq(@Param("id") Long id, @Param("currentNodeSeq") Integer currentNodeSeq);
 
+    // ------------------------------------------------------------------ 运行时（2a.4）
+
+    /**
+     * 实例进度落库（状态 / 子状态 / 当前节点 / 当前承接部门）。
+     *
+     * <p>{@code subStatus} 传 {@code null} 即**清空**子状态（待补件提交后的口径，§7.2）。
+     */
+    int updateProgress(@Param("id") Long id,
+                       @Param("status") String status,
+                       @Param("subStatus") String subStatus,
+                       @Param("currentNodeSeq") Integer currentNodeSeq,
+                       @Param("currentDeptId") Long currentDeptId);
+
+    /** 进入终态：写 {@code status} 与 {@code finished_at}，并清空 {@code sub_status}。 */
+    int markFinished(@Param("id") Long id, @Param("status") String status);
+
+    /** {@code routing_count} 与 {@code routing_seq} 同时 +1（Q6 的「流转 + 回退」计数口径）。 */
+    int incrementRoutingCount(@Param("id") Long id);
+
+    /** {@code supplement_count} +1（Q6 的补件计数口径；**请求补件时**占位，见 data-model §5.5）。 */
+    int incrementSupplementCount(@Param("id") Long id);
+
+    /**
+     * 驳回后重提的实例复位：回到 {@code draft}、清子状态/当前节点/承接部门/完成时间，
+     * 并换上**重新解析**后的模板版本与快照（REQ-FLOW-017）。
+     *
+     * <p>刻意**不重置** {@code routing_count} / {@code supplement_count}：Q6 两列是「<b>全单</b>累计」
+     * 计数（templates.md §1.7），重提不清零（如需清零须另立产品裁定）。
+     */
+    int resetForResubmit(@Param("id") Long id,
+                         @Param("templateId") Long templateId,
+                         @Param("templateVersion") Integer templateVersion,
+                         @Param("approverSnapshotJson") String approverSnapshotJson);
+
     // ------------------------------------------------------------------ form_data
 
     /** 新增表单数据行（biz_no 唯一），自增主键回填到 {@code row.id}。 */

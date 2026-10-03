@@ -52,13 +52,16 @@ public class FlowInstanceController {
     private final FlowInstanceService instanceService;
     private final ApproverPrecheckService precheckService;
     private final WorkflowPermissionService permissionService;
+    private final com.oa.workflow.runtime.app.FlowEngineService engineService;
 
     public FlowInstanceController(FlowInstanceService instanceService,
                                   ApproverPrecheckService precheckService,
-                                  WorkflowPermissionService permissionService) {
+                                  WorkflowPermissionService permissionService,
+                                  com.oa.workflow.runtime.app.FlowEngineService engineService) {
         this.instanceService = instanceService;
         this.precheckService = precheckService;
         this.permissionService = permissionService;
+        this.engineService = engineService;
     }
 
     // ================================================================ 预检
@@ -91,13 +94,13 @@ public class FlowInstanceController {
         return ApiResponse.success(instanceService.create(request, principal));
     }
 
-    /** 提交（草稿 → 审批中）。 */
+    /** 提交（草稿 → 审批中；建节点实例 + 首个节点待办由运行时引擎完成）。 */
     @PostMapping("/{instanceId}/submit")
     @Audited(action = "submit", targetType = "instance", targetId = "#instanceId", recordArgs = true)
     public ApiResponse<InstanceView> submit(@PathVariable("instanceId") Long instanceId,
                                             @Valid @RequestBody SubmitRequest request) {
         permissionService.requireInitiator("提交审批单");
-        return ApiResponse.success(instanceService.submit(instanceId, request.reason()));
+        return ApiResponse.success(engineService.submit(instanceId, request.reason()));
     }
 
     // ================================================================ 查询

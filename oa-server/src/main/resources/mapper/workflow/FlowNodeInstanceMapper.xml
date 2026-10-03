@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  节点实例 Mapper（flow_node_instance）
+  ============================================================================
+  受控表纪律：flow_node_instance **不是**受控表（未登记在 oa.scope.tables），
+  其可见性完全依附于 flow_instance —— 因此本文件 SELECT **刻意 0 个 @dataScope 标记**，
+  对外读取必须先经 FlowInstanceMapper#selectInstanceById（带标记、域外 404）拿到实例行。
+  写语句（insert/update）不需要标记（拦截器只约束 SELECT）。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.runtime.infra.FlowNodeInstanceMapper">
+
+  <resultMap id="NodeInstanceResultMap" type="com.oa.workflow.runtime.infra.row.FlowNodeInstanceRow">
+    <id property="id" column="id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="nodeSeq" column="node_seq"/>
+    <result property="nodeCode" column="node_code"/>
+    <result property="nodeName" column="node_name"/>
+    <result property="nodeKey" column="node_key"/>
+    <result property="deptId" column="dept_id"/>
+    <result property="decisionMode" column="decision_mode"/>
+    <result property="passThreshold" column="pass_threshold"/>
+    <result property="approverIdsJson" column="approver_ids_json"/>
+    <result property="status" column="status"/>
+    <result property="returnedCount" column="returned_count"/>
+    <result property="supplementRequested" column="supplement_requested"/>
+    <result property="addSignChainJson" column="add_sign_chain_json"/>
+    <result property="startedAt" column="started_at"/>
+    <result property="finishedAt" column="finished_at"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <sql id="NodeInstanceColumns">
+    ni.id, ni.instance_id, ni.node_seq, ni.node_code, ni.node_name, ni.node_key, ni.dept_id,
+    ni.decision_mode, ni.pass_threshold, ni.approver_ids_json, ni.status, ni.returned_count,
+    ni.supplement_requested, ni.add_sign_chain_json, ni.started_at, ni.finished_at,
+    ni.created_at, ni.updated_at
+  </sql>
+
+  <!-- 主干序 = 展示序；协同组/流转承接按 dept_id 紧跟其主干节点之后 -->
+  <select id="selectByInstance" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+    ORDER BY ni.node_seq ASC, IFNULL(ni.dept_id, 0) ASC, ni.id ASC
+  </select>
+
+  <select id="selectNodeInstanceById" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectByInstanceAndKey" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.node_key = #{nodeKey}
+    LIMIT 1
+  </select>
+
+  <select id="selectLiveByInstance" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.status IN ('pending', 'active', 'waiting_supplement', 'returned')
+    ORDER BY ni.node_seq ASC, IFNULL(ni.dept_id, 0) ASC, ni.id ASC
+  </select>
+
+  <select id="selectByInstanceAndSeq" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.node_seq = #{seq}
+    ORDER BY IFNULL(ni.dept_id, 0) ASC, ni.id ASC
+  </select>
+
+  <select id="selectPreviousApproved" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.node_seq &lt; #{seq}
+      AND ni.status = 'approved'
+    ORDER BY ni.node_seq DESC, ni.id DESC
+    LIMIT 1
+  </select>
+
+  <select id="selectReturnedNode" resultMap="NodeInstanceResultMap">
+    SELECT <include refid="NodeInstanceColumns"/>
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.status = 'returned'
+    ORDER BY ni.node_seq DESC, ni.id DESC
+    LIMIT 1
+  </select>
+
+  <select id="countLiveAtSeq" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.node_seq = #{seq}
+      AND ni.status IN ('pending', 'active', 'waiting_supplement', 'returned')
+  </select>
+
+  <select id="countFinishedAtSeq" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+      AND ni.node_seq = #{seq}
+      AND ni.status IN ('approved', 'skipped')
+  </select>
+
+  <select id="countByInstance" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_node_instance ni
+    WHERE ni.instance_id = #{instanceId}
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <!-- node_key 由引擎计算：concat(node_seq, ':', node_code, ':', IFNULL(dept_id, 0))（data-model §8.2） -->
+  <insert id="insert" parameterType="com.oa.workflow.runtime.infra.row.FlowNodeInstanceRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_node_instance (instance_id, node_seq, node_code, node_name, node_key, dept_id,
+                                    decision_mode, pass_threshold, approver_ids_json, status,
+                                    returned_count, supplement_requested, add_sign_chain_json,
+                                    started_at, finished_at)
+    VALUES (#{instanceId}, #{nodeSeq}, #{nodeCode}, #{nodeName}, #{nodeKey}, #{deptId},
+            #{decisionMode}, #{passThreshold}, #{approverIdsJson}, IFNULL(#{status}, 'pending'),
+            IFNULL(#{returnedCount}, 0), IFNULL(#{supplementRequested}, 0), #{addSignChainJson},
+            #{startedAt}, #{finishedAt})
+  </insert>
+
+  <update id="updateStatus">
+    UPDATE flow_node_instance
+    SET status = #{status}, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!--
+    激活：status='active'、清 finished_at，并把 started_at 置为**本轮的开始时间**（NOW()）。
+    不用 IFNULL(started_at, NOW()) 的原因：节点可被「回退上一节点」重新激活（§7.2 第 10 行），
+    此时上一轮的任务仍在表中（任务只追加、不复用），而**本轮决议只能数本轮的任务** ——
+    判定用的轮次边界就是 started_at（见 FlowTaskMapper#selectRoundPrimaryByNodeInstance）。
+    若保留首次 started_at，重审会沿用上一轮同意票，节点未经重新审批即通过（2026-10-03 运行期实测发现）。
+  -->
+  <update id="activate">
+    UPDATE flow_node_instance
+    SET status = 'active',
+        started_at = NOW(),
+        finished_at = NULL,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="finish">
+    UPDATE flow_node_instance
+    SET status = #{status},
+        finished_at = NOW(),
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateApprovers">
+    UPDATE flow_node_instance
+    SET approver_ids_json = #{approverIdsJson}, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateAddSignChain">
+    UPDATE flow_node_instance
+    SET add_sign_chain_json = #{addSignChainJson}, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="incrementReturnedCount">
+    UPDATE flow_node_instance
+    SET returned_count = returned_count + 1, updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="markSupplementWaiting">
+    UPDATE flow_node_instance
+    SET status = 'waiting_supplement',
+        supplement_requested = 1,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="markSupplementResolved">
+    UPDATE flow_node_instance
+    SET status = 'active',
+        finished_at = NULL,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 重提（驳回后从①重走）：状态、计数、时间戳、加签链一并复位；approver_ids_json 由调用方随后覆盖 -->
+  <update id="resetForNewRound">
+    UPDATE flow_node_instance
+    SET status = 'pending',
+        returned_count = 0,
+        supplement_requested = 0,
+        add_sign_chain_json = NULL,
+        started_at = NULL,
+        finished_at = NULL,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+</mapper>

@@ -68,7 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li><b>主干必填节点不可删</b>：{@link RequiredNodePolicy}；</li>
  *   <li><b>Q6/Q7 闸门配置</b>：模板级读写 + 取值范围校验（{@link FlowGatePolicy}），
  *       **不做**计数判定与超时调度（消费点是 2a.4 / 阶段 3，见
- *       {@link FlowGateEnums#COUNTER_TODO} / {@link FlowGateEnums#DEADLINE_TODO}）。</li>
+ *       {@link FlowGateEnums#CONSUMER} / {@link FlowGateEnums#DEADLINE_TODO}）。</li>
  * </ol>
  *
  * <h2>签名策略与超时只做「配置与校验」</h2>

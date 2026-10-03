@@ -32,8 +32,9 @@ import java.util.Objects;
  *
  * <h2>本期边界</h2>
  * <p>只做「配置 + 校验 + 持久化 + 读回」。**不做**计数判定与超时调度 —— 消费点是
- * {@link FlowGateEnums#COUNTER_TODO}（2a.4 运行时状态机）与
- * {@link FlowGateEnums#DEADLINE_TODO}（阶段 3 调度器）。
+ * {@link FlowGateEnums#CONSUMER}（2a.4 运行时状态机：{@code GateCounterPolicy}）与
+ * {@link FlowGateEnums#DEADLINE_TODO}（阶段 3 调度器；Q7 的**时限计算**已在 2a.4 落地，
+ * 见 {@code com.oa.workflow.runtime.domain.SupplementDeadlinePolicy}）。
  */
 public record FlowGatePolicy(
         Integer maxReturnCount,

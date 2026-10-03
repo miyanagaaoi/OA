@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,10 @@ import org.springframework.stereotype.Component;
  *       {@code current_dept_id} 落在子树内 —— 覆盖「发起人在该子树」与「单据当前流转到该子树」两种在途形态
  *       （依据 doc/import-spec.md §8.2「该组织节点（含其整棵子树）下的在途单据数」）；</li>
  *   <li><b>人员口径</b>（{@link #checkUser}）：{@code flow_task.assignee_id = ? AND status = 'pending'}
- *       的任务数（doc/import-spec.md §8.1「名下未处理待办」）。
- *       <b>活动节点候选口径未接入</b>：{@code flow_node_instance.approver_ids_json} 的结构
- *       由 2a.4 运行时状态机定义（本工作包不猜测其形状），因此这里**只按待办任务**计数；
- *       2a.4 落地后在此追加一条「本人在活动节点候选内」的查询即可，判定语义不变
- *       （见类尾的 TODO(2a.4)）；</li>
+ *       的任务数（doc/import-spec.md §8.1「名下未处理待办」）<b>加上</b>
+ *       {@code flow_node_instance.status='active'} 且 {@code approver_ids_json} 含本人的**在途单据数**
+ *       （2a.4 追加口径：依次签的后续候选人 / 已固化在快照但尚未产生任务的候选人；
+ *       该追加口径记为 {@code inFlightInstances}，**不与待办数重复计数**）；</li>
  *   <li><b>明细口径</b>（{@link #inFlightItems} / {@link #orgInFlightItems}）与数量口径
  *       **共用同一套过滤条件**（同一 Mapper 的相邻语句），不另写第二套判定逻辑。</li>
  * </ol>
@@ -93,15 +93,25 @@ public class DefaultInFlightChecker implements InFlightChecker {
         }
         return systemScope(() -> {
             int pending = mapper.countUserPendingTasks(userId);
-            if (pending == 0) {
+            // 2a.4 追加口径：本人在**活动节点候选**内（依次签的后续候选人、快照候选人尚未产生任务）
+            int candidates = mapper.countUserCandidateNodes(userId);
+            if (pending == 0 && candidates == 0) {
                 return InFlightSummary.none();
             }
-            List<String> bizNos = mapper.selectUserPendingBizNos(userId, MAX_BIZ_NO);
-            if (log.isDebugEnabled()) {
-                log.debug("待办检查（真实查询）：userId={} 待办={} 单号={}", userId, pending, bizNos);
+            List<String> bizNos = new ArrayList<>(mapper.selectUserPendingBizNos(userId, MAX_BIZ_NO));
+            if (candidates > 0) {
+                for (String bizNo : mapper.selectUserCandidateBizNos(userId, MAX_BIZ_NO)) {
+                    if (!bizNos.contains(bizNo)) {
+                        bizNos.add(bizNo);
+                    }
+                }
             }
-            // 人员口径的 inFlightInstances 计 0（避免与 pendingTasks 重复计数导致 total 翻倍）
-            return new InFlightSummary(0, pending, bizNos);
+            if (log.isDebugEnabled()) {
+                log.debug("待办检查（真实查询）：userId={} 待办={} 活动节点候选单据={} 单号={}",
+                        userId, pending, candidates, bizNos);
+            }
+            // 候选单据计入 inFlightInstances（**不与 pendingTasks 重复计数**，避免 total 翻倍）
+            return new InFlightSummary(candidates, pending, bizNos);
         });
     }
 
@@ -126,7 +136,20 @@ public class DefaultInFlightChecker implements InFlightChecker {
         if (userId == null) {
             return List.of();
         }
-        return systemScope(() -> toItems(mapper.selectUserInFlightItems(userId, MAX_ITEMS)));
+        return systemScope(() -> {
+            List<InFlightItem> items = new ArrayList<>(toItems(mapper.selectUserInFlightItems(userId, MAX_ITEMS)));
+            // 2a.4：候选但尚无待办的在途单据也要出现在影响清单里（否则「拦截了却看不到要处理什么」）
+            Set<Long> seen = new java.util.LinkedHashSet<>();
+            for (InFlightItem item : items) {
+                seen.add(item.instanceId());
+            }
+            for (InFlightItem item : toItems(mapper.selectUserCandidateInFlightItems(userId, MAX_ITEMS))) {
+                if (item.instanceId() != null && seen.add(item.instanceId())) {
+                    items.add(item);
+                }
+            }
+            return items;
+        });
     }
 
     @Override

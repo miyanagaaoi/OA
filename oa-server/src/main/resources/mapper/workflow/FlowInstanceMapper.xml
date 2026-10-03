@@ -168,6 +168,60 @@
     WHERE id = #{id}
   </update>
 
+  <!-- ===================== 运行时进度（2a.4） ===================== -->
+
+  <!-- 状态 / 子状态 / 当前节点 / 当前承接部门；subStatus 传 null 即清空子状态（补件提交后 §7.2） -->
+  <update id="updateProgress">
+    UPDATE flow_instance
+    SET status = #{status},
+        sub_status = #{subStatus},
+        current_node_seq = #{currentNodeSeq},
+        current_dept_id = #{currentDeptId},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <update id="markFinished">
+    UPDATE flow_instance
+    SET status = #{status},
+        sub_status = NULL,
+        finished_at = NOW(),
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- Q6 计数口径：只计 route 与 rollback，不含 back_home（data-model §8.2） -->
+  <update id="incrementRoutingCount">
+    UPDATE flow_instance
+    SET routing_count = routing_count + 1,
+        routing_seq = routing_seq + 1,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 补件计数在**请求补件时** +1（轮次占位口径，data-model §5.5 / §8.2） -->
+  <update id="incrementSupplementCount">
+    UPDATE flow_instance
+    SET supplement_count = supplement_count + 1,
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 驳回后重提：换模板版本 + 新快照，回到草稿；routing_count / supplement_count 保持全单累计 -->
+  <update id="resetForResubmit">
+    UPDATE flow_instance
+    SET status = 'draft',
+        sub_status = NULL,
+        current_node_seq = NULL,
+        current_dept_id = NULL,
+        finished_at = NULL,
+        template_id = #{templateId},
+        template_version = #{templateVersion},
+        approver_snapshot_json = #{approverSnapshotJson},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
   <insert id="insertFormData" parameterType="com.oa.workflow.approver.infra.row.FormDataRow"
           useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     INSERT INTO form_data (biz_no, form_type, fields_json, schema_version, creator_id)

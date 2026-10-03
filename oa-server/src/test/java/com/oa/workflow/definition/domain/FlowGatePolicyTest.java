@@ -106,9 +106,16 @@ class FlowGatePolicyTest {
     }
 
     @Test
-    @DisplayName("消费点 TODO 显式登记（Q6 计数判定属 2a.4、Q7 超时调度属阶段 3）")
+    @DisplayName("消费点登记：Q6 计数判定已由 2a.4 消费（不再留 TODO），Q7 超时调度仍属阶段 3")
     void consumerTodosDocumented() {
-        assertThat(FlowGateEnums.COUNTER_TODO).contains("TODO(2a.4)").contains("maxReturnCount");
+        // 2a.4 已消费 TODO(2a.4)：常量改为「消费点」说明，指向真实执行器
+        assertThat(FlowGateEnums.CONSUMER)
+                .contains("GateCounterPolicy")
+                .contains("maxReturnCount")
+                .contains("maxSupplementCount")
+                .contains("40908")
+                .contains("40909");
+        // Q7 的「时限计算」已在 2a.4 落地，但「超时策略的执行」仍属阶段 3 调度器 → TODO 保留
         assertThat(FlowGateEnums.DEADLINE_TODO).contains("TODO(阶段3)").contains("onSupplementTimeout");
         assertThat(FlowGateEnums.MAX_COUNT_LIMIT).isEqualTo(99);
         assertThat(FlowGateEnums.MAX_DEADLINE_DAYS).isEqualTo(365);

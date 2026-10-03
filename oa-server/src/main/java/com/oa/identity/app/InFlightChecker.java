@@ -39,9 +39,10 @@ import java.util.Map;
  * 这些查询属于**流程域受控表**（{@code flow_instance}/{@code flow_task} 已在
  * {@code oa.scope.tables} 登记），实现带 {@code /* @dataScope(...) *}{@code /} 标记，
  * 并显式使用 {@code DataScopeContext.system()}（后台口径）。
- * <p>{@code TODO(2a.4)}：人员口径追加「本人在活动节点候选内」
+ * <p>{@code TODO(2a.4) 已消费}：人员口径已追加「本人在活动节点候选内」
  * （{@code flow_node_instance.status='active'} 且 {@code approver_ids_json} 含本人）——
- * 该列的结构由 2a.4 运行时状态机定义，本工作包不猜测其形状。
+ * 该列的结构由 2a.4 运行时状态机定为**裸数组**（{@code [201,202]}），落地实现见
+ * {@code DefaultInFlightChecker#checkUser} 与 {@code InFlightQueryMapper#countUserCandidateNodes}。
  */
 public interface InFlightChecker {
 

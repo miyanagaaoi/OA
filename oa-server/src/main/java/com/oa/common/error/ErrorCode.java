@@ -44,6 +44,14 @@ public enum ErrorCode {
     APPROVER_RESOLUTION_BLOCKED(40007, "发起被拒绝：存在节点无有效审批人", 400),
     /** 400：模板/节点配置非法（顺序不连续、阈值非法、超时 <24h、必填节点缺失等）。 */
     FLOW_DEFINITION_INVALID(40008, "流程模板或节点配置非法，已拒绝", 400),
+    /**
+     * 400：驳回意见不足 5 字（REQ-FLOW-013 / AC-50）。
+     *
+     * <p>文案必须自带「当前字数」与「下限」，便于前端即时提示；空白驳回与不足 5 字同码。
+     */
+    FLOW_OPINION_TOO_SHORT(40009, "驳回意见不足 5 个字", 400),
+    /** 400：动作必填原因缺失（流转/回退/终止/跳转/转办/改派均要求必填原因）。 */
+    FLOW_REASON_REQUIRED(40010, "该动作必须填写原因", 400),
 
     // ---------- 401 认证 ----------
     /** 401：未登录、或会话 Cookie 缺失/已撤销。 */
@@ -105,6 +113,30 @@ public enum ErrorCode {
     FLOW_DEFINITION_IMMUTABLE(40906, "该模板版本为已发布/已归档状态，只读；如需变更请基于它发布新版本", 409),
     /** 409：同一 {@code code} 下已存在草稿版本（templates.md §3.3 同一 code 仅一个可编辑草稿）。 */
     FLOW_DRAFT_ALREADY_EXISTS(40907, "该单据类型已存在草稿版本，请先发布该草稿后再新增版本", 409),
+    /**
+     * 409：<b>Q6 闸门</b>——全单「流转 + 回退」次数已达模板配置的上限
+     * （{@code flow_template.max_return_count}，计数列 {@code flow_instance.routing_count}）。
+     *
+     * <p>文案必须给出「上限 / 已用 / 剩余次数」与错误码（旧行为的替代建议：改用驳回或终止）。
+     * {@code 0} 或 {@code NULL} = 不限，此时永不触发本码。
+     */
+    FLOW_RETURN_BUDGET_EXCEEDED(40908, "流转/回退次数已达上限", 409),
+    /**
+     * 409：<b>Q6 闸门</b>——全单补件次数已达模板配置的上限
+     * （{@code flow_template.max_supplement_count}，计数列 {@code flow_instance.supplement_count}）。
+     */
+    FLOW_SUPPLEMENT_BUDGET_EXCEEDED(40909, "补件次数已达上限", 409),
+    /**
+     * 409：当前节点/状态不允许该动作（节点开关关闭、节点非活动态、任务非待处理、
+     * ⑦ 登记节点不接受「通过」等）。
+     */
+    FLOW_ACTION_NOT_ALLOWED(40910, "当前节点或单据状态不允许该动作", 409),
+    /** 409：流转目标部门是已处理过的部门（禁止回流，REQ-FLOW-020）。 */
+    FLOW_ROUTING_LOOP_BACK(40911, "禁止流转回已处理过的部门", 409),
+    /** 409：同一节点被回退次数已达上限（≤2，REQ-FLOW-021）。 */
+    FLOW_NODE_RETURN_LIMIT_EXCEEDED(40912, "该节点被回退次数已达上限", 409),
+    /** 409：同一节点补件次数已达上限（≤1，REQ-FLOW-023）。 */
+    FLOW_SUPPLEMENT_PER_NODE_LIMIT(40913, "该节点已请求过补件，不能再请求", 409),
 
     // ---------- 429 ----------
     TOO_MANY_REQUESTS(42901, "请求过于频繁，请稍后重试", 429),

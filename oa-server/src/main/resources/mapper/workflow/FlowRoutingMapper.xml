@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  流转链 Mapper（flow_routing）—— 受控表
+  ============================================================================
+  flow_routing 登记为受控表（kind=INSTANCE）→ 每条 SELECT JOIN flow_instance i，
+  且**恰好 1 个** /* @dataScope(table=flow_instance, alias=i) */ 标记（过滤主体恒为实例）。
+  写语句不需要标记。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.runtime.infra.FlowRoutingMapper">
+
+  <resultMap id="RoutingResultMap" type="com.oa.workflow.runtime.infra.row.FlowRoutingRow">
+    <id property="id" column="id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="seq" column="seq"/>
+    <result property="actionType" column="action_type"/>
+    <result property="fromDeptId" column="from_dept_id"/>
+    <result property="toDeptId" column="to_dept_id"/>
+    <result property="fromNodeSeq" column="from_node_seq"/>
+    <result property="toNodeSeq" column="to_node_seq"/>
+    <result property="designatedBy" column="designated_by"/>
+    <result property="reason" column="reason"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="finishedAt" column="finished_at"/>
+  </resultMap>
+
+  <sql id="RoutingColumns">
+    r.id, r.instance_id, r.seq, r.action_type, r.from_dept_id, r.to_dept_id,
+    r.from_node_seq, r.to_node_seq, r.designated_by, r.reason, r.status, r.created_at, r.finished_at
+  </sql>
+
+  <select id="selectRoutingByInstance" resultMap="RoutingResultMap">
+    SELECT <include refid="RoutingColumns"/>
+    FROM flow_routing r
+    JOIN flow_instance i ON i.id = r.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND r.instance_id = #{instanceId}
+    ORDER BY r.seq ASC
+  </select>
+
+  <select id="selectLastRouting" resultMap="RoutingResultMap">
+    SELECT <include refid="RoutingColumns"/>
+    FROM flow_routing r
+    JOIN flow_instance i ON i.id = r.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND r.instance_id = #{instanceId}
+    ORDER BY r.seq DESC
+    LIMIT 1
+  </select>
+
+  <select id="selectProcessingRollback" resultMap="RoutingResultMap">
+    SELECT <include refid="RoutingColumns"/>
+    FROM flow_routing r
+    JOIN flow_instance i ON i.id = r.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND r.instance_id = #{instanceId}
+      AND r.action_type = 'rollback'
+      AND r.status = 'processing'
+      AND r.to_node_seq = #{toNodeSeq}
+    ORDER BY r.seq DESC
+    LIMIT 1
+  </select>
+
+  <select id="countRoutingToDept" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_routing r
+    JOIN flow_instance i ON i.id = r.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND r.instance_id = #{instanceId}
+      AND r.to_dept_id = #{toDeptId}
+      AND r.action_type IN ('route', 'back_home')
+  </select>
+
+  <select id="selectRecentRoutings" resultMap="RoutingResultMap">
+    SELECT <include refid="RoutingColumns"/>
+    FROM flow_routing r
+    JOIN flow_instance i ON i.id = r.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND r.instance_id = #{instanceId}
+    ORDER BY r.seq DESC
+    LIMIT #{limit}
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insertRouting" parameterType="com.oa.workflow.runtime.infra.row.FlowRoutingRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_routing (instance_id, seq, action_type, from_dept_id, to_dept_id,
+                              from_node_seq, to_node_seq, designated_by, reason, status, finished_at)
+    VALUES (#{instanceId}, #{seq}, #{actionType}, #{fromDeptId}, #{toDeptId},
+            #{fromNodeSeq}, #{toNodeSeq}, #{designatedBy}, #{reason}, IFNULL(#{status}, 'processing'),
+            #{finishedAt})
+  </insert>
+
+  <update id="finishRouting">
+    UPDATE flow_routing
+    SET status = 'finished', finished_at = NOW()
+    WHERE id = #{id} AND status = 'processing'
+  </update>
+
+</mapper>

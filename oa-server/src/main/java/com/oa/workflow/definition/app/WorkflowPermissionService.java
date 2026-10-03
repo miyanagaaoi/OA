@@ -41,6 +41,12 @@ public class WorkflowPermissionService {
         return principal;
     }
 
+    /** 当前登录人（缺失返回 {@code null}，用于「取自己姓名」这类非授权判定）。 */
+    public CurrentUser principalOrNull() {
+        DataScopeContext context = DataScopeContext.current();
+        return context == null ? null : context.getPrincipal();
+    }
+
     /** 模板读权限。 */
     public CurrentUser requireTemplateRead() {
         return require("查看流程模板", FlowConfigPermission.TEMPLATE_READ);
@@ -61,6 +67,34 @@ public class WorkflowPermissionService {
         CurrentUser principal = requirePrincipal();
         FlowConfigPermission.requireInitiator(isSuperAdmin(principal), permissionCodes(principal), action);
         return principal;
+    }
+
+    /**
+     * 动作面权限（2a.4 运行时）：按 {@code FlowAction.permission()} 给出的权限码放行。
+     *
+     * <p>与 {@link #requireInitiator} 同一闸门实现（{@link FlowConfigPermission#require}），
+     * 权限码来自 {@code V4__permissions.sql} 的 {@code flow:task:*} 一族 —— 不在别处硬编码。
+     */
+    public CurrentUser requirePermission(String actionLabel, String... permissionCodes) {
+        CurrentUser principal = requirePrincipal();
+        FlowConfigPermission.require(isSuperAdmin(principal), permissionCodes(principal), actionLabel,
+                permissionCodes);
+        return principal;
+    }
+
+    /** 仅系统管理员（改派 AC-52 等「admin-only」动作）。 */
+    public CurrentUser requireSuperAdmin(String actionLabel) {
+        CurrentUser principal = requirePrincipal();
+        if (!isSuperAdmin(principal)) {
+            throw new BizException(ErrorCode.FORBIDDEN,
+                    "「" + actionLabel + "」仅系统管理员可执行");
+        }
+        return principal;
+    }
+
+    /** 是否持有某角色码（如 {@code group_leader} 才能终止流程，AC-49）。 */
+    public boolean hasRole(CurrentUser principal, String roleCode) {
+        return principal != null && principal.hasRole(roleCode);
     }
 
     private CurrentUser require(String action, String permission) {

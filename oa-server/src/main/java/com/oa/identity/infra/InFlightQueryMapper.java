@@ -52,6 +52,26 @@ public interface InFlightQueryMapper {
     /** 该人名下待办所涉单号（拦截文案用）。 */
     List<String> selectUserPendingBizNos(@Param("userId") Long userId, @Param("limit") Integer limit);
 
+    /**
+     * 该人身处**活动节点候选**内的在途单据数（2a.4 追加口径，见 {@code TODO(2a.4)} 的消费）。
+     *
+     * <p>口径：{@code flow_node_instance.status='active'} 且 {@code approver_ids_json} 含本人
+     * （{@code JSON_CONTAINS}）。用途：**依次审批**的后续候选人、以及或签/会签尚未产生任务前的
+     * 「已固化在快照里的候选人」——他们此刻名下没有待办，但离职会让在途单据卡死
+     * （PRD §5.5「快照会导致单据永久卡死」正是这条补偿控制的理由）。
+     *
+     * <p>{@code flow_node_instance} **不是**受控表，但本语句 JOIN 了 {@code flow_instance}，
+     * 因此仍带 1 个 {@code @dataScope} 标记，并由调用方在 {@code DataScopeContext.system()} 下执行。
+     */
+    int countUserCandidateNodes(@Param("userId") Long userId);
+
+    /** 活动节点候选单据的单号（拦截文案用）。 */
+    List<String> selectUserCandidateBizNos(@Param("userId") Long userId, @Param("limit") Integer limit);
+
     /** 该人名下的在途/待办明细（人员影响清单：单据类型 / 发起人 / 当前节点 / 状态）。 */
     List<InFlightItemRow> selectUserInFlightItems(@Param("userId") Long userId, @Param("limit") Integer limit);
+
+    /** 活动节点候选单据明细（人员影响清单的第二段：候选但尚无待办）。 */
+    List<InFlightItemRow> selectUserCandidateInFlightItems(@Param("userId") Long userId,
+                                                          @Param("limit") Integer limit);
 }

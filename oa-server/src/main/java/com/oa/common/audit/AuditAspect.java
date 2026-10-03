@@ -175,10 +175,54 @@ public class AuditAspect {
         }
         try {
             String json = objectMapper.writeValueAsString(value);
-            return truncate(json, MAX_JSON_LENGTH);
+            return truncateJson(json, MAX_JSON_LENGTH);
         } catch (Exception ex) {
             return "{\"serializationError\":\"" + ex.getClass().getSimpleName() + "\"}";
         }
+    }
+
+    /**
+     * JSON 列的**安全截断**：超长时退化为「合法 JSON 对象」而不是把原文切断。
+     *
+     * <p>回归背景（2a.4 运行期实测发现）：{@code sys_log.after_json} 是 MySQL {@code JSON} 列，
+     * 而旧实现对**序列化后的原文**直接 {@code substring(0, 4000) + "...(truncated)"} —— 被切断的
+     * JSON 不再是合法 JSON，MySQL 以 {@code Data truncation: Invalid JSON text ... at position 4476}
+     * 拒绝写入；由于该写入在业务事务内，整笔业务随之 500（实测触发点：
+     * 终止流程 / 重新提交等**返回体较大**（含审批人快照）的动作）。
+     *
+     * <p>现在的口径：长度在阈值内原样返回；超长时返回
+     * {@code {"truncated":true,"length":N,"preview":"…"}} —— 预览字符串本身按**字符**截断并做 JSON 转义，
+     * 因此永远都是合法 JSON。
+     */
+    private String truncateJson(String json, int max) {
+        if (json == null || json.length() <= max) {
+            return json;
+        }
+        String preview = escapeForJsonString(json.substring(0, Math.max(max - 80, 0)));
+        return "{\"truncated\":true,\"length\":" + json.length() + ",\"preview\":\"" + preview + "\"}";
+    }
+
+    /** 把任意片段转义成可安全放进 JSON 字符串字面量的形态。 */
+    private static String escapeForJsonString(String value) {
+        StringBuilder builder = new StringBuilder(value.length() + 16);
+        for (int i = 0; i < value.length(); i++) {
+            char ch = value.charAt(i);
+            switch (ch) {
+                case '"' -> builder.append("\\\"");
+                case '\\' -> builder.append("\\\\");
+                case '\n' -> builder.append("\\n");
+                case '\r' -> builder.append("\\r");
+                case '\t' -> builder.append("\\t");
+                default -> {
+                    if (ch < 0x20) {
+                        builder.append(String.format("\\u%04x", (int) ch));
+                    } else {
+                        builder.append(ch);
+                    }
+                }
+            }
+        }
+        return builder.toString();
     }
 
     private static String errorJson(Throwable ex) {

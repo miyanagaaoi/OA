@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  运行时从表 Mapper（flow_supplement / sys_thread / flow_cc）—— 均**非**受控表
+  ============================================================================
+  这三张表未登记在 oa.scope.tables，因此 SELECT **刻意 0 个 @dataScope 标记**：
+  加了标记会被当成 flow_instance 拼片段（无对应列 → SQL 报错）。
+  可见性依附于前置校验：读取前必须先用 FlowInstanceMapper#selectInstanceById
+  （带标记、域外 404）拿到实例行。
+  ============================================================================
+-->
+<mapper namespace="com.oa.workflow.runtime.infra.FlowRuntimeMapper">
+
+  <resultMap id="SupplementResultMap" type="com.oa.workflow.runtime.infra.row.FlowSupplementRow">
+    <id property="id" column="id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="nodeInstanceId" column="node_instance_id"/>
+    <result property="requestedBy" column="requested_by"/>
+    <result property="reason" column="reason"/>
+    <result property="supplementRound" column="supplement_round"/>
+    <result property="deadline" column="deadline"/>
+    <result property="submittedAt" column="submitted_at"/>
+    <result property="submittedBy" column="submitted_by"/>
+    <result property="submittedNote" column="submitted_note"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <resultMap id="ThreadResultMap" type="com.oa.workflow.runtime.infra.row.FlowThreadRow">
+    <id property="id" column="id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="nodeInstanceId" column="node_instance_id"/>
+    <result property="seq" column="seq"/>
+    <result property="actorId" column="actor_id"/>
+    <result property="actorName" column="actor_name"/>
+    <result property="actorPosition" column="actor_position"/>
+    <result property="action" column="action"/>
+    <result property="opinion" column="opinion"/>
+    <result property="signatureId" column="signature_id"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <resultMap id="CcResultMap" type="com.oa.workflow.runtime.infra.row.FlowCcRow">
+    <id property="id" column="id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="userId" column="user_id"/>
+    <result property="source" column="source"/>
+    <result property="readAt" column="read_at"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <!-- ============================== 补件 ============================== -->
+
+  <select id="selectPendingSupplement" resultMap="SupplementResultMap">
+    SELECT s.id, s.instance_id, s.node_instance_id, s.requested_by, s.reason, s.supplement_round,
+           s.deadline, s.submitted_at, s.submitted_by, s.submitted_note, s.status, s.created_at
+    FROM flow_supplement s
+    WHERE s.instance_id = #{instanceId}
+      AND s.status = 'pending'
+    ORDER BY s.supplement_round DESC
+    LIMIT 1
+  </select>
+
+  <select id="selectSupplementsByInstance" resultMap="SupplementResultMap">
+    SELECT s.id, s.instance_id, s.node_instance_id, s.requested_by, s.reason, s.supplement_round,
+           s.deadline, s.submitted_at, s.submitted_by, s.submitted_note, s.status, s.created_at
+    FROM flow_supplement s
+    WHERE s.instance_id = #{instanceId}
+    ORDER BY s.supplement_round ASC
+  </select>
+
+  <insert id="insertSupplement" parameterType="com.oa.workflow.runtime.infra.row.FlowSupplementRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_supplement (instance_id, node_instance_id, requested_by, reason,
+                                 supplement_round, deadline, status)
+    VALUES (#{instanceId}, #{nodeInstanceId}, #{requestedBy}, #{reason},
+            #{supplementRound}, #{deadline}, IFNULL(#{status}, 'pending'))
+  </insert>
+
+  <update id="markSupplementSubmitted">
+    UPDATE flow_supplement
+    SET status = 'submitted',
+        submitted_at = NOW(),
+        submitted_by = #{submittedBy},
+        submitted_note = #{submittedNote}
+    WHERE id = #{id} AND status = 'pending'
+  </update>
+
+  <update id="markSupplementOverdue">
+    UPDATE flow_supplement
+    SET status = 'overdue'
+    WHERE id = #{id} AND status = 'pending'
+  </update>
+
+  <update id="cancelPendingSupplements">
+    UPDATE flow_supplement
+    SET status = 'cancelled'
+    WHERE instance_id = #{instanceId} AND status = 'pending'
+  </update>
+
+  <!-- ============================== 审批轨迹（只追加） ============================== -->
+
+  <select id="selectThreadByInstance" resultMap="ThreadResultMap">
+    SELECT th.id, th.instance_id, th.node_instance_id, th.seq, th.actor_id, th.actor_name,
+           th.actor_position, th.action, th.opinion, th.signature_id, th.created_at
+    FROM sys_thread th
+    WHERE th.instance_id = #{instanceId}
+    ORDER BY th.seq ASC, th.id ASC
+  </select>
+
+  <select id="nextThreadSeq" resultType="java.lang.Integer">
+    SELECT IFNULL(MAX(th.seq), 0) + 1
+    FROM sys_thread th
+    WHERE th.instance_id = #{instanceId}
+  </select>
+
+  <insert id="insertThread" parameterType="com.oa.workflow.runtime.infra.row.FlowThreadRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO sys_thread (instance_id, node_instance_id, seq, actor_id, actor_name, actor_position,
+                            action, opinion, signature_id)
+    VALUES (#{instanceId}, #{nodeInstanceId}, #{seq}, #{actorId}, #{actorName}, #{actorPosition},
+            #{action}, #{opinion}, #{signatureId})
+  </insert>
+
+  <!-- ============================== 抄送 ============================== -->
+
+  <select id="selectCcByInstance" resultMap="CcResultMap">
+    SELECT c.id, c.instance_id, c.user_id, c.source, c.read_at, c.created_at
+    FROM flow_cc c
+    WHERE c.instance_id = #{instanceId}
+    ORDER BY c.id ASC
+  </select>
+
+  <insert id="insertCc" parameterType="com.oa.workflow.runtime.infra.row.FlowCcRow"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT IGNORE INTO flow_cc (instance_id, user_id, source)
+    VALUES (#{instanceId}, #{userId}, IFNULL(#{source}, 'initiator'))
+  </insert>
+
+  <update id="markCcRead">
+    UPDATE flow_cc
+    SET read_at = NOW()
+    WHERE instance_id = #{instanceId} AND user_id = #{userId} AND read_at IS NULL
+  </update>
+
+</mapper>

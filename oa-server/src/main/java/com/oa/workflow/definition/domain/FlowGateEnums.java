@@ -20,18 +20,25 @@ import java.util.Optional;
  *
  * <p><b>本期（2a.2）只做「配置 + 校验 + 持久化 + 读回 + 接口」</b>：
  * 真正的计数判定属 2a.4 运行时状态机，真正的超时调度属 2b/阶段 3 —— 消费点见
- * {@link #COUNTER_TODO} 与 {@link #DEADLINE_TODO}。
+ * {@link #CONSUMER} 与 {@link #DEADLINE_TODO}。
  */
 public final class FlowGateEnums {
 
     private FlowGateEnums() {
     }
 
-    /** 消费点提示：计数判定依赖 2a.4。 */
-    public static final String COUNTER_TODO =
-            "TODO(2a.4): 按 maxReturnCount / maxSupplementCount 判定";
+    /**
+     * 计数判定的**消费点**（2a.4 已落地，2a.2 的 {@code TODO(2a.4)} 至此消费完毕）。
+     *
+     * <p>真实执行器：{@code com.oa.workflow.runtime.domain.GateCounterPolicy}
+     * （纯判定）→ {@code com.oa.workflow.runtime.app.FlowGateService}（按实例锁定的模板行读取配置）
+     * → {@code FlowEngineService} 在「回退/流转/请求补件」三个动作的入口调用并**超限即拒**。
+     */
+    public static final String CONSUMER =
+            "2a.4 已消费：GateCounterPolicy 判定 maxReturnCount / maxSupplementCount，"
+                    + "FlowGateService 按 flow_instance 锁定的模板行读配置，FlowEngineService 超限即拒（40908 / 40909）";
 
-    /** 消费点提示：超时调度依赖阶段 3 的定时器。 */
+    /** 消费点提示：超时调度依赖阶段 3 的定时器（Q7 的**时限计算**已在 2a.4 落地，见 CONSUMER 同族）。 */
     public static final String DEADLINE_TODO =
             "TODO(阶段3): 按 supplementDeadlineDays/Type 与 onSupplementTimeout 调度";
 

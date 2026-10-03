@@ -40,19 +40,20 @@ import org.springframework.transaction.annotation.Transactional;
  *       然后**一次性**解析全部节点并固化为快照，同时把
  *       {@code template_id + template_version} **锁成发起时的那一行**
  *       —— 这就是 REQ-FLOW-006 / AC-09 的「在途实例锁版本」；</li>
- *   <li><b>提交</b>（{@code POST /flow-instances/{id}/submit}）：{@code draft → approving}，
- *       写 {@code submitted_at} 与 {@code current_node_seq}。**仅此一条迁移**；</li>
+ *   <li><b>提交</b>（{@code POST /flow-instances/{id}/submit}）：{@code draft → approving}。
+ *       <b>2a.4 起由 {@code com.oa.workflow.runtime.app.FlowEngineService} 接管</b>
+ *       —— 提交不再是「一条迁移」，而要同时建节点实例、跳过命中跳过条件的节点、为首个节点产生待办；
+ *       本类的 {@link #submit} 只保留为**显式失败**的兼容入口（避免有人误用旧路径）。</li>
  *   <li><b>读快照</b> / <b>重解析</b>：重解析按 templates.md V-06「驳回后重新提交，重新解析审批人快照与
  *       流程版本（按最新模板）」，并把**旧快照写进审计日志**（{@code sys_log}，只追加）。</li>
  * </ol>
  *
  * <h2>TODO（明确不做，避免与后续工作包冲突）</h2>
  * <ul>
- *   <li>{@code TODO(2a.4)}：节点实例（{@code flow_node_instance}）与任务（{@code flow_task}）的生成、
- *       状态迁移矩阵、7.2 联动规则、四个计数闸门的判定；</li>
- *   <li>{@code TODO(2a.4): 按 maxReturnCount / maxSupplementCount 判定} ——
- *       Q6 配置已在 {@code flow_template} 落库并可读回，本服务只把实例的三个计数列初始化为 0；</li>
- *   <li>{@code TODO(2a.5)}：或签/会签/依次的决议执行与驳回（意见 ≥5 字）；</li>
+ *   <li>{@code TODO(2a.4)}：节点实例与任务的生成、状态迁移矩阵、7.2 联动规则、四个计数闸门的判定
+ *       —— <b>已由 {@code com.oa.workflow.runtime.app.FlowEngineService} 完成</b>；</li>
+ *   <li>{@code TODO(2a.5)}：或签/会签/依次的决议执行与驳回（意见 ≥5 字）
+ *       —— <b>已由 {@code com.oa.workflow.task.domain.TaskDecisionPolicy} + 引擎完成</b>；</li>
  *   <li>{@code TODO(2b)}：表单字段的服务端二次校验与写入白名单（本服务只落最小的
  *       {@code form_data} 行，{@code fields_json} 原样保存）。</li>
  * </ul>
@@ -158,28 +159,10 @@ public class FlowInstanceService {
         return toView(requireInstance(instance.getId()));
     }
 
-    /** 提交：{@code draft → approving}（**本工作包唯一的实例状态迁移**）。 */
-    @Transactional
+    /** 提交：{@code draft → approving} —— **2a.4 起由运行时引擎接管**（见类注释 TODO 说明）。 */
     public InstanceView submit(Long instanceId, String reason) {
-        CurrentUser operator = permissionService.requireInitiator("提交审批单");
-        FlowInstanceRow instance = requireInstance(instanceId);
-        requireInitiatorOrAdmin(instance, operator);
-        if (!"draft".equals(instance.getStatus())) {
-            throw new BizException(ErrorCode.CONFLICT,
-                    "只有草稿状态的单据可以提交，当前状态：" + instance.getStatus()
-                            + "（其余状态迁移属 2a.4 运行时状态机）");
-        }
-        Integer firstSeq = firstActiveSeq(instance);
-        int updated = instanceMapper.markSubmitted(instanceId, firstSeq);
-        if (updated == 0) {
-            throw new BizException(ErrorCode.CONFLICT, "单据状态已被他人变更，请刷新后重试");
-        }
-        auditLogWriter.appendAsCurrentUser("submit", "instance", instanceId, null,
-                "{\"reason\":" + JsonText.write(reason == null ? "" : reason) + "}", null, null);
-        log.info("流程实例提交：operator={} instanceId={} bizNo={} currentNodeSeq={} reason={}"
-                        + "（节点实例与任务生成 TODO(2a.4)）",
-                operator.account(), instanceId, instance.getBizNo(), firstSeq, reason);
-        return toView(requireInstance(instanceId));
+        throw new BizException(ErrorCode.INTERNAL_ERROR,
+                "提交已由 FlowEngineService 接管（2a.4 运行时状态机）：请在 FlowInstanceController 走引擎入口");
     }
 
     // ================================================================ 快照
@@ -302,20 +285,6 @@ public class FlowInstanceService {
             throw new BizException(ErrorCode.FORBIDDEN,
                     "只有发起人本人（或系统管理员）可以对该单据执行本操作");
         }
-    }
-
-    /** 首个未跳过节点的 seq（提交后的当前节点；跳过判断用快照，避免再查模板）。 */
-    private Integer firstActiveSeq(FlowInstanceRow instance) {
-        ApproverSnapshot snapshot = ApproverSnapshotCodec.read(instance.getApproverSnapshotJson());
-        if (snapshot == null || snapshot.nodes().isEmpty()) {
-            return 1;
-        }
-        for (ApproverSnapshot.SnapshotNode node : snapshot.nodes()) {
-            if (!Boolean.TRUE.equals(node.skipped()) && !node.approvers().isEmpty()) {
-                return node.nodeSeq();
-            }
-        }
-        return snapshot.nodes().get(0).nodeSeq();
     }
 
     /** 归口部门恒为集团财务部（PRD §6.3：即使②被跳过也记财务部）。 */

@@ -148,4 +148,49 @@
     LIMIT #{limit}
   </select>
 
+  <!-- ==========================================================================
+       2a.4 追加口径：「本人在活动节点候选内」（此前只有 TODO(2a.4)）
+       口径：flow_node_instance.status='active' 且 approver_ids_json 含本人
+       （approver_ids_json 是引擎写入的**裸数组**，如 [201,202]）
+       ========================================================================== -->
+  <select id="countUserCandidateNodes" resultType="int">
+    SELECT COUNT(DISTINCT ni.instance_id)
+    FROM flow_node_instance ni
+    JOIN flow_instance i ON i.id = ni.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND ni.status = 'active'
+      AND JSON_CONTAINS(ni.approver_ids_json, CAST(#{userId} AS JSON))
+  </select>
+
+  <select id="selectUserCandidateBizNos" resultType="java.lang.String">
+    SELECT DISTINCT i.biz_no
+    FROM flow_node_instance ni
+    JOIN flow_instance i ON i.id = ni.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND ni.status = 'active'
+      AND JSON_CONTAINS(ni.approver_ids_json, CAST(#{userId} AS JSON))
+    ORDER BY i.biz_no DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectUserCandidateInFlightItems" resultMap="InFlightItemResultMap">
+    SELECT DISTINCT i.id AS instance_id, i.biz_no, i.form_type,
+           ni.node_name AS node_name,
+           u.name AS initiator_name,
+           (SELECT n2.node_name FROM flow_node_instance n2
+             WHERE n2.instance_id = i.id AND n2.node_seq = i.current_node_seq LIMIT 1) AS current_node_name,
+           ni.status AS status
+    FROM flow_node_instance ni
+    JOIN flow_instance i ON i.id = ni.instance_id
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND ni.status = 'active'
+      AND JSON_CONTAINS(ni.approver_ids_json, CAST(#{userId} AS JSON))
+    ORDER BY i.id DESC
+    LIMIT #{limit}
+  </select>
+
 </mapper>

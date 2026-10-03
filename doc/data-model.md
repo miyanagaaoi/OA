@@ -462,9 +462,9 @@ CREATE TABLE flow_instance (
   initiator_company_id BIGINT UNSIGNED NOT NULL COMMENT '发起人公司快照（数据域判定）',
   initiator_org_path   VARCHAR(255) NOT NULL COMMENT '发起时组织路径快照',
   approver_snapshot_json JSON       NOT NULL COMMENT '审批人快照，结构见 7.1（REQ-FLOW-011）',
-  status               VARCHAR(16)  NOT NULL DEFAULT 'draft'
-                       COMMENT 'draft=草稿 approving=审批中 approved=已通过 rejected=已驳回 withdrawn=已撤回（**瞬时态**：撤回写入轨迹与审计后立即回到 draft，不长期驻留） terminated=已终止',
-  sub_status           VARCHAR(16)      NULL COMMENT '子状态：NULL / pending_supplement=待补件（值域与 doc/enums.md §4 一致）',
+  status               VARCHAR(24)  NOT NULL DEFAULT 'draft'
+                       COMMENT 'draft=草稿 approving=审批中 approved=已通过 rejected=已驳回 withdrawn=已撤回（**瞬时态**：撤回写入轨迹与审计后立即回到 draft，不长期驻留） terminated=已终止；**列宽 24**（enums.md §1.1 允许的 16/24/32 之一）：值域内 terminated/withdrawn/approving 等最长 10 字符，留足后续扩展（原 VARCHAR(16) 与 CHECK 值域不冲突，此处仅为与同族列口径一致）',
+  sub_status           VARCHAR(24)      NULL COMMENT '子状态：NULL / pending_supplement=待补件（值域与 doc/enums.md §4 一致）；**列宽必须 ≥18**：pending_supplement 共 18 字符，原 VARCHAR(16) 会在严格模式下报 Data too long，使待补件子状态无法落库（2026-10-03 运行期实测发现）',
   current_node_seq     INT              NULL COMMENT '当前节点序号',
   current_dept_id      BIGINT UNSIGNED NULL COMMENT '集团层当前承接部门（流转后变化）',
   owner_dept_id        BIGINT UNSIGNED NULL COMMENT '归口部门，恒为集团财务部，用于统计与审计（REQ-FLOW-001）',
@@ -503,8 +503,8 @@ CREATE TABLE flow_node_instance (
   decision_mode        VARCHAR(16)      NULL COMMENT '发起时冻结的决议模式；NULL=不适用（⑦归档登记节点默认仅登记不审批）',
   pass_threshold       VARCHAR(16)      NULL COMMENT '发起时冻结的会签阈值；判定与取整规则同 flow_node.pass_threshold（NULL=过半）',
   approver_ids_json    JSON         NOT NULL COMMENT '本节点候选人快照',
-  status               VARCHAR(16)  NOT NULL DEFAULT 'pending'
-                       COMMENT 'pending=未开始 active=进行中 waiting_supplement=等待补件 approved=已通过 rejected=已驳回 skipped=已跳过 returned=已退回 cancelled=已取消（值域与 doc/enums.md §5 一致）',
+  status               VARCHAR(24)  NOT NULL DEFAULT 'pending'
+                       COMMENT 'pending=未开始 active=进行中 waiting_supplement=等待补件 approved=已通过 rejected=已驳回 skipped=已跳过 returned=已退回 cancelled=已取消（值域与 doc/enums.md §5 一致）；**列宽必须 ≥18**：waiting_supplement 共 18 字符，原 VARCHAR(16) 会在严格模式下报 Data too long，使「等待补件」无法落库（2026-10-03 运行期实测发现）',
   returned_count       INT          NOT NULL DEFAULT 0 COMMENT '被回退次数（上限 2，REQ-FLOW-021）',
   supplement_requested TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '本节点是否已请求过补件（上限 1 次）',
   add_sign_chain_json  JSON             NULL COMMENT '加签链记录',
@@ -530,8 +530,8 @@ CREATE TABLE flow_task (
   origin_assignee_id BIGINT UNSIGNED   NULL COMMENT '转办/改派前的原处理人（转办用本列）',
   delegate_from    BIGINT UNSIGNED     NULL COMMENT '加签来源：发起加签/委托的原审批人 user_id（PRD 7.1 / REQ-FLOW-003）',
   add_sign_type    VARCHAR(8)          NULL COMMENT '加签类型：pre=前加签（加签人先审，审完回到本人） post=后加签（本人审完加签人再审） NULL=非加签任务',
-  status           VARCHAR(16)  NOT NULL DEFAULT 'pending'
-                   COMMENT 'pending=待处理 agreed=已同意 rejected=已拒绝 transferred=已转办 reassigned=已改派 added_sign=已加签 routed=已流转 rolled_back=已回退 supplement_requested=已请求补件 auto_closed=已自动关闭（值域与 doc/enums.md §6 一致）',
+  status           VARCHAR(24)  NOT NULL DEFAULT 'pending'
+                   COMMENT 'pending=待处理 agreed=已同意 rejected=已拒绝 transferred=已转办 reassigned=已改派 added_sign=已加签 routed=已流转 rolled_back=已回退 supplement_requested=已请求补件 auto_closed=已自动关闭（值域与 doc/enums.md §6 一致）；**列宽必须 ≥20**：supplement_requested 共 20 字符，原 VARCHAR(16) 会在严格模式下报 Data too long，使「已请求补件」无法落库（2026-10-03 运行期实测发现）',
   opinion          VARCHAR(1000)    NULL COMMENT '审批意见（驳回必填 ≥5 字）',
   decided_at       DATETIME         NULL,
   handover_reason  VARCHAR(255)     NULL COMMENT '转办/改派原因',

@@ -62,11 +62,42 @@ class WorkflowMapperXmlTest {
         STATEMENTS.put(DIR + "FlowInstanceMapper.xml", List.of(
                 "selectInstanceById", "selectInstances", "selectByBizNo", "countByBizNo", "countInFlightByTemplate",
                 "selectFormDataCreator", "selectFormDataFields",
-                "insertInstance", "updateSnapshot", "markSubmitted", "updateCurrentNodeSeq", "insertFormData"));
+                "insertInstance", "updateSnapshot", "markSubmitted", "updateCurrentNodeSeq", "insertFormData",
+                // 2a.4 运行时进度写语句
+                "updateProgress", "markFinished", "incrementRoutingCount", "incrementSupplementCount",
+                "resetForResubmit"));
+        // 2a.4 运行时从表（flow_node_instance）
+        STATEMENTS.put(DIR + "FlowNodeInstanceMapper.xml", List.of(
+                "selectByInstance", "selectNodeInstanceById", "selectByInstanceAndKey", "selectLiveByInstance",
+                "selectByInstanceAndSeq", "selectPreviousApproved", "selectReturnedNode",
+                "countLiveAtSeq", "countFinishedAtSeq", "countByInstance",
+                "insert", "updateStatus", "activate", "finish", "updateApprovers", "updateAddSignChain",
+                "incrementReturnedCount", "markSupplementWaiting", "markSupplementResolved",
+                "resetForNewRound"));
+        // 2a.5 任务（flow_task；受控表 → 每条 SELECT 1 个标记）
+        STATEMENTS.put(DIR + "FlowTaskMapper.xml", List.of(
+                "selectTaskById", "selectByNodeInstance", "selectPrimaryByNodeInstance",
+                "selectRoundPrimaryByNodeInstance",
+                "selectPendingPrimaryByNodeInstance", "selectPendingPrimaryByInstanceAndAssignee",
+                "countPendingByInstance", "selectTasksByInstance",
+                "selectTodo", "countTodo", "selectDone", "countDone", "selectInitiated", "countInitiated",
+                "insert", "updateDecision", "closePendingByNodeInstance", "closePendingByInstance",
+                "updateHandover"));
+        // 2a.4 流转链（flow_routing；受控表 → 每条 SELECT 1 个标记）
+        STATEMENTS.put(DIR + "FlowRoutingMapper.xml", List.of(
+                "selectRoutingByInstance", "selectLastRouting", "selectProcessingRollback",
+                "countRoutingToDept", "selectRecentRoutings", "insertRouting", "finishRouting"));
+        // 2a.4 补件 / 轨迹 / 抄送（均非受控表 → 0 个标记）
+        STATEMENTS.put(DIR + "FlowRuntimeMapper.xml", List.of(
+                "selectPendingSupplement", "selectSupplementsByInstance", "insertSupplement",
+                "markSupplementSubmitted", "markSupplementOverdue", "cancelPendingSupplements",
+                "selectThreadByInstance", "nextThreadSeq", "insertThread",
+                "selectCcByInstance", "insertCc", "markCcRead"));
         STATEMENTS.put(IDENTITY_DIR + "InFlightQueryMapper.xml", List.of(
                 "countOrgInFlight", "selectOrgInFlightItems", "selectOrgInFlightBizNos",
                 "countUserPendingTasks", "selectPendingTaskCounts", "selectUserPendingTasks",
-                "selectUserPendingBizNos", "selectUserInFlightItems"));
+                "selectUserPendingBizNos", "selectUserInFlightItems",
+                "countUserCandidateNodes", "selectUserCandidateBizNos", "selectUserCandidateInFlightItems"));
     }
 
     /** 命名空间推断（与文件名一一对应）。 */
@@ -83,6 +114,18 @@ class WorkflowMapperXmlTest {
         if (resource.endsWith("FlowInstanceMapper.xml")) {
             return "com.oa.workflow.approver.infra.FlowInstanceMapper";
         }
+        if (resource.endsWith("FlowNodeInstanceMapper.xml")) {
+            return "com.oa.workflow.runtime.infra.FlowNodeInstanceMapper";
+        }
+        if (resource.endsWith("FlowTaskMapper.xml")) {
+            return "com.oa.workflow.runtime.infra.FlowTaskMapper";
+        }
+        if (resource.endsWith("FlowRoutingMapper.xml")) {
+            return "com.oa.workflow.runtime.infra.FlowRoutingMapper";
+        }
+        if (resource.endsWith("FlowRuntimeMapper.xml")) {
+            return "com.oa.workflow.runtime.infra.FlowRuntimeMapper";
+        }
         return "com.oa.identity.infra.InFlightQueryMapper";
     }
 
@@ -90,12 +133,16 @@ class WorkflowMapperXmlTest {
     private static final Set<String> SCOPED_XML = new LinkedHashSet<>(List.of(
             DIR + "ApproverDirectoryMapper.xml",
             DIR + "FlowInstanceMapper.xml",
+            DIR + "FlowTaskMapper.xml",
+            DIR + "FlowRoutingMapper.xml",
             IDENTITY_DIR + "InFlightQueryMapper.xml"));
 
-    /** 配置数据 Mapper XML（**刻意 0 个标记**）。 */
+    /** 配置数据 / 非受控表语义的 Mapper XML（**刻意 0 个标记**）。 */
     private static final Set<String> CONFIG_XML = new LinkedHashSet<>(List.of(
             DIR + "FlowTemplateMapper.xml",
-            DIR + "FlowNodeMapper.xml"));
+            DIR + "FlowNodeMapper.xml",
+            DIR + "FlowNodeInstanceMapper.xml",
+            DIR + "FlowRuntimeMapper.xml"));
 
     private static String read(String resource) throws Exception {
         try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
@@ -196,8 +243,14 @@ class WorkflowMapperXmlTest {
         assertThat(markerTables(DIR + "ApproverDirectoryMapper.xml"))
                 .containsExactlyInAnyOrder("sys_org", "sys_org_leader", "sys_user");
         assertThat(markerTables(IDENTITY_DIR + "InFlightQueryMapper.xml")).containsExactly("flow_instance");
+        // 2a.4/2a.5：任务与流转链的过滤主体恒为 flow_instance（标记写成 flow_task/flow_routing
+        // 会拼出该表不存在的 initiator_id → SQL 报错）
+        assertThat(markerTables(DIR + "FlowTaskMapper.xml")).containsExactly("flow_instance");
+        assertThat(markerTables(DIR + "FlowRoutingMapper.xml")).containsExactly("flow_instance");
         assertThat(markerTables(DIR + "FlowTemplateMapper.xml")).isEmpty();
         assertThat(markerTables(DIR + "FlowNodeMapper.xml")).isEmpty();
+        assertThat(markerTables(DIR + "FlowNodeInstanceMapper.xml")).isEmpty();
+        assertThat(markerTables(DIR + "FlowRuntimeMapper.xml")).isEmpty();
     }
 
     @Test
@@ -208,7 +261,11 @@ class WorkflowMapperXmlTest {
                 "com.oa.workflow.approver.infra.FlowInstanceMapper",
                 "com.oa.identity.infra.InFlightQueryMapper",
                 "com.oa.workflow.definition.infra.FlowTemplateMapper",
-                "com.oa.workflow.definition.infra.FlowNodeMapper");
+                "com.oa.workflow.definition.infra.FlowNodeMapper",
+                // 2a.4 / 2a.5 新增
+                "com.oa.workflow.runtime.infra.FlowNodeInstanceMapper",
+                "com.oa.workflow.runtime.infra.FlowTaskMapper",
+                "com.oa.workflow.runtime.infra.FlowRuntimeMapper");
         Set<String> mpReadMethods = Set.of("selectById", "selectList", "selectOne", "selectPage",
                 "selectCount", "selectBatchIds");
 
