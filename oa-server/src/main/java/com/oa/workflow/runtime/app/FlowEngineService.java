@@ -192,7 +192,14 @@ public class FlowEngineService {
         // §3「金额为 0 或空时禁止提交（PRD 13.2）· 提交前必须通过」、§11.2。
         // ------------------------------------------------------------------
         String formGateEvidence = formSubmitGate.assertSubmittable(instance);
-        ApproverSnapshot snapshot = readSnapshot(instance);
+        // ------------------------------------------------------------------
+        // AC-19（发起前拦截空候选人）**唯一拦截点**：2026-10-04 起预检从「建草稿」移到「提交」——
+        // 草稿只是填写中的内容（建草稿时就要求审批人全部可解析会与「⑤依赖表单里的事项类别」
+        // 形成鸡生蛋），而「带着空审批人启动审批流」必须被拒。本调用同时把**同一次解析**的快照
+        // 固化回 flow_instance（REQ-FLOW-011「发起时解析并固化」），因此快照不会是草稿期的陈旧版。
+        // 失败 → 400 APPROVER_RESOLUTION_BLOCKED（逐节点/规则/缺配），发生在 markSubmitted **之前**。
+        // ------------------------------------------------------------------
+        ApproverSnapshot snapshot = instanceService.prepareSubmitSnapshot(instance, actor);
         List<SnapshotNode> nodes = orderedNodes(snapshot);
         if (nodes.isEmpty()) {
             throw new BizException(ErrorCode.CONFLICT, "审批人快照为空，无法提交；请先重新解析审批人快照");

@@ -11,8 +11,8 @@ description:
   en: >
       The table: canvas fill with a 1px outer border, 44px rows (36px compact rows for audit logs and details), a canvas-subtle header 40px tall that sticks while scrolling, canvas-subtle row hover and primary-subtle selection, a frozen first column (number/type) and a frozen right action column; amount columns are tnum right-aligned with two decimals.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.174Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.328Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

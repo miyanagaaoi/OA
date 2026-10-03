@@ -30,6 +30,8 @@ public class FlowTaskViewRow {
     private Integer currentNodeSeq;
     private String instanceStatus;
     private String subStatus;
+    /** 单据标题（{@code form_data.fields_json.title}；列表追加字段，关键字筛选的命中项之一）。 */
+    private String title;
     /** 分页总数（{@code COUNT(*) OVER()} 或独立 count 语句回填；列表查询为 {@code null}）。 */
     private Long total;
 
@@ -215,5 +217,13 @@ public class FlowTaskViewRow {
 
     public void setTotal(Long total) {
         this.total = total;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

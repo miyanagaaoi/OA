@@ -11,8 +11,8 @@ description:
   en: >
       Column definitions for the full-width table: type icon + title + status badge, document number, initiator, department, current node, submitted time, amount; the amount column uses typography.amount (tnum), right-aligned with two decimals and a ten-thousand-yuan conversion at 1,000,000 and above; timestamps and numbers use the monospace face.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.292Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.420Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

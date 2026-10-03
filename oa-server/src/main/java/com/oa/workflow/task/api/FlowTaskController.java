@@ -4,6 +4,7 @@ import com.oa.common.api.ApiResponse;
 import com.oa.common.audit.Audited;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.ActionResult;
+import com.oa.workflow.runtime.api.dto.RuntimeDtos.CcListItemView;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.PageResult;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.TaskListItemView;
 import com.oa.workflow.runtime.api.dto.RuntimeRequests.AddSignRequest;
@@ -16,6 +17,7 @@ import com.oa.workflow.runtime.api.dto.RuntimeRequests.ReasonRequest;
 import com.oa.workflow.runtime.api.dto.RuntimeRequests.RouteRequest;
 import com.oa.workflow.runtime.domain.FlowAction;
 import com.oa.workflow.task.app.FlowTaskService;
+import com.oa.workflow.task.domain.TaskListFilter;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>GET</td><td>{@code /flow-tasks/todo}</td><td>{@code flow}</td><td><b>待办</b>（pending 且我是处理人；分页 + 数据域）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-tasks/done}</td><td>{@code flow}</td><td><b>已办</b>（我处理过的任务）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-tasks/initiated}</td><td>{@code flow}</td><td><b>我发起的</b></td></tr>
+ *   <tr><td>GET</td><td>{@code /flow-tasks/cc}</td><td>{@code flow}</td>
+ *       <td><b>抄送我的一览</b>（{@code flow_cc} ⋈ {@code flow_instance}；只读可见、不产生待办）</td></tr>
+ *   <tr><td colspan="4">上述四个列表**同一套筛选参数**：{@code page/size/keyword/formType/status/dateFrom/dateTo}
+ *       （SQL 层过滤 + 数据域优先，见 {@code TaskListFilter}）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-tasks/{taskId}/approve}</td><td>{@code flow:task:approve}</td><td>通过（② 可勾选协同部门）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-tasks/{taskId}/reject}</td><td>{@code flow:task:reject}</td><td>驳回（意见 ≥5 字）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-tasks/{taskId}/archive-register}</td><td>{@code flow:task:approve}</td><td>⑦ 归档登记（不产生审批决议）</td></tr>
@@ -76,28 +82,82 @@ public class FlowTaskController {
 
     // ================================================================ 列表
 
+    /**
+     * 待我审批 / 我已审批 / 我发起的 / 抄送我的 —— <b>四个列表同一套筛选参数</b>。
+     *
+     * <table border="1">
+     *   <tr><th>参数</th><th>含义</th></tr>
+     *   <tr><td>{@code page} / {@code size}</td><td>分页（{@code page} 从 1 起，{@code size} ≤ 100）</td></tr>
+     *   <tr><td>{@code keyword}</td><td>关键字：单号 / 标题 / 发起人</td></tr>
+     *   <tr><td>{@code formType}</td><td>单据类型：{@code matter / fund / contract / seal}</td></tr>
+     *   <tr><td>{@code status}</td><td>单据状态码（含子状态 {@code pending_supplement}）</td></tr>
+     *   <tr><td>{@code dateFrom} / {@code dateTo}</td><td>起止日期（{@code YYYY-MM-DD}，含首含尾）</td></tr>
+     * </table>
+     *
+     * <p>过滤**全部在 SQL 层**（{@code FlowTaskMapper.xml} 的 {@code TaskListFilters} 片段），
+     * 且数据域片段恒在该片段之前；空值等价于不筛（{@link TaskListFilter#of} 归一化）。
+     */
     @GetMapping("/todo")
     public ApiResponse<PageResult<TaskListItemView>> todo(
             @RequestParam(name = "page", required = false) Integer page,
-            @RequestParam(name = "size", required = false) Integer size) {
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "formType", required = false) String formType,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "dateFrom", required = false) String dateFrom,
+            @RequestParam(name = "dateTo", required = false) String dateTo) {
         permissionService.requireInitiator("查看我的待办");
-        return ApiResponse.success(taskService.todo(page, size));
+        return ApiResponse.success(taskService.todo(page, size,
+                TaskListFilter.of(keyword, formType, status, dateFrom, dateTo)));
     }
 
     @GetMapping("/done")
     public ApiResponse<PageResult<TaskListItemView>> done(
             @RequestParam(name = "page", required = false) Integer page,
-            @RequestParam(name = "size", required = false) Integer size) {
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "formType", required = false) String formType,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "dateFrom", required = false) String dateFrom,
+            @RequestParam(name = "dateTo", required = false) String dateTo) {
         permissionService.requireInitiator("查看我已办");
-        return ApiResponse.success(taskService.done(page, size));
+        return ApiResponse.success(taskService.done(page, size,
+                TaskListFilter.of(keyword, formType, status, dateFrom, dateTo)));
     }
 
     @GetMapping("/initiated")
     public ApiResponse<PageResult<TaskListItemView>> initiated(
             @RequestParam(name = "page", required = false) Integer page,
-            @RequestParam(name = "size", required = false) Integer size) {
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "formType", required = false) String formType,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "dateFrom", required = false) String dateFrom,
+            @RequestParam(name = "dateTo", required = false) String dateTo) {
         permissionService.requireInitiator("查看我发起的");
-        return ApiResponse.success(taskService.initiated(page, size));
+        return ApiResponse.success(taskService.initiated(page, size,
+                TaskListFilter.of(keyword, formType, status, dateFrom, dateTo)));
+    }
+
+    /**
+     * <b>抄送我的一览</b>（分页 + 同一套筛选参数）。
+     *
+     * <p>数据源 {@code flow_cc ⋈ flow_instance}；{@code flow_cc} 不在受控表清单里，
+     * 因此「抄送人 = 本人」由 {@code c.user_id = :uid} 显式过滤，再叠加 {@code flow_instance}
+     * 的数据域标记（口径与理由见 {@code FlowTaskService#cc}）。
+     */
+    @GetMapping("/cc")
+    public ApiResponse<PageResult<CcListItemView>> cc(
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "formType", required = false) String formType,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "dateFrom", required = false) String dateFrom,
+            @RequestParam(name = "dateTo", required = false) String dateTo) {
+        permissionService.requireInitiator("查看抄送我的");
+        return ApiResponse.success(taskService.cc(page, size,
+                TaskListFilter.of(keyword, formType, status, dateFrom, dateTo)));
     }
 
     // ================================================================ 动作

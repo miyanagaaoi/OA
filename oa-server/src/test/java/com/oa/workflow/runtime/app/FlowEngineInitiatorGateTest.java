@@ -2,7 +2,9 @@ package com.oa.workflow.runtime.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +73,8 @@ class FlowEngineInitiatorGateTest {
 
     private FlowInstanceMapper instanceMapper;
     private FlowEngineService engine;
+    /** 发起门面的替身（2026-10-04 起 AC-19 的预检闸门挂在它的 prepareSubmitSnapshot 上）。 */
+    private FlowInstanceService instanceService;
 
     @BeforeEach
     void setUp() {
@@ -120,10 +124,11 @@ class FlowEngineInitiatorGateTest {
         when(permissions.permissionCodes(principalId))
                 .thenReturn(new java.util.LinkedHashSet<>(java.util.Arrays.asList(permissionCodes)));
         WorkflowPermissionService gate = new WorkflowPermissionService(permissions);
+        instanceService = mock(FlowInstanceService.class);
         engine = new FlowEngineService(instanceMapper, mock(FlowNodeInstanceMapper.class),
                 mock(FlowTaskMapper.class), mock(FlowRuntimeMapper.class), mock(FlowRoutingMapper.class),
                 mock(FlowGateService.class), mock(FlowThreadWriter.class), gate,
-                mock(ApproverDirectory.class), mock(AuditLogWriter.class), mock(FlowInstanceService.class),
+                mock(ApproverDirectory.class), mock(AuditLogWriter.class), instanceService,
                 mock(com.oa.form.app.FormSubmitGate.class));
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(principalId, "u" + principalId, "用户" + principalId,
@@ -206,10 +211,11 @@ class FlowEngineInitiatorGateTest {
         EffectivePermissionService permissions = mock(EffectivePermissionService.class);
         when(permissions.permissionCodes(OTHER_USER_ID)).thenReturn(Set.of());
         WorkflowPermissionService gate = new WorkflowPermissionService(permissions);
+        instanceService = mock(FlowInstanceService.class);
         engine = new FlowEngineService(instanceMapper, mock(FlowNodeInstanceMapper.class),
                 mock(FlowTaskMapper.class), mock(FlowRuntimeMapper.class), mock(FlowRoutingMapper.class),
                 mock(FlowGateService.class), mock(FlowThreadWriter.class), gate,
-                mock(ApproverDirectory.class), mock(AuditLogWriter.class), mock(FlowInstanceService.class),
+                mock(ApproverDirectory.class), mock(AuditLogWriter.class), instanceService,
                 mock(com.oa.form.app.FormSubmitGate.class));
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(OTHER_USER_ID, "admin2", "管理员", "T502", 135L, 12L,
@@ -228,14 +234,24 @@ class FlowEngineInitiatorGateTest {
     void engineEntriesReachStateMachine() {
         boot(INITIATOR_ID, FlowConfigPermission.FLOW_USE, FlowAction.SUPPLEMENT_SUBMIT.permission());
 
-        // submit：快照为空 → 409（不是 403）
+        // submit：2026-10-04 起 AC-19 的闸门是 FlowInstanceService#prepareSubmitSnapshot（预检
+        // 从「建草稿」移到「提交」）。这里把该协作者桩成「拦截」形态，断言：
+        // ① 引擎确实**委托**给它（而不是自己读旧快照放过）；
+        // ② 40007 原样透出（拦截未被引擎吞掉）。改前的断言是「快照为空 → 409」，属 2a.3 旧的
+        //    「建草稿即预检」时代的形态，已随拦截点迁移一并改到提交路径。
+        when(instanceService.prepareSubmitSnapshot(any(), any())).thenThrow(new BizException(
+                ErrorCode.APPROVER_RESOLUTION_BLOCKED,
+                "发起被拒绝：1 个节点无有效审批人 —— 5 集团分管领导（group_leader，规则 group_leader）："
+                        + "候选人集合为空；缺少配置：请在发起时确定事项类别"));
         assertThatThrownBy(() -> engine.submit(INSTANCE_ID, null))
                 .isInstanceOf(BizException.class)
-                .hasMessageContaining("审批人快照为空")
+                .hasMessageContaining("1 个节点无有效审批人")
+                .hasMessageContaining("group_leader")
                 .satisfies(ex -> assertThat(((BizException) ex).getErrorCode())
-                        .isEqualTo(ErrorCode.CONFLICT));
+                        .isEqualTo(ErrorCode.APPROVER_RESOLUTION_BLOCKED));
+        verify(instanceService).prepareSubmitSnapshot(any(), any());
 
-        // resubmit：实例为 draft 且快照为空 → 同样走到状态机（409）
+        // resubmit：实例为 draft 且快照为空 → 同样走到状态机
         when(instanceMapper.selectInstanceById(INSTANCE_ID)).thenReturn(instance(InstanceStatus.DRAFT.code()));
         assertThatThrownBy(() -> engine.resubmit(INSTANCE_ID, null)).isInstanceOf(BizException.class);
 

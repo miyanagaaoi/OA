@@ -3,6 +3,7 @@ package com.oa.form.api;
 import com.oa.common.api.ApiResponse;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
+import com.oa.common.security.CurrentUser;
 import com.oa.form.app.FormDataService;
 import com.oa.form.contract.ContractFormRules;
 import com.oa.form.document.FormRuleContext;
@@ -56,13 +57,17 @@ public class FormRuleController {
     private final FormRuleRegistry ruleRegistry;
     private final FormDataService formDataService;
     private final WorkflowPermissionService permissionService;
+    /** 金额只读策略的**唯一**判定入口（与写路径 {@code FormStateWriteGuard} 同一实现）。 */
+    private final com.oa.authz.visibility.FormFieldWriteGuard fieldWriteGuard;
 
     public FormRuleController(FormSchemaService schemaService, FormRuleRegistry ruleRegistry,
-                              FormDataService formDataService, WorkflowPermissionService permissionService) {
+                              FormDataService formDataService, WorkflowPermissionService permissionService,
+                              com.oa.authz.visibility.FormFieldWriteGuard fieldWriteGuard) {
         this.schemaService = schemaService;
         this.ruleRegistry = ruleRegistry;
         this.formDataService = formDataService;
         this.permissionService = permissionService;
+        this.fieldWriteGuard = fieldWriteGuard;
     }
 
     // ================================================================ 事项单
@@ -173,8 +178,30 @@ public class FormRuleController {
         view.put("formType", schema.formType());
         view.put("schemaVersion", schema.schemaVersion());
         view.put("sections", sections);
-        view.put("amountPolicy", FormDataService.amountPolicyOf(null));
+        // 金额字段对**当前登录角色**的读写策略。
+        // 2026-10-04 缺陷修复：改前这里是 `FormDataService.amountPolicyOf(null)` —— 硬编码
+        // null 主体使 `AmountFieldPolicy#canWriteAmounts(null)` 恒为 false，于是**所有账号
+        // （含系统管理员与财务角色）都被前端告知「金额只读」**，而写路径（FormStateWriteGuard
+        // → AmountFieldPolicy，按真实 principal 判）却放行 —— 「读说不能写、写却能写」。
+        // 现在与写路径共用**同一个**实现（FormFieldWriteGuard#amountPolicy）与**同一个**主体来源
+        // （DataScopeContext 的当前登录人），两条路径不可能再分叉。
+        view.put("amountPolicy", fieldWriteGuard.amountPolicy(requirePrincipal()));
         return ApiResponse.success(view);
+    }
+
+    /**
+     * 当前登录主体（与 {@code FormFieldWriteGuard#requirePrincipal} / {@code FieldPolicyController}
+     * **同一来源**：{@code DataScopeContext} 里鉴权阶段装载的 principal）。
+     *
+     * <p>刻意不另造一份读取方式：面向用户的策略展示必须用「当前登录人」，
+     * 而 DataScopeContext 是 AuthInterceptor 装载、AuthInterceptor 清理的单一事实源。
+     */
+    private static CurrentUser requirePrincipal() {
+        com.oa.common.scope.DataScopeContext context = com.oa.common.scope.DataScopeContext.current();
+        if (context == null || context.getPrincipal() == null) {
+            throw new BizException(ErrorCode.UNAUTHORIZED);
+        }
+        return context.getPrincipal();
     }
 
     private static Map<String, Object> fieldView(FormFieldDef field) {

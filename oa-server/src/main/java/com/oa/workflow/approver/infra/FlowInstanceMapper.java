@@ -72,6 +72,17 @@ public interface FlowInstanceMapper {
     /** 更新快照（重解析；旧快照由调用方写入审计日志）。 */
     int updateSnapshot(@Param("id") Long id, @Param("approverSnapshotJson") String approverSnapshotJson);
 
+    /**
+     * 提交发起时把**表单里选定的事项类别**固化到实例快照（本列允许为空）。
+     *
+     * <p>为什么需要：{@code flow_instance.category} 允许为空（草稿只是填写中的内容，事项单的类别由
+     * 用户在表单里选，见 {@code doc/data-model.md} §5.1 该列的说明）；而 ⑤集团分管领导按类别解析。
+     * 若「发起 = 提交」时不同步表单值，用户在草稿里新选的类别就不参与解析 →
+     * 「填了类别仍被 40007 拦住」的死路。类别**发起后不可改判**（{@code doc/forms.md} §2），
+     * 因此本语句只在提交那一刻调用。
+     */
+    int updateCategory(@Param("id") Long id, @Param("category") String category);
+
     /** 草稿 → 审批中（提交）：写 submitted_at 与当前节点序号。 */
     int markSubmitted(@Param("id") Long id, @Param("currentNodeSeq") Integer currentNodeSeq);
 

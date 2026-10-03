@@ -86,17 +86,37 @@ public final class FormPayloadValidator {
     /** 补件说明的长度上限（{@code doc/forms.md} §8：≤500）。 */
     public static final int SUPPLEMENT_NOTE_MAX = 500;
 
+    /**
+     * {@code user} / {@code org} 选择器的**统一数量上限**（模板未声明 {@code rules[pickerLimit]} 时生效）。
+     *
+     * <p>口径来源：{@code doc/forms.md} §2 事项单字段表 {@code cc_users} 行「长度 ≤20 人」——
+     * 这是全文唯一写明数量上限的人员/组织选择字段；模板可用 {@code rules[pickerLimit].max}
+     * **收窄**（{@code doc/templates.md} §2.3「{@code pickerLimit}：user / org / tag 的选择数量上限」）。
+     * 「未声明的取 20」属推断口径，已列入待决策（见交付说明）。
+     */
+    public static final int PICKER_MAX_DEFAULT = 20;
+
+    /** 元素存在性失败的规则名（{@code details.errors[].rule}）。 */
+    public static final String RULE_PICKER_VALUE = "pickerValue";
+
     private final FormDictService dictService;
     private final UniqueValueChecker uniqueChecker;
+    private final PickerValueChecker pickerChecker;
 
     public FormPayloadValidator(FormDictService dictService, UniqueValueChecker uniqueChecker) {
+        this(dictService, uniqueChecker, null);
+    }
+
+    public FormPayloadValidator(FormDictService dictService, UniqueValueChecker uniqueChecker,
+                                PickerValueChecker pickerChecker) {
         this.dictService = dictService;
         this.uniqueChecker = uniqueChecker;
+        this.pickerChecker = pickerChecker;
     }
 
     /** 无外部依赖的构造（单测 / 字典不可用的降级场景：{@code inDict} 规则跳过并记 WARN）。 */
     public static FormPayloadValidator offline(FormDictService dictService) {
-        return new FormPayloadValidator(dictService, null);
+        return new FormPayloadValidator(dictService, null, null);
     }
 
     // ================================================================ 入口
@@ -266,6 +286,9 @@ public final class FormPayloadValidator {
         // ---------- 数量上限（user / org / tag / multiselect） ----------
         validatePickerLimit(field, raw, collector);
 
+        // ---------- 人员 / 组织选择：去重后的元素必须在通讯录 / 组织树内 ----------
+        validatePicker(field, raw, collector);
+
         // ---------- 附件 ----------
         if (type != null && type.isAttachment()) {
             validateFiles(field, raw, collector);
@@ -285,8 +308,13 @@ public final class FormPayloadValidator {
             return false;
         }
         return switch (type) {
-            case TEXT, TEXTAREA, TAG, DATE, SELECT, USER, ORG -> raw instanceof CharSequence
+            case TEXT, TEXTAREA, TAG, DATE, SELECT -> raw instanceof CharSequence
                     || (type == FormFieldType.SELECT && raw instanceof Number);
+            // user / org 是「人员 / 组织选择」：**单值与数组都接受**
+            // （单值兼容既有数据与前端当前行为；数组按 doc/forms.md §2 cc_users「≤20 人」口径，
+            //   去重与元素存在性见 validatePicker / validatePickerLimit）
+            case USER, ORG -> raw instanceof CharSequence
+                    || raw instanceof Collection<?> || raw instanceof Object[];
             case NUMBER, AMOUNT -> raw instanceof Number || raw instanceof CharSequence;
             case BOOLEAN -> ConditionEvaluator.booleanOf(raw) != null;
             case MULTISELECT, FILES, FILE -> raw instanceof Collection<?> || raw instanceof Object[]
@@ -476,18 +504,102 @@ public final class FormPayloadValidator {
         }
     }
 
+    /**
+     * 选择数量上限（{@code doc/templates.md} §2.3 {@code rules[pickerLimit]}）。
+     *
+     * <p>{@code user} / {@code org} 按**去重后**的条数计（{@code doc/forms.md} §2 cc_users 行
+     * 「≤20 人」+「去重」：重复选择同一人不该把用户顶到上限外）；其余类型仍按原始条数计，
+     * 以免改变 {@code multiselect} 的既有口径（重复项在 multiselect 里是**独立取值**，不去重）。
+     *
+     * <p>模板未声明 {@code pickerLimit} 时，{@code user} / {@code org} 回落到
+     * {@link #PICKER_MAX_DEFAULT}（20），其余类型不判（保持旧行为）。
+     */
     private void validatePickerLimit(FormFieldDef field, Object raw, FormValidationReport.Collector collector) {
         JsonNode rule = field.rule("pickerLimit");
-        if (rule == null || !rule.path("max").isNumber()) {
+        boolean picker = field.type() == FormFieldType.USER || field.type() == FormFieldType.ORG;
+        int max;
+        if (rule != null && rule.path("max").isNumber()) {
+            max = rule.path("max").asInt();
+        } else if (picker) {
+            max = PICKER_MAX_DEFAULT;
+        } else {
             return;
         }
-        int size = collectionSize(raw);
-        if (size > rule.path("max").asInt()) {
+        int size = pickerCount(field.type(), raw);
+        if (size > max) {
             String message = ruleMessage(rule);
             collector.add(field.code(), field.label(), "pickerLimit",
-                    message == null ? String.format("「%s」最多选择 %d 项", field.label(), rule.path("max").asInt())
-                            : message);
+                    message == null ? defaultPickerLimitMessage(field, max) : message);
         }
+    }
+
+    /** 超限文案（表单类型感知：user 论「人」，org 论「个」；两处都含「最多 N …」）。 */
+    private static String defaultPickerLimitMessage(FormFieldDef field, int max) {
+        return field.type() == FormFieldType.USER
+                ? String.format("「%s」最多选择 %d 人", field.label(), max)
+                : String.format("「%s」最多选择 %d 个", field.label(), max);
+    }
+
+    /**
+     * {@code user} / {@code org} 的**元素存在性**判定（{@code doc/forms.md} §2 cc_users 行
+     * 「通讯录内」；{@code cost_bearer} 行为组织节点）。
+     *
+     * <p>三条口径：
+     * <ol>
+     *   <li>先 trim + 去空 + **去重**（保序），与 {@link #pickerElements(Object)} 同源，
+     *       因此「同一个 id 重复 21 次」既不会触发上限，也不会重复报错；</li>
+     *   <li>逐个元素判存在性，**一次返回全部**不合格元素（不是只报第一个；每条都带字段码 + 序号 + 原因）；</li>
+     *   <li>端口未装配（单测 / 降级）时**跳过并记 WARN**，与 {@code unique} 规则同一缺省语义。</li>
+     * </ol>
+     */
+    private void validatePicker(FormFieldDef field, Object raw, FormValidationReport.Collector collector) {
+        FormFieldType type = field.type();
+        if (type != FormFieldType.USER && type != FormFieldType.ORG) {
+            return;
+        }
+        List<String> elements = pickerElements(raw);
+        if (pickerChecker == null) {
+            log.warn("人员/组织选择器校验未装配，字段 {}（type={}）的元素存在性校验被跳过",
+                    field.code(), type.code());
+            return;
+        }
+        boolean user = type == FormFieldType.USER;
+        for (int i = 0; i < elements.size(); i++) {
+            String element = elements.get(i);
+            boolean exists = user ? pickerChecker.userExists(element) : pickerChecker.orgExists(element);
+            if (exists) {
+                continue;
+            }
+            collector.add(field.code(), field.label(), RULE_PICKER_VALUE, user
+                    ? String.format("「%s」的第 %d 项不是通讯录内的在职人员：%s（用户 id 不存在或已离职/停用）",
+                            field.label(), i + 1, element)
+                    : String.format("「%s」的第 %d 项不是有效的组织节点：%s（组织 id 不存在或已停用）",
+                            field.label(), i + 1, element));
+        }
+    }
+
+    /**
+     * 人员/组织选择器的**规范化元素清单**（trim + 去空 + 去重，保持提交顺序）。
+     *
+     * <p>单值形态返回单元素清单（单值不受「去重」影响），与数组形态共用同一口径；
+     * 落库前的同一份规范化见 {@code FormDataService#canonicalizePickers}。
+     */
+    public static List<String> pickerElements(Object raw) {
+        Set<String> unique = new LinkedHashSet<>();
+        for (String item : strings(raw)) {
+            if (!item.isEmpty()) {
+                unique.add(item);
+            }
+        }
+        return new ArrayList<>(unique);
+    }
+
+    /** 选择器的计数量：{@code user} / {@code org} 按去重后的条数，其余按原始条数。 */
+    private static int pickerCount(FormFieldType type, Object raw) {
+        if (type == FormFieldType.USER || type == FormFieldType.ORG) {
+            return pickerElements(raw).size();
+        }
+        return collectionSize(raw);
     }
 
     private void validateConditionalRequired(FormFieldDef field, Map<String, Object> values, ValidationMode mode,

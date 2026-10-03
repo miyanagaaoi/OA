@@ -10,8 +10,8 @@ description:
   en: >
       Binds select / multiselect / checkbox fields to data dictionaries: options come from `sys_dict_item` and new options need no release; validation and printing resolve option names through the bound dictionary.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.218Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.363Z"
 fingerprint: 4c8e59c3e05f7f284d06b633ceb39d02863f6398b39ca6b7438f144cef3e22b7
 source:
   - path: "doc/forms.md"

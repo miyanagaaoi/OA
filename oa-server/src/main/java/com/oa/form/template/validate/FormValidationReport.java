@@ -15,11 +15,12 @@ import java.util.stream.Collectors;
  * <p>两个消费面：
  * <ol>
  *   <li><b>HTTP 错误响应</b>：{@link #fail()} 把所有失败项拼进
- *       {@link ErrorCode#FORM_VALIDATION_FAILED} 的 message（{@code GlobalExceptionHandler}
- *       只透出 message，{@code BizException#getDetails()} 不进响应体 —— 见
- *       {@code doc/tech-design.md} §5.5 / AC-41「错误信息不泄露」）；</li>
+ *       {@link ErrorCode#FORM_VALIDATION_FAILED} 的 message，**并**把 {@link #issueViews()}
+ *       经 {@code BizException#withPublicDetail("errors", …)} 放进响应体的
+ *       {@code details.errors[]}（2026-10-04 追加；排查用的 {@code withDetail} 仍只进日志）；</li>
  *   <li><b>干跑接口</b>：{@code POST /api/v1/forms/{form_type}/validate} 直接把
- *       {@link #view()} 作为 200 出参返回，前端可逐字段标红。</li>
+ *       {@link #view()} 作为 200 出参返回，前端可逐字段标红。
+ *       两个面的失败项**同源**（同一个 {@link #issueViews()}），不会出现两套形状。</li>
  * </ol>
  */
 public final class FormValidationReport {
@@ -144,6 +145,24 @@ public final class FormValidationReport {
         Map<String, Object> view = new LinkedHashMap<>();
         view.put("passed", passed());
         view.put("issueCount", issues.size());
+        view.put("issues", issueViews());
+        return view;
+    }
+
+    /**
+     * 失败项的**结构化清单**（唯一生产者）。
+     *
+     * <p>两个消费面**同源**（避免两套形状各自漂移）：
+     * <ol>
+     *   <li>干跑接口 {@code POST /api/v1/forms/{formType}/validate} → {@code report.issues[]}；</li>
+     *   <li>校验失败的 HTTP 错误响应（40011）→ {@code details.errors[]}
+     *       （{@link #fail()} 经 {@code BizException#withPublicDetail} 放进响应体）。</li>
+     * </ol>
+     * <p>键只有四个：{@code field}（字段码）、{@code label}（标签）、{@code rule}（规则名）、
+     * {@code message}（可读文案）—— **不含**任何内部实现信息（异常类名、SQL、模板内部 id），
+     * 因此可以安全地直接下发（AC-41）。
+     */
+    public List<Map<String, Object>> issueViews() {
         List<Map<String, Object>> items = new ArrayList<>();
         for (FieldIssue issue : issues) {
             Map<String, Object> item = new LinkedHashMap<>();
@@ -153,18 +172,30 @@ public final class FormValidationReport {
             item.put("message", issue.message());
             items.add(item);
         }
-        view.put("issues", items);
-        return view;
+        return items;
     }
 
-    /** 不通过即抛 400 {@link ErrorCode#FORM_VALIDATION_FAILED}（message 含**全部**失败项）。 */
+    /**
+     * 不通过即抛 400 {@link ErrorCode#FORM_VALIDATION_FAILED}（message 含**全部**失败项）。
+     *
+     * <p><b>两处都写</b>（2026-10-04 起）：
+     * <ul>
+     *   <li>{@code withDetail("errors", …)} → 服务端日志（排查用，口径不变）；</li>
+     *   <li>{@code withPublicDetail("errors", …)} → **HTTP 响应体的 {@code details.errors[]}**：
+     *       前端原先只能从「字段码（标签）：原因」的 message 文本里**尽力还原**逐字段错误，
+     *       现在拿到结构化明细（与干跑接口 {@code report.issues[]} 同一份数据）。</li>
+     * </ul>
+     * message 一字未改：既有解析 message 的调用方不受影响。
+     */
     public void fail() {
         if (passed()) {
             return;
         }
+        List<Map<String, Object>> views = issueViews();
         throw new BizException(ErrorCode.FORM_VALIDATION_FAILED,
                 String.format("表单字段校验未通过（%d 项）：%s", issues.size(), summary()))
-                .withDetail("errors", view().get("issues"));
+                .withDetail("errors", views)
+                .withPublicDetail("errors", views);
     }
 
     /** 全部失败项的一行摘要（保持校验顺序）。 */

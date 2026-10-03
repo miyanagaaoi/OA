@@ -10,8 +10,8 @@ description:
   en: >
       On submission the `form_schema_json` version and `fields_json` are frozen into `form_data`, so later template changes never affect in-flight documents; the server accepts amounts only as strings or fixed-point numbers.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.221Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.365Z"
 fingerprint: df9d0e44bd2a0db6ef4145ab59af6fe7496facc3a76e4e369b6c8991eb537192
 source:
   - path: "doc/forms.md"

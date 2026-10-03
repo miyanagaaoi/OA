@@ -11,8 +11,8 @@ description:
   en: >
       Mirrors the paper form: three-column header, multi-section signature blocks (group function department / group executives / chairman, each with a blank signature line), and the closing system-linkage row (linked document number and approval chain). Measured height 242mm; the paper label 「集团职能部门」 is kept rather than renamed to finance.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.209Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.357Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

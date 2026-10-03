@@ -459,7 +459,7 @@ CREATE TABLE flow_instance (
   template_version     INT          NOT NULL COMMENT '发起时锁定的模板版本（REQ-FLOW-006）',
   form_data_id         BIGINT UNSIGNED NOT NULL,
   form_type            VARCHAR(32)  NOT NULL,
-  category             VARCHAR(32)  NOT NULL COMMENT '事项分类（快照，不可改判）：business/economy/admin/hr/invest；配置项，不参与路由；旧码 operate 作废并迁移为 business（enums.md §14）',
+  category             VARCHAR(32)      NULL COMMENT '事项分类（快照，不可改判）：business/economy/admin/hr/invest；配置项，不参与路由；旧码 operate 作废并迁移为 business（enums.md §14）。**允许为空（2026-10-04 收敛）**：草稿只是填写中的内容，事项单的类别由用户在表单里选，因此必须能在**选定之前**保存草稿（否则「填类别才能存草稿、存草稿才能填类别」形成鸡生蛋）；空类别在**提交发起**时被预检闸门拦下（⑤集团分管领导按类别解析 → 40007「请在发起时确定事项类别」）——「不允许带着空类别进入审批流」由提交闸门保证，不再由本列的 NOT NULL 保证',
   initiator_id         BIGINT UNSIGNED NOT NULL,
   initiator_org_id     BIGINT UNSIGNED NOT NULL COMMENT '发起人组织快照',
   initiator_company_id BIGINT UNSIGNED NOT NULL COMMENT '发起人公司快照（数据域判定）',

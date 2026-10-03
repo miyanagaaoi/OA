@@ -11,9 +11,9 @@ description:
   en: >
       Single archive search entry that routes a query to the live store or the history store by document age and archive flag, returning the data source and read-only state.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.147Z"
-fingerprint: dafba8454c2ea5a5ae6ebbfb022f1ad604e10180af201758bcae5ef7145ee3cf
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.306Z"
+fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"
   - path: "doc/data-model.md"

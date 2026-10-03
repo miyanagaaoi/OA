@@ -107,32 +107,39 @@ public class FlowInstanceService {
     // ================================================================ 发起
 
     /**
-     * 建草稿实例：预检 → 锁定模板版本 → 固化审批人快照 → 落 {@code form_data} + {@code flow_instance}。
+     * 建**草稿**实例：解析（不阻断）→ 锁定模板版本 → 固化审批人快照 → 落 {@code form_data} + {@code flow_instance}。
      *
-     * <p>预检不通过时抛 400（{@link ErrorCode#APPROVER_RESOLUTION_BLOCKED}），
-     * 消息里逐条给出「哪个节点、命中哪条规则、缺什么配置」（AC-11 / AC-19）。
+     * <h2>空候选人预检<b>不在</b>这里（2026-10-04 收敛，AC-19 移到提交）</h2>
+     * <p>改前本方法在预检不通过时抛 400 {@link ErrorCode#APPROVER_RESOLUTION_BLOCKED}，
+     * 于是「保存草稿」被要求「审批人此刻就能全部解析出来」。三条反证：
+     * <ol>
+     *   <li>预检的目的（AC-11 / AC-19 / REQ-FLOW-012）是<b>不允许带着空审批人启动审批流</b>——
+     *       那是**提交发起**（{@code submit}）的职责，草稿还没有任何审批流；</li>
+     *   <li>组织负责人尚未配好时，用户<b>连草稿都存不下来</b>，填了一半的内容无处安放；</li>
+     *   <li>更硬的一条：⑤集团分管领导按**事项类别**解析（{@code group_leader} 规则读
+     *       {@code request.category}），而类别正是用户在表单里正在填的字段 →
+     *       「填类别才能存草稿、存草稿才能填类别」的鸡生蛋。</li>
+     * </ol>
+     * <p>因此本方法只做：模板解析 + 发起人事实快照（{@code context}，写 {@code flow_instance}
+     * 的组织/公司列）+ 表单二次校验（{@code prepareDraft}）+ 落库。预检报告仍会被算出并
+     * **记 WARN 留痕**（不静默），但<b>不阻断</b>。
+     *
+     * <p><b>AC-19 未削弱</b>：拦截点在 {@link #prepareSubmitSnapshot}（提交与重提都必经），
+     * 那里的空候选人一律 40007，且文案仍是「哪个节点、命中哪条规则、缺什么配置」。
      *
      * <p><b>闸门 = {@code flow}（与控制器入口同源，2026-10-04 收紧）</b>：本方法作**第二层**兜底，
      * 判据与 {@code FlowInstanceController#create} 逐字一致 —— 防的是「绕过控制器直调服务」把
      * 「只持 {@code admin:flow}」的主体放进来（该主体在动作面 {@code submit} 处本就会被拒）。
-     * 改前这里是 {@code requireInitiator}（{@code flow} ∪ {@code admin:flow}），比入口宽。
      */
     @Transactional
     public InstanceView create(CreateInstanceRequest request, CurrentUser principal) {
         CurrentUser operator = permissionService.requirePermission("发起审批单",
                 FlowConfigPermission.FLOW_USE);
         PrecheckRequest precheckRequest = toPrecheckRequest(request);
-        // 预检 + 解析一次完成：快照必须与预检结果**同源**（否则会出现「预检通过但快照为空」）
+        // 解析一次：快照与（可能的）预检报告同源；`context` 提供 initiator_org/company_path 等列值
         ApproverPrecheckService.Resolved resolved = precheckService.resolveForSubmit(precheckRequest, operator);
-        if (!resolved.report().allowed()) {
-            precheckService.logBlocked(resolved.report(), operator);
-            StringBuilder builder = new StringBuilder("发起被拒绝：")
-                    .append(resolved.report().blockers().size()).append(" 个节点无有效审批人");
-            resolved.report().blockers().forEach(blocker -> builder.append(" —— ")
-                    .append(ApproverPrecheckService.describeBlocker(blocker)));
-            throw new BizException(ErrorCode.APPROVER_RESOLUTION_BLOCKED, builder.toString())
-                    .withDetail("blockers", resolved.report().blockers());
-        }
+        // 草稿期不阻断，但必须留痕（改前这里是 40007 —— 见类注释的三条反证）
+        precheckService.logDraftNotReady(resolved.report(), operator);
 
         FlowTemplate template = resolved.template();
         RuleRequest context = resolved.context();
@@ -194,6 +201,64 @@ public class FlowInstanceService {
     public InstanceView submit(Long instanceId, String reason) {
         throw new BizException(ErrorCode.INTERNAL_ERROR,
                 "提交已由 FlowEngineService 接管（2a.4 运行时状态机）：请在 FlowInstanceController 走引擎入口");
+    }
+
+    /**
+     * <b>提交发起的预检闸门 + 快照固化</b>（AC-11 / AC-19 / REQ-FLOW-011）。
+     *
+     * <h2>为什么在提交而不是建草稿</h2>
+     * <p>见 {@link #create} 的类注释：草稿是填写中的内容，**发起**才需要「审批人全部可解析」。
+     * 本方法由 {@code FlowEngineService#submit} 在状态迁移（{@code markSubmitted}）**之前**调用，
+     * 因此拦截时一行都不落库（不会出现「拒了但状态已经变了」）。
+     *
+     * <h2>三条不可回退的口径</h2>
+     * <ol>
+     *   <li><b>锁定版本解析</b>：预检按 {@code instance.templateId}（= 发起时锁定的模板行）
+     *       解析，而不是「当前已发布」—— AC-09「在途实例按其发起时版本执行」。
+     *       （重提走 {@code reparse}，它显式换到最新已发布版本后再回到这里。）</li>
+     *   <li><b>拦截不削弱</b>：命中空候选人 → 400 {@link ErrorCode#APPROVER_RESOLUTION_BLOCKED}，
+     *       文案仍逐条给出「哪个节点、命中哪条规则、缺什么配置」（{@code ApproverPrecheckService#assertAllowed}）；</li>
+     *   <li><b>同源固化</b>：通过后把**同一次解析**的快照写回 {@code flow_instance.approver_snapshot_json}
+     *       （REQ-FLOW-011「发起时解析并固化」）—— 草稿期冻结的那份可能是在组织负责人尚未配好时算出的，
+     *       提交时必须刷新，否则会带着空/陈旧快照进入审批流。</li>
+     * </ol>
+     *
+     * @return 刷新后的快照（调用方必须使用**本返回值**，不要回读入参行里的旧 JSON）
+     */
+    @Transactional
+    public ApproverSnapshot prepareSubmitSnapshot(FlowInstanceRow instance, CurrentUser operator) {
+        if (instance == null || instance.getId() == null) {
+            throw BizException.notFound("流程实例");
+        }
+        Map<String, Object> formValues = formValuesOf(instance);
+        // 事项类别以**表单当前值**为准（缺省回落实例已锁定的值），并在提交这一刻固化回实例列 ——
+        // 理由见 categoryForSubmit 与 FlowInstanceMapper#updateCategory 的注释。
+        String category = categoryForSubmit(instance, formValues);
+        if (category != null && !category.equals(instance.getCategory())) {
+            instanceMapper.updateCategory(instance.getId(), category);
+            log.info("提交发起：事项类别取表单值并固化 instanceId={} {} → {}",
+                    instance.getId(), instance.getCategory(), category);
+        }
+        PrecheckRequest request = new PrecheckRequest(instance.getTemplateId(), instance.getTemplateVersion(),
+                instance.getInitiatorId(), instance.getFormType(), category,
+                null, null, null, null, formValues);
+        ApproverPrecheckService.Resolved resolved = precheckService.resolveForSubmit(request, operator);
+        // 空候选人 → 40007（AC-19 的唯一拦截点）。日志与判定分开：判定是**纯函数**（可被单测真实覆盖），
+        // 日志走协作者（生产=WARN 留痕，替身=可断言「确实记了」）。
+        if (resolved.report() != null && !resolved.report().allowed()) {
+            precheckService.logBlocked(resolved.report(), operator);
+        }
+        ApproverPrecheckService.assertAllowed(resolved.report());
+
+        ApproverSnapshot snapshot = ApproverSnapshotCodec.assemble(resolved.template().getId(),
+                resolved.template().getCode(), resolved.template().getVersion(),
+                resolved.context(), resolved.resolutions());
+        String json = ApproverSnapshotCodec.write(snapshot);
+        instanceMapper.updateSnapshot(instance.getId(), json);
+        log.info("提交发起：审批人快照已按锁定版本 v{} 重新解析并固化 instanceId={} initiator={} 节点数={}",
+                resolved.template().getVersion(), instance.getId(), instance.getInitiatorId(),
+                resolved.resolutions() == null ? 0 : resolved.resolutions().size());
+        return snapshot;
     }
 
     // ================================================================ 快照
@@ -325,6 +390,26 @@ public class FlowInstanceService {
             return configuredId;
         }
         return directory.orgByName(financeDeptName).map(OrgNodeView::id).orElse(null);
+    }
+
+    /**
+     * 提交发起时的**事项类别**口径：以**表单当前值**（{@code fields_json.category}）为准，
+     * 缺省回落到实例上已锁定的值。
+     *
+     * <p>为什么不是直接读 {@code flow_instance.category}：草稿期该列允许为空（见 {@link #create}），
+     * 而事项单的类别正是用户在表单里选的字段。若提交时仍用建草稿那一刻的值，用户后来在草稿里选的
+     * 类别**不参与 ⑤集团分管领导的解析** → 「填了类别仍被 40007 拦住」的死路。
+     * 类别在**发起后不可改判**（{@code doc/forms.md} §2），所以「发起 = 提交」这一刻的表单值才是
+     * 正确的快照来源（{@code doc/data-model.md} §7.1 的 {@code basis.category} 同此口径）。
+     *
+     * <p>四类模板都有 {@code category} 字段（合同/印鉴为 locked 的固定值，资金默认 {@code economy}），
+     * 因此本方法对四类单据都取得到值；表单里确实没有该键时回落实例列（可能是 {@code null}，
+     * 由预检闸门按「请在发起时确定事项类别」拦截）。
+     */
+    private static String categoryForSubmit(FlowInstanceRow instance, Map<String, Object> formValues) {
+        Object raw = formValues == null ? null : formValues.get("category");
+        String fromForm = raw == null ? null : String.valueOf(raw).trim();
+        return fromForm == null || fromForm.isEmpty() ? instance.getCategory() : fromForm;
     }
 
     /** 读回该实例的表单字段值（重解析时用于跳过条件求值）；读不到则返回空表。 */

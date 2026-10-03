@@ -11,8 +11,8 @@ description:
   en: >
       A form renderer driven by the template's form_schema_json, shared by all four document types with no hard-coded fields: single column, label above the control, controls filling the form width, content column capped at 760px and centred, 16px between field rows; from 1440px up a 140px sticky in-page index appears on the right.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.287Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.416Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

@@ -7,7 +7,18 @@ import java.util.Map;
 /**
  * 业务异常：只承载**可对外**的错误码与文案，内部细节一律走日志。
  *
- * <p>{@link #getDetails()} 仅用于服务端日志与排查，不写入 HTTP 响应（AC-41）。
+ * <p>{@link #getDetails()} 仅用于服务端日志与排查，**不写入 HTTP 响应**（AC-41）。
+ *
+ * <p><b>两个 details 的区别（2026-10-04 补记，务必分清）</b>：
+ * <ul>
+ *   <li>{@link #withDetail}：**排查用**上下文（如 {@code requiredPermissions}、
+ *       {@code unknownFields}）—— 只进服务端日志。AC-41「错误信息不泄露」的落点，
+ *       {@code FlowWithdrawCcGateTest} 与 {@code FlowAutoScopeTest} 一族用例把它锁死了；</li>
+ *   <li>{@link #withPublicDetail}：**可对外**的结构化明细 —— 会出现在 HTTP 响应体的
+ *       {@code details} 里（{@link com.oa.common.api.ApiResponse}）。只允许放
+ *       「字段码 / 标签 / 规则名 / 已可读文案」这类前端展示必需、且不含内部实现的信息，
+ *       因此它是**逐键显式声明**的（默认空 Map → 响应体里连 {@code details} 字段都不出现）。</li>
+ * </ul>
  */
 public class BizException extends RuntimeException {
 
@@ -15,6 +26,9 @@ public class BizException extends RuntimeException {
 
     private final ErrorCode errorCode;
     private final transient Map<String, Object> details;
+
+    /** 可对外的结构化明细（进 HTTP 响应体；默认空 = 不出现该字段）。 */
+    private final transient Map<String, Object> publicDetails = new LinkedHashMap<>();
 
     public BizException(ErrorCode errorCode) {
         this(errorCode, errorCode.getMessage(), null, Collections.emptyMap());
@@ -73,12 +87,34 @@ public class BizException extends RuntimeException {
         return this;
     }
 
+    /**
+     * 追加**可对外**的结构化明细（进 HTTP 响应体的 {@code details}）。
+     *
+     * <p>与 {@link #withDetail} 的区别见类注释：本方法的内容**会被前端看到**，
+     * 因此只允许放字段码 / 标签 / 规则名 / 已可读文案（例如 40011 的
+     * {@code details.errors[] = [{field,label,rule,message}]}）。
+     *
+     * @throws IllegalArgumentException key 为空（防止「匿名明细」污染响应结构）
+     */
+    public BizException withPublicDetail(String key, Object value) {
+        if (key == null || key.isBlank()) {
+            throw new IllegalArgumentException("publicDetail 的 key 不能为空");
+        }
+        this.publicDetails.put(key, value);
+        return this;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }
 
     public Map<String, Object> getDetails() {
         return Collections.unmodifiableMap(details);
+    }
+
+    /** 可对外的结构化明细（{@code null} 表示无 —— 响应体里省略整个 {@code details} 字段）。 */
+    public Map<String, Object> getPublicDetails() {
+        return publicDetails.isEmpty() ? null : Collections.unmodifiableMap(publicDetails);
     }
 
     /** 是否为客户端错误（4xx），日志可用 WARN 级别。 */

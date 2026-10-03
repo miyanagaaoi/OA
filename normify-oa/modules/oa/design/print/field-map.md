@@ -11,8 +11,8 @@ description:
   en: >
       Print labels come from printLabel on each field of the template's form_schema_json (falling back to the interface label) and printVisible (true by default, switchable off for internal notes); the first release fixes mappings such as category to matter classification, amount to requested or contract amount, the two period fields merged into one contract-term cell and counterparty to party B; the attachment list names files and marks supplement rounds.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.177Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.330Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

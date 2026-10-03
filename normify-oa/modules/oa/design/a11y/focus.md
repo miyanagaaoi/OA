@@ -11,8 +11,8 @@ description:
   en: >
       The focus ring can never be removed: a 2px canvas ring followed by a 4px focus-ring ring, shown only for keyboard use via :focus-visible and not on mouse click; approval work is keyboard-heavy and auditability requires traceable operability, so no component may set outline none.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.172Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.326Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

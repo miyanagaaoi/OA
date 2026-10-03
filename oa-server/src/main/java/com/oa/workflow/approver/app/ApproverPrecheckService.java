@@ -134,19 +134,75 @@ public class ApproverPrecheckService {
      */
     public PrecheckReportView assertSubmittable(PrecheckRequest request, CurrentUser principal) {
         PrecheckReportView report = precheck(request, principal);
-        if (!report.allowed()) {
-            StringBuilder builder = new StringBuilder("发起被拒绝：")
-                    .append(report.blockers().size()).append(" 个节点无有效审批人");
-            for (PrecheckBlockerView blocker : report.blockers()) {
-                builder.append(" —— ").append(describeBlocker(blocker));
-            }
-            throw new BizException(ErrorCode.APPROVER_RESOLUTION_BLOCKED, builder.toString())
-                    .withDetail("blockers", report.blockers())
-                    .withDetail("templateId", report.templateId())
-                    .withDetail("templateVersion", report.templateVersion())
-                    .withDetail("initiatorId", report.initiatorId());
-        }
+        assertAllowed(report, principal);
         return report;
+    }
+
+    /**
+     * 断言「该预检报告允许发起」：命中拦截项即抛 400（{@link ErrorCode#APPROVER_RESOLUTION_BLOCKED}）。
+     *
+     * <p><b>这是 AC-19 的唯一拦截点（2026-10-04 收敛）</b>：预检闸门从「建草稿」
+     * （{@code POST /flow-instances}）移到「**提交发起**」（{@code POST /flow-instances/{id}/submit}
+     * 与重提 {@code resubmit}）。理由见 {@code FlowInstanceService#create} 的类注释：
+     * 草稿只是填写中的内容，若建草稿就要求「审批人此刻全部可解析」，会出现
+     * ① 组织负责人未配好时连草稿都存不下来；② ⑤集团分管领导依赖**表单内容**（事项类别）
+     * 而类别正是用户正在填的字段 → 鸡生蛋。
+     *
+     * <p>调用方（{@code FlowInstanceService#prepareSubmitSnapshot}）拿的是**同一次解析**的结果，
+     * 因此「预检通过」与「固化的快照」必然同源（不会出现「预检说通过、快照却为空」）。
+     */
+    public void assertAllowed(PrecheckReportView report, CurrentUser principal) {
+        if (report == null || report.allowed()) {
+            return;
+        }
+        logBlocked(report, principal);
+        assertAllowed(report);
+    }
+
+    /**
+     * <b>纯判定版</b>的「断言可发起」：命中拦截项即抛 400
+     * （{@link ErrorCode#APPROVER_RESOLUTION_BLOCKED}），文案逐条给出「哪个节点、命中哪条规则、
+     * 缺什么配置」。
+     *
+     * <p>为什么做成**静态纯函数**：调用方（{@code FlowInstanceService#prepareSubmitSnapshot}）
+     * 已经持有**同一次解析**的报告，不需要再跑一遍预检；而它对协作者只依赖「日志」这一个副作用，
+     * 因此判定本身可以脱离 Spring 容器被真实覆盖（单测给它一个带 blockers 的报告即可断言 40007
+     * 与文案，不必拉起整条解析链）。
+     */
+    public static void assertAllowed(PrecheckReportView report) {
+        if (report == null || report.allowed()) {
+            return;
+        }
+        StringBuilder builder = new StringBuilder("发起被拒绝：")
+                .append(report.blockers().size()).append(" 个节点无有效审批人");
+        for (PrecheckBlockerView blocker : report.blockers()) {
+            builder.append(" —— ").append(describeBlocker(blocker));
+        }
+        throw new BizException(ErrorCode.APPROVER_RESOLUTION_BLOCKED, builder.toString())
+                .withDetail("blockers", report.blockers())
+                .withDetail("templateId", report.templateId())
+                .withDetail("templateVersion", report.templateVersion())
+                .withDetail("initiatorId", report.initiatorId());
+    }
+
+    /**
+     * 建草稿时**不阻断**但必须留痕的披露（{@code POST /flow-instances}）。
+     *
+     * <p>文案刻意与 {@link #logBlocked} 区分：草稿期的空候选人**不是**拦截，
+     * 若沿用「发起前预检拦截」会把「正常可预期的草稿态」误报成安全事件。
+     */
+    public void logDraftNotReady(PrecheckReportView report, CurrentUser principal) {
+        if (report == null || report.allowed() || !log.isWarnEnabled()) {
+            return;
+        }
+        List<String> details = new ArrayList<>();
+        for (PrecheckBlockerView blocker : report.blockers()) {
+            details.add(describeBlocker(blocker));
+        }
+        log.warn("建草稿：审批人尚未全部解析（**不阻断草稿保存**；提交时按 AC-19 拦截）"
+                        + " operator={} initiator={} template={} v{} 待配置项={}",
+                principal == null ? null : principal.account(), report.initiatorId(), report.templateCode(),
+                report.templateVersion(), details);
     }
 
     /** 单条拦截项的可读文案（**哪个节点、哪条规则、缺什么配置**）。 */

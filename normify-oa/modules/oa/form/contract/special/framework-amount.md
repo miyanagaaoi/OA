@@ -11,8 +11,8 @@ description:
   en: >
       When `is_framework` is yes the amount is filled as a ceiling and `period_end` becomes mandatory; the performance term feeds later expiry reminders, which phase one merely records (reminders are P1).
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.188Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.340Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

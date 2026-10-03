@@ -11,8 +11,8 @@ description:
   en: >
       The field control set: input / select / date-picker (32px tall, rounded.sm, 2px focus ring kept on focus), textarea (min 88px, 500-character cap), checkbox / radio / switch, the four-level organisation cascader (240px per level, nodes outside scope invisible) and the amount control (tnum right-aligned, thousands separators, two decimals); read-only values are shown in a canvas-subtle block without borders.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.286Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.415Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

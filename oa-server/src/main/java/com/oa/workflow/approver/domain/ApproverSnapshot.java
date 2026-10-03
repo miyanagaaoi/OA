@@ -1,5 +1,7 @@
 package com.oa.workflow.approver.domain;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,16 @@ public record ApproverSnapshot(
 ) {
 
     public ApproverSnapshot {
-        basis = basis == null ? Map.of() : Map.copyOf(basis);
+        // 必须容忍 **null 值**：basis 的既定键里 `category` 在一部分单据上是空的
+        // （事项单由用户在表单里选、资金/合同/印鉴单可为空），而 `Map.copyOf` 对 null 值抛 NPE
+        // （2026-10-04 运行期实测：建草稿 POST /flow-instances {"formType":"matter"} → 50000，
+        //  堆栈落在本行）。原来这条路径被「建草稿即预检」挡住不可达：matter 的 ⑤ 依赖 category，
+        //  空 category 会在预检处 40007。预检闸门移到提交后，草稿期必须先能固化出「category 为空」
+        //  的快照，因此改为 **LinkedHashMap 拷贝 + unmodifiableMap**：保留键序与既有 JSON 契约
+        //  （`doc/data-model.md` §7.1 的 basis 六键仍在，空值为 null），只放弃「非空值」这条额外约束。
+        basis = basis == null
+                ? Collections.emptyMap()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(basis));
         nodes = nodes == null ? List.of() : List.copyOf(nodes);
     }
 

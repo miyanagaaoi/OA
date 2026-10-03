@@ -77,7 +77,8 @@ class FormApiEntryGateTest {
                 .standaloneSetup(
                         new FormDataController(formDataService, gate),
                         new FormTemplateController(dictService, schemaService, gate),
-                        new FormRuleController(schemaService, registry, formDataService, gate))
+                        new FormRuleController(schemaService, registry, formDataService, gate,
+                                new com.oa.authz.visibility.FormFieldWriteGuard()))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

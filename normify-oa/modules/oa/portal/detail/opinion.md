@@ -11,8 +11,8 @@ description:
   en: >
       The approval opinion block: canvas-subtle fill, rounded.sm and 12px padding, structured as opinion text, then the signature image if any, then approver plus position and timestamp; the signature image and timestamp can never be edited or deleted, only re-signed with history kept (REQ-SIGN-004).
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.277Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.408Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

@@ -1,7 +1,9 @@
 package com.oa.workflow.runtime.infra;
 
+import com.oa.workflow.runtime.infra.row.FlowCcViewRow;
 import com.oa.workflow.runtime.infra.row.FlowTaskRow;
 import com.oa.workflow.runtime.infra.row.FlowTaskViewRow;
+import com.oa.workflow.task.domain.TaskListFilter;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,7 +18,14 @@ import org.apache.ibatis.annotations.Param;
  *       且过滤主体一律是 {@code flow_instance}（别名 {@code i}）—— 任务查询全部 JOIN 它取单号/状态/发起人；
  *       标记若写成 {@code table=flow_task, alias=t}，片段会拼出 {@code t.initiator_id}（该表无此列）→ SQL 报错；</li>
  *   <li><b>待办列表就是「我是审批人」口径</b>：{@code t.assignee_id = :uid AND t.status = 'pending'}，
- *       叠加数据域后等于「域内 + 名下有未处理任务」；</li>
+ *       叠加数据域后等于「域内 + 名下有未处理任务」；
+ *       三个任务列表与「抄送我的一览」共用同一套筛选条件（{@link TaskListFilter}），
+ *       过滤**全部在 SQL 层**（{@code FlowTaskMapper.xml} 的 {@code TaskListFilters} 片段，
+ *       位于 LIMIT/OFFSET 之前），因此 {@code total} 是筛选后的总数而不是当前页内再筛；</li>
+ *   <li><b>抄送我的一览</b>（{@code flow_cc ⋈ flow_instance}）：{@code flow_cc} **未**登记为受控表
+ *       （{@code oa.scope.tables} 里没有它），因此本语句按「**抄送人 = 本人**」显式过滤
+ *       {@code c.user_id = :uid}，再叠加 {@code flow_instance} 的数据域标记 ——
+ *       即「抄送给我的 **且** 该单据在我的数据域内」；</li>
  *   <li>引擎内部（级联关闭、计数）由调用方包 {@code DataScopeContext.system()}，标记退化为 {@code 1=1}；</li>
  *   <li>不继承 {@code BaseMapper}；方法名避开 MP 通用读方法名（{@code selectById} 等）。</li>
  * </ul>
@@ -55,31 +64,49 @@ public interface FlowTaskMapper {
     /** 某单尚未决议的待办数（实例终态时的联动统计）。 */
     int countPendingByInstance(@Param("instanceId") Long instanceId);
 
-    // ------------------------------------------------------------------ 列表（分页 + 数据域）
+    // ------------------------------------------------------------------ 列表（分页 + 数据域 + 筛选）
 
-    /** 待办（{@code status='pending'} 且 assignee=我）。 */
+    /** 待办（{@code status='pending'} 且 assignee=我；筛选见 {@link TaskListFilter}）。 */
     List<FlowTaskViewRow> selectTodo(@Param("userId") Long userId,
+                                     @Param("filter") TaskListFilter filter,
                                      @Param("offset") Integer offset,
                                      @Param("size") Integer size);
 
-    /** 待办总数。 */
-    long countTodo(@Param("userId") Long userId);
+    /** 待办总数（**筛选后**的总数：过滤在 SQL 层，LIMIT/OFFSET 之前）。 */
+    long countTodo(@Param("userId") Long userId, @Param("filter") TaskListFilter filter);
 
     /** 已办（我处理过的任务：非 pending 的全部终态）。 */
     List<FlowTaskViewRow> selectDone(@Param("userId") Long userId,
+                                     @Param("filter") TaskListFilter filter,
                                      @Param("offset") Integer offset,
                                      @Param("size") Integer size);
 
-    /** 已办总数。 */
-    long countDone(@Param("userId") Long userId);
+    /** 已办总数（筛选后）。 */
+    long countDone(@Param("userId") Long userId, @Param("filter") TaskListFilter filter);
 
     /** 我发起的（以 {@code flow_instance.initiator_id} 为准）。 */
     List<FlowTaskViewRow> selectInitiated(@Param("userId") Long userId,
+                                          @Param("filter") TaskListFilter filter,
                                           @Param("offset") Integer offset,
                                           @Param("size") Integer size);
 
-    /** 我发起的总数。 */
-    long countInitiated(@Param("userId") Long userId);
+    /** 我发起的总数（筛选后）。 */
+    long countInitiated(@Param("userId") Long userId, @Param("filter") TaskListFilter filter);
+
+    /**
+     * <b>抄送我的一览</b>（{@code flow_cc c ⋈ flow_instance i}）。
+     *
+     * <p>口径：{@code c.user_id = 我}（「抄送人 = 本人」）**且**该实例在调用人的数据域内
+     * （{@code @dataScope} 标记指向 {@code flow_instance}）—— 只读可见、不产生待办
+     * （PRD REQ-MSG-003 / AC-54）。
+     */
+    List<FlowCcViewRow> selectCcOverview(@Param("userId") Long userId,
+                                         @Param("filter") TaskListFilter filter,
+                                         @Param("offset") Integer offset,
+                                         @Param("size") Integer size);
+
+    /** 抄送我的总数（筛选后）。 */
+    long countCcOverview(@Param("userId") Long userId, @Param("filter") TaskListFilter filter);
 
     // ------------------------------------------------------------------ 写（无需标记）
 

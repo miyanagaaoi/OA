@@ -11,8 +11,8 @@ description:
   en: >
       Structurally different from the group sheets: top info bar (application number left, printer and time right), heading, vertical field table (label/value pairs for applicant, time, department, status), merged group titles (approval detail, contract validity, our info, counterparty info, approval records), an approval trail, and withdrawal and approval on separate lines.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.210Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.358Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

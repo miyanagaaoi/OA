@@ -64,7 +64,7 @@ class WorkflowMapperXmlTest {
                 // E 项（2026-10-04）：在途实例锁版本清单（AC-09 可见性）
                 "selectInFlightByTemplate",
                 "selectFormDataCreator", "selectFormDataFields",
-                "insertInstance", "updateSnapshot", "markSubmitted", "updateCurrentNodeSeq", "insertFormData",
+                "insertInstance", "updateSnapshot", "updateCategory", "markSubmitted", "updateCurrentNodeSeq", "insertFormData",
                 // 2a.4 运行时进度写语句
                 "updateProgress", "markFinished", "incrementRoutingCount", "incrementSupplementCount",
                 "resetForResubmit"));
@@ -77,12 +77,14 @@ class WorkflowMapperXmlTest {
                 "incrementReturnedCount", "markSupplementWaiting", "markSupplementResolved",
                 "resetForNewRound"));
         // 2a.5 任务（flow_task；受控表 → 每条 SELECT 1 个标记）
+        // 2026-10-04：新增「抄送我的一览」（flow_cc ⋈ flow_instance，标记仍指向 flow_instance）
         STATEMENTS.put(DIR + "FlowTaskMapper.xml", List.of(
                 "selectTaskById", "selectByNodeInstance", "selectPrimaryByNodeInstance",
                 "selectRoundPrimaryByNodeInstance",
                 "selectPendingPrimaryByNodeInstance", "selectPendingPrimaryByInstanceAndAssignee",
                 "countPendingByInstance", "selectTasksByInstance",
                 "selectTodo", "countTodo", "selectDone", "countDone", "selectInitiated", "countInitiated",
+                "selectCcOverview", "countCcOverview",
                 "insert", "updateDecision", "closePendingByNodeInstance", "closePendingByInstance",
                 "updateHandover"));
         // 2a.4 流转链（flow_routing；受控表 → 每条 SELECT 1 个标记）

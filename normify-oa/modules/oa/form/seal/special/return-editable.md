@@ -10,8 +10,8 @@ description:
   en: >
       `return_status` and `return_date` are the only main fields editable during approval because they record a later fact (whether the certificate was returned) and are filled by archive node ⑦; the exception must be registered explicitly in the server-side state whitelist, and marking returned requires a return time.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.215Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.361Z"
 fingerprint: a5033f25b7d8f0482e18cc8dd361b23e4f3335e361d405a3652cb457322bafb6
 source:
   - path: "doc/forms.md"

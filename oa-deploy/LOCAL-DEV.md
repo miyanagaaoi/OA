@@ -111,7 +111,7 @@ foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-auth
 mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"
 oa-deploy\runtime\start-local.cmd          # 等 /actuator/health 返回 UP（Flyway 跑完 V1~V4）
 # 执行上面的夹具脚本；再按 fixtures/90-dev-admin.md 建一个有口令的 admin
-# 最后 fixtures/99-verify.sql 应 16/16 PASS
+# 最后 fixtures/99-verify.sql 应 17/17 PASS
 ```
 
 > **幂等**：所有夹具脚本都是显式主键 + upsert，**反复执行不产生重复数据**。
@@ -119,7 +119,12 @@ oa-deploy\runtime\start-local.cmd          # 等 /actuator/health 返回 UP（Fl
 > `doc/data-model.md` §2.3 修掉：`category_key GENERATED ALWAYS AS (IFNULL(category,'')) STORED`
 > 纳入唯一键 `uk_org_leader (org_id, user_id, leader_type, category_key)`，负责人链因此也改回**直接 upsert**
 > （飞轮路径：改 `doc/data-model.md` → `node tools/gen-init-sql.js` → `node tools/build-flyway-migrations.js` → 重置库）。
-> 已在临时库上从零验证：同一套迁移 + 夹具 + 断言 16/16 PASS，重复执行行数不变（连跑两次 `sys_org_leader` 行数一致）。
+> 已在临时库上从零验证：同一套迁移 + 夹具 + 断言 17/17 PASS，重复执行行数不变（连跑两次 `sys_org_leader` 行数一致）。
+>
+> **⑰ 常驻护栏（2026-10-04）**：`99-verify.sql` 新增 `roles.placeholder_none` ——
+> `sys_user_role` 中 `account='matrix_admin'`（越权矩阵的**不可登录**占位行）必须 **0 行**。
+> 上一轮修掉的夹具缺陷（占位行持有 `admin` 角色 → 节点⑦把待办解析到不可登录的 id=1 上）由此
+> 从「一次性修复」变成**每次跑 99-verify 都会复检**的护栏；断言总数 16 → **17**。
 
 > **⑤ 集团分管领导「五类业务线全绑」**（2026-10-04）：`fixtures/20-dev-people.sql` 在集团根
 > （`org_id = 1`）为 `business` / `economy` / `admin` / `hr` / `invest` **各绑一行**

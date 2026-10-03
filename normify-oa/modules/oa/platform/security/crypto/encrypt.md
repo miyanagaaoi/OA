@@ -10,8 +10,8 @@ description:
   en: >
       Field-level encryption for phone numbers and other PII, with masked values returned by default and full values only for the owner and administrators.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.272Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.404Z"
 fingerprint: c103d3b6295f4a12d2328832a957ca67208b438ec54a683088ac5bcb0a6b38e0
 source:
   - path: "oa-server/src/main/java/com/oa/platform/security/crypto/PhoneCipher.java"

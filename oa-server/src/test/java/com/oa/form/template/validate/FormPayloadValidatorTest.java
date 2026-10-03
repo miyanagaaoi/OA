@@ -318,6 +318,142 @@ class FormPayloadValidatorTest {
         assertThat(report.issues()).extracting(FieldIssue::rule).contains("unique");
     }
 
+    // ================================================================ 人员 / 组织选择（forms.md §2 cc_users）
+
+    /** 目录替身：十进制 id 且 < 900 视为「通讯录/组织树内的有效节点」（生产实现见 FormPickerDirectoryChecker）。 */
+    private static final PickerValueChecker DIRECTORY = new PickerValueChecker() {
+        @Override
+        public boolean userExists(String userId) {
+            return known(userId);
+        }
+
+        @Override
+        public boolean orgExists(String orgId) {
+            return known(orgId);
+        }
+
+        private static boolean known(String id) {
+            if (id == null || id.isEmpty() || !id.chars().allMatch(Character::isDigit)) {
+                return false;
+            }
+            try {
+                return Long.parseLong(id) < 900L;
+            } catch (NumberFormatException ex) {
+                return false;
+            }
+        }
+    };
+
+    private FormPayloadValidator withDirectory() {
+        return new FormPayloadValidator(new FormDictService(new InMemoryDictMapper()),
+                (scope, value) -> true, DIRECTORY);
+    }
+
+    private static Map<String, Object> picker(Object value) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("cc_users", value);
+        return payload;
+    }
+
+    @Test
+    @DisplayName("user 字段：单值仍接受（兼容既有 fields_json 与前端当前单值控件）")
+    void userAcceptsSingleValue() {
+        FormPayloadValidator validator = withDirectory();
+        assertThat(validator.validate(matter, picker("12"), ValidationMode.DRAFT, TODAY, null).passed()).isTrue();
+        assertThat(validator.validate(matter, picker("14"), ValidationMode.DRAFT, TODAY, null).passed()).isTrue();
+    }
+
+    @Test
+    @DisplayName("user 字段：数组形态被接受（改前 typeMatches 回 typeMismatch；doc/forms.md §2「≤20 人」）")
+    void userAcceptsArray() {
+        FormPayloadValidator validator = withDirectory();
+        FormValidationReport report = validator.validate(matter,
+                picker(List.of("12", "13", "14")), ValidationMode.DRAFT, TODAY, null);
+        assertThat(report.passed()).as("数组不该再回 typeMismatch：%s", report.summary()).isTrue();
+        assertThat(report.issues()).extracting(FieldIssue::rule).doesNotContain("typeMismatch");
+    }
+
+    @Test
+    @DisplayName("上限：按**去重后**计数 —— 同一 id 重复 21 次不超限（forms.md §2「≤20 人」+「去重」）")
+    void pickerLimitCountsDistinctValues() {
+        FormPayloadValidator validator = withDirectory();
+        List<String> repeated = new ArrayList<>();
+        for (int i = 0; i < 21; i++) {
+            repeated.add("12");
+        }
+        FormValidationReport report = validator.validate(matter, picker(repeated), ValidationMode.DRAFT, TODAY, null);
+        assertThat(report.issues()).extracting(FieldIssue::rule).doesNotContain("pickerLimit");
+        assertThat(report.passed()).isTrue();
+    }
+
+    @Test
+    @DisplayName("上限：去重后 21 个 → pickerLimit，文案含「最多 … 20 人」（模板 message 优先）")
+    void pickerLimitRejectsOverflow() {
+        FormPayloadValidator validator = withDirectory();
+        List<Object> tooMany = new ArrayList<>();
+        for (int i = 1; i <= 21; i++) {
+            tooMany.add(String.valueOf(i));
+        }
+        FormValidationReport report = validator.validate(matter, picker(tooMany), ValidationMode.DRAFT, TODAY, null);
+        assertThat(report.messagesOf("cc_users")).as("模板自带 message 优先（doc/templates.md §2.3）")
+                .containsExactly("抄送人最多选择 20 人");
+        assertThat(report.issues()).extracting(FieldIssue::rule).containsExactly("pickerLimit");
+    }
+
+    @Test
+    @DisplayName("上限：去重后 21 个（模板无 pickerLimit 的 org 字段）→ 默认 20，文案「最多选择 20 个」")
+    void pickerLimitDefaultAppliesToOrg() {
+        FormPayloadValidator validator = withDirectory();
+        Map<String, Object> payload = new LinkedHashMap<>();
+        List<String> tooMany = new ArrayList<>();
+        for (int i = 1; i <= 21; i++) {
+            tooMany.add(String.valueOf(i));
+        }
+        payload.put("involve_cost", true);
+        payload.put("amount", "10.00");
+        payload.put("cost_bearer", tooMany);
+        FormValidationReport report = validator.validate(matter, payload, ValidationMode.DRAFT, TODAY, null);
+        assertThat(report.messagesOf("cost_bearer")).containsExactly("「费用承担主体」最多选择 20 个");
+    }
+
+    @Test
+    @DisplayName("非法元素：不存在的 user id / org id / 非 id 取值 → pickerValue，且**返回全部失败项**")
+    void pickerValueReportsEveryInvalidElement() {
+        FormPayloadValidator validator = withDirectory();
+        FormValidationReport users = validator.validate(matter,
+                picker(List.of("12", "999", "王雪", "998")), ValidationMode.DRAFT, TODAY, null);
+        assertThat(users.issues()).extracting(FieldIssue::rule).containsOnly("pickerValue");
+        assertThat(users.messagesOf("cc_users")).hasSize(3)
+                .as("去重后的第 2/3/4 项各自报一条（不是只报第一个）")
+                .allMatch(message -> message.contains("不是通讯录内的在职人员"));
+        assertThat(users.messagesOf("cc_users").get(0)).contains("第 2 项").contains("999");
+        assertThat(users.messagesOf("cc_users").get(1)).contains("第 3 项").contains("王雪");
+
+        Map<String, Object> orgPayload = new LinkedHashMap<>();
+        orgPayload.put("involve_cost", true);
+        orgPayload.put("amount", "10.00");
+        orgPayload.put("cost_bearer", List.of("135", "977"));
+        FormValidationReport orgs = validator.validate(matter, orgPayload, ValidationMode.DRAFT, TODAY, null);
+        assertThat(orgs.messagesOf("cost_bearer")).singleElement()
+                .asString().contains("第 2 项").contains("977").contains("不是有效的组织节点");
+    }
+
+    @Test
+    @DisplayName("非法元素：单值形态同样判（不是只判数组）")
+    void pickerValueAppliesToSingleValueToo() {
+        FormPayloadValidator validator = withDirectory();
+        FormValidationReport report = validator.validate(matter, picker("999"), ValidationMode.DRAFT, TODAY, null);
+        assertThat(report.issues()).extracting(FieldIssue::rule).containsExactly("pickerValue");
+    }
+
+    @Test
+    @DisplayName("端口未装配（offline）：存在性跳过并记 WARN，数组仍被接受（不静默变成「永远拒绝」）")
+    void pickerCheckIsSkippedWhenPortMissing() {
+        FormValidationReport report = validator.validate(matter,
+                picker(List.of("999", "998")), ValidationMode.DRAFT, TODAY, null);
+        assertThat(report.passed()).as("未装配端口时跳过元素存在性，但类型/上限仍然生效").isTrue();
+    }
+
     // ================================================================ 夹具
 
     private Map<String, Object> fundPayload(Object amount) {

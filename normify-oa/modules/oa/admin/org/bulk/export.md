@@ -10,8 +10,8 @@ description:
   en: >
       CSV export engine shared by the master-data exports plus the audit-log export: header and row rendering with UTF-8 BOM and RFC4180 escaping, business-path resolution and recursive redaction of amount keys inside audit JSON; master-data exports are system-admin only and write an audit entry.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.128Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.291Z"
 fingerprint: 2e7b8a7d1c7885b6b85af1520475aad562015db5c8cf18a70a6f742bcea60d5d
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/BulkExportService.java"

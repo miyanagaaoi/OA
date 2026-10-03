@@ -11,8 +11,8 @@ description:
   en: >
       The fund sheet's three-part signature block (group function department / group line leader / chairman), each with a blank signature line and date. Formal A4 printouts always leave the signature area blank for handwriting; only the on-screen preview shows the signed thumbnail with its timestamp. The print sheet keeps the paper form's label "group function department" even though Finance is the single owner.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.179Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.331Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

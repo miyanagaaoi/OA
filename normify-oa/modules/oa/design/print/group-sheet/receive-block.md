@@ -11,8 +11,8 @@ description:
   en: >
       The core feature of the contract sheet: each block holds receiving unit, receiver and signed time as a three-cell embedded table with vertical rules only, a multi-line handling opinion and a right-aligned signature and date, up to three blocks, one per group-level routing hop, rendered according to how many hops actually happened.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.178Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.331Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

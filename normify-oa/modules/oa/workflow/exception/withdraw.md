@@ -11,8 +11,8 @@ description:
   en: >
       Only the initiator may withdraw. The window is a template-level setting (flow_template.withdraw_window, templates.md 1.8): the default until_finance_approved allows withdrawal until the finance node (node 2) approves, node 2 in approval included (REQ-FLOW-009); the optional until_finance_started allows it only before node 2 starts (strict AC-16). The engine reads it from the version locked at instance creation, so edits never affect in-flight documents (AC-09).
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.318Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.444Z"
 fingerprint: 8d16cf2ade0b836c969a1d24ebfe8370cf368f4e374aabc5aa266a360273d630
 source:
   - path: "doc/prd-0.1.md"

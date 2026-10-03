@@ -74,4 +74,17 @@ SELECT 'trigger.instance', '=1',  CAST(COUNT(*) AS CHAR),
 UNION ALL
 SELECT 'triggers.total', '=4',    CAST(COUNT(*) AS CHAR),
        IF(COUNT(*) = 4, 'PASS', 'FAIL')
-  FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE();
+  FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE()
+UNION ALL
+-- ⑰ admin 角色只授予**可登录账号**：占位行 matrix_admin（占位哈希、不可登录）不得持有任何角色。
+--   回归背景（2026-10-04 收敛，本轮变成常驻护栏）：40-authz-matrix.sql 的占位行曾持有 admin 角色，
+--   于是节点⑦（archive_register，approver_param={"role_code":"admin"}）解析出
+--   [1(matrix_admin), <真实 admin>]，待办落在**不可登录**的 id=1 上 —— 演示与验收必须先「改派」
+--   才能继续，那是夹具自己制造的人工障碍。占位行的存在理由只是「两个 MySQL 集成测试把合成的
+--   当前登录人写成 userId=1，要求该行真实存在」，与「有没有角色」无关（那两个测试从不回读
+--   sys_user_role，见 40-authz-matrix.sql 文末「角色分配」）。
+--   本项按 account 定位（不写死 id），因此换库、换自增序列都不会漏检。
+SELECT 'roles.placeholder_none', '=0', CAST(COUNT(*) AS CHAR),
+       IF(COUNT(*) = 0, 'PASS', 'FAIL')
+  FROM sys_user_role ur JOIN sys_user u ON u.id = ur.user_id
+ WHERE u.account = 'matrix_admin';

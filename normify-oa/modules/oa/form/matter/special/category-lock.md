@@ -10,8 +10,8 @@ description:
   en: >
       Once the initiator picks the category, no approval node may change it; the only remedy for a wrong classification is rejecting back to the initiator. Category values come from admin-configured dictionary items, no longer determine central ownership, and serve only as a label and reporting dimension.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.203Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.349Z"
 fingerprint: 2cd70094f1f0ca58486a7545a207061d4af024e2dd777b6b42c457a39f8ec430
 source:
   - path: "doc/forms.md"

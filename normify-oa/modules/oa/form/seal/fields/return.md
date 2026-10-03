@@ -10,8 +10,8 @@ description:
   en: >
       Return status `return_status` (select, required, default pending, editable during approval but only by the archive node) and return time `return_date` (datetime, required when the status is returned, editable during approval).
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.213Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.359Z"
 fingerprint: d89254a4a362eeecf74041196101e27dfc2da4a3cda4140ddf808eea93895c61
 source:
   - path: "doc/forms.md"

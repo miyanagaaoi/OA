@@ -234,7 +234,42 @@ public final class RuntimeDtos {
             String initiatorName,
             Integer currentNodeSeq,
             String instanceStatus,
-            String subStatus
+            String subStatus,
+            /**
+             * 单据标题（{@code form_data.fields_json.title}；四类单据标题字段码一致）。
+             *
+             * <p><b>追加字段</b>（2026-10-04）：关键字筛选必须能命中「标题」，
+             * 而列表此前只有类型与发起人，前端拿不到标题就只剩「尽力还原」一条路。
+             * 追加在**末尾**，不影响既有字段的顺序与语义。
+             */
+            String title
+    ) {
+    }
+
+    /**
+     * 「抄送我的一览」列表项（{@code GET /flow-tasks/cc}）。
+     *
+     * <p>出参七项：单号 / 单据类型 / 标题 / 发起人 / 发起时间 / 当前状态 / 抄送时间 + 是否已读。
+     * 抄送**只读可见、不产生待办**（PRD REQ-MSG-003 / AC-54），因此没有任务维度字段。
+     */
+    public record CcListItemView(
+            Long ccId,
+            Long instanceId,
+            String bizNo,
+            String formType,
+            String category,
+            String title,
+            Long initiatorId,
+            String initiatorName,
+            String instanceCreatedAt,
+            Integer currentNodeSeq,
+            String instanceStatus,
+            String subStatus,
+            String ccCreatedAt,
+            String ccSource,
+            String readAt,
+            /** 是否已读（{@code read_at IS NOT NULL}）；抄送人打开详情时写入（{@code markCcRead}）。 */
+            boolean read
     ) {
     }
 

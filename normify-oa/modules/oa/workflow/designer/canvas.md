@@ -11,8 +11,8 @@ description:
   en: >
       Canvas layer of the graphical designer: loads the template node graph, adds and removes nodes, reorders them and previews links; the result is written back to flow_node definitions and editing is allowed only on draft versions (REQ-FLOW-008).
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.312Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.440Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

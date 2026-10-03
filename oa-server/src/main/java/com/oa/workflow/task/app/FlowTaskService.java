@@ -5,12 +5,15 @@ import com.oa.common.error.ErrorCode;
 import com.oa.common.security.CurrentUser;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.ActionResult;
+import com.oa.workflow.runtime.api.dto.RuntimeDtos.CcListItemView;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.PageResult;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.TaskListItemView;
 import com.oa.workflow.runtime.app.FlowEngineService;
 import com.oa.workflow.runtime.domain.RuntimeEnums.TaskStatus;
 import com.oa.workflow.runtime.infra.FlowTaskMapper;
+import com.oa.workflow.runtime.infra.row.FlowCcViewRow;
 import com.oa.workflow.runtime.infra.row.FlowTaskViewRow;
+import com.oa.workflow.task.domain.TaskListFilter;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -59,33 +62,74 @@ public class FlowTaskService {
 
     // ================================================================ 列表
 
-    /** 待办（真实口径：pending 且我是处理人）。 */
-    public PageResult<TaskListItemView> todo(Integer page, Integer size) {
+    /** 待办（真实口径：pending 且我是处理人；筛选见 {@link TaskListFilter}）。 */
+    public PageResult<TaskListItemView> todo(Integer page, Integer size, TaskListFilter filter) {
         CurrentUser actor = permissionService.requireInitiator("查看我的待办");
         int p = normalizePage(page);
         int s = normalizeSize(size);
-        long total = taskMapper.countTodo(actor.id());
-        List<TaskListItemView> items = toItems(taskMapper.selectTodo(actor.id(), offset(p, s), s));
+        TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
+        long total = taskMapper.countTodo(actor.id(), f);
+        List<TaskListItemView> items = toItems(taskMapper.selectTodo(actor.id(), f, offset(p, s), s));
         return new PageResult<>(items, total, p, s);
     }
 
     /** 已办（我处理过的任务）。 */
-    public PageResult<TaskListItemView> done(Integer page, Integer size) {
+    public PageResult<TaskListItemView> done(Integer page, Integer size, TaskListFilter filter) {
         CurrentUser actor = permissionService.requireInitiator("查看我已办");
         int p = normalizePage(page);
         int s = normalizeSize(size);
-        long total = taskMapper.countDone(actor.id());
-        List<TaskListItemView> items = toItems(taskMapper.selectDone(actor.id(), offset(p, s), s));
+        TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
+        long total = taskMapper.countDone(actor.id(), f);
+        List<TaskListItemView> items = toItems(taskMapper.selectDone(actor.id(), f, offset(p, s), s));
         return new PageResult<>(items, total, p, s);
     }
 
     /** 我发起的（以实例发起人为准）。 */
-    public PageResult<TaskListItemView> initiated(Integer page, Integer size) {
+    public PageResult<TaskListItemView> initiated(Integer page, Integer size, TaskListFilter filter) {
         CurrentUser actor = permissionService.requireInitiator("查看我发起的");
         int p = normalizePage(page);
         int s = normalizeSize(size);
-        long total = taskMapper.countInitiated(actor.id());
-        List<TaskListItemView> items = toItems(taskMapper.selectInitiated(actor.id(), offset(p, s), s));
+        TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
+        long total = taskMapper.countInitiated(actor.id(), f);
+        List<TaskListItemView> items = toItems(taskMapper.selectInitiated(actor.id(), f, offset(p, s), s));
+        return new PageResult<>(items, total, p, s);
+    }
+
+    /**
+     * <b>抄送我的一览</b>（{@code GET /flow-tasks/cc}）。
+     *
+     * <h2>数据域口径（先取证再落地）</h2>
+     * <p>{@code flow_cc} **不在**受控表清单里（{@code oa.scope.tables} 只有
+     * {@code flow_instance / form_data / flow_task / flow_routing / sys_user}，
+     * 见 {@code DataScopeTableRegistry}），因此它没有可织入的数据域语义。
+     * 本列表的口径由**两段**组成：
+     * <ol>
+     *   <li><b>抄送人 = 本人</b>：{@code flow_cc.user_id = 当前登录人}（表唯一键
+     *       {@code uk_flow_cc (instance_id, user_id)} 保证「一单一抄送人一行」，不会重复）；</li>
+     *   <li><b>单据在我的数据域内</b>：语句带 {@code @dataScope(table=flow_instance, alias=i)}，
+     *       由 {@code DataScopeInterceptor} 织入 —— 域外单据**不出现**（不是「显示但点不开」）。</li>
+     * </ol>
+     * <p><b>为什么不是「抄送即可见」</b>：{@code DataScopeSqlBuilder} 的 self 口径已经把
+     * 「我是抄送人」并入可见性（{@code EXISTS (flow_cc ...)}），所以第 2 段对 self 类角色
+     * 不产生额外裁剪；对 {@code company} 类角色，抄送域外单据同样不可见 —— 与
+     * AC-02 / TC-AUTH-024「6 个入口均无泄露」一致（宁可少显示，不可泄露）。
+     *
+     * <p>抄送**只读可见、不产生待办**（PRD REQ-MSG-003 / AC-54）：本列表不出任务维度字段。
+     */
+    public PageResult<CcListItemView> cc(Integer page, Integer size, TaskListFilter filter) {
+        CurrentUser actor = permissionService.requireInitiator("查看抄送我的");
+        int p = normalizePage(page);
+        int s = normalizeSize(size);
+        TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
+        long total = taskMapper.countCcOverview(actor.id(), f);
+        List<CcListItemView> items = new ArrayList<>();
+        for (FlowCcViewRow row : taskMapper.selectCcOverview(actor.id(), f, offset(p, s), s)) {
+            items.add(new CcListItemView(row.getCcId(), row.getInstanceId(), row.getBizNo(), row.getFormType(),
+                    row.getCategory(), row.getTitle(), row.getInitiatorId(), row.getInitiatorName(),
+                    row.getInstanceCreatedAt(), row.getCurrentNodeSeq(), row.getInstanceStatus(),
+                    row.getSubStatus(), row.getCcCreatedAt(), row.getCcSource(), row.getReadAt(),
+                    row.getReadAt() != null));
+        }
         return new PageResult<>(items, total, p, s);
     }
 
@@ -176,7 +220,8 @@ public class FlowTaskService {
                                     .orElse(row.getTaskStatus()),
                     row.getOpinion(), row.getTaskCreatedAt(), row.getDecidedAt(),
                     row.getInitiatorId(), row.getInitiatorName(), row.getCurrentNodeSeq(),
-                    row.getInstanceStatus(), row.getSubStatus()));
+                    row.getInstanceStatus(), row.getSubStatus(),
+                    row.getTitle()));
         }
         return items;
     }

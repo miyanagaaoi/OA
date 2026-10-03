@@ -10,9 +10,9 @@ description:
   en: >
       User profiles and login accounts: name, employee number (for watermarking), primary org and company, position, employment status, salted password hash and encrypted phone; phones are never stored in clear text.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.243Z"
-fingerprint: 27436db7be3ac82bec96b3ef661f323e3789c3dc0b16aad5911b409985d661fe
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.382Z"
+fingerprint: 02c79bef5b526c09d9b17ac2bb5a55cdff4a11759e5c538d9f8df8b95cd4948f
 source:
   - path: "doc/data-model.md"
   - path: "doc/prd-0.1.md"

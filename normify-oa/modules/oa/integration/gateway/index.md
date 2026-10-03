@@ -11,8 +11,8 @@ description:
   en: >
       A unified API gateway carries all module communication over RESTful APIs, applying authentication, authorisation and data-scope filtering to every call, with external writes disabled in phase one and all traffic over HTTPS.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.248Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.387Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "ok": true,
   "project": "normify-oa",
-  "compiled_at": "2026-10-03T06:15:58.674Z",
+  "compiled_at": "2026-10-03T06:54:52.360Z",
   "stats": {
     "tree_count": 1,
     "module_count": 526,
@@ -24,7 +24,7 @@
   },
   "artifacts": {
     "tree.json": {
-      "sha256": "9663ea1183c90f18f628da6632fa6ae9523cd060245feccc6b3a4c4ef447f4e4",
+      "sha256": "eb2fe22c651d1399abf92607ce2af981d8fadf4ddce4474a2d9e23902a697097",
       "bytes": 1629901
     },
     "outline.md": {
@@ -36,7 +36,7 @@
       "bytes": 69947
     },
     "receipt.json": {
-      "sha256": "cfa2a645f5f43b691be16b804e876707ee431d1c4ff29ea7f565b91802f7b610",
+      "sha256": "cfd29270ba29d5c6891e48d0324c2378ee3cdc792d1bbff20ab931a64e8b4239",
       "bytes": 971
     }
   }

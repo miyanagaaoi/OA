@@ -54,6 +54,25 @@
     <result property="currentNodeSeq" column="current_node_seq"/>
     <result property="instanceStatus" column="instance_status"/>
     <result property="subStatus" column="sub_status"/>
+    <result property="title" column="title"/>
+  </resultMap>
+
+  <resultMap id="CcViewResultMap" type="com.oa.workflow.runtime.infra.row.FlowCcViewRow">
+    <id property="ccId" column="cc_id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="bizNo" column="biz_no"/>
+    <result property="formType" column="form_type"/>
+    <result property="category" column="category"/>
+    <result property="title" column="title"/>
+    <result property="initiatorId" column="initiator_id"/>
+    <result property="initiatorName" column="initiator_name"/>
+    <result property="instanceCreatedAt" column="instance_created_at"/>
+    <result property="currentNodeSeq" column="current_node_seq"/>
+    <result property="instanceStatus" column="instance_status"/>
+    <result property="subStatus" column="sub_status"/>
+    <result property="ccCreatedAt" column="cc_created_at"/>
+    <result property="ccSource" column="cc_source"/>
+    <result property="readAt" column="read_at"/>
   </resultMap>
 
   <sql id="TaskColumns">
@@ -61,7 +80,7 @@
     t.add_sign_type, t.status, t.opinion, t.decided_at, t.handover_reason, t.created_at, t.updated_at
   </sql>
 
-  <!-- 列表公共投影：单号/类型/节点/发起人/状态/时间（隐藏单据正文与快照） -->
+  <!-- 列表公共投影：单号/类型/标题/节点/发起人/状态/时间（隐藏单据正文与快照） -->
   <sql id="TaskViewColumns">
     t.id AS task_id, t.instance_id, i.biz_no, i.form_type, i.category,
     ni.node_seq AS node_seq, ni.node_name AS node_name, ni.node_code AS node_code,
@@ -70,7 +89,47 @@
     DATE_FORMAT(t.created_at, '%Y-%m-%d %H:%i:%s') AS task_created_at,
     DATE_FORMAT(t.decided_at, '%Y-%m-%d %H:%i:%s') AS decided_at,
     i.initiator_id, u.name AS initiator_name, i.current_node_seq,
-    i.status AS instance_status, i.sub_status
+    i.status AS instance_status, i.sub_status,
+    (SELECT JSON_UNQUOTE(JSON_EXTRACT(fd.fields_json, '$.title'))
+       FROM form_data fd WHERE fd.id = i.form_data_id) AS title
+  </sql>
+
+  <!--
+    ============================================================================
+    列表筛选片段（三个任务列表 + 抄送我的一览**同一套参数**，doc/forms.md 与 PRD 审批中心）
+    ============================================================================
+    纪律：
+      · 本片段只包含 <if> 条件，**不含** @dataScope 标记 —— 标记在调用方的 WHERE 1 = 1 之后、
+        本片段之前，保证「数据域过滤在最前」（请求参数再宽也不能越过数据域）；
+      · 全部条件写在 SQL 层（LIMIT/OFFSET 之前），因此分页 total 是筛选后的总数；
+      · 关键字命中三项：单号 i.biz_no / 标题 form_data.fields_json.title / 发起人 sys_user.name。
+        标题用**相关子查询**而不是 JOIN：三个列表与两个 count 语句都能复用同一片段，
+        且不必为「只有关键字筛才需要的 form_data」改动既有 FROM 子句（同 DataScopeSqlBuilder
+        的 financeInvolveCost 分支已是此写法）。
+      · ESCAPE '!'（不是反斜杠）：见 TaskListFilter#escapeLike 的说明。
+  -->
+  <sql id="TaskListFilters">
+    <if test="filter.hasFormType()">
+      AND i.form_type = #{filter.formType}
+    </if>
+    <if test="filter.hasStatus()">
+      AND i.status = #{filter.status}
+    </if>
+    <if test="filter.hasSubStatus()">
+      AND i.sub_status = #{filter.subStatus}
+    </if>
+    <if test="filter.hasDateFrom()">
+      AND i.created_at &gt;= CONCAT(#{filter.dateFrom}, ' 00:00:00')
+    </if>
+    <if test="filter.hasDateTo()">
+      AND i.created_at &lt; DATE_ADD(CONCAT(#{filter.dateTo}, ' 00:00:00'), INTERVAL 1 DAY)
+    </if>
+    <if test="filter.hasKeyword()">
+      AND (i.biz_no LIKE #{filter.keywordLike} ESCAPE '!'
+           OR (SELECT JSON_UNQUOTE(JSON_EXTRACT(fd.fields_json, '$.title'))
+                 FROM form_data fd WHERE fd.id = i.form_data_id) LIKE #{filter.keywordLike} ESCAPE '!'
+           OR u.name LIKE #{filter.keywordLike} ESCAPE '!')
+    </if>
   </sql>
 
   <!-- ============================== 单条读 ============================== -->
@@ -173,7 +232,7 @@
     ORDER BY t.id ASC
   </select>
 
-  <!-- ============================== 列表（分页 + 数据域） ============================== -->
+  <!-- ============================== 列表（分页 + 数据域 + 筛选） ============================== -->
 
   <select id="selectTodo" resultMap="TaskViewResultMap">
     SELECT <include refid="TaskViewColumns"/>
@@ -185,6 +244,7 @@
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status = 'pending'
+    <include refid="TaskListFilters"/>
     ORDER BY t.created_at DESC, t.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -193,10 +253,12 @@
     SELECT COUNT(1)
     FROM flow_task t
     JOIN flow_instance i ON i.id = t.instance_id
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status = 'pending'
+    <include refid="TaskListFilters"/>
   </select>
 
   <select id="selectDone" resultMap="TaskViewResultMap">
@@ -209,6 +271,7 @@
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status &lt;&gt; 'pending'
+    <include refid="TaskListFilters"/>
     ORDER BY t.decided_at DESC, t.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -217,10 +280,12 @@
     SELECT COUNT(1)
     FROM flow_task t
     JOIN flow_instance i ON i.id = t.instance_id
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status &lt;&gt; 'pending'
+    <include refid="TaskListFilters"/>
   </select>
 
   <select id="selectInitiated" resultMap="TaskViewResultMap">
@@ -235,12 +300,15 @@
            DATE_FORMAT(i.created_at, '%Y-%m-%d %H:%i:%s') AS task_created_at,
            DATE_FORMAT(i.finished_at, '%Y-%m-%d %H:%i:%s') AS decided_at,
            i.initiator_id, u.name AS initiator_name, i.current_node_seq,
-           i.status AS instance_status, i.sub_status
+           i.status AS instance_status, i.sub_status,
+           (SELECT JSON_UNQUOTE(JSON_EXTRACT(fd.fields_json, '$.title'))
+              FROM form_data fd WHERE fd.id = i.form_data_id) AS title
     FROM flow_instance i
     LEFT JOIN sys_user u ON u.id = i.initiator_id
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND i.initiator_id = #{userId}
+    <include refid="TaskListFilters"/>
     ORDER BY i.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -248,9 +316,51 @@
   <select id="countInitiated" resultType="long">
     SELECT COUNT(1)
     FROM flow_instance i
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND i.initiator_id = #{userId}
+    <include refid="TaskListFilters"/>
+  </select>
+
+  <!-- ============================== 抄送我的一览（flow_cc ⋈ flow_instance） ============================== -->
+
+  <!--
+    口径：flow_cc **未**登记为受控表（oa.scope.tables 无此项，见 DataScopeTableRegistry），
+    因此「抄送人 = 本人」由 c.user_id = #{userId} 显式表达；数据域过滤仍叠加在 flow_instance 上
+    （域外单据不出现，而不是「显示但点不开」，AC-02/TC-AUTH-024）。
+    出参七项：单号 / 单据类型 / 标题 / 发起人 / 发起时间 / 当前状态 / 抄送时间 + 是否已读。
+  -->
+  <select id="selectCcOverview" resultMap="CcViewResultMap">
+    SELECT c.id AS cc_id, c.instance_id, i.biz_no, i.form_type, i.category,
+           (SELECT JSON_UNQUOTE(JSON_EXTRACT(fd.fields_json, '$.title'))
+              FROM form_data fd WHERE fd.id = i.form_data_id) AS title,
+           i.initiator_id, u.name AS initiator_name,
+           DATE_FORMAT(i.created_at, '%Y-%m-%d %H:%i:%s') AS instance_created_at,
+           i.current_node_seq, i.status AS instance_status, i.sub_status,
+           DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i:%s') AS cc_created_at,
+           c.source AS cc_source,
+           DATE_FORMAT(c.read_at, '%Y-%m-%d %H:%i:%s') AS read_at
+    FROM flow_cc c
+    JOIN flow_instance i ON i.id = c.instance_id
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND c.user_id = #{userId}
+    <include refid="TaskListFilters"/>
+    ORDER BY c.created_at DESC, c.id DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="countCcOverview" resultType="long">
+    SELECT COUNT(1)
+    FROM flow_cc c
+    JOIN flow_instance i ON i.id = c.instance_id
+    LEFT JOIN sys_user u ON u.id = i.initiator_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND c.user_id = #{userId}
+    <include refid="TaskListFilters"/>
   </select>
 
   <!-- ============================== 写 ============================== -->

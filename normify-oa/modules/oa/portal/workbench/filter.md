@@ -11,8 +11,8 @@ description:
   en: >
       In-list search (the system deliberately has no global search box): document type, status, submission date range, initiator/department, amount range and document-number keyword; filters persist across the four tabs; organisation nodes outside the caller's data scope never appear as filter options.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.290Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.419Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

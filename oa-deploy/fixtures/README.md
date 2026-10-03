@@ -137,6 +137,11 @@ oa-deploy\runtime\start-local.cmd
 - `sys_org ≥ 13`（含 5 个 `RT-*`）、`sys_user.dev_* = 7`、`sys_user.mtx_* = 5`
 - `sys_org_leader` 上 ①–⑥ 全部可解析 ⇒ 四类单据 precheck `allowed=true`（⑤ 集团分管领导**五类业务线全绑**，任意 `category` 都可发起）
 - `information_schema.TRIGGERS`（schema `oa`）**= 4**，且 `UPDATE sys_log WHERE id=1` 报错
+- **第 17 项 `roles.placeholder_none`（2026-10-04 新增）**：`sys_user_role` 中
+  `account='matrix_admin'` 必须 **0 行** —— admin 角色只授予**可登录**账号。占位行一旦持角色，
+  节点⑦（`approver_param={"role_code":"admin"}`）就会把待办解析到**不可登录**的 id=1 上，
+  演示与验收必须先「改派」才能继续（那是夹具自己制造的人工障碍）。
+  该断言沿用 `99-verify.sql` 的 PASS/FAIL + expected/actual 口径，**断言总数 16 → 17**。
 
 ### 4.1 发起链路的入口闸门（2026-10-04 口径）
 

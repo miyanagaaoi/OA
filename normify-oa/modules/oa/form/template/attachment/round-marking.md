@@ -11,8 +11,8 @@ description:
   en: >
       Supplement attachments carry a `round` marker: 0 for originals, 1..3 for the Nth supplement; at most one supplement per node and three per document; the printed attachment list labels each round.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.216Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.361Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

@@ -11,8 +11,8 @@ description:
   en: >
       Contrast baselines are computed on white: body text at 4.5:1 or better and large text at 3:1 or better, with disabled states exempt; measured values are ink 16.8:1, ink-muted 7.8:1, ink-subtle 5.2:1, warning #9a6200 at 4.6:1 on white, inverse-ink 14.6:1 and inverse-ink-muted 6.4:1; tools/validate-design-md.js checks every component and raises an error below AA.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.171Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.326Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

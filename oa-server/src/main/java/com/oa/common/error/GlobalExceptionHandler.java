@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,12 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  *
  * <p>安全基线 AC-41「错误信息不泄露」的落点：对外只输出 {@link ErrorCode} 的文案与追踪号，
  * 堆栈、SQL、内部类名只写服务端日志（含 traceId，便于按追踪号取证）。
+ *
+ * <h2>结构化明细（2026-10-04 追加：40011 的 {@code details.errors[]}）</h2>
+ * <p>仅当异常**显式声明**了可对外明细时才追加 {@code details} 字段
+ * （{@link BizException#withPublicDetail}）；{@code BizException#getDetails()}（排查用上下文，
+ * 如 {@code requiredPermissions}）**仍然只进日志**，因此其它错误码的响应形状一字未变。
+ * 形状是**纯追加**：{@code code / message / traceId / success} 的语义与位置都不动。
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,7 +52,7 @@ public class GlobalExceptionHandler {
             log.error("业务异常(服务端) code={} {} {} traceId={}",
                     code.getCode(), request.getMethod(), request.getRequestURI(), TraceIds.current(), ex);
         }
-        return build(code, ex.getMessage());
+        return build(code, ex.getMessage(), ex.getPublicDetails());
     }
 
     /** {@code @Valid} 请求体校验失败（MethodArgumentNotValidException 继承自 BindException）。 */
@@ -126,7 +133,19 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ApiResponse<Void>> build(ErrorCode code, String message) {
-        ApiResponse<Void> body = ApiResponse.failure(code.getCode(), message);
+        return build(code, message, null);
+    }
+
+    /**
+     * 组装响应。
+     *
+     * @param details **可对外**的结构化明细（{@code null} / 空 → 响应体里省略 {@code details} 字段，
+     *                既有错误码的形状与语义因此完全不变）
+     */
+    private ResponseEntity<ApiResponse<Void>> build(ErrorCode code, String message, Map<String, Object> details) {
+        ApiResponse<Void> body = details == null || details.isEmpty()
+                ? ApiResponse.failure(code.getCode(), message)
+                : ApiResponse.failure(code.getCode(), message, details);
         HttpStatus status = HttpStatus.resolve(code.getHttpStatus());
         return ResponseEntity.status(status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status).body(body);
     }

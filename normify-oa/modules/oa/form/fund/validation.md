@@ -10,8 +10,8 @@ description:
   en: >
       Fund-specific validation: the amount is required and > 0 (zero or empty blocks submission), payee name and account are required with a valid account character set, the pay date is not earlier than today, the linked contract number must be valid, and at least one attachment is required; all server-side.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.200Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.347Z"
 fingerprint: 3677ada712f976a13af7d0b59d7ca50765b031d91b5f9dea79eb02e1f375eeff
 source:
   - path: "doc/forms.md"

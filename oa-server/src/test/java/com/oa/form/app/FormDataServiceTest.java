@@ -444,6 +444,51 @@ class FormDataServiceTest {
         assertThat(view.get("lockedVersionEvidence").toString()).contains("AC-09");
     }
 
+    // ================================================================ 人员 / 组织多值（2b.1+）
+
+    @Test
+    @DisplayName("既有数据：user/org 单值（字符串 id）照原样读出（历史单据不受本改动影响）")
+    void legacySingleValuePickerIsReadAsIs() {
+        login(INITIATOR_ID, "employee");
+        instance("matter", "draft", null,
+                "{\"title\":\"采购办公用品\",\"cc_users\":\"12\",\"cost_bearer\":\"135\"}");
+
+        Map<String, Object> read = service.read(INSTANCE_ID);
+        assertThat(readField(read, "snapshot", "fields")).asInstanceOf(
+                        org.assertj.core.api.InstanceOfAssertFactories.MAP)
+                .containsEntry("cc_users", "12")
+                .containsEntry("cost_bearer", "135");
+    }
+
+    @Test
+    @DisplayName("既有数据：已是数组的历史值也能读出（readFields 的数组分支）")
+    void legacyArrayPickerIsReadAsList() {
+        login(INITIATOR_ID, "employee");
+        instance("matter", "draft", null, "{\"cc_users\":[\"12\",\"13\"]}");
+
+        Map<String, Object> read = service.read(INSTANCE_ID);
+        assertThat(readField(read, "snapshot", "fields")).asInstanceOf(
+                        org.assertj.core.api.InstanceOfAssertFactories.MAP)
+                .containsEntry("cc_users", List.of("12", "13"));
+    }
+
+    @Test
+    @DisplayName("多值落库：数组 trim + 去空 + 去重（保序）；单值形态仍是字符串（不改写既有形态）")
+    void pickerArraysAreDedupedAndSinglesKeepShape() {
+        login(INITIATOR_ID, "employee");
+
+        instance("matter", "draft", null, "{}");
+        service.save(INSTANCE_ID, Map.of("cc_users", List.of(" 13 ", "12", "13", "", "12")),
+                ValidationMode.DRAFT);
+        assertThat(capturedPayload.get()).as("去重保序、去掉空串、逐项 trim")
+                .containsEntry("cc_users", List.of("13", "12"));
+
+        instance("matter", "draft", null, "{}");
+        service.save(INSTANCE_ID, Map.of("cc_users", "12"), ValidationMode.DRAFT);
+        assertThat(capturedPayload.get()).as("单值原样保留（既有单据/前端单值控件继续工作）")
+                .containsEntry("cc_users", "12");
+    }
+
     // ================================================================ 工具
 
     @SuppressWarnings("unchecked")

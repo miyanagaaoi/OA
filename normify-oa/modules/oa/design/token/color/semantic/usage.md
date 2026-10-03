@@ -11,8 +11,8 @@ description:
   en: >
       Status and colour mapping is globally unique and must not be extended: draft and closed are neutral, pending my approval is warning, in approval is info, approved is success, rejected or terminated is error, and transferred or countersigned is tag-info; no document type may invent its own palette, and when categories genuinely need separation use text plus a neutral grey tag.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.183Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.334Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

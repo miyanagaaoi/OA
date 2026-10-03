@@ -193,6 +193,17 @@
     WHERE id = #{id}
   </update>
 
+  <!--
+    提交发起时固化事项类别（列允许为空：草稿期用户可能尚未在表单里选定，见 data-model.md §5.1）。
+    只在「发起 = 提交」那一刻写一次 —— 类别发起后不可改判（forms.md §2）。
+  -->
+  <update id="updateCategory">
+    UPDATE flow_instance
+    SET category = #{category},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
   <!-- 草稿 → 审批中：本工作包只做这一条迁移；其余迁移属 2a.4 运行时状态机 -->
   <update id="markSubmitted">
     UPDATE flow_instance

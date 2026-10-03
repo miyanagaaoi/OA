@@ -4,7 +4,7 @@
 -- 生成器: tools/gen-init-sql.js sha256=4ff51bba65ea
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（可安全重跑生成器）。
 -- 请勿手工编辑本文件：改文档后重跑本脚本。
--- 真源文档: doc/data-model.md sha256=2870228b95c4
+-- 真源文档: doc/data-model.md sha256=755132d742a1
 --
 -- 执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。
 -- 包含：建表 28 张、索引 61 个、CHECK 12 个、外键若干、不可篡改触发器 4 个。
@@ -398,7 +398,7 @@ CREATE TABLE flow_instance (
   template_version     INT          NOT NULL COMMENT '发起时锁定的模板版本（REQ-FLOW-006）',
   form_data_id         BIGINT UNSIGNED NOT NULL,
   form_type            VARCHAR(32)  NOT NULL,
-  category             VARCHAR(32)  NOT NULL COMMENT '事项分类（快照，不可改判）：business/economy/admin/hr/invest；配置项，不参与路由；旧码 operate 作废并迁移为 business（enums.md §14）',
+  category             VARCHAR(32)      NULL COMMENT '事项分类（快照，不可改判）：business/economy/admin/hr/invest；配置项，不参与路由；旧码 operate 作废并迁移为 business（enums.md §14）。**允许为空（2026-10-04 收敛）**：草稿只是填写中的内容，事项单的类别由用户在表单里选，因此必须能在**选定之前**保存草稿（否则「填类别才能存草稿、存草稿才能填类别」形成鸡生蛋）；空类别在**提交发起**时被预检闸门拦下（⑤集团分管领导按类别解析 → 40007「请在发起时确定事项类别」）——「不允许带着空类别进入审批流」由提交闸门保证，不再由本列的 NOT NULL 保证',
   initiator_id         BIGINT UNSIGNED NOT NULL,
   initiator_org_id     BIGINT UNSIGNED NOT NULL COMMENT '发起人组织快照',
   initiator_company_id BIGINT UNSIGNED NOT NULL COMMENT '发起人公司快照（数据域判定）',

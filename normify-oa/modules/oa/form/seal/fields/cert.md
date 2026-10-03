@@ -11,8 +11,8 @@ description:
   en: >
       Certificate name `cert_name` (select, conditionally required, values per 6.5): mandatory only when seal_type is certificate borrow and hidden for the other seal types.
       
-revision: 94b9772b3364afcdfb2ecb408d7293d22a24a92f
-updated_at: "2026-10-03T06:13:00.211Z"
+revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
+updated_at: "2026-10-03T06:52:10.358Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

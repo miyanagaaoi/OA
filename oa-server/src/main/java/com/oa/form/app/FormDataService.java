@@ -5,7 +5,6 @@ import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
 import com.oa.common.json.JsonText;
 import com.oa.common.security.CurrentUser;
-import com.oa.authz.visibility.AmountFieldPolicy;
 import com.oa.authz.visibility.VisibilityRoles;
 import com.oa.form.document.FormRuleContext;
 import com.oa.form.document.FormRuleRegistry;
@@ -124,6 +123,7 @@ public class FormDataService {
         Map<String, Object> values = new LinkedHashMap<>(payload == null ? Map.of() : payload);
         applyDefaults(schema, values);
         canonicalizeAmounts(schema, values);
+        canonicalizePickers(schema, values);
         FormValidationReport report = validator.validate(schema, values, mode, LocalDate.now(), null);
         FormTypeRules rules = ruleRegistry.require(schema.formType());
         FormValidationReport.Collector collector = collectorOf(report);
@@ -157,6 +157,7 @@ public class FormDataService {
         Map<String, Object> merged = merge(stored, payload);
         applyDefaults(schema, merged);
         canonicalizeAmounts(schema, merged);
+        canonicalizePickers(schema, merged);
         FormValidationReport.Collector collector = FormValidationReport.collector();
         collector.addAll(validator.validate(schema, merged, mode, LocalDate.now(), instance.getSubmittedAt()));
         FormTypeRules rules = ruleRegistry.require(schema.formType());
@@ -205,6 +206,7 @@ public class FormDataService {
         Map<String, Object> merged = merge(stored, payload);
         applyDefaults(schema, merged);
         canonicalizeAmounts(schema, merged);
+        canonicalizePickers(schema, merged);
         Map<String, Object> forValidation = new LinkedHashMap<>(merged);
         injectSensitiveForValidation(schema, forValidation, instance.getFormDataId());
 
@@ -266,6 +268,7 @@ public class FormDataService {
         Map<String, Object> merged = merge(stored, payload);
         applyDefaults(schema, merged);
         canonicalizeAmounts(schema, merged);
+        canonicalizePickers(schema, merged);
         Map<String, Object> forValidation = new LinkedHashMap<>(merged);
         injectSensitiveForValidation(schema, forValidation, instance.getFormDataId());
         FormRuleContext ruleContext = ruleContext(schema, forValidation, payload, stored, ValidationMode.DRAFT, instance);
@@ -344,6 +347,7 @@ public class FormDataService {
         Map<String, Object> stored = snapshotService.readFields(row == null ? null : row.getFieldsJson());
         applyDefaults(schema, stored);
         canonicalizeAmounts(schema, stored);
+        canonicalizePickers(schema, stored);
         Map<String, Object> forValidation = new LinkedHashMap<>(stored);
         injectSensitiveForValidation(schema, forValidation, instance.getFormDataId());
         FormRuleContext context = ruleContext(schema, forValidation, Map.of(), stored, mode, instance);
@@ -383,6 +387,7 @@ public class FormDataService {
         Map<String, Object> values = new LinkedHashMap<>(payload == null ? Map.of() : payload);
         applyDefaults(schema, values);
         canonicalizeAmounts(schema, values);
+        canonicalizePickers(schema, values);
         FormRuleContext ruleContext = ruleContext(schema, values, payload, Map.of(), ValidationMode.DRAFT, null);
         FormTypeRules rules = ruleRegistry.require(schema.formType());
         FormValidationReport.Collector collector = FormValidationReport.collector();
@@ -608,6 +613,42 @@ public class FormDataService {
         }
     }
 
+    /**
+     * 人员 / 组织选择字段落库前的**规范化**（{@code doc/forms.md} §2 cc_users 行「去重」）。
+     *
+     * <p>三条不可回退的口径：
+     * <ol>
+     *   <li><b>单值原样保留</b>：既有草稿/单据的 {@code fields_json} 里 {@code user}/{@code org}
+     *       存的是**字符串 id**（与前端单值控件一致），本次改动**不改写**它 ——
+     *       历史数据读法（{@code FormSnapshotService#readFields}）与打印/详情一律不受影响；</li>
+     *   <li><b>数组去重（保序）</b>：数组形态先 trim、去空、按首次出现顺序去重后再落库，
+     *       因此「同一个 id 提交 21 次」既不会被上限拦，也不会在库里留下重复项；</li>
+     *   <li>与校验同源：去重口径 = {@link FormPayloadValidator#pickerElements(Object)}，
+     *       避免「校验按去重计数、落库却存了重复项」的两套口径。</li>
+     * </ol>
+     *
+     * <p>为什么在**校验之前**调用（与 {@code canonicalizeAmounts} 同一位置）：
+     * 上限与存在性都必须判**最终落库形态**，否则「先存 21 条、再单独存 20 条」这类
+     * 分两次保存的写法就能绕过上限。
+     */
+    void canonicalizePickers(FormSchema schema, Map<String, Object> values) {
+        if (values == null || values.isEmpty()) {
+            return;
+        }
+        for (FormFieldDef field : schema.fields()) {
+            com.oa.form.template.schema.FormFieldType type = field.type();
+            if (type != com.oa.form.template.schema.FormFieldType.USER
+                    && type != com.oa.form.template.schema.FormFieldType.ORG) {
+                continue;
+            }
+            Object raw = values.get(field.code());
+            if (!(raw instanceof java.util.Collection<?>) && !(raw instanceof Object[])) {
+                continue;
+            }
+            values.put(field.code(), FormPayloadValidator.pickerElements(raw));
+        }
+    }
+
     /** 应用归一化补丁（{@code null} 值 = 删除该键）。 */
     void applyPatch(Map<String, Object> values, Map<String, Object> patch, FormSchema schema, WriteContext context) {
         if (patch == null || patch.isEmpty() || values == null) {
@@ -760,14 +801,18 @@ public class FormDataService {
                 date == null ? "（空）" : date);
     }
 
-    /** 金额角色的只读披露（出参用；判定的真正落点是 {@code FormFieldWriteGuard}）。 */
-    public static Map<String, Object> amountPolicyOf(CurrentUser principal) {
-        Map<String, Object> view = new LinkedHashMap<>();
-        view.put("writable", AmountFieldPolicy.canWriteAmounts(principal));
-        view.put("exportable", AmountFieldPolicy.canExportAmounts(principal));
-        view.put("writableRoles", List.of(VisibilityRoles.ADMIN, VisibilityRoles.FINANCE_OWNER));
-        return view;
-    }
+    /**
+     * 金额角色的只读披露 —— <b>已删除（2026-10-04）</b>。
+     *
+     * <p>它曾是 {@code FormDataService} 里的一份**副本**（只有 writable/exportable/writableRoles
+     * 三个键），与 {@code com.oa.authz.visibility.FormFieldWriteGuard#amountPolicy}（六个键，
+     * 另含 {@code amountFieldNames / readOnly / reason}）口径重复；唯一的调用方
+     * {@code FormRuleController#fieldGroups} 还硬编码传 {@code null} 主体，导致
+     * 「读路径说金额只读、写路径却放行」的展示缺陷。
+     *
+     * <p>现在读路径直接调用 {@code FormFieldWriteGuard#amountPolicy(当前登录人)} ——
+     * 与写路径同一实现、同一主体来源。删除副本是为了让「两套口径」在编译期就不可能再出现。
+     */
 
     /** 选项类字段的合法取值（下拉接口复用）。 */
     public List<String> optionCodes(FormFieldDef field) {
