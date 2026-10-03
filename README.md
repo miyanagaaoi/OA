@@ -39,11 +39,11 @@
 
 | 指标 | 数值 |
 | --- | --- |
-| 模块 | **527**（容器 142 / 叶子 385），最大深度 6 段 |
+| 模块 | **527**（容器 142 = 有子模块者 / 叶子 385），最大深度 6 段 |
 | API 契约 | **879**（http 698 / file 98 / kafka 30 / mysql 26 / rpc 21 / redis 6） |
 | 依赖箭头 | **539**（单树跨分支，无悬空、无环） |
-| 渲染数据 | **142** 层（每层含阅读顺序与导语） |
-| 生命周期 | 全部 `state: planned`（代码未落地），`revision` 指向 `0c43a9d` |
+| 渲染数据 | **142** 层（= `renders/*.json` 数；与容器数同为 142 但语义不同） |
+| 生命周期 | 全部 `state: active`（`state` 字段缺省即 active；planned / deprecated 均为 0），`revision` 记录该模块最后一次落地提交（非全树同一 SHA：仅根模块 `oa` = `0c43a9d`，523 个 = `b08abc44`，3 个 = `2b35226a`） |
 
 - 交互视图：打开 [`normify-oa/normify.html`](normify-oa/normify.html) —— 点击下钻、悬停看介绍、`?lang=en` 切英文、`#module=<id>` 深链直达
 - 机器读：`normify-oa/tree.json` ｜ 人读大纲：`normify-oa/outline.md` ｜ API 索引：`normify-oa/api-index.json` ｜ 编译回执：`normify-oa/receipt.json`

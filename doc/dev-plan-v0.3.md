@@ -1,7 +1,7 @@
 # 集团OA审批系统 · 开发步骤与排期（基线 V0.3）
 
 > 依据：[`prd-0.1.md`](prd-0.1.md) 第 11 章里程碑 + 第 3 章范围 + 第 9 章可配置项 + 附录 D 未决问题；
-> 规模基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（527 个计划态模块 / 879 条 API 契约 / 539 条依赖箭头，深度 6 段）。
+> 规模基线：[`../normify-oa/normify.html`](../normify-oa/normify.html)（527 个模块 —— 已落地为 `state: active`（`state` 字段缺省即 active；planned / deprecated 均为 0）/ 879 条 API 契约 / 539 条依赖箭头，深度 6 段）。
 > 口径：阶段周期沿用 PRD 第 11 章（4 + 8 + 4 + 4 + 3 = **23 周**）；本文件把它拆成可分配的工作包、决策闸门与验收门。
 
 ---
@@ -106,8 +106,8 @@
 >   - 矩阵测试**抓出并修复一个真实提权口**：`PermissionTreeService` 权限树读/写原本无任何角色判定（任意登录用户可读可写）→ 收紧为仅系统管理员（REQ-ADMIN-003）。
 >   - 顺带修正两处既有缺陷：人员**工号判重**原为数据域口径（域外重复工号会被**静默写入**，因 `employee_no` 无库唯一键）→ 改系统口径；`DataScopeMapperGuardTest` 的 yml 解析器遇整行注释会提前 `break`，**守卫本身曾静默失效**，已修并补断言。
 >   - 口径裁定：金额导出的闸门在**导出端点的角色权限**（PRD §5.3 / AC-18：导出功能仅系统管理员与财务角色可用），而非一律剔除金额列；主数据导出 `phone` 不脱敏是**往返可还原的显式例外**（仅 `admin:user:export` + 审计留痕 + 唯一实现内二次鉴权），见 `import-spec.md` §9.2.1 / §9.3。
->   - 验证：`mvn -B test` **313 全绿**；结构 `validate` 0 error、模块 **526** / API **880**
->   - **结构基线的证据引用已「锚点化」**（阶段 0/1 收尾项）：模块 `source` 指向 `doc/*.md` 的条目**一律去掉 `line`/`end_line`**（行号是位置坐标，文档一增删就整体漂移，而 `normify_module_refresh` 只重算 fingerprint/revision、**不重算行号**，漂移对 `normify_validate` 完全不可见），改为在模块正文写 `## 证据锚点`，用「REQ 编号 / 章节标题原文 / `CREATE TABLE <表名>`」定位；并有 `tools/check-normify-anchors.js` 机检（doc 引用带行号、锚点缺失、锚点在文档中找不到 → error 并 exit 1；锚点重复、「锚点待定」→ warning），已接入 `docs-ci.yml`。迁移覆盖 **449 个模块 / 768 条 doc 引用**（625 条去重后 module×文档），`validate` 仍 **0 error / 16 warning（既有 leaf-too-coarse）**。
+>   - 验证：`mvn -B test` **313 全绿**；结构 `validate` 0 error、模块 **526** / API **880**（**该日期的事实；其后阶段 2 起结构继续落地，现为 527 模块 / 879 API**）
+>   - **结构基线的证据引用已「锚点化」**（阶段 0/1 收尾项）：模块 `source` 指向 `doc/*.md` 的条目**一律去掉 `line`/`end_line`**（行号是位置坐标，文档一增删就整体漂移，而 `normify_module_refresh` 只重算 fingerprint/revision、**不重算行号**，漂移对 `normify_validate` 完全不可见），改为在模块正文写 `## 证据锚点`，用「REQ 编号 / 章节标题原文 / `CREATE TABLE <表名>`」定位；并有 `tools/check-normify-anchors.js` 机检（doc 引用带行号、锚点缺失、锚点在文档中找不到 → error 并 exit 1；锚点重复、「锚点待定」→ warning），已接入 `docs-ci.yml`。迁移覆盖 **449 个模块 / 768 条 doc 引用**（625 条去重后 module×文档），`validate` 仍 **0 error / 16 warning（既有 leaf-too-coarse）**（**该日期的事实；其后口径已对齐为 450 个模块 / 777 条 doc 引用，锚点机检 635 条锚点条目 / 144 个唯一锚点 / 6 份文档，`validate` 0 error / 17 warning**）。
 >   - **开发夹具已入库（`oa-deploy/fixtures/`），重置库后可复现**：四类单据 precheck 所需的负责人链（① 部门负责人 / ② 财务部正职 / ③ 公司副职 / ④ 公司正职 / ⑤ 集团经济线 / ⑥ 集团董事长）不再依赖 `.cache/` 手工 SQL。矩阵测试夹具的**默认路径仍指向 `.cache/`**（`AuthzMatrixHttpTest:485`、`AuthzMatrixMySqlIntegrationTest`），但可用 `-Doa.it.fixture=` / `OA_IT_FIXTURE=` 指向 `oa-deploy/fixtures/40-authz-matrix.sql`（**`oa-server/**` 未改动**，见交接备注）。
 
 **风险**：数据域是最容易"上线后才发现漏过滤"的地方 → 建议在第 1 阶段末做一次**逐接口矩阵测试**（角色 × 数据范围 × 入口）。
@@ -213,7 +213,7 @@
 
 ## 10. 每阶段完成的定义（DoD，统一口径）
 
-1. 对应模块的 API 契约与实现一致（结构基线已给出 879 条契约，落地后 `normify_module_refresh(activate)` 转 active）；
+1. 对应模块的 API 契约与实现一致（结构基线已给出 879 条契约，落地后 `normify_module_refresh(activate)` 转 active —— **该动作已于阶段 1（2026-10-03）执行完毕**：受影响的 planned 模块已激活，现 planned = 0、527 个模块全部 `state: active`）；
 2. 单元/集成测试通过，阶段验收用例（AC 编号）全绿；
 3. 越权与边界用例随阶段执行（不是最后补测）；
 4. 文档同步：字段变更走 `forms.md` 版本、表变更走 `data-model.md`、规则变更同步 PRD 与设计规范；
