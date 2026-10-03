@@ -56,7 +56,7 @@
 | 交叉引用错误 | 6 处 | 0 处 |
 | 打印签名栏口径 | 三处冲突 | 统一：**正式 A4 打印空栏**，屏幕预览可显示缩略图 |
 
-**新增配套文档（V0.4）**：`enums.md`（枚举权威源，514 行）、`dict-seed.md`（8 类字典 **37 行**种子，每表带幂等 SQL）、`templates.md`（四类单据 × 7 节点配置 + `form_schema_json` 契约，711 行）、`test-cases.md`（**206 条用例，AC-01~AC-61 全覆盖**，812 行）。
+**新增配套文档（V0.4）**：`enums.md`（枚举权威源，514 行）、`dict-seed.md`（8 类字典 **37 行**种子，每表带幂等 SQL）、`templates.md`（四类单据 × 7 节点配置 + `form_schema_json` 契约，711 行）、`test-cases.md`（**217 条用例，AC-01~AC-61 全覆盖**，827 行）。
 
 **最终交叉校验（脚本独立复核，非自述）**：
 
@@ -64,7 +64,7 @@
 | --- | --- |
 | PRD 验收 / 编号 | 61 条 AC；68 个编号；**0 悬空、0 无验收**；AC→阶段归属 **61/61 恰好各一次** |
 | `data-model.md` | **27 张表**；`submitted_note` 唯一；新增表/列齐全；表内无重复列 |
-| `test-cases.md` | 206 条用例（ID 唯一）；**AC 覆盖 61/61**；追溯表 61 行 |
+| `test-cases.md` | 217 条用例（ID 唯一）；**AC 覆盖 61/61**；追溯表 61 行 |
 | `DESIGN.md` | `validate-design-md` **errors 0** |
 | 结构基线 | `normify_validate` **0 error** → build → render：520 模块 / 865 API / 142 层渲染数据 |
 | 命名统一 | `plan_category`、`other_review_depts`（字典 `review_dept_other`）、`business`、`archive_register`、`pending_supplement`、`active`/`waiting_supplement`/`rolled_back`/`supplement_requested`/`auto_closed` 全项目一致 |

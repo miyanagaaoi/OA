@@ -10,9 +10,9 @@ description:
   en: >
       Two gates for deleting an attachment: identity (uploader, document initiator, or system administrator; else 40310) and the state window (three-state whitelist reused; deletable in draft and pending-supplement, 40304 while approving or closed). The initiator tier covers delegated uploads, where uploader_id is the admin. The file is deleted before the metadata row: a failed file delete raises 50004 and rolls back (metadata kept, retryable).
       
-revision: b08abc4417060c06343ed11a019f7fea44966e64
-updated_at: "2026-10-03T08:18:40.035Z"
-fingerprint: d4d66fddc36c266d7ab9fbbd808f6b3802ea345dd1badc4fce143b7e4485e3ec
+revision: 2b35226a53c51a794d873f97783d9eb3d4382933
+updated_at: "2026-10-03T08:28:42.525Z"
+fingerprint: 78bb3e8c1c61b8cb282f82241ad9baefed7dc07fe5038d170d5f3d45df6f77e2
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/attachment/app/AttachmentService.java"

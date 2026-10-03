@@ -10,9 +10,9 @@ description:
   en: >
       Attachments live in a private dir outside the repo (oa.attachment.root overrides), sharded by date and a random name; only the relative path is stored. No static mapping exists, so storage_path is unreachable. Download and preview need auth plus data scope (controlled table flow_attachment; out-of-scope and missing ids both 404). Downloads always attachment; only jpeg/png/pdf inline. HEIC preview degrades to download: the HEIC-to-JPG transcode is unimplemented (phase 3).
       
-revision: b08abc4417060c06343ed11a019f7fea44966e64
-updated_at: "2026-10-03T08:18:40.039Z"
-fingerprint: c4a48f17816feff238dcc98f4666c96ef57cdbaf0b48eaa1f2f7f6c075057dd7
+revision: 2b35226a53c51a794d873f97783d9eb3d4382933
+updated_at: "2026-10-03T08:28:42.527Z"
+fingerprint: 4fbc94448065918d07b278183e3db94b8470040ec18f3dae977e416e31d000ef
 source:
   - path: "doc/forms.md"
   - path: "doc/data-model.md"

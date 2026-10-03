@@ -327,7 +327,7 @@ class AttachmentServiceTest {
     }
 
     @Test
-    @DisplayName("删除：非上传者本人（且非管理员）→ 40310，文件与元数据都不动")
+    @DisplayName("删除：三档全不中（既非上传者本人、也非单据发起人本人、也非管理员）→ 40310，文件与元数据都不动")
     void deleteByNonUploaderIsDenied() {
         Attachment row = storedRow("draft");
         when(attachmentMapper.selectById(7L)).thenReturn(row);

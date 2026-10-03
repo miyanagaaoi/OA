@@ -44,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
  *   <tr><td>GET</td><td>{@code /forms/attachments/{id}/preview}</td>
  *       <td>{@code flow} ∪ {@code admin:flow}</td><td>预览（仅安全类型内联，其余降级为下载）</td></tr>
  *   <tr><td>DELETE</td><td>{@code /forms/attachments/{id}}</td><td>{@code flow}</td>
- *       <td>删除（仅上传者本人或管理员，且仅在三态窗口内）</td></tr>
+ *       <td>删除（三档身份：上传者本人 ∪ 单据发起人本人 ∪ 系统管理员，且仅在三态窗口内）</td></tr>
  * </table>
  *
  * <h2>为什么没有直链</h2>
@@ -145,7 +145,7 @@ public class AttachmentController {
 
     // ================================================================ 删除
 
-    /** 删除附件（仅上传者本人或管理员，且仅在三态窗口内）。 */
+    /** 删除附件（三档身份：上传者本人 ∪ 单据发起人本人 ∪ 系统管理员，且仅在三态窗口内）。 */
     @DeleteMapping("/attachments/{attachmentId}")
     @Audited(action = "attachment_delete", targetType = "flow_attachment", targetId = "#attachmentId")
     public com.oa.common.api.ApiResponse<Map<String, Object>> delete(
