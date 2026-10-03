@@ -215,7 +215,13 @@ const attachmentIdentity = computed<'initiator' | 'admin' | 'other'>(() => {
   return isAdmin ? 'admin' : 'other'
 })
 
-/** 当前登录人 id（附件删除入口的判据：只能删自己传的） */
+/**
+ * 当前登录人 id（附件删除入口的判据之一）。
+ *
+ * <p>删除是**三档**（上传者本人 / 单据发起人本人 / 系统管理员，见
+ * `utils/attachment.ts#canDeleteAttachment`）：本 id 只用于判「我是不是该附件的上传者」，
+ * 另两档分别用 `attachmentIdentity` 的 `initiator` / `admin`。
+ */
 const currentUserId = computed(() => userStore.user?.userId ?? '')
 
 // ---------------------------------------------------------------------------
@@ -260,23 +266,21 @@ function resetPage(): void {
  * **能力缺失说明**（区别于「界面坏了」）：本模板里出现了受后端能力限制的字段时，
  * 在页面顶部给一句可发现的说明，而不是让入口默默消失。
  *
- * 现状（阶段 2b.7 收敛后**只剩一项**）：
- *   · heic 附件：后端**本轮未实现** heic→jpg 转码（`AttachmentController#preview`
- *     的注释写明「HEIC 转码未在本轮实现（需要图像库）」），预览接口对 heic 返回
- *     `Content-Disposition: attachment` 降级 ⇒ 界面只给下载并如实说明。
+ * 现状：**只剩 heic 在线预览这一项**（后端未实现转码）。附件本身已可用 ——
+ * 上传 / 清单（按 round 分组）/ 鉴权下载 / 删除都是阶段 2b.7 交付的真接口。
  *
- * 已删除的条目（不要再写回来）：
- *   · 「附件字段：上传入口待阶段 2b.7 支持」——2b.7 已交付上传/清单/下载/预览/删除
- *     五条接口，附件字段已是真正可用的控件（`components/AttachmentPanel.vue`）；
- *   · 「user / org 多值待支持」——2026-10-04 后端 7c409ea 已交付，界面已是多选。
+ * ⚠ 不要再往这张卡片里写**已经可用**的事（例如当年的「附件上传入口待支持」、
+ * 「user / org 多值待支持」）：本卡片只讲**尚不可用**的能力，混入已交付项会让读者
+ * 分不清「界面坏了」与「还没做」。
  */
 const capabilityNotes = computed<string[]>(() => {
   const fields = schema.value?.fields ?? []
   const notes: string[] = []
   if (fields.some((field) => field.control === 'attachment')) {
     notes.push(
-      '附件：上传 / 清单（按 round 分组）/ 鉴权下载 / 预览 / 本人删除均已可用（阶段 2b.7）；' +
-        '**heic 暂不支持在线预览，请下载查看**（后端本轮未实现 heic→jpg 转码）。',
+      'heic 在线预览待阶段 3：后端本轮**未实现** heic→jpg 转码（`AttachmentController#preview` ' +
+        '对 heic 返回 `Content-Disposition: attachment` 降级），因此 heic **可上传、可下载，但不能在线预览** ' +
+        '—— 请下载查看（模板 `filePolicy.message` 里那句「heic 转 jpg 预览」尚未落地）。',
     )
   }
   return notes
@@ -867,13 +871,14 @@ function formatTime(value: string | null | undefined): string {
 
     <!-- ================= 能力缺失说明（不是界面坏了） ================= -->
     <section v-if="capabilityNotes.length > 0" class="oa-card capability-card">
-      <div class="oa-section-band">能力说明（尚未交付的能力，非界面故障）</div>
+      <div class="oa-section-band">能力说明（尚未实现的能力，非界面故障）</div>
       <ul>
         <li v-for="(note, index) in capabilityNotes" :key="index">{{ note }}</li>
       </ul>
       <p class="meta">
-        这些入口**不是被隐藏**，而是服务端当前不接受该形态的取值；后端补齐后前端会同步放开。
-        （人员 / 组织多值已于 2026-10-04 交付：界面已是多选，提交按数组上送。）
+        这里的条目**不是被隐藏**，而是服务端尚未提供该能力：附件本身可上传、可下载，
+        heic 走「下载查看」；后端实现 heic 转码后，**前端的内联入口判定也要同步放开**
+        （预览入口是按内联白名单在前端先行判定的，不是等 403 再说）。
       </p>
     </section>
 
@@ -1040,7 +1045,9 @@ function formatTime(value: string | null | undefined): string {
 
     <p class="footnote">
       附件：上传 / 清单（按 round 分组）/ 下载 / 预览 / 删除走阶段 2b.7 的**鉴权接口**
-      （不出直链、不暴露存储路径）；审批中与已完结只读（40304），删除仅限本人上传的附件（40310）。
+      （不出直链、不暴露存储路径）；审批中与已完结只读（40304）；
+      删除开放给**上传者本人 / 单据发起人本人 / 系统管理员**（40310，仅草稿与待补件窗口；
+      单据归发起人，他人代传的附件本人同样可删）——服务端仍是裁决方。
       heic 暂不支持在线预览，请下载查看。「抄送我的」列表现已在审批中心 `/task/cc` 提供；打印属阶段 3。
     </p>
   </div>

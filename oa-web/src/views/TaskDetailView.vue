@@ -110,10 +110,13 @@ const deptOptions = ref<FormOption[]>([])
 const NO_ISSUES: Record<string, never[]> = {}
 
 /**
- * 附件面板的身份闸门（镜像后端 `AttachmentService#requireInitiatorOrAdmin`）。
+ * 附件面板的身份闸门。
  *
- * 详情页是**只读视图**（`force-readonly-reason` 已让所有字段只读），因此这里只在
- * 「是否发起人/管理员」上给面板一个如实的原因文本；上传与删除入口本就不会出现。
+ * <p>与后端同源：**上传** = 发起人本人或系统管理员（`requireInitiatorOrAdmin`）；
+ * **删除** = 上传者本人 / 单据发起人本人 / 系统管理员三档（2026-10-05 裁定）。
+ *
+ * <p>详情页是**只读视图**（`force-readonly-reason` 已让所有字段只读），因此这里只在
+ * 「是否发起人 / 管理员」上给面板一个如实的原因文本；上传与删除入口本就不会出现。
  */
 const attachmentIdentity = computed<'initiator' | 'admin' | 'other'>(() => {
   const me = userStore.user?.userId ?? ''
@@ -123,7 +126,7 @@ const attachmentIdentity = computed<'initiator' | 'admin' | 'other'>(() => {
   return isAdmin ? 'admin' : 'other'
 })
 
-/** 当前登录人 id（附件删除入口的判据：只能删自己传的；详情页不发删除请求） */
+/** 当前登录人 id（删除三档里「上传者本人」一档的判据；详情页不发删除请求） */
 const currentUserId = computed(() => userStore.user?.userId ?? '')
 
 // ---------------------------------------------------------------------------
