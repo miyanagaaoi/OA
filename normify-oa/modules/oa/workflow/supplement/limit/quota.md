@@ -12,12 +12,12 @@ description:
       Supplement caps: a node may request a supplement only once (node instance flag supplement_requested) and a document accumulates at most three (instance supplement_count, consistent with the unique key on instance and round). Once the cap is reached the supplement action disappears and the approver may only pass, reject or terminate.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.833Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 333
-    end_line: 333
+    line: 352
+    end_line: 352
   - path: "doc/prd-0.1.md"
     line: 554
     end_line: 554

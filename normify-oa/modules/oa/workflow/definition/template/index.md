@@ -12,15 +12,15 @@ description:
       Template metadata and version accumulation: each code binds a document type and form template (form_schema_json drives rendering); changes create new versions without overwriting history. In-flight instances keep the version and approver snapshot captured at submission, and disabling a template never affects them (REQ-FLOW-006).
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.808Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
     line: 276
     end_line: 295
   - path: "doc/prd-0.1.md"
-    line: 349
-    end_line: 349
+    line: 368
+    end_line: 368
 deps:
   - kind: reference
     to: oa.form.template

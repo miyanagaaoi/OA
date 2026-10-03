@@ -12,12 +12,12 @@ description:
       The only permitted update path for CA verification results: it touches verify_result and verified_at only, which is exactly what the trigger allows; the path exists in phase one with no caller.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.800Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 373
-    end_line: 373
+    line: 392
+    end_line: 392
   - path: "doc/data-model.md"
     line: 756
     end_line: 767

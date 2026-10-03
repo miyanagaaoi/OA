@@ -61,6 +61,8 @@
 > 阶段 0 的**硬阻塞**为 0.9 与 0.12：前者决定第 1 阶段数据域引擎怎么写，后者决定 2a 能否建表。0.10/0.11 可与第 1 阶段并行。
 >
 > **✅ 文档侧已于 2026-10-02 完成**：0.1 [`tech-design.md`](tech-design.md) **V1.0（D1–D10 已评审确认）**、0.9 `prd-0.1.md` → **V0.4**、0.12 `data-model.md` V0.4（27 张表、DDL 可执行）、0.10 [`enums.md`](enums.md)、0.11 [`dict-seed.md`](dict-seed.md)、0.4 [`templates.md`](templates.md)、0.7 [`test-cases.md`](test-cases.md)，另加终审记录 [`prd-v0.3-review.md`](prd-v0.3-review.md) 与仓库首页 [`../README.md`](../README.md)。**阶段 0 的文档阻塞项已清零**，剩余为工程侧准备：**0.2 CI 流水线**（仓库与首次推送已完成、`docs-ci.yml` 已就位）、**0.3 环境**（开发/测试/预发 + 离线依赖仓库）、**0.8 打印稿目视核对**（`DESIGN.print-a4.html`）。**0.5 字典种子 SQL 与 0.6 导入模板均已产出**（`oa-deploy/sql/02-dict-seed.sql`、`oa-deploy/import/*.csv`）。
+>
+> **✅ 开发夹具已入库（2026-10-03）**：[`oa-deploy/fixtures/`](../oa-deploy/fixtures/README.md) —— 组织/人员/角色/越权矩阵/触发器 5 个幂等脚本 + `99-verify.sql` 断言 + `90-dev-admin.md`（口令由使用者自定，仓库不含任何可用口令）。**重置库后可复现**：`DROP/CREATE oa` → 启动应用跑 Flyway V1~V4 → 按序执行 fixtures → `99-verify.sql` 全 PASS；已在临时库 `oa_fixturecheck` 上从零验证（同一套迁移 + 夹具 + 断言 16/16 PASS，用完即删）。此前这些数据只存在于 `.cache/*.sql`（已 gitignore），重置库即永久丢失（含 `RT-*` 运行期组织）。
 
 **决策闸门（W0 内必须关闭）**：~~技术栈~~ ✅（[`tech-design.md`](tech-design.md) D1–D10 已确认）、部署规格（按 REQ-NFR-003 的「总人数 300 / 峰值在线 80 / 审批 30 TPS」）、**邮件通道**（SMTP 服务器与发信人）、时钟与日志留存策略、~~财务部数据域口径~~ ✅（PRD V0.4 附录 D Q13 已裁定——归口类别全可见 + 涉及费用事项单 + 流转链）。
 
@@ -105,6 +107,7 @@
 >   - 顺带修正两处既有缺陷：人员**工号判重**原为数据域口径（域外重复工号会被**静默写入**，因 `employee_no` 无库唯一键）→ 改系统口径；`DataScopeMapperGuardTest` 的 yml 解析器遇整行注释会提前 `break`，**守卫本身曾静默失效**，已修并补断言。
 >   - 口径裁定：金额导出的闸门在**导出端点的角色权限**（PRD §5.3 / AC-18：导出功能仅系统管理员与财务角色可用），而非一律剔除金额列；主数据导出 `phone` 不脱敏是**往返可还原的显式例外**（仅 `admin:user:export` + 审计留痕 + 唯一实现内二次鉴权），见 `import-spec.md` §9.2.1 / §9.3。
 >   - 验证：`mvn -B test` **313 全绿**；结构 `validate` 0 error、模块 **526** / API **880**
+>   - **开发夹具已入库（`oa-deploy/fixtures/`），重置库后可复现**：四类单据 precheck 所需的负责人链（① 部门负责人 / ② 财务部正职 / ③ 公司副职 / ④ 公司正职 / ⑤ 集团经济线 / ⑥ 集团董事长）不再依赖 `.cache/` 手工 SQL。矩阵测试夹具的**默认路径仍指向 `.cache/`**（`AuthzMatrixHttpTest:485`、`AuthzMatrixMySqlIntegrationTest`），但可用 `-Doa.it.fixture=` / `OA_IT_FIXTURE=` 指向 `oa-deploy/fixtures/40-authz-matrix.sql`（**`oa-server/**` 未改动**，见交接备注）。
 
 **风险**：数据域是最容易"上线后才发现漏过滤"的地方 → 建议在第 1 阶段末做一次**逐接口矩阵测试**（角色 × 数据范围 × 入口）。
 

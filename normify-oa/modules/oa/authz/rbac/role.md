@@ -11,12 +11,12 @@ description:
       Role master data: code (admin/company_admin/employee/dept_leader/gm/group_dept_leader/group_exec/chairman), name, group or company level and default data scope — the entry point for grants and scope decisions.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.662Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 164
-    end_line: 186
+    line: 201
+    end_line: 221
   - path: "doc/prd-0.1.md"
     line: 159
     end_line: 168

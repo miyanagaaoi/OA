@@ -12,15 +12,15 @@ description:
       A form renderer driven by the template's form_schema_json, shared by all four document types with no hard-coded fields: single column, label above the control, controls filling the form width, content column capped at 760px and centred, 16px between field rows; from 1440px up a 140px sticky in-page index appears on the right.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.781Z"
+updated_at: "2026-10-03T02:52:03.661Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"
     line: 856
     end_line: 871
   - path: "doc/forms.md"
-    line: 396
-    end_line: 404
+    line: 490
+    end_line: 490
 deps:
   - kind: reference
     to: oa.form.template

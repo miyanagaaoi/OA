@@ -12,13 +12,13 @@ description:
       In-app message inbox: generated on new tasks, rejection, withdrawal, collaboration task creation, timeout reminders and results; supports unread counts, mark-as-read and deep links back to the document.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.751Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 401
-    end_line: 411
+    line: 426
+    end_line: 426
   - path: "doc/data-model.md"
-    line: 529
-    end_line: 660
+    line: 684
+    end_line: 684
 ---

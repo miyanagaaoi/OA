@@ -12,12 +12,12 @@ description:
       Plan category values: in_plan (checked by default) and out_plan; they gain meaning only when phase-two plan management ships, with no plan drafting, comparison or over-plan blocking in phase one.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.694Z"
+updated_at: "2026-10-03T02:47:04.570Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 243
-    end_line: 250
+    line: 292
+    end_line: 292
 apis:
   - protocol: http
     method: GET

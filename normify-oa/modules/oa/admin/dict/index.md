@@ -12,13 +12,13 @@ description:
       Maintain the option lists behind request categories, contract types, seal types and certificate types; new options take effect without a release, and in-use items can only be disabled.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.587Z"
+updated_at: "2026-10-03T02:46:08.334Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 438
-    end_line: 438
+    line: 457
+    end_line: 457
   - path: "doc/data-model.md"
-    line: 256
-    end_line: 267
+    line: 309
+    end_line: 309
 ---

@@ -12,12 +12,12 @@ description:
       Defines the super-admin fallback capability set, pre-checks whether a requested operation is forbidden, and provides the audited fallback reassignment used when snapshot approvers cannot act.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.574Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 440
-    end_line: 440
+    line: 459
+    end_line: 459
   - path: "doc/prd-0.1.md"
     line: 202
     end_line: 202

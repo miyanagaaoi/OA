@@ -12,12 +12,12 @@ description:
       No physical deletion in phase one; any cleanup must go through a purge request, a separate review and an audit record, and the system enforces the approved scope.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.642Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 827
-    end_line: 828
+    line: 924
+    end_line: 924
   - path: "doc/prd-0.1.md"
     line: 440
     end_line: 440

@@ -12,13 +12,13 @@ description:
       Document initiation: pick the document type, fill the template-driven form with inline validation, choose matter category and CC recipients, upload attachments, and pass pre-flight checks (empty approver sets, missing required fields, unauthorised org node) before submission.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.782Z"
+updated_at: "2026-10-03T02:52:03.660Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 856
     end_line: 872
   - path: "doc/prd-0.1.md"
-    line: 342
-    end_line: 356
+    line: 375
+    end_line: 375
 ---

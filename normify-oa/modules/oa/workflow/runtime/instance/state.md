@@ -12,18 +12,15 @@ description:
       Reads and writes instance status with guarded transitions: persists the draft/approving/approved/rejected/withdrawn/terminated enum plus the supplement sub-status (only approving may carry it) and broadcasts a status-changed event for notification and audit consumers.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.827Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 475
     end_line: 486
   - path: "doc/data-model.md"
-    line: 394
-    end_line: 397
-  - path: "doc/data-model.md"
-    line: 416
-    end_line: 417
+    line: 452
+    end_line: 494
 apis:
   - protocol: mysql
     path: "flow_instance"

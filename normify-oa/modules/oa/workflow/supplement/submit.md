@@ -12,7 +12,7 @@ description:
       The initiator submits the supplement: only newly uploaded attachments (flow_attachment.round equals the supplement round) and a supplement note of up to 500 characters. Submission clears the sub-status, increments supplement_count, marks the record submitted and returns the node to active with tasks back to the requesting approver. A supplement is not a rejection and never writes a rejection record.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.834Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
@@ -22,8 +22,8 @@ source:
     line: 331
     end_line: 331
   - path: "doc/prd-0.1.md"
-    line: 502
-    end_line: 502
+    line: 522
+    end_line: 522
   - path: "doc/data-model.md"
     line: 511
     end_line: 515

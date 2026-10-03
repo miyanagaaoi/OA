@@ -12,18 +12,15 @@ description:
       Parallel collaboration grouping: several co-approving departments fold into one group box whose title reads Collaboration · N departments with progress on the right (for example 3/4) and all child nodes visible when expanded; the flow advances only when the whole group is done, and any rejecting department rejects the document.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.772Z"
+updated_at: "2026-10-03T02:52:03.660Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 880
     end_line: 880
   - path: "doc/prd-0.1.md"
-    line: 348
-    end_line: 348
-  - path: "doc/prd-0.1.md"
-    line: 387
-    end_line: 387
+    line: 367
+    end_line: 367
 apis:
   - protocol: http
     method: GET

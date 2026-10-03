@@ -12,15 +12,12 @@ description:
       On resubmission the approver snapshot and process version are resolved again: candidates come from the latest template version and the current organisation, overwriting the previous snapshot and frozen version rather than reusing them.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.814Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 389
-    end_line: 389
-  - path: "doc/prd-0.1.md"
-    line: 202
-    end_line: 202
+    line: 408
+    end_line: 408
   - path: "doc/data-model.md"
     line: 393
     end_line: 393

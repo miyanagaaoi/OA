@@ -12,15 +12,15 @@ description:
       Marks archived instances read-only: no approval, no withdrawal and no supplementing, while document-number lookup, detail preview and audit export remain available.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.643Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 824
-    end_line: 824
+    line: 921
+    end_line: 921
   - path: "doc/prd-0.1.md"
-    line: 540
-    end_line: 540
+    line: 560
+    end_line: 560
 apis:
   - protocol: http
     method: POST

@@ -12,7 +12,7 @@ description:
       Roll the document back to the previous completed node for re-approval: a reason is mandatory; the current node instance becomes returned, the previous node instance returns to active with returned_count +1, and once it passes the document automatically comes back. A node may be rolled back at most twice and each rollback counts towards the total gate.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.822Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
@@ -22,8 +22,8 @@ source:
     line: 358
     end_line: 358
   - path: "doc/data-model.md"
-    line: 435
-    end_line: 435
+    line: 553
+    end_line: 553
   - path: "doc/prd-0.1.md"
     line: 505
     end_line: 505

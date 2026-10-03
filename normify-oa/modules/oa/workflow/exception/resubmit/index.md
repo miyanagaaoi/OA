@@ -12,13 +12,10 @@ description:
       A rejected or withdrawn document returns to draft; on resubmission the approver snapshot and process version are resolved again against the latest template and reviewed nodes are discarded, so the flow restarts from node one. This is where the immutable snapshot strategy meets the exception paths.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.813Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 389
-    end_line: 389
-  - path: "doc/prd-0.1.md"
-    line: 380
-    end_line: 380
+    line: 408
+    end_line: 408
 ---

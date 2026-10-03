@@ -12,12 +12,12 @@ description:
       The flow_node definition itself: sequence seq mapped to PRD 6.3's ①-⑦, node_code, display name and node_type (approve / condition reserved for phase 2 / cc / archive), keeping seq unique within a template and supporting node add, update and delete.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.807Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 297
-    end_line: 322
+    line: 369
+    end_line: 396
   - path: "doc/prd-0.1.md"
     line: 457
     end_line: 457

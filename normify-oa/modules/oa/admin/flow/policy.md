@@ -12,15 +12,15 @@ description:
       Owns the operational parameter set changed without a release: total routing plus rollback limit of 5, per-node rollback limit of 2, return-to-own-department limit of 2, supplement limits of 1 per node and 3 per document, and the 3-working-day supplement deadline.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.602Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 551
     end_line: 555
   - path: "doc/data-model.md"
-    line: 399
-    end_line: 401
+    line: 553
+    end_line: 553
 apis:
   - protocol: http
     method: GET

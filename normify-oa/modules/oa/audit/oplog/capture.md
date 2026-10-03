@@ -12,15 +12,15 @@ description:
       Single ingestion entry for the operation log: records actor, timestamp, source IP and user agent, target type and ID, and action code, appending only to sys_log with no update or delete.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.651Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 426
-    end_line: 426
+    line: 445
+    end_line: 445
   - path: "doc/data-model.md"
-    line: 647
-    end_line: 663
+    line: 723
+    end_line: 739
 apis:
   - protocol: mysql
     path: "sys_log"

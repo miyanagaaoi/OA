@@ -12,13 +12,10 @@ description:
       Password policy of at least eight characters mixing letters and digits, lockout for fifteen minutes after five failed attempts, and forced change flow, all written to the login log.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.768Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 535
-    end_line: 535
-  - path: "doc/prd-0.1.md"
-    line: 536
-    end_line: 536
+    line: 555
+    end_line: 555
 ---

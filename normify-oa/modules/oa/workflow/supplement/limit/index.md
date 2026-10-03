@@ -12,15 +12,12 @@ description:
       Supplement quantity and deadline control: at most one request per node and three per document, after which the approver may only pass, reject or terminate; the deadline defaults to three working days and an overdue supplement only reminds the initiator, never auto-rejecting or auto-passing.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.832Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 325
-    end_line: 325
-  - path: "doc/prd-0.1.md"
-    line: 333
-    end_line: 333
+    line: 352
+    end_line: 352
   - path: "doc/prd-0.1.md"
     line: 554
     end_line: 555

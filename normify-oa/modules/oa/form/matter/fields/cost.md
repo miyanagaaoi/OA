@@ -12,12 +12,12 @@ description:
       Cost involved `involve_cost` (boolean, required, default no), amount `amount` (amount, conditionally required, see rule 1.5) and cost bearer `cost_bearer` (org, conditionally required, defaults to the initiator's company, limited to that company and below); involve_cost also decides whether the finance review node is skipped.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.700Z"
+updated_at: "2026-10-03T02:47:41.778Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 82
-    end_line: 84
+    line: 88
+    end_line: 88
 apis:
   - protocol: http
     method: GET

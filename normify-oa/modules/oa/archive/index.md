@@ -12,13 +12,13 @@ description:
       Completed documents are archived to a history store after three years, become read-only, and stay searchable and previewable by document number; the archive schema feeds the data warehouse.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.640Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
     line: 818
     end_line: 831
   - path: "doc/prd-0.1.md"
-    line: 540
-    end_line: 540
+    line: 560
+    end_line: 560
 ---

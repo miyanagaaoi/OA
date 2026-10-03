@@ -11,15 +11,12 @@ description:
       Directory search and member browsing: phone numbers are masked by default (138****8888) and only the owner or a system admin sees the full value; lists and search respect the caller's data scope.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.733Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 184
-    end_line: 199
-  - path: "doc/prd-0.1.md"
-    line: 133
-    end_line: 142
+    line: 201
+    end_line: 201
 apis:
   - protocol: http
     method: GET

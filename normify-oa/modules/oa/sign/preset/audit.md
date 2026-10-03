@@ -12,15 +12,12 @@ description:
       Every upload, replacement and deletion of a preset signature is traced (REQ-SIGN-002) through change events and history, queryable from the personal center and by audit.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.793Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 366
-    end_line: 366
-  - path: "doc/prd-0.1.md"
-    line: 424
-    end_line: 431
+    line: 385
+    end_line: 385
 apis:
   - protocol: kafka
     path: "oa.sign.preset.changed"

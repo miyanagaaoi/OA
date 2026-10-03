@@ -12,15 +12,15 @@ description:
       The detail-page watermark layer: typography.caption in ink at 5%–8% opacity, rotated -24°, tiled every 240×160px with the user's name and employee number; pointer-events and user-select are both none, and it must never cover buttons or form values (REQ-USER-004).
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.773Z"
+updated_at: "2026-10-03T02:52:03.660Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 900
     end_line: 900
   - path: "doc/prd-0.1.md"
-    line: 418
-    end_line: 418
+    line: 437
+    end_line: 437
 apis:
   - protocol: http
     method: GET

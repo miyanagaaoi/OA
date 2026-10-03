@@ -12,13 +12,13 @@ description:
       Form template engine: field dictionary drives rendering and server-side validation, the three-state write model is enforced server-side (draft all writable, in-approval read-only, supplement attachments and note only), fields are immutable once their code is used, and started documents carry a read-only snapshot of the submitted data.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.716Z"
+updated_at: "2026-10-03T02:47:41.778Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
     line: 9
     end_line: 72
   - path: "doc/forms.md"
-    line: 395
-    end_line: 421
+    line: 488
+    end_line: 488
 ---

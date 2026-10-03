@@ -12,10 +12,10 @@ description:
       Handwritten signature capture: the approver taps sign-confirm and draws on a canvas (mouse on desktop), with the signature bound to the approval act and recorded with a timestamp.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.790Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 365
-    end_line: 367
+    line: 384
+    end_line: 384
 ---

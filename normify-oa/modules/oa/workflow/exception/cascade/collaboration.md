@@ -12,15 +12,12 @@ description:
       A rejection from any collaborating department returns the document to the initiator and automatically closes the remaining collaboration task groups; the rejection of a collaboration task counts as the rejection of that parallel sub-task and does not wait for the other departments to finish.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.811Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 387
-    end_line: 387
-  - path: "doc/prd-0.1.md"
-    line: 348
-    end_line: 348
+    line: 406
+    end_line: 406
 apis:
   - protocol: http
     method: POST

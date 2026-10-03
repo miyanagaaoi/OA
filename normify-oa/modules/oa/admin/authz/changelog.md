@@ -12,7 +12,7 @@ description:
       Records every change to roles, data scopes and permission-tree ticks with actor, timestamp and before/after values, and exposes them for audit and CSV export.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.564Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
@@ -22,8 +22,8 @@ source:
     line: 429
     end_line: 429
   - path: "doc/data-model.md"
-    line: 654
-    end_line: 655
+    line: 721
+    end_line: 721
 apis:
   - protocol: http
     method: GET

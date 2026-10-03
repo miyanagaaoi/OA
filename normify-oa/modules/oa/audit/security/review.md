@@ -12,15 +12,12 @@ description:
       Joint query across permission-change and login logs with failed-login and anomalous-IP analysis, scoped by data domain, plus export of security logs for audit.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.654Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 429
-    end_line: 430
-  - path: "doc/prd-0.1.md"
-    line: 440
-    end_line: 440
+    line: 441
+    end_line: 450
 apis:
   - protocol: http
     method: GET

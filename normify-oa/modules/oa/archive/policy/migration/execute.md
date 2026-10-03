@@ -12,12 +12,12 @@ description:
       Moves each document as a unit - instance, nodes, tasks, trail, signatures, attachment metadata and form data - into _history tables inside one rollback-safe transaction, keeping attachment paths resolvable.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.641Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75
 source:
   - path: "doc/data-model.md"
-    line: 822
-    end_line: 826
+    line: 920
+    end_line: 920
 apis:
   - protocol: http
     method: POST

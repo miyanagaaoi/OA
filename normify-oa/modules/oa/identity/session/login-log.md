@@ -11,15 +11,15 @@ description:
       Logs each login attempt with time, IP, device info, success/failure and failure reason (bad_password/locked/disabled), recording the attempted account even on failure; append-only, kept for one year.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.731Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
     line: 143
     end_line: 159
   - path: "doc/prd-0.1.md"
-    line: 422
-    end_line: 431
+    line: 449
+    end_line: 449
 apis:
   - protocol: http
     method: GET

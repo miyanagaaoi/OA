@@ -12,7 +12,7 @@ description:
       Status and colour mapping is globally unique and must not be extended: draft and closed are neutral, pending my approval is warning, in approval is info, approved is success, rejected or terminated is error, and transferred or countersigned is tag-info; no document type may invent its own palette, and when categories genuinely need separation use text plus a neutral grey tag.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.685Z"
+updated_at: "2026-10-03T02:52:03.660Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
@@ -22,8 +22,8 @@ source:
     line: 668
     end_line: 668
   - path: "doc/prd-0.1.md"
-    line: 660
-    end_line: 660
+    line: 718
+    end_line: 718
 apis:
   - protocol: http
     method: GET

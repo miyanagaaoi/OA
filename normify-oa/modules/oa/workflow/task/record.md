@@ -12,18 +12,15 @@ description:
       The approval-task ledger: one row per approver on countersign nodes, the task state machine (pending/agreed/rejected/transferred/reassigned/added_sign/routed/returned/supplement/closed), opinion and decision time, the to-do list and task detail, plus automatic closing when another approver has decided or the document reached a terminal state.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.839Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 449
-    end_line: 473
+    line: 525
+    end_line: 554
   - path: "doc/prd-0.1.md"
-    line: 460
-    end_line: 460
-  - path: "doc/prd-0.1.md"
-    line: 490
-    end_line: 490
+    line: 510
+    end_line: 510
 apis:
   - protocol: mysql
     path: "flow_task"

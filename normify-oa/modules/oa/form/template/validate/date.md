@@ -12,12 +12,12 @@ description:
       Dates must not precede today (some fields must not precede the initiation date) and a date range's end must be ≥ its start; messages are 「{标签}不能早于今天」 and 「结束日期不能早于开始日期」.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.719Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"
-    line: 44
-    end_line: 45
+    line: 49
+    end_line: 49
 apis:
   - protocol: http
     method: POST

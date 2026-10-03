@@ -12,15 +12,12 @@ description:
       Freezes the verdict of approved documents while still allowing the administrator to terminate an in-flight process with a reason or reassign a task, both of which are audited.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.577Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 440
-    end_line: 440
-  - path: "doc/prd-0.1.md"
-    line: 354
-    end_line: 354
+    line: 459
+    end_line: 459
   - path: "doc/data-model.md"
     line: 394
     end_line: 395

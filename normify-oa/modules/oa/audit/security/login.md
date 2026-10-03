@@ -12,15 +12,15 @@ description:
       Records login and logout time, source IP, device information and failure reason, covering multi-device login, over-limit eviction and lockout scenarios; retained for one year.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.653Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 430
-    end_line: 430
+    line: 449
+    end_line: 449
   - path: "doc/data-model.md"
-    line: 841
-    end_line: 841
+    line: 152
+    end_line: 170
 apis:
   - protocol: http
     method: POST

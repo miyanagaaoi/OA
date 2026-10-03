@@ -12,13 +12,13 @@ description:
       Four print layouts: the group contract circulation sheet, the group fund sheet, the subsidiary internal sheet and the seal & certificate sheet. The two group layouts mirror the paper forms, the subsidiary sheet uses vertical fields plus an approval trail, and the seal sheet derives from the group layout (REQ-FORM-001).
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.709Z"
+updated_at: "2026-10-03T02:52:03.660Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"
     line: 966
     end_line: 974
   - path: "doc/prd-0.1.md"
-    line: 279
-    end_line: 279
+    line: 295
+    end_line: 295
 ---

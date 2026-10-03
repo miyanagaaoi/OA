@@ -12,13 +12,13 @@ description:
       Author flow templates and their nodes, publish them through versioned publishing, and configure approver resolution, decision modes, thresholds, signatures, timeouts and routing gates.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.605Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
+    line: 455
+    end_line: 455
   - path: "doc/data-model.md"
-    line: 278
-    end_line: 295
+    line: 333
+    end_line: 333
 ---

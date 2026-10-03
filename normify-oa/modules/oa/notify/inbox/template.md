@@ -12,15 +12,15 @@ description:
       Keeps title and body templates per msg_type (placeholders for document title, business number, node name, opinion), rendered centrally before sending.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.754Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 407
     end_line: 407
   - path: "doc/data-model.md"
-    line: 611
-    end_line: 615
+    line: 684
+    end_line: 684
 apis:
   - protocol: http
     method: GET

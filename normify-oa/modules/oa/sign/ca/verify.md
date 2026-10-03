@@ -12,15 +12,12 @@ description:
       The verification result state machine for phase-two CA (valid / invalid / expired / revoked) writing verify_result and verified_at; in phase one the endpoint reports not-enabled without changing the data model.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.790Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 373
-    end_line: 373
-  - path: "doc/prd-0.1.md"
-    line: 376
-    end_line: 376
+    line: 392
+    end_line: 392
   - path: "doc/data-model.md"
     line: 552
     end_line: 553

@@ -12,10 +12,10 @@ description:
       Reports (priority one): process volume, average duration, timeout rate, approver efficiency and rejection rate with reason distribution, all computed without counting supplements as rejections.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.637Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
+    line: 458
+    end_line: 458
 ---

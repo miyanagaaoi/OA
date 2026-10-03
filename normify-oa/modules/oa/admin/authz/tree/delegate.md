@@ -12,14 +12,11 @@ description:
       Controls who may assign permissions to whom: branch process admins receive a company-scoped delegation range and are explicitly barred from re-delegating further down.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.573Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
     line: 165
-    end_line: 166
-  - path: "doc/prd-0.1.md"
-    line: 166
     end_line: 166
 apis:
   - protocol: http

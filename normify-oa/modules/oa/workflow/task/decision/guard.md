@@ -12,12 +12,12 @@ description:
       Pre-checks before a decision is recorded: rejections require an opinion of at least five characters (no blank rejection); a person appearing several times in one node is deduplicated into a single candidate and task; the same person approving several sequential nodes is handled node by node, not merged.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.837Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 230
-    end_line: 232
+    line: 237
+    end_line: 237
   - path: "doc/prd-0.1.md"
     line: 384
     end_line: 384

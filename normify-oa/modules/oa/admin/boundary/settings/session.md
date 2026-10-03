@@ -12,12 +12,12 @@ description:
       Adjustable items: concurrent device cap (default three, earliest device evicted), remember-me validity (default seven days with automatic renewal) and login failure lockout (default five attempts, fifteen-minute lockout).
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.581Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 557
-    end_line: 559
+    line: 577
+    end_line: 577
   - path: "doc/prd-0.1.md"
     line: 416
     end_line: 417

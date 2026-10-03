@@ -12,7 +12,7 @@ description:
       Writes in-app messages (sys_message) for new tasks, rejection, withdrawal, collaboration tasks, timeout reminders and results, keyed by msg_type with ref_instance_id for deep links, and publishes a creation event.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.752Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
@@ -22,8 +22,8 @@ source:
     line: 411
     end_line: 411
   - path: "doc/data-model.md"
-    line: 607
-    end_line: 622
+    line: 686
+    end_line: 698
 apis:
   - protocol: mysql
     path: "sys_message"

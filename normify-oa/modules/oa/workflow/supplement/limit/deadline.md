@@ -12,7 +12,7 @@ description:
       The supplement deadline defaults to three working days and is computed on the working calendar when the request is made. Once overdue the record becomes overdue and only in-app and email reminders go to the initiator - never an automatic rejection or approval. The scan uses the status and deadline index.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.832Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
@@ -25,8 +25,8 @@ source:
     line: 510
     end_line: 510
   - path: "doc/prd-0.1.md"
-    line: 503
-    end_line: 503
+    line: 523
+    end_line: 523
 apis:
   - protocol: http
     method: POST

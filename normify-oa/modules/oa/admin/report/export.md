@@ -12,15 +12,12 @@ description:
       Queues CSV exports of the reports; export is limited to the system administrator and amount fields stay non-exportable for non-finance roles.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.637Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 439
-    end_line: 439
-  - path: "doc/prd-0.1.md"
-    line: 561
-    end_line: 561
+    line: 581
+    end_line: 581
   - path: "doc/prd-0.1.md"
     line: 195
     end_line: 195

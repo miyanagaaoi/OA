@@ -12,15 +12,15 @@ description:
       Renders the per-document approval timeline by trail sequence and a node-grouped trail view reused by detail, print and archived preview; the read side never writes back.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.657Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 427
-    end_line: 427
+    line: 446
+    end_line: 446
   - path: "doc/data-model.md"
-    line: 625
-    end_line: 642
+    line: 703
+    end_line: 718
 apis:
   - protocol: http
     method: GET

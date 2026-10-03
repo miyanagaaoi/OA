@@ -12,15 +12,15 @@ description:
       Persists the node instance status enum (pending/active/waiting_supplement/approved/rejected/skipped/returned/cancelled, per doc/enums.md section 5) together with the frozen candidate snapshot approver_ids_json, decision mode, pass_threshold, returned_count and supplement_requested (the single writer of that table).
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.829Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 423
-    end_line: 447
+    line: 495
+    end_line: 524
   - path: "doc/prd-0.1.md"
-    line: 488
-    end_line: 488
+    line: 478
+    end_line: 478
 apis:
   - protocol: mysql
     path: "flow_node_instance"

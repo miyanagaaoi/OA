@@ -12,15 +12,15 @@ description:
       Aggregates each approver's conclusion, opinion and timestamp per node under or-sign / countersign / sequential decision modes, producing the per-person outcome view that forms part of the approval trail.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.655Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 427
-    end_line: 427
+    line: 446
+    end_line: 446
   - path: "doc/data-model.md"
-    line: 459
-    end_line: 460
+    line: 703
+    end_line: 718
 apis:
   - protocol: http
     method: GET

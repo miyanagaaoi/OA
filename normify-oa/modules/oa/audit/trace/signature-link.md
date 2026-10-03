@@ -12,15 +12,15 @@ description:
       Links signature records to their trail events and reads back signature images and verification results, giving one-to-one traceability while signature records stay independently stored and undeletable.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.656Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 428
-    end_line: 428
+    line: 447
+    end_line: 447
   - path: "doc/data-model.md"
-    line: 637
-    end_line: 637
+    line: 609
+    end_line: 609
 apis:
   - protocol: http
     method: POST

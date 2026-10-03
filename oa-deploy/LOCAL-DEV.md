@@ -31,11 +31,24 @@ oa-deploy\runtime\stop-local.cmd
 | 项 | 值 |
 | --- | --- |
 | 账号 | `admin` |
-| 口令 | `Admin@12345` |
+| 口令 | **由你自定**（旧的固定开发口令已随提交 `0448683`「开发口令移出仓库 + 轮换已泄露口令」废弃，本文不再记录任何口令字面量） |
 | 工号 | `10086`（水印「姓名 + 工号」用） |
 | 角色 | `admin`（系统管理员，拥有全部 94 项权限） |
 
-**这不是系统内置账号**：`V1~V4` 迁移只播种角色/权限/授权，**不播种任何用户**（PRD 与 import-spec 的口径是「首个管理员在初始化时创建、随机口令线下分发、首登强制改密」，避免把固定口令写进交付物）。本机这份数据由 `.cache/bootstrap-dev.sql` 手工灌入，**只存在于本地开发库**，不随仓库交付。
+**这不是系统内置账号**：`V1~V4` 迁移只播种角色/权限/授权，**不播种任何用户**（PRD 与 import-spec 的口径是「首个管理员在初始化时创建、随机口令线下分发、首登强制改密」，避免把固定口令写进交付物）。仓库里也**不存放任何可用口令的哈希**——本机这份数据由你自己生成哈希后手工灌入，见 §2.1。
+
+### 2.1 重建管理员账号（重置库后必做）
+
+完整步骤（含 BCrypt 哈希生成器与可复制的 SQL）见 **[`fixtures/90-dev-admin.md`](fixtures/90-dev-admin.md)**。摘要：
+
+```powershell
+# 1) 生成哈希（口令由你自定；生成器源码在库内，不含任何口令）
+mvn -q -f oa-server/pom.xml -DskipTests dependency:build-classpath "-Dmdep.outputFile=$env:TEMP\oa-fixture-cp.txt"
+$cp = Get-Content "$env:TEMP\oa-fixture-cp.txt" -Raw
+javac -cp $cp -d "$env:TEMP\oa-fixture-tools" oa-deploy/fixtures/tools/GenHash.java
+java -cp "$env:TEMP\oa-fixture-tools;$cp" GenHash "<你的口令>" 12
+# 2) 把输出的 hash 粘进 90-dev-admin.md 第 3 节的 SQL 并执行
+```
 
 ## 3. 依赖从哪来（全部便携版，未注册 Windows 服务）
 
@@ -63,6 +76,48 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 > `validate-on-migrate: true` 下启动会报 `Migration checksum mismatch` —— 此时**需重置库**（重跑上面的 DROP/CREATE + 引导数据），
 > 或对可接受的本地库执行 `flyway repair` 重写历史 checksum。
 
+## 4.1 夹具 / 演示数据（**入库、可复现**）
+
+Flyway 的 `V1~V4` **只播种角色 / 权限 / 字典 / 流程模板，不播种任何组织与人员**。
+重置库之后，**组织树是空的、四类单据因候选人为空而 precheck 失败、`RT-*` 这类运行期样例也会消失**。
+为此仓库提供 [`oa-deploy/fixtures/`](fixtures/README.md)：一套**幂等、可反复执行**的脚本，
+把库恢复到「可演示、可跑集成测试」的状态。**重置库后不要再依赖 `.cache/*.sql`（已 gitignore，clone 不到）。**
+
+| 顺序 | 文件 | 作用 |
+| --- | --- | --- |
+| 1 | [`fixtures/10-dev-orgs.sql`](fixtures/10-dev-orgs.sql) | 四级演示组织（集团 → 2 家公司 → 部门 → 科室）+ 集团财务部 + 被弄丢的 `RT-*` 样例组织 |
+| 2 | [`fixtures/20-dev-people.sql`](fixtures/20-dev-people.sql) | 演示人员 + 一人多岗 + **负责人链** ⇒ 四类单据 precheck 跑到 `allowed=true` |
+| 3 | [`fixtures/30-dev-roles.sql`](fixtures/30-dev-roles.sql) | 演示账号 → 9 个内置角色（覆盖 `company_admin`/`dept_leader`/`group_leader`/`employee`） |
+| 4 | [`fixtures/40-authz-matrix.sql`](fixtures/40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链） |
+| 5 | [`fixtures/50-trigger-fixture.sql`](fixtures/50-trigger-fixture.sql) | AC-20 触发器验收所需的 `sys_log` / `flow_signature` 行（§5 第 3/4 条的前提） |
+| 6 | [`fixtures/99-verify.sql`](fixtures/99-verify.sql) | **只读断言**：关键行数逐条 `PASS`/`FAIL` |
+| — | [`fixtures/90-dev-admin.md`](fixtures/90-dev-admin.md) | 生成 BCrypt 哈希并插入 `admin`（**口令由你自定**，仓库不含任何可用口令） |
+
+一键执行（口令从 `local-secrets.ps1` 读，不回显；未 dot-source，避免执行策略限制）：
+
+```powershell
+$txt = Get-Content oa-deploy\runtime\local-secrets.ps1 -Raw
+$dbu = [regex]::Match($txt, "\`$DbUser\s*=\s*'([^']*)'").Groups[1].Value
+$dbp = [regex]::Match($txt, "\`$DbPass\s*=\s*'([^']*)'").Groups[1].Value
+$mysql = 'H:\dsh\OA\.cache\mysql\extract\mysql-8.0.40-winx64\bin\mysql.exe'
+foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-authz-matrix.sql','50-trigger-fixture.sql','99-verify.sql') {
+  & $mysql --host=127.0.0.1 --port=3306 "-u$dbu" "-p$dbp" -D oa --default-character-set=utf8mb4 -e "source oa-deploy/fixtures/$f" 2>$null
+}
+```
+
+**重置库 → 恢复可演示状态**（完整版见 [`fixtures/README.md`](fixtures/README.md) §4）：
+
+```powershell
+mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"
+oa-deploy\runtime\start-local.cmd          # 等 /actuator/health 返回 UP（Flyway 跑完 V1~V4）
+# 执行上面的夹具脚本；再按 fixtures/90-dev-admin.md 建一个有口令的 admin
+# 最后 fixtures/99-verify.sql 应 16/16 PASS
+```
+
+> **幂等**：所有夹具脚本都是显式主键 + upsert（`sys_org_leader` 例外：其唯一键含可空列 `category`，
+> MySQL 对 NULL 不去重，故改为「清空夹具拥有的组织 + 重建」），**反复执行不产生重复数据**。
+> 已在临时库上从零验证：同一套迁移 + 夹具 + 断言 16/16 PASS，重复执行行数不变。
+
 ## 5. 启动后自检清单（5 分钟）
 
 | # | 命令 / 操作 | 期望 |
@@ -74,7 +129,8 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 | 5 | 未登录访问 `http://127.0.0.1:8080/api/v1/identity/orgs/tree` | **401** |
 | 6 | 用 `admin` 登录前端 → 待我审批 / 组织架构 / 人员管理 / 角色与权限 | 四页均渲染**真实**数据（空列表是正常的：库里还没有单据） |
 
-> 第 3 条需要库里 `sys_log` 存在 `id=1` 的行——**MySQL 触发器是逐行触发的，空表上 `WHERE id=1` 命中 0 行不会触发**，会「假通过」。可用 `.cache/trigger-test-fixture.sql` 造夹具。
+> 第 3 条需要库里 `sys_log` 存在 `id=1` 的行——**MySQL 触发器是逐行触发的，空表上 `WHERE id=1` 命中 0 行不会触发**，会「假通过」。
+> 用 [`fixtures/50-trigger-fixture.sql`](fixtures/50-trigger-fixture.sql) 造夹具（已入库，替代原 `.cache/trigger-test-fixture.sql`）。
 
 ## 6. 已知限制（本机开发形态）
 

@@ -12,18 +12,15 @@ description:
       Signature records (flow_signature) are append-only: one record per approval act, re-signing adds a new record while keeping the old one, never overwriting or deleting (REQ-LOG-003).
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.796Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 368
-    end_line: 368
-  - path: "doc/prd-0.1.md"
-    line: 375
-    end_line: 375
+    line: 394
+    end_line: 394
   - path: "doc/data-model.md"
-    line: 533
-    end_line: 563
+    line: 611
+    end_line: 643
 apis:
   - protocol: mysql
     path: "flow_signature"

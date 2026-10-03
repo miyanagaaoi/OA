@@ -12,15 +12,15 @@ description:
       Tick permission-tree nodes for a role, set the role's data scope and category bindings, preview the resulting visibility, and log every change; IT assigns node by node and branch admins cannot re-delegate.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.574Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 437
     end_line: 437
   - path: "doc/prd-0.1.md"
-    line: 165
-    end_line: 165
+    line: 172
+    end_line: 172
   - path: "doc/data-model.md"
     line: 222
     end_line: 251

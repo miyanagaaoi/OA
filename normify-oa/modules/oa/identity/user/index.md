@@ -11,12 +11,12 @@ description:
       User profiles, accounts, contact directory and Excel import/export; mobile numbers are masked by default, and resignation is blocked until all of the user's tasks are handled.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.734Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 135
-    end_line: 142
+    line: 246
+    end_line: 246
   - path: "doc/data-model.md"
     line: 28
     end_line: 163

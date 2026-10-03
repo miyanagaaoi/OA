@@ -12,12 +12,12 @@ description:
       Configures an optional per-node timeout with a 24-hour minimum; on expiry the system only sends in-app and mail reminders, with no automatic skip or escalation in phase one.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.601Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 351
-    end_line: 351
+    line: 370
+    end_line: 370
   - path: "doc/prd-0.1.md"
     line: 550
     end_line: 550

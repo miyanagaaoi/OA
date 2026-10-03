@@ -8,7 +8,7 @@
         "root_uid": "6396d753"
       }
     ],
-    "compiled_at": "2026-10-03T02:33:51.294Z",
+    "compiled_at": "2026-10-03T02:52:17.152Z",
     "stats": {
       "tree_count": 1,
       "module_count": 526,
@@ -71,17 +71,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 433,
-          "end_line": 440
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 544,
-          "end_line": 561
+          "line": 452,
+          "end_line": 452
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.607Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 65,
@@ -109,12 +104,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 437,
-          "end_line": 437
+          "line": 456,
+          "end_line": 456
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.565Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 8,
@@ -152,12 +147,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 654,
-          "end_line": 655
+          "line": 721,
+          "end_line": 721
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.564Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -510,8 +505,8 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 165,
-          "end_line": 165
+          "line": 172,
+          "end_line": 172
         },
         {
           "path": "doc/data-model.md",
@@ -520,7 +515,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.574Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 2,
@@ -553,8 +548,8 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 437,
-          "end_line": 437
+          "line": 456,
+          "end_line": 456
         },
         {
           "path": "doc/data-model.md",
@@ -563,7 +558,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.572Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -657,15 +652,10 @@
           "path": "doc/prd-0.1.md",
           "line": 165,
           "end_line": 166
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 166,
-          "end_line": 166
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.573Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -737,22 +727,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 426,
-          "end_line": 431
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 544,
-          "end_line": 561
+          "line": 459,
+          "end_line": 459
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.577Z",
+      "updated_at": "2026-10-03T02:46:08.334Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 8,
@@ -780,8 +760,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
+          "line": 459,
+          "end_line": 459
         },
         {
           "path": "doc/prd-0.1.md",
@@ -795,7 +775,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.574Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -876,22 +856,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 431,
-          "end_line": 431
+          "line": 459,
+          "end_line": 459
         },
         {
           "path": "doc/data-model.md",
-          "line": 739,
-          "end_line": 775
+          "line": 609,
+          "end_line": 609
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.576Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 2,
@@ -919,13 +894,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 431,
-          "end_line": 431
+          "line": 459,
+          "end_line": 459
         },
         {
           "path": "doc/data-model.md",
@@ -934,7 +904,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.575Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -1014,13 +984,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 354,
-          "end_line": 354
+          "line": 459,
+          "end_line": 459
         },
         {
           "path": "doc/data-model.md",
@@ -1029,7 +994,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.577Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -1125,12 +1090,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
+          "line": 580,
+          "end_line": 580
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.578Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -1163,12 +1128,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 828,
-          "end_line": 828
+          "line": 925,
+          "end_line": 925
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.580Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -1249,8 +1214,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 557,
-          "end_line": 559
+          "line": 577,
+          "end_line": 577
         },
         {
           "path": "doc/prd-0.1.md",
@@ -1259,7 +1224,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.581Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -1411,17 +1376,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 438,
-          "end_line": 438
+          "line": 457,
+          "end_line": 457
         },
         {
           "path": "doc/data-model.md",
-          "line": 256,
-          "end_line": 267
+          "line": 309,
+          "end_line": 309
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.587Z",
+      "updated_at": "2026-10-03T02:46:08.334Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 7,
@@ -1689,12 +1654,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 256,
-          "end_line": 267
+          "line": 311,
+          "end_line": 324
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.589Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -1925,17 +1890,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 436,
-          "end_line": 436
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 544,
-          "end_line": 561
+          "line": 455,
+          "end_line": 455
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.594Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 11,
@@ -2349,8 +2309,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 367,
-          "end_line": 367
+          "line": 386,
+          "end_line": 386
         },
         {
           "path": "doc/prd-0.1.md",
@@ -2364,7 +2324,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.600Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -2426,8 +2386,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 351,
-          "end_line": 351
+          "line": 370,
+          "end_line": 370
         },
         {
           "path": "doc/prd-0.1.md",
@@ -2436,7 +2396,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.601Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -2503,12 +2463,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 399,
-          "end_line": 401
+          "line": 553,
+          "end_line": 553
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.602Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -2590,17 +2550,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 436,
-          "end_line": 436
+          "line": 455,
+          "end_line": 455
         },
         {
           "path": "doc/data-model.md",
-          "line": 278,
-          "end_line": 295
+          "line": 333,
+          "end_line": 333
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.605Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 2,
@@ -2739,13 +2699,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 436,
-          "end_line": 436
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 349,
-          "end_line": 349
+          "line": 368,
+          "end_line": 368
         },
         {
           "path": "doc/data-model.md",
@@ -2754,7 +2709,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.606Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -2883,17 +2838,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 242,
-          "end_line": 242
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 195,
-          "end_line": 196
+          "line": 247,
+          "end_line": 247
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.616Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 4,
@@ -3334,13 +3284,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 435,
-          "end_line": 435
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 241,
-          "end_line": 241
+          "line": 246,
+          "end_line": 246
         },
         {
           "path": "doc/data-model.md",
@@ -3349,7 +3294,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.620Z",
+      "updated_at": "2026-10-03T02:49:57.377Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 3,
@@ -3464,12 +3409,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 155,
-          "end_line": 157
+          "line": 144,
+          "end_line": 144
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.622Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -3652,8 +3597,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 435,
-          "end_line": 435
+          "line": 245,
+          "end_line": 245
         },
         {
           "path": "doc/prd-0.1.md",
@@ -3667,7 +3612,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.634Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 3,
@@ -3971,12 +3916,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 439,
-          "end_line": 439
+          "line": 458,
+          "end_line": 458
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.637Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 11,
@@ -4163,13 +4108,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 439,
-          "end_line": 439
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 561,
-          "end_line": 561
+          "line": 581,
+          "end_line": 581
         },
         {
           "path": "doc/prd-0.1.md",
@@ -4178,7 +4118,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.637Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -4664,12 +4604,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 540,
-          "end_line": 540
+          "line": 560,
+          "end_line": 560
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.640Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 14,
@@ -4697,8 +4637,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 818,
-          "end_line": 831
+          "line": 915,
+          "end_line": 915
         },
         {
           "path": "doc/prd-0.1.md",
@@ -4707,7 +4647,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.641Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 8,
@@ -4735,17 +4675,12 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 825,
-          "end_line": 825
-        },
-        {
-          "path": "doc/data-model.md",
-          "line": 568,
-          "end_line": 588
+          "line": 922,
+          "end_line": 922
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.640Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75",
       "apis": [
         {
@@ -4932,12 +4867,12 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 822,
-          "end_line": 826
+          "line": 920,
+          "end_line": 920
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.641Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75",
       "apis": [
         {
@@ -5207,8 +5142,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 827,
-          "end_line": 828
+          "line": 924,
+          "end_line": 924
         },
         {
           "path": "doc/prd-0.1.md",
@@ -5217,7 +5152,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.642Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -5299,17 +5234,17 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 824,
-          "end_line": 824
+          "line": 921,
+          "end_line": 921
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 540,
-          "end_line": 540
+          "line": 560,
+          "end_line": 560
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.643Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -5434,12 +5369,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 824,
-          "end_line": 824
+          "line": 921,
+          "end_line": 921
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.643Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -5779,17 +5714,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 422,
-          "end_line": 431
+          "line": 557,
+          "end_line": 557
         },
         {
           "path": "doc/data-model.md",
-          "line": 739,
-          "end_line": 799
+          "line": 701,
+          "end_line": 739
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.648Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 18,
@@ -5817,17 +5752,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 431,
-          "end_line": 431
+          "line": 450,
+          "end_line": 450
         },
         {
           "path": "doc/data-model.md",
-          "line": 739,
-          "end_line": 799
+          "line": 832,
+          "end_line": 867
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.650Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 4,
@@ -5855,12 +5790,12 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 800,
-          "end_line": 814
+          "line": 901,
+          "end_line": 901
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.649Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75",
       "apis": [
         {
@@ -5926,12 +5861,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 431,
-          "end_line": 431
+          "line": 450,
+          "end_line": 450
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.649Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6013,17 +5948,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 537,
-          "end_line": 537
+          "line": 557,
+          "end_line": 557
         },
         {
           "path": "doc/data-model.md",
-          "line": 828,
-          "end_line": 828
+          "line": 925,
+          "end_line": 925
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.650Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6115,17 +6050,12 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 546,
-          "end_line": 546
-        },
-        {
-          "path": "doc/data-model.md",
-          "line": 775,
-          "end_line": 776
+          "line": 832,
+          "end_line": 867
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.651Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75",
       "apis": [
         {
@@ -6197,17 +6127,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 426,
-          "end_line": 426
+          "line": 445,
+          "end_line": 445
         },
         {
           "path": "doc/data-model.md",
-          "line": 739,
-          "end_line": 799
+          "line": 723,
+          "end_line": 739
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.652Z",
+      "updated_at": "2026-10-03T02:46:08.334Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 3,
@@ -6235,17 +6165,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 426,
-          "end_line": 426
+          "line": 445,
+          "end_line": 445
         },
         {
           "path": "doc/data-model.md",
-          "line": 647,
-          "end_line": 663
+          "line": 723,
+          "end_line": 739
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.651Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6317,17 +6247,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 426,
-          "end_line": 429
+          "line": 448,
+          "end_line": 448
         },
         {
           "path": "doc/data-model.md",
-          "line": 654,
-          "end_line": 655
+          "line": 730,
+          "end_line": 731
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.652Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6410,17 +6340,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 426,
-          "end_line": 426
+          "line": 445,
+          "end_line": 445
         },
         {
           "path": "doc/data-model.md",
-          "line": 660,
-          "end_line": 662
+          "line": 723,
+          "end_line": 739
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.653Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6501,8 +6431,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 429,
-          "end_line": 430
+          "line": 448,
+          "end_line": 448
         },
         {
           "path": "doc/data-model.md",
@@ -6511,7 +6441,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.653Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 3,
@@ -6539,17 +6469,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 430,
-          "end_line": 430
+          "line": 449,
+          "end_line": 449
         },
         {
           "path": "doc/data-model.md",
-          "line": 841,
-          "end_line": 841
+          "line": 152,
+          "end_line": 170
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.653Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6622,17 +6552,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 429,
-          "end_line": 429
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 167,
-          "end_line": 167
+          "line": 448,
+          "end_line": 448
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.654Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -6714,17 +6639,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 429,
-          "end_line": 430
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 440,
-          "end_line": 440
+          "line": 441,
+          "end_line": 450
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.654Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -6805,17 +6725,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 427,
-          "end_line": 427
+          "line": 446,
+          "end_line": 446
         },
         {
           "path": "doc/data-model.md",
-          "line": 739,
-          "end_line": 799
+          "line": 703,
+          "end_line": 718
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.655Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 4,
@@ -6843,17 +6763,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 427,
-          "end_line": 427
+          "line": 446,
+          "end_line": 446
         },
         {
           "path": "doc/data-model.md",
-          "line": 459,
-          "end_line": 460
+          "line": 703,
+          "end_line": 718
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.655Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -6925,17 +6845,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 428,
-          "end_line": 428
+          "line": 447,
+          "end_line": 447
         },
         {
           "path": "doc/data-model.md",
-          "line": 637,
-          "end_line": 637
+          "line": 609,
+          "end_line": 609
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.656Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -7007,8 +6927,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 427,
-          "end_line": 427
+          "line": 446,
+          "end_line": 446
         },
         {
           "path": "doc/data-model.md",
@@ -7017,7 +6937,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.656Z",
+      "updated_at": "2026-10-03T02:46:08.334Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -7108,17 +7028,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 427,
-          "end_line": 427
+          "line": 446,
+          "end_line": 446
         },
         {
           "path": "doc/data-model.md",
-          "line": 625,
-          "end_line": 642
+          "line": 703,
+          "end_line": 718
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.657Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -7227,8 +7147,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 159,
-          "end_line": 168
+          "line": 170,
+          "end_line": 170
         },
         {
           "path": "doc/data-model.md",
@@ -7237,7 +7157,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.661Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 9,
@@ -7473,8 +7393,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 238,
-          "end_line": 251
+          "line": 296,
+          "end_line": 310
         },
         {
           "path": "doc/prd-0.1.md",
@@ -7483,7 +7403,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.660Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -7648,17 +7568,17 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 219,
-          "end_line": 236
+          "line": 277,
+          "end_line": 295
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 159,
-          "end_line": 168
+          "line": 170,
+          "end_line": 170
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.661Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -7747,8 +7667,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 164,
-          "end_line": 186
+          "line": 201,
+          "end_line": 221
         },
         {
           "path": "doc/prd-0.1.md",
@@ -7757,7 +7677,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.662Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -7848,8 +7768,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 188,
-          "end_line": 203
+          "line": 222,
+          "end_line": 244
         },
         {
           "path": "doc/prd-0.1.md",
@@ -7858,7 +7778,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.664Z",
+      "updated_at": "2026-10-03T02:49:57.378Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -8035,12 +7955,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 668,
-          "end_line": 738
+          "line": 824,
+          "end_line": 824
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.666Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 5,
@@ -8136,17 +8056,12 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 205,
-          "end_line": 217
-        },
-        {
-          "path": "doc/data-model.md",
-          "line": 722,
-          "end_line": 735
+          "line": 264,
+          "end_line": 276
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.665Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75",
       "apis": [
         {
@@ -8603,12 +8518,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 546,
-          "end_line": 561
+          "line": 613,
+          "end_line": 613
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.669Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -9022,12 +8937,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 682,
-          "end_line": 682
+          "line": 741,
+          "end_line": 741
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.670Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -10175,12 +10090,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 360,
-          "end_line": 394
+          "line": 428,
+          "end_line": 428
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.678Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -11191,12 +11106,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 660,
-          "end_line": 660
+          "line": 718,
+          "end_line": 718
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.685Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -11832,17 +11747,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 136,
-          "end_line": 139
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 147,
-          "end_line": 147
+          "line": 144,
+          "end_line": 144
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.688Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -12027,12 +11937,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 134,
-          "end_line": 135
+          "line": 140,
+          "end_line": 140
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.689Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -12094,12 +12004,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 140,
-          "end_line": 140
+          "line": 145,
+          "end_line": 145
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.689Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -12255,12 +12165,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 144,
-          "end_line": 147
+          "line": 152,
+          "end_line": 152
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.691Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -12312,12 +12222,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 140,
-          "end_line": 140
+          "line": 145,
+          "end_line": 145
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.691Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -12903,12 +12813,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 243,
-          "end_line": 250
+          "line": 292,
+          "end_line": 292
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.694Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -12981,12 +12891,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 225,
-          "end_line": 233
+          "line": 269,
+          "end_line": 269
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.694Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -13128,15 +13038,10 @@
           "path": "doc/forms.md",
           "line": 96,
           "end_line": 123
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 61,
-          "end_line": 69
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.697Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "aggregate": {
         "descendant_count": 10,
@@ -13416,12 +13321,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 109,
-          "end_line": 112
+          "line": 116,
+          "end_line": 116
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.696Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -13483,22 +13388,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 104,
-          "end_line": 105
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 119,
-          "end_line": 120
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 292,
-          "end_line": 298
+          "line": 125,
+          "end_line": 125
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.697Z",
+      "updated_at": "2026-10-03T02:47:04.570Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "aggregate": {
         "descendant_count": 3,
@@ -13608,13 +13503,8 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 104,
-          "end_line": 104
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 119,
-          "end_line": 120
+          "line": 108,
+          "end_line": 108
         },
         {
           "path": "doc/forms.md",
@@ -13628,7 +13518,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.698Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -13772,17 +13662,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 106,
-          "end_line": 113
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 117,
-          "end_line": 117
+          "line": 41,
+          "end_line": 41
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.698Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -13856,15 +13741,10 @@
           "path": "doc/forms.md",
           "line": 73,
           "end_line": 95
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 264,
-          "end_line": 277
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.701Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "aggregate": {
         "descendant_count": 10,
@@ -14047,12 +13927,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 82,
-          "end_line": 84
+          "line": 88,
+          "end_line": 88
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.700Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -14135,12 +14015,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 85,
-          "end_line": 86
+          "line": 89,
+          "end_line": 89
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.701Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -14217,12 +14097,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 248,
-          "end_line": 264
+          "line": 274,
+          "end_line": 274
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.703Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6",
       "aggregate": {
         "descendant_count": 3,
@@ -14328,12 +14208,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 86,
-          "end_line": 86
+          "line": 90,
+          "end_line": 90
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.702Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -14395,27 +14275,22 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 82,
-          "end_line": 82
+          "line": 96,
+          "end_line": 96
         },
         {
           "path": "doc/forms.md",
-          "line": 92,
-          "end_line": 92
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 349,
-          "end_line": 349
+          "line": 410,
+          "end_line": 410
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 264,
-          "end_line": 264
+          "line": 327,
+          "end_line": 327
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.702Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "a590145bc5717823c1c716f7cd29b05065b1aa8bf16dddb19dfc3b30d5207ee6",
       "apis": [
         {
@@ -14554,12 +14429,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 279,
-          "end_line": 279
+          "line": 295,
+          "end_line": 295
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.706Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "a704b11dfb09e375e9b90b2f19f26f32e8d5b1e3b582a00abd3741ae5448f332",
       "aggregate": {
         "descendant_count": 18,
@@ -14587,17 +14462,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 372,
-          "end_line": 372
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 389,
-          "end_line": 389
+          "line": 433,
+          "end_line": 433
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.703Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -14702,12 +14572,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 371,
-          "end_line": 371
+          "line": 432,
+          "end_line": 432
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.704Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896",
       "apis": [
         {
@@ -15389,12 +15259,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 279,
-          "end_line": 279
+          "line": 295,
+          "end_line": 295
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.709Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "aggregate": {
         "descendant_count": 4,
@@ -15577,12 +15447,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 383,
-          "end_line": 385
+          "line": 445,
+          "end_line": 445
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.710Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896",
       "apis": [
         {
@@ -15836,12 +15706,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 160,
-          "end_line": 160
+          "line": 167,
+          "end_line": 167
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.711Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -15904,12 +15774,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 162,
-          "end_line": 163
+          "line": 169,
+          "end_line": 169
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.712Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -16211,13 +16081,8 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 166,
-          "end_line": 167
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 172,
-          "end_line": 172
+          "line": 179,
+          "end_line": 179
         },
         {
           "path": "doc/forms.md",
@@ -16226,7 +16091,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.714Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -16360,12 +16225,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 395,
-          "end_line": 421
+          "line": 488,
+          "end_line": 488
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.716Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "aggregate": {
         "descendant_count": 22,
@@ -16426,17 +16291,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 59,
-          "end_line": 59
-        },
-        {
-          "path": "doc/forms.md",
-          "line": 286,
-          "end_line": 286
+          "line": 63,
+          "end_line": 63
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.715Z",
+      "updated_at": "2026-10-03T02:47:41.778Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -16498,12 +16358,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 58,
-          "end_line": 58
+          "line": 62,
+          "end_line": 62
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.715Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -16643,12 +16503,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 395,
-          "end_line": 398
+          "line": 490,
+          "end_line": 490
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.716Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "aggregate": {
         "descendant_count": 2,
@@ -16676,8 +16536,8 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 17,
-          "end_line": 17
+          "line": 19,
+          "end_line": 19
         },
         {
           "path": "doc/forms.md",
@@ -16686,7 +16546,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.716Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -17093,12 +16953,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 400,
-          "end_line": 402
+          "line": 493,
+          "end_line": 493
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.718Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -17162,12 +17022,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 398,
-          "end_line": 398
+          "line": 491,
+          "end_line": 491
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.719Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "aggregate": {
         "descendant_count": 5,
@@ -17323,12 +17183,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 44,
-          "end_line": 45
+          "line": 49,
+          "end_line": 49
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.719Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -17378,17 +17238,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 46,
-          "end_line": 46
-        },
-        {
-          "path": "doc/forms.md",
           "line": 49,
           "end_line": 59
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.719Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -17440,12 +17295,12 @@
       "source": [
         {
           "path": "doc/forms.md",
-          "line": 41,
-          "end_line": 42
+          "line": 46,
+          "end_line": 46
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.719Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -17677,12 +17532,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 278,
-          "end_line": 286
+          "line": 343,
+          "end_line": 343
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.720Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112",
       "apis": [
         {
@@ -18193,12 +18048,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 509,
-          "end_line": 524
+          "line": 536,
+          "end_line": 536
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.724Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -18260,12 +18115,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 234,
-          "end_line": 244
+          "line": 245,
+          "end_line": 245
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.724Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -18667,15 +18522,10 @@
           "path": "doc/prd-0.1.md",
           "line": 204,
           "end_line": 216
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 226,
-          "end_line": 232
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.726Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -19151,8 +19001,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 413,
-          "end_line": 420
+          "line": 436,
+          "end_line": 436
         },
         {
           "path": "doc/prd-0.1.md",
@@ -19161,7 +19011,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.729Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -19233,8 +19083,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 525,
-          "end_line": 541
+          "line": 579,
+          "end_line": 579
         },
         {
           "path": "doc/prd-0.1.md",
@@ -19243,7 +19093,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.730Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -19356,12 +19206,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 422,
-          "end_line": 431
+          "line": 449,
+          "end_line": 449
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.731Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -19532,8 +19382,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 525,
-          "end_line": 541
+          "line": 555,
+          "end_line": 555
         },
         {
           "path": "doc/data-model.md",
@@ -19542,7 +19392,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.733Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -19625,8 +19475,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 413,
-          "end_line": 420
+          "line": 435,
+          "end_line": 435
         },
         {
           "path": "doc/prd-0.1.md",
@@ -19635,7 +19485,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.733Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -19707,8 +19557,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 135,
-          "end_line": 142
+          "line": 246,
+          "end_line": 246
         },
         {
           "path": "doc/data-model.md",
@@ -19717,7 +19567,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.734Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 8,
@@ -19744,17 +19594,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 184,
-          "end_line": 199
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 133,
-          "end_line": 142
+          "line": 201,
+          "end_line": 201
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.733Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -19994,12 +19839,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 509,
-          "end_line": 524
+          "line": 536,
+          "end_line": 536
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.735Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -20164,8 +20009,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 234,
-          "end_line": 244
+          "line": 246,
+          "end_line": 246
         },
         {
           "path": "doc/prd-0.1.md",
@@ -20174,7 +20019,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.736Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -20427,12 +20272,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 518,
-          "end_line": 523
+          "line": 543,
+          "end_line": 543
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.738Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 3,
@@ -20460,12 +20305,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 522,
-          "end_line": 523
+          "line": 542,
+          "end_line": 542
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.738Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -20568,12 +20413,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 523,
-          "end_line": 523
+          "line": 543,
+          "end_line": 543
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.739Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -20622,12 +20467,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 511,
-          "end_line": 516
+          "line": 533,
+          "end_line": 533
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.740Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 7,
@@ -21019,12 +20864,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 514,
-          "end_line": 516
+          "line": 536,
+          "end_line": 536
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.742Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 6,
@@ -21349,12 +21194,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 515,
-          "end_line": 515
+          "line": 535,
+          "end_line": 535
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.747Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 6,
@@ -21617,8 +21462,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 515,
-          "end_line": 515
+          "line": 535,
+          "end_line": 535
         },
         {
           "path": "doc/data-model.md",
@@ -21627,7 +21472,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.748Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -21714,8 +21559,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 409,
-          "end_line": 409
+          "line": 428,
+          "end_line": 428
         },
         {
           "path": "doc/data-model.md",
@@ -21724,7 +21569,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.750Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 3,
@@ -21752,8 +21597,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 409,
-          "end_line": 409
+          "line": 428,
+          "end_line": 428
         },
         {
           "path": "doc/data-model.md",
@@ -21762,7 +21607,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.749Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -21847,12 +21692,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 590,
-          "end_line": 605
+          "line": 669,
+          "end_line": 681
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.749Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -22003,17 +21848,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 401,
-          "end_line": 411
+          "line": 426,
+          "end_line": 426
         },
         {
           "path": "doc/data-model.md",
-          "line": 529,
-          "end_line": 660
+          "line": 684,
+          "end_line": 684
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.751Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 4,
@@ -22122,12 +21967,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 607,
-          "end_line": 622
+          "line": 686,
+          "end_line": 698
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.752Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -22293,12 +22138,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 611,
-          "end_line": 615
+          "line": 684,
+          "end_line": 684
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.754Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -22359,12 +22204,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 408,
-          "end_line": 411
+          "line": 427,
+          "end_line": 427
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.755Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 4,
@@ -22392,17 +22237,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 408,
-          "end_line": 408
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 411,
-          "end_line": 411
+          "line": 427,
+          "end_line": 427
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.755Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -22546,17 +22386,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 408,
-          "end_line": 408
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 531,
-          "end_line": 531
+          "line": 551,
+          "end_line": 551
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.756Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -22618,17 +22453,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 408,
-          "end_line": 408
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 411,
-          "end_line": 411
+          "line": 424,
+          "end_line": 424
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.756Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -22710,12 +22540,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 403,
-          "end_line": 412
+          "line": 370,
+          "end_line": 370
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.757Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 5,
@@ -22743,17 +22573,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 394,
-          "end_line": 394
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 407,
-          "end_line": 408
+          "line": 413,
+          "end_line": 413
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.757Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -22837,8 +22662,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 394,
-          "end_line": 394
+          "line": 413,
+          "end_line": 413
         },
         {
           "path": "doc/prd-0.1.md",
@@ -22847,7 +22672,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.757Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -22973,22 +22798,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 394,
-          "end_line": 394
+          "line": 570,
+          "end_line": 570
         },
         {
           "path": "doc/prd-0.1.md",
           "line": 550,
           "end_line": 550
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 457,
-          "end_line": 457
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.758Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -23057,13 +22877,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 398,
-          "end_line": 399
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 503,
-          "end_line": 503
+          "line": 523,
+          "end_line": 523
         },
         {
           "path": "doc/data-model.md",
@@ -23072,7 +22887,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.759Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -23177,17 +22992,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 538,
-          "end_line": 538
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 540,
-          "end_line": 540
+          "line": 558,
+          "end_line": 558
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.760Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 3,
@@ -23269,12 +23079,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 538,
-          "end_line": 538
+          "line": 558,
+          "end_line": 558
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.759Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -23382,12 +23192,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 531,
-          "end_line": 531
+          "line": 551,
+          "end_line": 551
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.761Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 5,
@@ -23415,17 +23225,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 531,
-          "end_line": 531
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 544,
-          "end_line": 561
+          "line": 564,
+          "end_line": 564
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.760Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -23551,12 +23356,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 531,
-          "end_line": 531
+          "line": 551,
+          "end_line": 551
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.762Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -23677,12 +23482,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 533,
-          "end_line": 534
+          "line": 554,
+          "end_line": 554
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.764Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 5,
@@ -23769,12 +23574,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 534,
-          "end_line": 534
+          "line": 554,
+          "end_line": 554
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.764Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -23959,12 +23764,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 535,
-          "end_line": 536
+          "line": 555,
+          "end_line": 555
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.767Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 8,
@@ -23992,8 +23797,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 535,
-          "end_line": 535
+          "line": 647,
+          "end_line": 647
         },
         {
           "path": "doc/prd-0.1.md",
@@ -24002,7 +23807,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.767Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 3,
@@ -24202,17 +24007,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 535,
-          "end_line": 535
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 536,
-          "end_line": 536
+          "line": 555,
+          "end_line": 555
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.768Z",
+      "updated_at": "2026-10-03T02:47:41.779Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -24240,12 +24040,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 536,
-          "end_line": 536
+          "line": 579,
+          "end_line": 579
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.768Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -24294,12 +24094,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 535,
-          "end_line": 535
+          "line": 555,
+          "end_line": 555
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.768Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -24406,8 +24206,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 413,
-          "end_line": 420
+          "line": 432,
+          "end_line": 432
         },
         {
           "path": "DESIGN.md",
@@ -24416,7 +24216,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.778Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "aggregate": {
         "descendant_count": 38,
@@ -24449,12 +24249,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 427,
-          "end_line": 427
+          "line": 726,
+          "end_line": 726
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.770Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "aggregate": {
         "descendant_count": 8,
@@ -24614,12 +24414,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 661,
-          "end_line": 661
+          "line": 726,
+          "end_line": 726
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.770Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -24695,12 +24495,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 368,
-          "end_line": 368
+          "line": 446,
+          "end_line": 446
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.771Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -24772,8 +24572,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 667,
-          "end_line": 669
+          "line": 726,
+          "end_line": 726
         },
         {
           "path": "DESIGN.md",
@@ -24787,7 +24587,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.771Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -24849,8 +24649,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 427,
-          "end_line": 427
+          "line": 446,
+          "end_line": 446
         },
         {
           "path": "DESIGN.md",
@@ -24859,7 +24659,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.772Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "deps": [
         {
@@ -24976,17 +24776,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 348,
-          "end_line": 348
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 387,
-          "end_line": 387
+          "line": 367,
+          "end_line": 367
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.772Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -25052,12 +24847,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 418,
-          "end_line": 418
+          "line": 437,
+          "end_line": 437
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.773Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -25109,12 +24904,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 415,
-          "end_line": 415
+          "line": 434,
+          "end_line": 434
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.773Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 4,
@@ -25142,12 +24937,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 417,
-          "end_line": 417
+          "line": 436,
+          "end_line": 436
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.773Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -25301,17 +25096,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 416,
-          "end_line": 416
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 420,
-          "end_line": 420
+          "line": 435,
+          "end_line": 435
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.774Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -25871,12 +25661,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 666,
-          "end_line": 666
+          "line": 724,
+          "end_line": 724
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.777Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -25933,12 +25723,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 342,
-          "end_line": 356
+          "line": 375,
+          "end_line": 375
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.782Z",
+      "updated_at": "2026-10-03T02:52:03.660Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "aggregate": {
         "descendant_count": 8,
@@ -26160,12 +25950,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 396,
-          "end_line": 404
+          "line": 490,
+          "end_line": 490
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.781Z",
+      "updated_at": "2026-10-03T02:52:03.661Z",
       "fingerprint": "88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896",
       "deps": [
         {
@@ -26519,12 +26309,12 @@
         },
         {
           "path": "doc/forms.md",
-          "line": 372,
-          "end_line": 372
+          "line": 433,
+          "end_line": 433
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.783Z",
+      "updated_at": "2026-10-03T02:52:03.661Z",
       "fingerprint": "88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896",
       "apis": [
         {
@@ -26798,12 +26588,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 664,
-          "end_line": 664
+          "line": 722,
+          "end_line": 722
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.785Z",
+      "updated_at": "2026-10-03T02:52:03.661Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -26886,8 +26676,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 667,
-          "end_line": 669
+          "line": 726,
+          "end_line": 726
         },
         {
           "path": "DESIGN.md",
@@ -26896,7 +26686,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.787Z",
+      "updated_at": "2026-10-03T02:52:03.661Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "deps": [
         {
@@ -26945,12 +26735,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 663,
-          "end_line": 663
+          "line": 721,
+          "end_line": 721
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.786Z",
+      "updated_at": "2026-10-03T02:52:03.661Z",
       "fingerprint": "cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc",
       "apis": [
         {
@@ -27364,17 +27154,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 369,
-          "end_line": 369
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 376,
-          "end_line": 376
+          "line": 395,
+          "end_line": 395
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.789Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -27444,13 +27229,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 373,
-          "end_line": 373
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 376,
-          "end_line": 376
+          "line": 392,
+          "end_line": 392
         },
         {
           "path": "doc/data-model.md",
@@ -27459,7 +27239,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.790Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -27531,12 +27311,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 365,
-          "end_line": 367
+          "line": 384,
+          "end_line": 384
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.790Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 4,
@@ -27656,17 +27436,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 365,
-          "end_line": 365
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 415,
-          "end_line": 419
+          "line": 384,
+          "end_line": 384
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.791Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -27761,13 +27536,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 367,
-          "end_line": 367
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 457,
-          "end_line": 457
+          "line": 386,
+          "end_line": 386
         },
         {
           "path": "doc/prd-0.1.md",
@@ -27776,7 +27546,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.791Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -27939,17 +27709,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 366,
-          "end_line": 367
+          "line": 385,
+          "end_line": 385
         },
         {
           "path": "doc/data-model.md",
-          "line": 529,
-          "end_line": 600
+          "line": 135,
+          "end_line": 135
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.794Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 4,
@@ -27977,17 +27747,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 366,
-          "end_line": 366
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 424,
-          "end_line": 431
+          "line": 385,
+          "end_line": 385
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.793Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -28188,8 +27953,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 366,
-          "end_line": 366
+          "line": 385,
+          "end_line": 385
         },
         {
           "path": "doc/data-model.md",
@@ -28198,7 +27963,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.795Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -28327,22 +28092,17 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 368,
-          "end_line": 368
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 375,
-          "end_line": 375
+          "line": 394,
+          "end_line": 394
         },
         {
           "path": "doc/data-model.md",
-          "line": 533,
-          "end_line": 563
+          "line": 611,
+          "end_line": 643
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.796Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -28428,8 +28188,8 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 565,
-          "end_line": 588
+          "line": 830,
+          "end_line": 830
         },
         {
           "path": "doc/prd-0.1.md",
@@ -28438,7 +28198,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.797Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "3fa55e709cb9ac98044607ebc445808895af5b80efb5c73bd0edbfe19bf2c4ad",
       "apis": [
         {
@@ -28618,8 +28378,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 739,
-          "end_line": 773
+          "line": 832,
+          "end_line": 832
         },
         {
           "path": "doc/prd-0.1.md",
@@ -28628,7 +28388,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.799Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "deps": [
         {
@@ -28805,8 +28565,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 373,
-          "end_line": 373
+          "line": 392,
+          "end_line": 392
         },
         {
           "path": "doc/data-model.md",
@@ -28815,7 +28575,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.800Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -28882,12 +28642,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 557,
-          "end_line": 558
+          "line": 609,
+          "end_line": 609
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.801Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -29039,12 +28799,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 231,
-          "end_line": 232
+          "line": 237,
+          "end_line": 237
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.801Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -29340,12 +29100,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 213,
-          "end_line": 214
+          "line": 218,
+          "end_line": 218
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.803Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -29515,17 +29275,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 208,
-          "end_line": 208
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 210,
-          "end_line": 211
+          "line": 213,
+          "end_line": 213
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.803Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -29606,8 +29361,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 670,
-          "end_line": 720
+          "line": 746,
+          "end_line": 746
         },
         {
           "path": "doc/prd-0.1.md",
@@ -29621,7 +29376,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.804Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -30194,8 +29949,8 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 297,
-          "end_line": 322
+          "line": 369,
+          "end_line": 396
         },
         {
           "path": "doc/prd-0.1.md",
@@ -30204,7 +29959,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.807Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -30301,12 +30056,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 349,
-          "end_line": 349
+          "line": 368,
+          "end_line": 368
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.808Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "deps": [
         {
@@ -30345,17 +30100,17 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 278,
-          "end_line": 295
+          "line": 335,
+          "end_line": 368
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 436,
-          "end_line": 436
+          "line": 475,
+          "end_line": 475
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.808Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -30441,8 +30196,8 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 282,
-          "end_line": 295
+          "line": 333,
+          "end_line": 333
         },
         {
           "path": "doc/prd-0.1.md",
@@ -30451,7 +30206,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.809Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -30544,12 +30299,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 352,
-          "end_line": 362
+          "line": 371,
+          "end_line": 371
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.809Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 4,
@@ -30577,8 +30332,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 352,
-          "end_line": 352
+          "line": 371,
+          "end_line": 371
         },
         {
           "path": "doc/prd-0.1.md",
@@ -30587,7 +30342,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.809Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -30691,17 +30446,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 352,
-          "end_line": 352
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 218,
-          "end_line": 232
+          "line": 371,
+          "end_line": 371
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.810Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -30903,17 +30653,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 229,
-          "end_line": 230
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 351,
-          "end_line": 352
+          "line": 234,
+          "end_line": 234
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.810Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -31041,17 +30786,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 386,
-          "end_line": 387
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 496,
-          "end_line": 496
+          "line": 405,
+          "end_line": 405
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.811Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -31079,17 +30819,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 387,
-          "end_line": 387
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 348,
-          "end_line": 348
+          "line": 406,
+          "end_line": 406
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.811Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -31165,8 +30900,8 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 223,
-          "end_line": 223
+          "line": 405,
+          "end_line": 405
         },
         {
           "path": "doc/prd-0.1.md",
@@ -31175,7 +30910,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.811Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -31343,17 +31078,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 389,
-          "end_line": 389
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 380,
-          "end_line": 380
+          "line": 408,
+          "end_line": 408
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.813Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -31453,13 +31183,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 389,
-          "end_line": 389
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 202,
-          "end_line": 202
+          "line": 408,
+          "end_line": 408
         },
         {
           "path": "doc/data-model.md",
@@ -31468,7 +31193,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.814Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -31627,13 +31352,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 394,
-          "end_line": 394
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 351,
-          "end_line": 351
+          "line": 370,
+          "end_line": 370
         },
         {
           "path": "doc/prd-0.1.md",
@@ -31642,7 +31362,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.815Z",
+      "updated_at": "2026-10-03T02:48:17.650Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -31868,12 +31588,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 482,
-          "end_line": 482
+          "line": 553,
+          "end_line": 553
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.817Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -32084,12 +31804,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 478,
-          "end_line": 498
+          "line": 555,
+          "end_line": 579
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.818Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -32305,22 +32025,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 338,
-          "end_line": 338
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 322,
-          "end_line": 322
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 506,
-          "end_line": 506
+          "line": 357,
+          "end_line": 357
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.820Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -32382,8 +32092,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 337,
-          "end_line": 337
+          "line": 356,
+          "end_line": 356
         },
         {
           "path": "doc/prd-0.1.md",
@@ -32397,7 +32107,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.821Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -32457,8 +32167,8 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 435,
-          "end_line": 435
+          "line": 553,
+          "end_line": 553
         },
         {
           "path": "doc/prd-0.1.md",
@@ -32467,7 +32177,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.822Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -32935,17 +32645,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 394,
-          "end_line": 397
-        },
-        {
-          "path": "doc/data-model.md",
-          "line": 416,
-          "end_line": 417
+          "line": 452,
+          "end_line": 494
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.827Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -33164,8 +32869,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 488,
-          "end_line": 488
+          "line": 508,
+          "end_line": 508
         },
         {
           "path": "doc/data-model.md",
@@ -33174,7 +32879,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.828Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "deps": [
         {
@@ -33339,17 +33044,17 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 423,
-          "end_line": 447
+          "line": 495,
+          "end_line": 524
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 488,
-          "end_line": 488
+          "line": 478,
+          "end_line": 478
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.829Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -33616,12 +33321,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 328,
-          "end_line": 330
+          "line": 349,
+          "end_line": 349
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.830Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -33683,13 +33388,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 325,
-          "end_line": 325
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 333,
-          "end_line": 333
+          "line": 352,
+          "end_line": 352
         },
         {
           "path": "doc/prd-0.1.md",
@@ -33698,7 +33398,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.832Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -33741,12 +33441,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 503,
-          "end_line": 503
+          "line": 523,
+          "end_line": 523
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.832Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -33827,8 +33527,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 333,
-          "end_line": 333
+          "line": 352,
+          "end_line": 352
         },
         {
           "path": "doc/prd-0.1.md",
@@ -33847,7 +33547,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.833Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -34004,12 +33704,12 @@
         },
         {
           "path": "doc/data-model.md",
-          "line": 500,
-          "end_line": 524
+          "line": 580,
+          "end_line": 610
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.834Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -34120,8 +33820,8 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 502,
-          "end_line": 502
+          "line": 522,
+          "end_line": 522
         },
         {
           "path": "doc/data-model.md",
@@ -34130,7 +33830,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.834Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -34249,13 +33949,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 346,
-          "end_line": 346
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 392,
-          "end_line": 392
+          "line": 365,
+          "end_line": 365
         },
         {
           "path": "doc/data-model.md",
@@ -34264,7 +33959,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.835Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "aggregate": {
         "descendant_count": 3,
@@ -34668,8 +34363,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 230,
-          "end_line": 232
+          "line": 237,
+          "end_line": 237
         },
         {
           "path": "doc/prd-0.1.md",
@@ -34678,7 +34373,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.837Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -34848,12 +34543,12 @@
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 549,
-          "end_line": 549
+          "line": 569,
+          "end_line": 569
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.838Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -34915,12 +34610,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 347,
-          "end_line": 347
+          "line": 366,
+          "end_line": 366
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.839Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "apis": [
         {
@@ -34992,22 +34687,17 @@
       "source": [
         {
           "path": "doc/data-model.md",
-          "line": 449,
-          "end_line": 473
+          "line": 525,
+          "end_line": 554
         },
         {
           "path": "doc/prd-0.1.md",
-          "line": 460,
-          "end_line": 460
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 490,
-          "end_line": 490
+          "line": 510,
+          "end_line": 510
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.839Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {
@@ -35088,17 +34778,12 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 390,
-          "end_line": 391
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 238,
-          "end_line": 238
+          "line": 409,
+          "end_line": 409
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.840Z",
+      "updated_at": "2026-10-03T02:48:17.651Z",
       "fingerprint": "9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c",
       "aggregate": {
         "descendant_count": 2,
@@ -35126,13 +34811,8 @@
       "source": [
         {
           "path": "doc/prd-0.1.md",
-          "line": 390,
-          "end_line": 390
-        },
-        {
-          "path": "doc/prd-0.1.md",
-          "line": 202,
-          "end_line": 202
+          "line": 409,
+          "end_line": 409
         },
         {
           "path": "doc/data-model.md",
@@ -35141,7 +34821,7 @@
         }
       ],
       "revision": "e3b34a3c59417096ade647fab4261b06f6b605e2",
-      "updated_at": "2026-10-03T02:30:28.840Z",
+      "updated_at": "2026-10-03T02:46:08.334Z",
       "fingerprint": "096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e",
       "apis": [
         {

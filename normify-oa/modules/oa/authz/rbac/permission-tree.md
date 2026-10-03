@@ -11,15 +11,15 @@ description:
       Defines and maintains the permission tree: menu/button/api nodes, each with a unique permission code (e.g. flow:task:approve) and front-end route, assignable level by level.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.661Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
-    line: 219
-    end_line: 236
+    line: 277
+    end_line: 295
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
+    line: 170
+    end_line: 170
 apis:
   - protocol: http
     method: GET

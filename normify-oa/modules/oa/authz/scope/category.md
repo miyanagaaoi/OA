@@ -11,15 +11,12 @@ description:
       Category scope: category values come from the data dictionary (no release needed, downstream consumer of REQ-ADMIN-004) and a role's category range lives in the role-category table; after centralizing on Finance it only applies to business-line roles such as group executives.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.665Z"
+updated_at: "2026-10-03T02:47:04.570Z"
 fingerprint: 1d71d83c11c75a93b7ff4af24882ab247a2d9cf90243263cdddb7b8ade83fa75
 source:
   - path: "doc/data-model.md"
-    line: 205
-    end_line: 217
-  - path: "doc/data-model.md"
-    line: 722
-    end_line: 735
+    line: 264
+    end_line: 276
 apis:
   - protocol: http
     method: GET

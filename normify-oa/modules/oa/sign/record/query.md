@@ -12,15 +12,15 @@ description:
       Queries all signature records of a document (including historical versions, device fingerprints, IP and signing times) plus single-record detail, and serves the image behind an authenticated download.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.801Z"
+updated_at: "2026-10-03T02:48:17.650Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 368
     end_line: 368
   - path: "doc/data-model.md"
-    line: 557
-    end_line: 558
+    line: 609
+    end_line: 609
 apis:
   - protocol: http
     method: GET

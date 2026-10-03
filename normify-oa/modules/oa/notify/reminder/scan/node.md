@@ -12,18 +12,15 @@ description:
       Scans stalled approval tasks against the configured node timeout (≥24h, no reminder when unset) and emits reminder signals without changing task or node state.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.758Z"
+updated_at: "2026-10-03T02:47:41.779Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 394
-    end_line: 394
+    line: 570
+    end_line: 570
   - path: "doc/prd-0.1.md"
     line: 550
     end_line: 550
-  - path: "doc/prd-0.1.md"
-    line: 457
-    end_line: 457
 apis:
   - protocol: http
     method: GET

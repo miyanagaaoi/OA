@@ -12,15 +12,15 @@ description:
       Maintain a user's assignments across multiple org nodes and the primary-post flag; the primary post determines the owning company used by data-scope filtering.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.622Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/data-model.md"
     line: 113
     end_line: 126
   - path: "doc/prd-0.1.md"
-    line: 155
-    end_line: 157
+    line: 144
+    end_line: 144
 apis:
   - protocol: http
     method: GET

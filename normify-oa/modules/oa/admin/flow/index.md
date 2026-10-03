@@ -12,13 +12,10 @@ description:
       Configure process templates, form templates, approver resolution rules, decision modes and thresholds, signature requirements and timeout lengths; publishing goes through version management and a branch process admin is limited to their own company's templates.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.594Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"
-    line: 436
-    end_line: 436
-  - path: "doc/prd-0.1.md"
-    line: 544
-    end_line: 561
+    line: 455
+    end_line: 455
 ---

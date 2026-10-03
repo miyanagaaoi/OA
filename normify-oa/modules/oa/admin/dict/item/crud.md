@@ -12,15 +12,15 @@ description:
       Creates, updates and deletes dictionary items keyed by dict_type plus item_code, refusing deletion once an item is referenced by any document.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.589Z"
+updated_at: "2026-10-03T02:49:57.377Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
     line: 438
     end_line: 438
   - path: "doc/data-model.md"
-    line: 256
-    end_line: 267
+    line: 311
+    end_line: 324
 apis:
   - protocol: http
     method: GET

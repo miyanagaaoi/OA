@@ -11,12 +11,12 @@ description:
       Roles and the permission tree (menu/feature nodes) plus role-permission assignment; IT assigns permissions node by node, and branch process admins may maintain their own company but cannot re-delegate permissions.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.661Z"
+updated_at: "2026-10-03T02:49:57.378Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 159
-    end_line: 168
+    line: 170
+    end_line: 170
   - path: "doc/data-model.md"
     line: 164
     end_line: 271

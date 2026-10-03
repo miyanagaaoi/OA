@@ -12,15 +12,12 @@ description:
       Two ways for an approver to add a temporary approver: add-sign before inserts the signer ahead of the current approver, add-sign after hands the task over once the current approver has passed. Added signers must give an opinion; the chain is stored on the node instance and audited.
       
 revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.835Z"
+updated_at: "2026-10-03T02:48:17.651Z"
 fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
 source:
   - path: "doc/prd-0.1.md"
-    line: 346
-    end_line: 346
-  - path: "doc/prd-0.1.md"
-    line: 392
-    end_line: 392
+    line: 365
+    end_line: 365
   - path: "doc/data-model.md"
     line: 437
     end_line: 437
