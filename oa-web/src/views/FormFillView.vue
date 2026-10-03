@@ -201,12 +201,17 @@ const isInitiator = computed(
 )
 
 /**
- * 附件面板的身份闸门（镜像后端 `AttachmentService#requireInitiatorOrAdmin`：
- * 上传/删除仅**发起人本人或系统管理员**）。
+ * 附件面板的身份闸门（镜像后端：**上传** = 发起人本人或系统管理员，
+ * `AttachmentService#requireInitiatorOrAdmin`；**删除** = 三档 ——
+ * 上传者本人 ∪ 单据发起人本人 ∪ 系统管理员，判据在 `AttachmentService#delete`）。
  *
- * 注意「服务端走的是角色码 `admin`」，而 store 里的 `isSuperAdmin` 是管理员兜底能力：
+ * <p>本 computed 只产出「发起人 / 管理员 / 其他」这一层身份（面板据此判删除的
+ * initiator / admin 两档，与上传闸门同源）；删除的第三档「上传者本人」按附件逐条
+ * 比 `uploaderId`，由 `utils/attachment.ts#canDeleteAttachment` 判。
+ *
+ * <p>注意「服务端走的是角色码 `admin`」，而 store 里的 `isSuperAdmin` 是管理员兜底能力：
  * 两个都认（与 `utils/form-rules.ts#AMOUNT_WRITABLE_ROLES` 的口径一致）。
- * 判定权仍在服务端：身份不符时服务端按 403 拒绝，界面只是**不显示入口**。
+ * 判定权仍在服务端：身份不符时服务端按 403（上传）/ 40310（删除）拒绝，界面只是**不显示入口**。
  */
 const attachmentIdentity = computed<'initiator' | 'admin' | 'other'>(() => {
   if (isInitiator.value) return 'initiator'

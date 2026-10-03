@@ -494,7 +494,13 @@ export interface AttachmentSubject {
   isAdmin: boolean
 }
 
-/** 上传/删除窗口结论 */
+/**
+ * 附件的**读写窗口结论**。
+ *
+ * <p>⚠ 窗口对「上传」与「删除」是同一条（草稿 / 待补件），但**身份口径不同**：
+ * 上传 = 发起人本人或系统管理员；删除 = 上传者本人 ∪ 发起人本人 ∪ 系统管理员
+ * —— 详见 `resolveAttachmentWindow` 与 `canDeleteAttachment` 的注释。
+ */
 export interface AttachmentWindow {
   /** 三态白名单是否放行（草稿 / 待补件） */
   stateOpen: boolean
