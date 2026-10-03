@@ -11,8 +11,8 @@ description:
   en: >
       Fund approval form (form_type=fund): amount mandatory in DECIMAL(18,2) with two decimals and a 100-million ceiling, attachments mandatory, plus planned-category and payment-ownership fields that are stored but do not affect routing in phase one; amount shown with ten-thousand conversion and not exportable by non-finance roles.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:47:04.570Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.209Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

@@ -130,7 +130,7 @@
 | `check-ddl.js` | 28 张表结构（主键/外键目标/重复列/金额禁浮点） |
 | `check-templates-sql.js` | 模板 SQL（4 模板 × 7 节点、`form_schema_json` 合法性） |
 | `check-import-csv.js` | 导入模板（表头/BOM/枚举/跨文件引用/工号唯一/角色码白名单） |
-| `gen-permission-seed.js` / `check-permission-seed.js` | 权限树种子（9 角色 / 94 权限项 / 374 授权行）与 15 类断言 |
+| `gen-permission-seed.js` / `check-permission-seed.js` | 权限树种子（9 角色 / 94 权限项 / 375 授权行）与全套断言：权限树结构与角色段顺序、`company_admin`/`employee` 越权防护、`group_leader`+`chairman` 报表口径、AC-49「终止持有角色恰为 `admin` + `group_leader`」、祖先闭包（原先此处写作「15 类断言」，该数字在代码里无对应物，已改为自描述清单） |
 | `validate-design-md.js` | `DESIGN.md` 设计规范校验 |
 | 其余（`fetch-github-repo.js`、`serve.js`、`png-probe.js`、`png-alpha.js`、`npx.js`、`pack-tgz.js`） | 辅助（拉取参考仓库、本地静态服务、PNG 检查、打包） |
 

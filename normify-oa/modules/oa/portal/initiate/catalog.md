@@ -11,8 +11,8 @@ description:
   en: >
       Entry point for the four document types (matter / fund / contract / seal-and-licence): icon blocks all use a primary-subtle fill with a primary glyph, and types differ by icon shape rather than colour; templates outside the caller's permission are not rendered; card-style layout is an exception only on this page and on H5, lists otherwise default to tables.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.779Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.276Z"
 fingerprint: cd9efea98e4b8fd30bd3cc4099150a74c191c187c756c15dfd65a60a05dc8cbc
 source:
   - path: "DESIGN.md"

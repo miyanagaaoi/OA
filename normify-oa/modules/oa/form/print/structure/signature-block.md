@@ -11,8 +11,8 @@ description:
   en: >
       Nodes that require a signature leave a blank signature line on the sheet (signature ____ date); the fund sheet has three sections (group function department, group executives, chairman); already-signed blocks print a signature thumbnail with a timestamp, taking seals and signatures from signature records.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.708Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.218Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

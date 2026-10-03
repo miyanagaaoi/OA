@@ -1,10 +1,10 @@
 -- ============================================================================
--- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 374 授权行，幂等）
+-- V4 内置角色 + 权限树 + 角色授权（9 角色 / 94 权限项 / 375 授权行，幂等）
 -- ----------------------------------------------------------------------------
--- 生成器: tools/build-flyway-migrations.js sha256=194ee2f2e8ab
+-- 生成器: tools/build-flyway-migrations.js sha256=f03ac8fd71c2
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（Flyway checksum 稳定）。
 -- 请勿手工编辑本文件：改 oa-deploy/sql 或文档后重跑生成器。
--- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=36e33617be65
+-- 来源: oa-deploy/sql/04-permissions.sql ← tools/gen-permission-seed.js（数据在此定义） sha256=61bd6f0c00f8
 -- 三段顺序不可调换：① 播种 sys_role（9 个内置角色）→ ② 播种 sys_permission（权限树，父先于子）→ ③ 播种 sys_role_permission。
 -- 若角色段被移到授权段之后，授权 JOIN 不到角色会**静默插入 0 行**（表现为登录后没有菜单）——check-permission-seed.js 有顺序断言。
 -- 权限码为**冒号风格**（如 admin:user:export），与 oa-web 的前端判据逐字一致。
@@ -554,7 +554,7 @@ ON DUPLICATE KEY UPDATE name = VALUES(name), url = VALUES(url), sort_no = VALUES
 
 -- ===== 角色 admin（系统管理员）：94 项 =====
 -- 范围：全部权限（含全部 admin:* 与 flow:*）
--- 仅 admin 权限项（本角色持有 5 项）：flow:task:reassign、flow:task:terminate、admin:user:export、admin:role:grant、admin:report:export
+-- 仅 admin 权限项（本角色持有 4 项）：flow:task:reassign、admin:user:export、admin:role:grant、admin:report:export
 -- admin 系统管理员：共 94 项（第 1/12 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
@@ -887,9 +887,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'finance_owner'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 group_leader（集团分管领导）：40 项 =====
--- 范围：员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内
--- group_leader 集团分管领导：共 40 项（第 1/5 段）
+-- ===== 角色 group_leader（集团分管领导）：41 项 =====
+-- 范围：员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）+ **终止流程**（AC-49 / 附录A 权限矩阵）；`portal:detail:*` 已在基础包内
+-- group_leader 集团分管领导：共 41 项（第 1/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -897,7 +897,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 2/5 段）
+-- group_leader 集团分管领导：共 41 项（第 2/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -905,7 +905,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 3/5 段）
+-- group_leader 集团分管领导：共 41 项（第 3/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -913,19 +913,27 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 4/5 段）
+-- group_leader 集团分管领导：共 41 项（第 4/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:task:reject', 'flow:task:addsign', 'flow:task:transfer', 'flow:task:route', 'flow:task:rollback', 'flow:supplement:request', 'flow:task:withdraw', 'flow:print')
+  JOIN sys_permission p ON p.code IN ('flow:task:reject', 'flow:task:addsign', 'flow:task:transfer', 'flow:task:route', 'flow:task:rollback', 'flow:supplement:request', 'flow:task:withdraw', 'flow:task:terminate')
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 5/5 段）
+-- group_leader 集团分管领导：共 41 项（第 5/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:export', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog', 'admin:report:efficiency')
+  JOIN sys_permission p ON p.code IN ('flow:print', 'flow:export', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog')
+ WHERE r.code = 'group_leader'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- group_leader 集团分管领导：共 41 项（第 6/6 段）
+INSERT INTO sys_role_permission (role_id, permission_id, created_by)
+SELECT r.id, p.id, NULL
+  FROM sys_role r
+  JOIN sys_permission p ON p.code IN ('admin:report:efficiency')
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
@@ -1013,7 +1021,7 @@ SELECT perm_type, COUNT(*) AS cnt FROM sys_permission GROUP BY perm_type ORDER B
 --   branch_leader   33 行
 --   subsidiary_gm   33 行
 --   finance_owner   40 行
---   group_leader    40 行
+--   group_leader    41 行
 --   chairman        40 行
 SELECT r.code AS role_code, COUNT(*) AS granted
   FROM sys_role_permission rp
@@ -1063,12 +1071,6 @@ SELECT 'flow:task:reassign 非 admin 授权数（期望 0）' AS check_item, COU
   JOIN sys_role r ON r.id = rp.role_id
   JOIN sys_permission p ON p.id = rp.permission_id
  WHERE p.code = 'flow:task:reassign' AND r.code <> 'admin'
-UNION ALL
-SELECT 'flow:task:terminate 非 admin 授权数（期望 0）' AS check_item, COUNT(*) AS cnt
-  FROM sys_role_permission rp
-  JOIN sys_role r ON r.id = rp.role_id
-  JOIN sys_permission p ON p.id = rp.permission_id
- WHERE p.code = 'flow:task:terminate' AND r.code <> 'admin'
 UNION ALL
 SELECT 'admin:user:export 非 admin 授权数（期望 0）' AS check_item, COUNT(*) AS cnt
   FROM sys_role_permission rp
@@ -1121,5 +1123,15 @@ SELECT r.code AS role_code, COUNT(rc.id) AS category_count
   FROM sys_role r
   LEFT JOIN sys_role_category rc ON rc.role_id = r.id
  WHERE r.data_scope = 'group_category'
+ GROUP BY r.code
+ ORDER BY r.code;
+
+-- ⑫ 终止流程授权分布（AC-49 / PRD 附录A 权限矩阵「终止流程」行）：期望恰好两行 admin=1、group_leader=1
+-- flow:task:terminate 的角色分布：期望恰好两行 —— admin=1、group_leader=1（AC-49 / PRD 附录A 权限矩阵）
+SELECT r.code AS role_code, COUNT(*) AS cnt
+  FROM sys_role_permission rp
+  JOIN sys_role r ON r.id = rp.role_id
+  JOIN sys_permission p ON p.id = rp.permission_id
+ WHERE p.code = 'flow:task:terminate'
  GROUP BY r.code
  ORDER BY r.code;

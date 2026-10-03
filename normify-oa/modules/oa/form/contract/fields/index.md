@@ -11,8 +11,8 @@ description:
   en: >
       Field groups of the contract approval form: basics (name, category fixed to business, contract type and other-type note), counterparty (name and unified social credit code), amount and term (amount / start / end / framework flag), intended seal type, and attachments (contract text plus counterparty credentials). Central ownership is always finance.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.689Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.203Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

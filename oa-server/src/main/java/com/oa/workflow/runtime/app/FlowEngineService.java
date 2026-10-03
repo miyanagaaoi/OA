@@ -861,16 +861,20 @@ public class FlowEngineService {
     /**
      * 终止（REQ-FLOW-010 / AC-49）：仅系统管理员与集团分管领导，必填原因，终态不可再提交。
      *
-     * <p><b>真源冲突与裁定（取证）</b>：
+     * <p><b>真源口径（2026-10-04 已对齐，「种子与 PRD 不一致」的遗留已消除）</b>：
      * <ul>
-     *   <li>doc/prd-0.1.md §6.3.1 / §6.6 / AC-49：「系统管理员<b>与集团分管领导</b>可终止（必填原因），
-     *       其他角色无入口」；</li>
-     *   <li>{@code db/migration/V4__permissions.sql}（行 594、1064–1071）：{@code flow:task:terminate}
-     *       **只授权给 admin**，并有自检「非 admin 授权数（期望 0）」。</li>
+     *   <li>{@code doc/prd-0.1.md} AC-49（第 655 行）：「<b>系统管理员与集团分管领导</b>可终止（必填原因），
+     *       其他角色无入口」；附录A 权限矩阵（第 764 行）「终止流程」行同口径（其余 6 个内置角色均为 {@code -}）；</li>
+     *   <li>种子侧：{@code tools/gen-permission-seed.js} 的 {@code GROUP_LEADER_TERMINATE} 把
+     *       {@code flow:task:terminate} 授给 {@code group_leader}（生成物
+     *       {@code oa-deploy/sql/04-permissions.sql} → {@code db/migration/V4__permissions.sql}），
+     *       并由 {@code check-permission-seed.js} 断言「持有人恰为 {admin, group_leader}」——
+     *       AC-49 的「集团分管领导可终止」不再只靠本类的角色兜底。</li>
      * </ul>
-     * <p><b>裁定</b>：以 PRD 的**角色**口径为准，同时**不削弱**权限种子（V4 一行未改，自检继续成立）：
-     * 放行条件 = 系统管理员 ∪ 持有 {@code group_leader} 角色 ∪ 持有 {@code flow:task:terminate} 权限。
-     * 这样 AC-49 的「集团分管领导可终止」成立，权限矩阵「非 admin 不持有 terminate 权限」的断言也不被破坏。
+     *
+     * <p>放行条件 = 系统管理员 ∪ 持有 {@code group_leader} 角色 ∪ 持有 {@code flow:task:terminate} 权限。
+     * 三者是**并集**：后台「角色与权限」界面若调整了授权，group_leader 仍按 AC-49 角色口径放行；
+     * 而任何不持有该角色/权限的账号（含 {@code company_admin}，REQ-ADMIN-003）一律 403。
      */
     @Transactional
     public InstanceView terminate(Long instanceId, String reason) {

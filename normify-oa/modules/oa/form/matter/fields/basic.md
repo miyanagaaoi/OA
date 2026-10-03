@@ -11,8 +11,8 @@ description:
   en: >
       Matter title `title` (text ≤60, required, read-only after initiation), category `category` (select, configuration item, not re-classifiable after submission) and description `description` (textarea ≤2000, ≥10 characters); all three become read-only after submission.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.700Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.210Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

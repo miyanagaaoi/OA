@@ -11,8 +11,8 @@ description:
   en: >
       Design language for the approval UI: white canvas, deep-ink text, a single corporate blue, dark left nav holding the org tree, high data density with right-aligned tabular numerals; tokens, components, status colours and A4 print specs.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.677Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.194Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

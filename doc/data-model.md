@@ -104,8 +104,9 @@ CREATE TABLE sys_org_leader (
   created_by   BIGINT UNSIGNED     NULL,
   updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   updated_by   BIGINT UNSIGNED     NULL,
+  category_key VARCHAR(32)  GENERATED ALWAYS AS (IFNULL(category, '')) STORED COMMENT '唯一键口径：category 为 NULL 时按空串参与唯一键（MySQL 唯一键对 NULL 不去重，否则同一组织/同一人/同一 leader_type 在 category 为 NULL 时可无限重复插入）。业务语义不变：NULL 与 NULL 视为同一组、非 NULL 仍按值区分',
   PRIMARY KEY (id),
-  UNIQUE KEY uk_org_leader (org_id, user_id, leader_type, category),
+  UNIQUE KEY uk_org_leader (org_id, user_id, leader_type, category_key),
   KEY idx_org_leader_user (user_id),
   KEY idx_org_leader_lookup (org_id, category, leader_type),
   CONSTRAINT fk_org_leader_org  FOREIGN KEY (org_id)  REFERENCES sys_org (id),
@@ -508,7 +509,7 @@ CREATE TABLE flow_node_instance (
   returned_count       INT          NOT NULL DEFAULT 0 COMMENT '被回退次数（上限 2，REQ-FLOW-021）',
   supplement_requested TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '本节点是否已请求过补件（上限 1 次）',
   add_sign_chain_json  JSON             NULL COMMENT '加签链记录',
-  started_at           DATETIME         NULL,
+  started_at           DATETIME         NULL COMMENT '**本轮**开始时间（不是「首次开始时间」）：节点每次被激活都刷新为当前时间 —— 包括被下一节点「回退上一节点」退回后重新进入 active 的那一次。理由：本轮决议只能统计**本轮主任务** —— 轮次边界就是这个 started_at，判定 SQL 见 `FlowTaskMapper.xml#selectRoundPrimaryByNodeInstance`（`flow_task.created_at >= started_at`）。若沿用「首次开始时间」，回退重审会把上一轮的同意票算作本轮结论，节点未经重新审批即通过（2026-10-03 运行期实测发现）。要追溯「首次进入本节点的时间」，请看 `created_at` 与 `sys_thread` 轨迹',
   finished_at          DATETIME         NULL,
   created_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -872,6 +873,8 @@ DELIMITER ;
 | 金额非浮点、金额上限 | `DECIMAL(18,2)` + 服务端禁止浮点运算（`doc/forms.md` 1.5）；**库级只存约束，金额上限（单笔/年度）与格式白名单由应用层强制** |
 | 一单一号 | `form_data.biz_no` 与 `flow_instance.biz_no` 双向唯一 |
 | 会签同节点多任务 | `flow_task.node_instance_id` 一对多；`flow_node_instance` 上唯一约束为 `(instance_id, node_key)`，其中 `node_key = concat(node_seq,":",node_code,":",IFNULL(dept_id,0))`。**理由**：MySQL 唯一键对 `NULL` 视为互不相同，裸 `dept_id` 无法约束 `dept_id IS NULL` 的模板固定节点，会重复插入（O17） |
+| 组织负责人唯一 | `sys_org_leader` 唯一键为 `(org_id, user_id, leader_type, category_key)`，`category_key` 是 `IFNULL(category,'')` 的**生成列**。**理由**：`category` 可空，MySQL 唯一键对 `NULL` 不去重，裸 `category` 会让「同一组织 / 同一人 / 同一 `leader_type`、`category IS NULL`」的行无限重复（2026-10-04 实测：夹具每次执行都堆积重复负责人行）。业务语义不变（NULL 与 NULL 同组、非 NULL 按值区分），与 `sys_user_role.scope_org_key` 同一先例 |
+| 回退重审的「本轮」边界 | `flow_node_instance.started_at` = **本轮**开始时间：每次激活（含被「回退上一节点」退回后重新 active）都刷新为当前时间；本轮决议只统计 `flow_task.created_at >= started_at` 的任务（`FlowTaskMapper.xml#selectRoundPrimaryByNodeInstance`）。**理由**：任务只追加不复用，若沿用「首次开始时间」，回退重审会沿用上一轮同意票、节点未经重新审批即通过（2026-10-03 运行期实测发现）。**不得**回退为 `IFNULL(started_at, NOW())` 或「首次开始时间」 |
 | 补件轮次唯一 | `flow_supplement` 唯一键 `(instance_id, supplement_round)`；轮次在**请求补件时**占位（第 N 次请求即第 N 轮），提交补件不改轮次，超时未补沿用同一轮 |
 | 流转序号唯一 | `flow_routing` 唯一键 `(instance_id, seq)` |
 | 流转次数口径 | `flow_instance.routing_count` 只计 `route` 与 `rollback`（≤5），**不含** `back_home`；连续 `back_home` ≤2 由 `flow_routing` 按 `seq` 的连续记录判定（REQ-FLOW-022 / 024）；动作值域 `route` / `rollback` / `back_home`（旧值 `return_node` 作废） |

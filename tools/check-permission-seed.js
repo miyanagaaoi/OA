@@ -87,10 +87,17 @@ const GROUP_REPORT_ROLES = ['group_leader', 'chairman'];
 const GROUP_REPORT_NODE = 'admin:report';
 const GROUP_REPORT_EXPORT = 'admin:report:export';
 
-/** 仅 `admin` 可持有的权限项（改派 / 终止 / 主数据导出 / 权限树勾选 / 报表导出） */
+/**
+ * **终止流程**（`flow:task:terminate`）的授权口径：AC-49「系统管理员**与集团分管领导**可终止」，
+ * PRD 附录A 权限矩阵「终止流程」行同口径（`doc/prd-0.1.md` 第 655 / 764 行）。
+ * 故它**不属于** `ADMIN_ONLY_CODES`（那不是「仅 admin」），持有人必须**恰为**下面这两个角色。
+ */
+const TERMINATE_ROLES = ['admin', 'group_leader'];
+const TERMINATE_CODE = 'flow:task:terminate';
+
+/** 仅 `admin` 可持有的权限项（改派 / 主数据导出 / 权限树勾选 / 报表导出） */
 const ADMIN_ONLY_CODES = [
   'flow:task:reassign',
-  'flow:task:terminate',
   'admin:user:export',
   'admin:role:grant',
   'admin:report:export',
@@ -529,6 +536,23 @@ function check(text, errors, warnings) {
     }
   }
 
+  // --- 9d2：终止流程持有角色恰为 {admin, group_leader}（AC-49，PRD 655 / 764 行） ----
+  if (!byCode.has(TERMINATE_CODE)) {
+    errors.push(`终止权限在权限树中不存在：${TERMINATE_CODE}`);
+  } else {
+    const holders = ROLE_WHITELIST.filter((role) => (grantedByRole.get(role) || new Set()).has(TERMINATE_CODE));
+    for (const role of ROLE_WHITELIST) {
+      const held = holders.includes(role);
+      const expected = TERMINATE_ROLES.includes(role);
+      if (held && !expected) {
+        errors.push(`终止权限被下放给非授权角色：${role} -> ${TERMINATE_CODE}（AC-49 仅系统管理员与集团分管领导可终止）`);
+      }
+      if (!held && expected) {
+        errors.push(`角色缺少终止权限：${role} -> ${TERMINATE_CODE}（AC-49 / PRD 附录A 权限矩阵「终止流程」行）`);
+      }
+    }
+  }
+
   // --- 9e：祖先闭包（PermissionTreePolicy.requireAncestorClosed 同口径） -------
   // 「父节点未授予时子节点不得单独授予」——服务端对违规集合一律 400，故种子必须同口径。
   for (const [role, set] of grantedByRole) {
@@ -589,6 +613,9 @@ function check(text, errors, warnings) {
     rolesWithGrants: grantedByRole.size,
     grantedPerRole,
     adminOnlyCodes: ADMIN_ONLY_CODES,
+    terminateRoles: TERMINATE_ROLES,
+    terminateHolders: ROLE_WHITELIST.filter((role) =>
+      (grantedByRole.get(role) || new Set()).has(TERMINATE_CODE)),
     sectionOrder: {
       firstRoleInsert: marks.firstRole,
       firstPermissionInsert: marks.firstPermission,

@@ -73,13 +73,14 @@ import org.junit.jupiter.api.Test;
  *   <li>受控表漏标记（有人新增裸查询 / 直连接口）→ 40303 fail-closed。</li>
  * </ul>
  *
- * <p><b>开启方式</b>（夹具 SQL 放在 {@code .cache/}，不入库）：
+ * <p><b>开启方式</b>（夹具默认读**已入库**的 {@code oa-deploy/fixtures/40-authz-matrix.sql}）：
  * <pre>
  * mvn -B test -Dtest=AuthzMatrixMySqlIntegrationTest `
  *     "-Doa.it.db.url=jdbc:mysql://127.0.0.1:3306/oa?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=Asia/Shanghai" `
- *     -Doa.it.db.user=oa -Doa.it.db.password=*** -Doa.it.fixture=..\.cache\oa-authz-matrix-fixture.sql
+ *     -Doa.it.db.user=oa -Doa.it.db.password=*** -Doa.it.fixture=..\oa-deploy\fixtures\40-authz-matrix.sql
  * </pre>
- * 未提供连接参数时整类跳过（CI 无库时不会红）。
+ * 未提供连接参数时整类跳过（CI 无库时不会红）。<b>但「已提供连接参数却找不到夹具」是失败，不是跳过</b>
+ * （见 {@link AuthzMatrixFixture}）：夹具缺失时静默跳过 = 测试全绿而覆盖为零。
  */
 class AuthzMatrixMySqlIntegrationTest {
 
@@ -105,7 +106,7 @@ class AuthzMatrixMySqlIntegrationTest {
     private static final String USERS = "com.oa.matrix.MatrixMapper.countUsers";
     private static final String USERS_BARE = "com.oa.matrix.MatrixMapper.countUsersBare";
 
-    /** 夹具账号（`.cache/oa-authz-matrix-fixture.sql`）。 */
+    /** 夹具账号（`oa-deploy/fixtures/40-authz-matrix.sql`）。 */
     private static final long CA = 201L;
     private static final long DL = 202L;
     private static final long GL = 203L;
@@ -437,14 +438,16 @@ class AuthzMatrixMySqlIntegrationTest {
 
     // ================================================================ 夹具与环境
 
-    /** 执行 `-Doa.it.fixture` 指向的夹具 SQL（默认 {@code ../.cache/oa-authz-matrix-fixture.sql}）。 */
+    /**
+     * 执行夹具 SQL（默认 {@code ../oa-deploy/fixtures/40-authz-matrix.sql}，可被
+     * {@code -Doa.it.fixture} / {@code OA_IT_FIXTURE} 覆盖）。
+     *
+     * <p>本方法只在 {@code url} 非空（= 已提供 DB 环境）时被调用；此时夹具缺失一律**失败**
+     * 而不是跳过，缺失信息由 {@link AuthzMatrixFixture#resolve(String)} 给出。
+     */
     private static void applyFixture(String url, String user, String password) throws Exception {
-        String fixturePath = config("oa.it.fixture", "OA_IT_FIXTURE");
-        if (fixturePath.isBlank()) {
-            fixturePath = Path.of("..", ".cache", "oa-authz-matrix-fixture.sql").toString();
-        }
-        Path path = Path.of(fixturePath);
-        assumeTrue(Files.isReadable(path), "未找到夹具 SQL（-Doa.it.fixture 或 " + path.toAbsolutePath() + "），跳过矩阵测试");
+        Path path = AuthzMatrixFixture.resolve(url);
+        assumeTrue(path != null, "未提供 -Doa.it.db.url / OA_IT_DB_URL，跳过越权矩阵测试");
         String script = Files.readString(path, StandardCharsets.UTF_8);
         try (Connection connection = DriverManager.getConnection(url, user, password);
              Statement statement = connection.createStatement()) {

@@ -67,7 +67,7 @@ mysql -uoa -p -e "DROP DATABASE IF EXISTS oa; CREATE DATABASE oa DEFAULT CHARSET
 # 启动应用后由 Flyway 自动执行 V1 → V2 → V3 → V4
 ```
 
-期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=374`。
+期望：`flyway_schema_history` 里 **V1~V4 全部 `success=1`**；`sys_role=9`、`sys_permission=94`、`sys_role_permission=375`。
 
 > **生成产物是确定性的，可安全重跑**：`tools/gen-init-sql.js` 与 `tools/build-flyway-migrations.js` 的产物头部只有
 > 确定性溯源行（生成器自身 sha256 + 来源内容 sha256），**不含墙钟时间戳**，因此「同一输入 → 逐字节相同」，
@@ -88,7 +88,7 @@ Flyway 的 `V1~V4` **只播种角色 / 权限 / 字典 / 流程模板，不播�
 | 1 | [`fixtures/10-dev-orgs.sql`](fixtures/10-dev-orgs.sql) | 四级演示组织（集团 → 2 家公司 → 部门 → 科室）+ 集团财务部 + 被弄丢的 `RT-*` 样例组织 |
 | 2 | [`fixtures/20-dev-people.sql`](fixtures/20-dev-people.sql) | 演示人员 + 一人多岗 + **负责人链** ⇒ 四类单据 precheck 跑到 `allowed=true` |
 | 3 | [`fixtures/30-dev-roles.sql`](fixtures/30-dev-roles.sql) | 演示账号 → 9 个内置角色（覆盖 `company_admin`/`dept_leader`/`group_leader`/`employee`） |
-| 4 | [`fixtures/40-authz-matrix.sql`](fixtures/40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链） |
+| 4 | [`fixtures/40-authz-matrix.sql`](fixtures/40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链 + **`sys_user.id=1` 的系统管理员占位行**，两个数据域集成测试依赖它） |
 | 5 | [`fixtures/50-trigger-fixture.sql`](fixtures/50-trigger-fixture.sql) | AC-20 触发器验收所需的 `sys_log` / `flow_signature` 行（§5 第 3/4 条的前提） |
 | 6 | [`fixtures/99-verify.sql`](fixtures/99-verify.sql) | **只读断言**：关键行数逐条 `PASS`/`FAIL` |
 | — | [`fixtures/90-dev-admin.md`](fixtures/90-dev-admin.md) | 生成 BCrypt 哈希并插入 `admin`（**口令由你自定**，仓库不含任何可用口令） |
@@ -114,9 +114,12 @@ oa-deploy\runtime\start-local.cmd          # 等 /actuator/health 返回 UP（Fl
 # 最后 fixtures/99-verify.sql 应 16/16 PASS
 ```
 
-> **幂等**：所有夹具脚本都是显式主键 + upsert（`sys_org_leader` 例外：其唯一键含可空列 `category`，
-> MySQL 对 NULL 不去重，故改为「清空夹具拥有的组织 + 重建」），**反复执行不产生重复数据**。
-> 已在临时库上从零验证：同一套迁移 + 夹具 + 断言 16/16 PASS，重复执行行数不变。
+> **幂等**：所有夹具脚本都是显式主键 + upsert，**反复执行不产生重复数据**。
+> `sys_org_leader` 此前是例外（唯一键含可空列 `category`，MySQL 对 NULL 不去重），现已在真源
+> `doc/data-model.md` §2.3 修掉：`category_key GENERATED ALWAYS AS (IFNULL(category,'')) STORED`
+> 纳入唯一键 `uk_org_leader (org_id, user_id, leader_type, category_key)`，负责人链因此也改回**直接 upsert**
+> （飞轮路径：改 `doc/data-model.md` → `node tools/gen-init-sql.js` → `node tools/build-flyway-migrations.js` → 重置库）。
+> 已在临时库上从零验证：同一套迁移 + 夹具 + 断言 16/16 PASS，重复执行行数不变（连跑两次 `sys_org_leader` 行数一致）。
 
 ## 5. 启动后自检清单（5 分钟）
 

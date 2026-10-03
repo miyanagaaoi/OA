@@ -11,8 +11,8 @@ description:
   en: >
       Only explicitly authorized nodes may jump (off by default, enabled per node in the template); a reason is mandatory and every jump is written to the audit log and approval trail. Unauthorized calls are rejected and completed approvals are never altered.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:48:17.651Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.322Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

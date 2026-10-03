@@ -24,7 +24,9 @@
 -- 幂等：显式主键 + `INSERT ... ON DUPLICATE KEY UPDATE`。
 --   唯一键：`sys_user.PRIMARY KEY (id)` / `sys_user.uk_sys_user_account (account)`；
 --           `sys_user_position.uk_user_org (user_id, org_id)`；
---           `sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category)`。
+--           `sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category_key)`
+--           （`category_key` = `IFNULL(category,'')` 的生成列，见 doc/data-model.md §2.3，
+--            故 NULL 与 NULL 视为同一组、可安全 upsert）。
 -- 前置：10-dev-orgs.sql；Flyway V1~V4（角色/权限已播种）。
 -- 执行：见 ./README.md「执行顺序」。
 --
@@ -86,22 +88,13 @@ ON DUPLICATE KEY UPDATE
   is_primary = VALUES(is_primary), position = VALUES(position), remark = VALUES(remark);
 
 -- ---------------------------------------------------------------- 3) 负责人链（审批人解析的唯一权威来源）
--- ⚠️ 为什么不用单纯的 INSERT ... ON DUPLICATE KEY UPDATE：
---   `sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category)` 含**可空列 category**，
---   而 MySQL 唯一索引对 NULL **不去重** —— 直接 upsert 会在重复执行时**不断新增重复负责人行**。
---   所以这里三步走：① 归一历史重复行 → ② 清空本夹具**拥有的组织**的负责人配置 → ③ 重建。
+-- 幂等写法：**直接 upsert**（不再需要「归一重复 → 清空 → 重建」特例）。
+--   `sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category_key)` 的 `category_key`
+--   是 `category` 的生成列（`IFNULL(category,'')`，见 doc/data-model.md §2.3）——
+--   这修掉了「唯一键含可空列 `category`、MySQL 唯一索引对 NULL 不去重 → 重复执行不断堆积重复负责人行」
+--   的缺陷（业务语义不变：NULL 与 NULL 同组、非 NULL 仍按值区分）。
 --   **归属约定**：`sys_org_leader` 中 org_id ∈ {1, 12, 135, 138, 150} 的行由本夹具独占
 --   （这五个组织也由 10-dev-orgs.sql 定义）；如需手工加负责人，请用别的组织节点。
---   本表无外键指向它，删除是安全的；结果与执行次数无关（这五个组织恒为 7 条负责人行）。
-DELETE l FROM sys_org_leader l
-  JOIN sys_org_leader k
-    ON k.org_id = l.org_id AND k.user_id = l.user_id
-   AND k.leader_type = l.leader_type
-   AND k.category <=> l.category          -- NULL 安全等值（两侧同为表列 → 不涉及 collation 混用）
-   AND k.id < l.id;
-
-DELETE FROM sys_org_leader WHERE org_id IN (1, 12, 135, 138, 150);
-
 INSERT INTO sys_org_leader (org_id, user_id, leader_type, duty_title, category, sort_no, remark) VALUES
   (135, @u_dl01, 'primary', '部门1 负责人',   NULL,      0, '① dept_leader_upward'),
   (138, @u_sc01, 'primary', '科室1 负责人',   NULL,      0, '① 上溯起点（科室已设负责人时直接命中）'),
@@ -109,7 +102,11 @@ INSERT INTO sys_org_leader (org_id, user_id, leader_type, duty_title, category, 
   (12,  @u_dl01, 'deputy',  '公司A 分管领导', NULL,      0, '③ branch_leader'),
   (1,   @u_gl01, 'primary', '集团董事长',     NULL,      0, '⑥ chairman'),
   (1,   @u_gl01, 'primary', '集团分管领导',   'economy', 0, '⑤ group_leader（经济线）'),
-  (150, @u_ca01, 'primary', '财务部负责人',   NULL,      0, '② finance_owner');
+  (150, @u_ca01, 'primary', '财务部负责人',   NULL,      0, '② finance_owner')
+ON DUPLICATE KEY UPDATE
+  duty_title = VALUES(duty_title),
+  sort_no    = VALUES(sort_no),
+  remark     = VALUES(remark);
 
 -- ---------------------------------------------------------------- 4) 冗余主负责人回填（sys_org.leader_id）
 UPDATE sys_org o

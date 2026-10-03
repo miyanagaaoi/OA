@@ -11,8 +11,8 @@ description:
   en: >
       A 140px sticky in-page index on the right of the form from 1440px up: it lists all section titles, highlights the current section in primary text colour and scrolls to a section on click; on narrower screens it disappears and the section header bands take over navigation.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.782Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.278Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

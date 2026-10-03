@@ -11,8 +11,8 @@ description:
   en: >
       Fund-only content: the plan category and payment belong checkboxes, stored but unused in phase one (Q8/Q9, never referenced by flow conditions, data-scope filters or timeout rules), plus payee-account encryption and role masking.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:47:04.570Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.209Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

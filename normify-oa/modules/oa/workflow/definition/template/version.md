@@ -11,9 +11,9 @@ description:
   en: >
       Version accumulation and lifecycle (draft/published/archived): open a new draft from a published version, bump version and record published_at on publish, never overwrite history; in-flight instances stay on the version captured at submission (REQ-FLOW-006, AC-09).
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:48:17.650Z"
-fingerprint: 096973f1fba51dd7db650df9d8f89410da3245f99fe2654f82416f2b8bc3909e
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.301Z"
+fingerprint: 6d9cef647f836df43b112d559d9426ebc050ad12b109eafc2db793d5d2a1b3b1
 source:
   - path: "doc/prd-0.1.md"
     line: 349

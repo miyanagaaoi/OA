@@ -101,7 +101,7 @@
 > - **1.8 组织人员维护** ⏳ 部分：组织与人员**管理界面 + 组织导出已就绪**；Excel/CSV 批量导入（五张模板，按 `import-spec.md`）与其余导出待做
 > - **1.9 设计基座** ✅：`tokens.scss` 逐项对齐 `DESIGN.md`、Element Plus 主题覆写、A4 打印样式、水印/三态/状态徽标组件、管理后台版式（`DESIGN.md` 已补 `admin-org-console` 受控例外）
 > - **验证口径**：后端 `mvn -B test` **268 个单测全绿**（数据域 SQL 与织入参数绑定、守卫、自读不变式、在途/强制继续、层级与 path 级联、主岗唯一、正职唯一、契约与审计、Jackson 序列化、CSV 导出、不可篡改触发器脚本解析等）；前端 `vue-tsc` ×2 + `vite build` 通过；CI 9 项检查全绿
-> - **系统已真实运行**（2026-10-02）：Flyway V1~V4 全新库全部 `success=1`，种子 9 角色 / 94 权限 / 374 授权，`admin` 登录后 `/auth/me` 返回 94 项权限与 `isSuperAdmin`，组织架构 / 人员管理 / 角色与权限 / 权限变更日志四页在真实数据下渲染通过。启动方式见 [`../oa-deploy/LOCAL-DEV.md`](../oa-deploy/LOCAL-DEV.md)
+> - **系统已真实运行**（2026-10-02）：Flyway V1~V4 全新库全部 `success=1`，种子 9 角色 / 94 权限 / 374 授权（**该日期的事实；AC-49 口径对齐后现为 375 授权**：`group_leader` 增授 `flow:task:terminate`，见 `tools/gen-permission-seed.js` 的 `GROUP_LEADER_TERMINATE`），`admin` 登录后 `/auth/me` 返回 94 项权限与 `isSuperAdmin`，组织架构 / 人员管理 / 角色与权限 / 权限变更日志四页在真实数据下渲染通过。启动方式见 [`../oa-deploy/LOCAL-DEV.md`](../oa-deploy/LOCAL-DEV.md)
 > - **阶段 1 = ✅ 已关闭（2026-10-03）**：1.6 字段级限制（金额只读 40306 / 导出策略 7 目标列白名单 + JSON 任意层级金额键剔除 / 手机号脱敏**唯一实现**）、1.7 手机号 **AES-256-GCM** 落库（密钥缺失 fail-fast、历史明文兼容 + 幂等迁移、keyId 轮换就位）、1.8 **五类 CSV 批量导入**（preview 干跑 + commit 事务、错误零落库、幂等、数据域逐行 fail-closed）、以及 DoD 要求的**逐接口越权矩阵**（SQL 层 9 例 + HTTP 层 12 例，覆盖 5 角色 × 8 入口、手改 URL、直连接口、换 id、未登录）。
 >   - 矩阵测试**抓出并修复一个真实提权口**：`PermissionTreeService` 权限树读/写原本无任何角色判定（任意登录用户可读可写）→ 收紧为仅系统管理员（REQ-ADMIN-003）。
 >   - 顺带修正两处既有缺陷：人员**工号判重**原为数据域口径（域外重复工号会被**静默写入**，因 `employee_no` 无库唯一键）→ 改系统口径；`DataScopeMapperGuardTest` 的 yml 解析器遇整行注释会提前 `break`，**守卫本身曾静默失效**，已修并补断言。

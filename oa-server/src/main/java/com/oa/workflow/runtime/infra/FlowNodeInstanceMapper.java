@@ -64,7 +64,12 @@ public interface FlowNodeInstanceMapper {
     /** 仅改状态。 */
     int updateStatus(@Param("id") Long id, @Param("status") String status);
 
-    /** 激活：{@code status='active'}、{@code started_at=IFNULL(started_at, NOW())}、清 {@code finished_at}。 */
+    /**
+     * 激活：{@code status='active'}、{@code started_at=NOW()}（**本轮**开始时间，每次激活都刷新）、
+     * 清 {@code finished_at}。刻意不用 {@code IFNULL(started_at, NOW())}：节点可被「回退上一节点」
+     * 重新激活，而本轮决议只能数本轮任务，轮次边界就是 {@code started_at}
+     * （见 {@code FlowTaskMapper#selectRoundPrimaryByNodeInstance} 与 {@code doc/data-model.md} §5.2 / §8.2）。
+     */
     int activate(@Param("id") Long id);
 
     /** 结束：{@code status=#{status}}、{@code finished_at=NOW()}。 */

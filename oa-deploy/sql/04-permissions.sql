@@ -19,7 +19,7 @@
 --
 -- 【规模】
 --   角色 9 个；权限项合计 94 项：menu 82 + button 12 + api 0；
---   顶层节点 20 个，最大深度 2 层；授权行 374 行。
+--   顶层节点 20 个，最大深度 2 层；授权行 375 行。
 --   说明：任务书建议规模 60–90 项，但其「至少覆盖」清单本身展开即需 94 行
 --   （含 82 个页面级菜单/分组节点）；已裁定**接受 94 项**，不再删减。
 --
@@ -62,7 +62,7 @@
 --     · sys_role 命中 uk_sys_role_code(code)，只覆盖 name/role_scope/data_scope（**不改 code、不改 remark**）；
 --     · sys_permission 命中 uk_sys_permission_code(code)，只覆盖 name/url/sort_no；
 --     · sys_role_permission 命中 uk_role_permission(role_id, permission_id)，重复执行不产生重复行；
---   因此本文件可**重复执行**，且执行后：角色 9 行、权限项 94 行、授权 374 行。
+--   因此本文件可**重复执行**，且执行后：角色 9 行、权限项 94 行、授权 375 行。
 --   注意（已知限制）：sys_permission 的 ON DUPLICATE 分支**不重排 parent_id**。若已有环境的树形结构需要改挂
 --   父节点，请先在测试库 DELETE FROM sys_permission（生产环境请走「权限树勾选」界面，并留存审计 before/after），
 --   再整体重跑本文件。
@@ -93,7 +93,7 @@
 --   | branch_leader  |  33 | 员工基础包 + 审批动作包
 --   | subsidiary_gm  |  33 | 员工基础包 + 审批动作包
 --   | finance_owner  |  40 | 员工基础包 + 审批动作包 + 财务归口查看项（集团层报表查看，不含报表导出）
---   | group_leader   |  40 | 员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内
+--   | group_leader   |  41 | 员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）+ **终止流程**（AC-49 / 附录A 权限矩阵）；`portal:detail:*` 已在基础包内
 --   | chairman       |  40 | 员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内
 --   关键口径（越权防护的种子层保障）：
 --     · admin               = 全部权限；
@@ -103,14 +103,19 @@
 --                             **不含 admin:authz:*、admin:system:*** —— 体现 PRD 5.2「分公司管理员不可再授权」；
 --     · employee            = 门户基础包 + flow:task:withdraw（可撤回自己发起的单据，PRD 6.4）；
 --                             **不含任何审批动作**（同意/驳回/加签/流转/回退/补件/终止/改派）；
---     · 6 个审批角色         = employee 基础包 + flow:* 审批动作包（不含 改派 / 终止）；
+--     · 6 个审批角色         = employee 基础包 + flow:* 审批动作包（不含 改派 / 撤回 / 终止）；
+--                             **terminate 仅 group_leader 追加**（AC-49：系统管理员与集团分管领导可终止）；
 --     · finance_owner       = 审批角色包 + 财务归口查看项（admin:report:* 除 admin:report:export）；
---     · group_leader/chairman = 审批角色包 + 集团层报表查看（admin:report:* 除 admin:report:export）；
+--     · group_leader        = 审批角色包 + 集团层报表查看（admin:report:* 除 admin:report:export）
+--                             + **flow:task:terminate 终止流程**（AC-49 / 附录A 权限矩阵「终止流程」行）；
+--     · chairman            = 审批角色包 + 集团层报表查看（admin:report:* 除 admin:report:export）；
 --                             portal:detail:* 已在基础包内，故与 dept_leader 的差异仅在报表。
---   仅 admin 持有的权限项（5 项，理由逐条见下方授权段注释）：
---     flow:task:reassign、flow:task:terminate、admin:user:export、admin:role:grant、admin:report:export
---     —— 改派是系统管理员兜底动作、终止是管理员动作；主数据导出（import-spec §9.2 T-11）、
+--   仅 admin 持有的权限项（4 项，理由逐条见下方授权段注释）：
+--     flow:task:reassign、admin:user:export、admin:role:grant、admin:report:export
+--     —— 改派是系统管理员兜底动作（AC-52）；主数据导出（import-spec §9.2 T-11）、
 --        权限树勾选（PRD 5.2 不可再授权）、报表导出（与 T-11 同口径的导出治理）同理。
+--   ⚠ **终止（flow:task:terminate）不在上式**：AC-49 与附录A 权限矩阵都写明
+--     「系统管理员**与集团分管领导**可终止」，故它归 group_leader（holders 恰为 {admin, group_leader}）。
 --   ⚠ 授权的**祖先闭包**：本文件为每个角色补齐「到达每个被授予节点的全部祖先」，
 --     因为 oa-server 的 PermissionTreePolicy.requireAncestorClosed 规定「父未授予时子不得单独授予」，
 --     违规集合一律 400。种子必须与界面勾选（el-tree 联动）同口径。
@@ -670,7 +675,7 @@ ON DUPLICATE KEY UPDATE name = VALUES(name), url = VALUES(url), sort_no = VALUES
 
 -- ===== 角色 admin（系统管理员）：94 项 =====
 -- 范围：全部权限（含全部 admin:* 与 flow:*）
--- 仅 admin 权限项（本角色持有 5 项）：flow:task:reassign、flow:task:terminate、admin:user:export、admin:role:grant、admin:report:export
+-- 仅 admin 权限项（本角色持有 4 项）：flow:task:reassign、admin:user:export、admin:role:grant、admin:report:export
 -- admin 系统管理员：共 94 项（第 1/12 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
@@ -1003,9 +1008,9 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'finance_owner'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- ===== 角色 group_leader（集团分管领导）：40 项 =====
--- 范围：员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内
--- group_leader 集团分管领导：共 40 项（第 1/5 段）
+-- ===== 角色 group_leader（集团分管领导）：41 项 =====
+-- 范围：员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）+ **终止流程**（AC-49 / 附录A 权限矩阵）；`portal:detail:*` 已在基础包内
+-- group_leader 集团分管领导：共 41 项（第 1/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -1013,7 +1018,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 2/5 段）
+-- group_leader 集团分管领导：共 41 项（第 2/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -1021,7 +1026,7 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 3/5 段）
+-- group_leader 集团分管领导：共 41 项（第 3/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
@@ -1029,19 +1034,27 @@ SELECT r.id, p.id, NULL
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 4/5 段）
+-- group_leader 集团分管领导：共 41 项（第 4/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:task:reject', 'flow:task:addsign', 'flow:task:transfer', 'flow:task:route', 'flow:task:rollback', 'flow:supplement:request', 'flow:task:withdraw', 'flow:print')
+  JOIN sys_permission p ON p.code IN ('flow:task:reject', 'flow:task:addsign', 'flow:task:transfer', 'flow:task:route', 'flow:task:rollback', 'flow:supplement:request', 'flow:task:withdraw', 'flow:task:terminate')
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
--- group_leader 集团分管领导：共 40 项（第 5/5 段）
+-- group_leader 集团分管领导：共 41 项（第 5/6 段）
 INSERT INTO sys_role_permission (role_id, permission_id, created_by)
 SELECT r.id, p.id, NULL
   FROM sys_role r
-  JOIN sys_permission p ON p.code IN ('flow:export', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog', 'admin:report:efficiency')
+  JOIN sys_permission p ON p.code IN ('flow:print', 'flow:export', 'admin:report', 'admin:report:volume', 'admin:report:duration', 'admin:report:reject', 'admin:report:timeout', 'admin:report:backlog')
+ WHERE r.code = 'group_leader'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
+
+-- group_leader 集团分管领导：共 41 项（第 6/6 段）
+INSERT INTO sys_role_permission (role_id, permission_id, created_by)
+SELECT r.id, p.id, NULL
+  FROM sys_role r
+  JOIN sys_permission p ON p.code IN ('admin:report:efficiency')
  WHERE r.code = 'group_leader'
 ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
@@ -1129,7 +1142,7 @@ SELECT perm_type, COUNT(*) AS cnt FROM sys_permission GROUP BY perm_type ORDER B
 --   branch_leader   33 行
 --   subsidiary_gm   33 行
 --   finance_owner   40 行
---   group_leader    40 行
+--   group_leader    41 行
 --   chairman        40 行
 SELECT r.code AS role_code, COUNT(*) AS granted
   FROM sys_role_permission rp
@@ -1179,12 +1192,6 @@ SELECT 'flow:task:reassign 非 admin 授权数（期望 0）' AS check_item, COU
   JOIN sys_role r ON r.id = rp.role_id
   JOIN sys_permission p ON p.id = rp.permission_id
  WHERE p.code = 'flow:task:reassign' AND r.code <> 'admin'
-UNION ALL
-SELECT 'flow:task:terminate 非 admin 授权数（期望 0）' AS check_item, COUNT(*) AS cnt
-  FROM sys_role_permission rp
-  JOIN sys_role r ON r.id = rp.role_id
-  JOIN sys_permission p ON p.id = rp.permission_id
- WHERE p.code = 'flow:task:terminate' AND r.code <> 'admin'
 UNION ALL
 SELECT 'admin:user:export 非 admin 授权数（期望 0）' AS check_item, COUNT(*) AS cnt
   FROM sys_role_permission rp
@@ -1237,5 +1244,15 @@ SELECT r.code AS role_code, COUNT(rc.id) AS category_count
   FROM sys_role r
   LEFT JOIN sys_role_category rc ON rc.role_id = r.id
  WHERE r.data_scope = 'group_category'
+ GROUP BY r.code
+ ORDER BY r.code;
+
+-- ⑫ 终止流程授权分布（AC-49 / PRD 附录A 权限矩阵「终止流程」行）：期望恰好两行 admin=1、group_leader=1
+-- flow:task:terminate 的角色分布：期望恰好两行 —— admin=1、group_leader=1（AC-49 / PRD 附录A 权限矩阵）
+SELECT r.code AS role_code, COUNT(*) AS cnt
+  FROM sys_role_permission rp
+  JOIN sys_role r ON r.id = rp.role_id
+  JOIN sys_permission p ON p.id = rp.permission_id
+ WHERE p.code = 'flow:task:terminate'
  GROUP BY r.code
  ORDER BY r.code;

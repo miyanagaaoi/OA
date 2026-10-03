@@ -11,8 +11,8 @@ description:
   en: >
       The four-step surface ladder (canvas through surface-2) and the two hairline weights (hairline and hairline-strong): layers are expressed in order and never skipped, cards and panels are white with a 1px hairline, and depth comes from the surface ladder rather than shadows.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.686Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.200Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

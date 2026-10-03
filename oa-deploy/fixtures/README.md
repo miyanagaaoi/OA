@@ -16,7 +16,7 @@
 | 1 | [`10-dev-orgs.sql`](10-dev-orgs.sql) | 四级演示组织（集团 → 2 家公司 → 部门 → 科室）+ 集团财务部 + 被弄丢的 `RT-*` 样例组织 |
 | 2 | [`20-dev-people.sql`](20-dev-people.sql) | 演示人员（各角色样本）+ 一人多岗 + **负责人链**（四类单据 precheck 跑到 `allowed=true` 的必要条件） |
 | 3 | [`30-dev-roles.sql`](30-dev-roles.sql) | 演示账号 → 9 个内置角色（覆盖矩阵测试需要的 `company_admin` / `dept_leader` / `group_leader` / `employee`） |
-| 4 | [`40-authz-matrix.sql`](40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链） |
+| 4 | [`40-authz-matrix.sql`](40-authz-matrix.sql) | 越权矩阵固定夹具（`mtx_*` 账号 + 四级组织链 + **`sys_user.id=1` 的系统管理员占位行**） |
 | 5 | [`50-trigger-fixture.sql`](50-trigger-fixture.sql) | AC-20 不可篡改触发器验收夹具（`sys_log` / `flow_signature` 的 id=1 行） |
 | 6 | [`99-verify.sql`](99-verify.sql) | **只读**断言：关键行数逐条 PASS/FAIL |
 | — | [`90-dev-admin.md`](90-dev-admin.md) | **不是 SQL**：如何生成 BCrypt 哈希并插入 `admin`（口令由使用者自定，**仓库里不出现任何可用口令**） |
@@ -52,16 +52,16 @@ foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-auth
 | 脚本 | 幂等写法 | 依赖的唯一键 |
 | --- | --- | --- |
 | `10-dev-orgs.sql` | 显式主键 + `INSERT ... ON DUPLICATE KEY UPDATE` | `sys_org.PRIMARY KEY (id)`、`uk_sys_org_path (path)` |
-| `20-dev-people.sql` | 同上 + `INSERT ... ON DUPLICATE KEY UPDATE`（**刻意不更新 `password_hash`**）；子行按 `account` 反查 `user_id`；负责人链为「归一重复 → 清空夹具组织 → 重建」 | `sys_user.PRIMARY KEY (id)`、`uk_sys_user_account (account)`；`sys_user_position.uk_user_org (user_id, org_id)`；`sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category)`（含可空列，**必须**用清空重建而非 upsert） |
+| `20-dev-people.sql` | 同上 + `INSERT ... ON DUPLICATE KEY UPDATE`（**刻意不更新 `password_hash`**）；子行按 `account` 反查 `user_id`；负责人链为**直接 upsert** | `sys_user.PRIMARY KEY (id)`、`uk_sys_user_account (account)`；`sys_user_position.uk_user_org (user_id, org_id)`；`sys_org_leader.uk_org_leader (org_id, user_id, leader_type, category_key)`（`category_key` 是 `IFNULL(category,'')` 的**生成列**，NULL 与 NULL 视为同一组 → 可安全 upsert） |
 | `30-dev-roles.sql` | `INSERT ... SELECT ... WHERE r.code = ?` + `ON DUPLICATE KEY UPDATE` | `sys_user_role.uk_sys_user_role (user_id, role_id, scope_org_key)`（`scope_org_id` 为 NULL 时按 0 参与） |
-| `40-authz-matrix.sql` | 与 `10`/`20`/`30` 相同的显式主键 + `ON DUPLICATE KEY UPDATE` | 同上 |
+| `40-authz-matrix.sql` | 与 `10`/`20`/`30` 相同的显式主键 + `ON DUPLICATE KEY UPDATE`；`matrix_admin`（`sys_user.id=1`）用 `INSERT ... SELECT ... WHERE NOT EXISTS` **只补空缺** | 同上 + `sys_user.PRIMARY KEY (id)` |
 | `50-trigger-fixture.sql` | `INSERT ... SELECT ... WHERE NOT EXISTS (...)` | `sys_log.id`、`form_data.uk_form_data_biz_no`、`flow_instance.uk_flow_instance_biz_no`、`flow_signature.id` |
 
 **保留 id 段**（本目录约定，其它种子/脚本请避开）：
 
 | 段 | 用途 |
 | --- | --- |
-| `1` | 集团根节点 |
+| `1` | 集团根节点（`sys_org`）；**`sys_user.id=1` 由 `40-authz-matrix.sql` 占位**（`matrix_admin`） |
 | `12` / `13` | 公司A / 公司B |
 | `135`–`138` | 部门1 / 部门2 / 部门3 / 科室1 |
 | `150` | 集团财务部 |
@@ -73,11 +73,20 @@ foreach ($f in '10-dev-orgs.sql','20-dev-people.sql','30-dev-roles.sql','40-auth
 > 一个脚本把另一个的账号改名，已拆开）。子行一律**按 `account` 反查真实 `user_id`**，
 > 因此即使库里某账号的 id 与预期不同，也不会产生外键悬空。
 >
+> ⚠️ **`sys_user.id=1` 是集成测试的硬依赖**：`DataScopeMySqlIntegrationTest`
+> （`oa-server/src/test/java/com/oa/common/scope/DataScopeMySqlIntegrationTest.java:114`）与
+> `AuthzMatrixMySqlIntegrationTest`（`:171`、`:222`）把**合成的当前登录人**写成 `userId = 1`，
+> 要求库里真实存在 id=1 的行。旧环境里 id=1 恰好是最早插入的 bootstrap admin，于是长期「假绿」；
+> 重置库后夹具不再提供该行 → 这两个用例立刻变红。故由 `40-authz-matrix.sql` 用
+> `matrix_admin`（占位哈希、不可登录）**确定性地占住 id=1**；若 id=1 已被占用（例如你手工建的
+> 真实 admin 就在 id=1），该语句整条跳过，绝不覆盖既有行的账号与口令。
+>
 > ⚠️ **`sys_org_leader` 的归属约定**：`org_id ∈ {1, 12, 135, 138, 150}` 的负责人行由
-> `20-dev-people.sql` 独占（每次执行会清空这五个组织的负责人配置后重建）。
-> 原因：其唯一键 `uk_org_leader (org_id, user_id, leader_type, category)` 含**可空列 `category`**，
-> 而 MySQL 唯一索引对 NULL **不去重** —— 若用普通 upsert，重复执行会不断堆积重复负责人行。
-> 需要手工加负责人时，请挂在别的组织节点上。
+> `20-dev-people.sql` 独占（其它脚本/手工操作请挂到别的组织节点上）。
+> 唯一键已是 `uk_org_leader (org_id, user_id, leader_type, category_key)`，其中 `category_key`
+> 是 `IFNULL(category,'')` 的**生成列**（`doc/data-model.md` §2.3）—— 这修掉了「唯一键含可空列
+> `category`、MySQL 对 NULL 不去重 → 重复执行不断堆积重复负责人行」的缺陷，
+> 因此负责人链现在是**直接 upsert**，不再需要「归一重复 → 清空 → 重建」的特例。
 
 ## 4. 重置库之后如何恢复到「可演示」
 
@@ -95,7 +104,7 @@ oa-deploy\runtime\start-local.cmd
 
 期望（与 `oa-deploy/LOCAL-DEV.md` §5 的自检清单一致）：
 
-- `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 374`、`flow_template = 4`
+- `sys_role = 9`、`sys_permission = 94`、`sys_role_permission = 375`、`flow_template = 4`
 - `sys_org ≥ 13`（含 5 个 `RT-*`）、`sys_user.dev_* = 7`、`sys_user.mtx_* = 5`
 - `sys_org_leader` 上 ①–⑥ 全部可解析 ⇒ 四类单据 precheck `allowed=true`
 - `information_schema.TRIGGERS`（schema `oa`）**= 4**，且 `UPDATE sys_log WHERE id=1` 报错
@@ -112,23 +121,29 @@ oa-deploy\runtime\start-local.cmd
 | `flow-leader-chain-fixture.sql` | 并入 [`20-dev-people.sql`](20-dev-people.sql)（负责人链段） |
 | `GenHash.java` | [`tools/GenHash.java`](tools/GenHash.java) |
 
-### 5.1 集成测试仍需显式指向本目录（`oa-server/**` 未改动）
+### 5.1 集成测试**默认**就读本目录（已收口）
 
-两个矩阵测试的夹具路径**默认仍写死在 `.cache/`**，但都可配置：
+两个矩阵测试的夹具**默认路径已指向本目录**（`oa-server/**` 已改，见
+`AuthzMatrixFixture`），因此新环境 `git clone` 后直接跑集成测试即可，无需再手工传路径：
 
 | 测试 | 默认路径 | 覆盖方式 |
 | --- | --- | --- |
-| `AuthzMatrixHttpTest`（`oa-server/src/test/java/com/oa/authz/matrix/AuthzMatrixHttpTest.java:485`） | `..\.cache\oa-authz-matrix-fixture.sql` | 系统属性 `-Doa.it.fixture=..\oa-deploy\fixtures\40-authz-matrix.sql` 或环境变量 `OA_IT_FIXTURE` |
-| `AuthzMatrixMySqlIntegrationTest` | 同上参数 `oa.it.fixture` | 同上 |
+| `AuthzMatrixHttpTest` | `../oa-deploy/fixtures/40-authz-matrix.sql`（相对 Maven `${basedir}` = `oa-server/`） | 系统属性 `-Doa.it.fixture=<路径>` 或环境变量 `OA_IT_FIXTURE` |
+| `AuthzMatrixMySqlIntegrationTest` | 同上（共用 `AuthzMatrixFixture.resolve`） | 同上 |
+
+**语义收紧（防「假绿」）**：完全没提供 DB 环境（`-Doa.it.db.url` / `OA_IT_DB_URL` 为空）→ 整类跳过（合法）；
+**已提供 DB 环境却找不到夹具 → 直接失败**（`IllegalStateException`，报错里给出可复制的
+`-Doa.it.fixture=oa-deploy\fixtures\40-authz-matrix.sql` 提示），不再 `assumeTrue` 静默跳过。
 
 ```powershell
-# 例：用入库夹具跑 HTTP 矩阵（其余 OA_IT_* 见测试类注释）
-mvn -f oa-server/pom.xml -B test "-Dtest=AuthzMatrixHttpTest" "-Doa.it.fixture=..\oa-deploy\fixtures\40-authz-matrix.sql"
+# 例：用入库夹具跑 HTTP 矩阵（其余 OA_IT_* 见测试类注释；夹具路径已可省略）
+mvn -f oa-server/pom.xml -B test "-Dtest=AuthzMatrixHttpTest"
 ```
 
 > 本目录的 `40-authz-matrix.sql` 与该测试的解析方式兼容：只用 `--` 行注释、`;` 结尾，
 > 测试的 `stripComments` + 按 `;` 切分可直接执行。
-> **建议后续把默认路径改到本目录**（属 `oa-server/**` 改动，本次未做，留给 `oa-server` 的负责人）。
+> 触发器夹具 `50-trigger-fixture.sql` **没有任何测试引用**（它是 `LOCAL-DEV.md` §5 第 3/4 条
+> 手工验收的前提），故不涉及默认路径改造。
 
 ## 6. 安全边界
 

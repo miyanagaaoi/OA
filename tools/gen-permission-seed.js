@@ -316,7 +316,7 @@ const EMPLOYEE_ACTIONS = [
   'flow:task:withdraw',
 ];
 
-/** 审批人动作包（6 个审批角色共有）；不含 改派 / 撤回 / 终止 */
+/** 审批人动作包（6 个审批角色共有）；不含 改派 / 撤回 / 终止（终止仅 `group_leader` 追加，见 `GROUP_LEADER_TERMINATE`） */
 const APPROVER_ACTIONS = [
   'flow',
   'flow:task:approve',
@@ -341,6 +341,22 @@ const EMPLOYEE_BASE = [...EMPLOYEE_PORTAL, ...EMPLOYEE_ACTIONS];
 
 /** 审批角色 = 员工角色 + 审批动作包 */
 const APPROVER_BASE = [...EMPLOYEE_BASE, ...APPROVER_ACTIONS];
+
+/**
+ * 集团分管领导（`group_leader`）额外持有的权限：**终止流程**（AC-49）。
+ *
+ * **口径取证（文档是唯一真源）**
+ *   · `doc/prd-0.1.md` AC-49（第 655 行）：「**系统管理员与集团分管领导**可终止（必填原因），
+ *     其他角色无入口；终止后单据不可再提交」；
+ *   · `doc/prd-0.1.md` 附录A 权限矩阵（第 764 行）「终止流程」行：系统管理员 ✓ / 集团分管领导 ✓ /
+ *     其余 6 个内置角色均为 `-`；
+ *   · 引擎侧放行条件本就是「系统管理员 ∪ 持有 `group_leader` 角色 ∪ 持有 `flow:task:terminate` 权限」
+ *     （`FlowEngineService#assertTerminable` 的类注释写明了这一点），即**运行行为已符合 PRD**，
+ *     只有种子漏授 group_leader —— 本常量按文档补齐，不新增任何权限项（`sys_permission` 仍 94 项）。
+ *
+ * 因此本项**不在** `ADMIN_ONLY_CODES` 内，而由专门的断言保证「持有人恰为 {admin, group_leader}」。
+ */
+const GROUP_LEADER_TERMINATE = ['flow:task:terminate'];
 
 const ROLE_GRANTS = [
   {
@@ -397,8 +413,8 @@ const ROLE_GRANTS = [
   {
     role: 'group_leader',
     roleName: ROLE_NAMES.group_leader,
-    scope: '员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）；`portal:detail:*` 已在基础包内',
-    include: [...APPROVER_BASE, 'portal:detail:*', ...GROUP_REPORT_VIEW],
+    scope: '员工基础包 + 审批动作包 + 集团层报表查看（不含报表导出）+ **终止流程**（AC-49 / 附录A 权限矩阵）；`portal:detail:*` 已在基础包内',
+    include: [...APPROVER_BASE, 'portal:detail:*', ...GROUP_REPORT_VIEW, ...GROUP_LEADER_TERMINATE],
     exclude: [...GROUP_REPORT_VIEW_EXCLUDE],
   },
   {
@@ -412,15 +428,16 @@ const ROLE_GRANTS = [
 
 /**
  * 仅 `admin` 持有的权限码（授权表注释与校验器共用同一份口径）：
- *   · `flow:task:reassign` 改派：PRD 口径为系统管理员兜底动作；
- *   · `flow:task:terminate` 终止：管理员动作；
+ *   · `flow:task:reassign` 改派：PRD 口径为系统管理员兜底动作（AC-52「仅系统管理员可改派」）；
  *   · `admin:user:export` 主数据导出（import-spec §9.2 T-11 仅系统管理员）；
  *   · `admin:role:grant` 权限树勾选、「分公司管理员不可再授权」（PRD 5.2）；
  *   · `admin:report:export` 报表导出（与 T-11 同口径的导出治理）。
+ *
+ * **`flow:task:terminate` 不在此列**：AC-49 明确「系统管理员**与集团分管领导**可终止」，
+ * 它归 `group_leader`，见 `GROUP_LEADER_TERMINATE`。
  */
 const ADMIN_ONLY_CODES = [
   'flow:task:reassign',
-  'flow:task:terminate',
   'admin:user:export',
   'admin:role:grant',
   'admin:report:export',
@@ -783,14 +800,19 @@ ${grantTable}
 --                             **不含 admin:authz:*、admin:system:*** —— 体现 PRD 5.2「分公司管理员不可再授权」；
 --     · employee            = 门户基础包 + flow:task:withdraw（可撤回自己发起的单据，PRD 6.4）；
 --                             **不含任何审批动作**（同意/驳回/加签/流转/回退/补件/终止/改派）；
---     · 6 个审批角色         = employee 基础包 + flow:* 审批动作包（不含 改派 / 终止）；
+--     · 6 个审批角色         = employee 基础包 + flow:* 审批动作包（不含 改派 / 撤回 / 终止）；
+--                             **terminate 仅 group_leader 追加**（AC-49：系统管理员与集团分管领导可终止）；
 --     · finance_owner       = 审批角色包 + 财务归口查看项（admin:report:* 除 admin:report:export）；
---     · group_leader/chairman = 审批角色包 + 集团层报表查看（admin:report:* 除 admin:report:export）；
+--     · group_leader        = 审批角色包 + 集团层报表查看（admin:report:* 除 admin:report:export）
+--                             + **flow:task:terminate 终止流程**（AC-49 / 附录A 权限矩阵「终止流程」行）；
+--     · chairman            = 审批角色包 + 集团层报表查看（admin:report:* 除 admin:report:export）；
 --                             portal:detail:* 已在基础包内，故与 dept_leader 的差异仅在报表。
 --   仅 admin 持有的权限项（${ADMIN_ONLY_CODES.length} 项，理由逐条见下方授权段注释）：
 --     ${ADMIN_ONLY_CODES.join('、')}
---     —— 改派是系统管理员兜底动作、终止是管理员动作；主数据导出（import-spec §9.2 T-11）、
+--     —— 改派是系统管理员兜底动作（AC-52）；主数据导出（import-spec §9.2 T-11）、
 --        权限树勾选（PRD 5.2 不可再授权）、报表导出（与 T-11 同口径的导出治理）同理。
+--   ⚠ **终止（flow:task:terminate）不在上式**：AC-49 与附录A 权限矩阵都写明
+--     「系统管理员**与集团分管领导**可终止」，故它归 group_leader（holders 恰为 {admin, group_leader}）。
 --   ⚠ 授权的**祖先闭包**：本文件为每个角色补齐「到达每个被授予节点的全部祖先」，
 --     因为 oa-server 的 PermissionTreePolicy.requireAncestorClosed 规定「父未授予时子不得单独授予」，
 --     违规集合一律 400。种子必须与界面勾选（el-tree 联动）同口径。
@@ -836,6 +858,17 @@ function renderSelfCheck(rows, grants, stats) {
   const categoryProbe = BUILT_IN_ROLES.filter((r) => r.dataScope === 'group_category')
     .map((r) => sqlStr(r.code))
     .join(', ');
+
+  const terminateProbe = GROUP_LEADER_TERMINATE.map(
+    (c) => `-- ${c} 的角色分布：期望恰好两行 —— admin=1、group_leader=1（AC-49 / PRD 附录A 权限矩阵）
+SELECT r.code AS role_code, COUNT(*) AS cnt
+  FROM sys_role_permission rp
+  JOIN sys_role r ON r.id = rp.role_id
+  JOIN sys_permission p ON p.id = rp.permission_id
+ WHERE p.code = ${sqlStr(c)}
+ GROUP BY r.code
+ ORDER BY r.code;`,
+  ).join('\n');
 
   return `-- =============================================================================
 -- 第 4 部分：自检 SQL（执行完本文件后逐条跑，核对期望值）
@@ -937,6 +970,9 @@ SELECT r.code AS role_code, COUNT(rc.id) AS category_count
  WHERE r.data_scope = 'group_category'
  GROUP BY r.code
  ORDER BY r.code;
+
+-- ⑫ 终止流程授权分布（AC-49 / PRD 附录A 权限矩阵「终止流程」行）：期望恰好两行 admin=1、group_leader=1
+${terminateProbe}
 `;
 }
 
@@ -1087,6 +1123,21 @@ function main() {
     }
   }
 
+  // AC-49 终止流程：持有人必须**恰为** {admin, group_leader}（PRD 655 行 + 附录A 权限矩阵 764 行）
+  for (const code of GROUP_LEADER_TERMINATE) {
+    if (!byCode.has(code)) errors.push(`GROUP_LEADER_TERMINATE 引用了未定义的权限码：${code}`);
+    for (const g of grants) {
+      const expected = g.role === 'admin' || g.role === 'group_leader';
+      const held = g.codes.includes(code);
+      if (held && !expected) {
+        errors.push(`终止权限被下放给非授权角色：${g.role} -> ${code}（AC-49 仅系统管理员与集团分管领导可终止）`);
+      }
+      if (!held && expected) {
+        errors.push(`角色缺少终止权限：${g.role} -> ${code}（AC-49 / PRD 附录A 权限矩阵「终止流程」行）`);
+      }
+    }
+  }
+
   const depthCache = new Map();
   const parentOf = new Map(rows.map((r) => [r.code, r.parentCode]));
   const depthDistribution = {};
@@ -1112,6 +1163,7 @@ function main() {
       return acc;
     }, {}),
     adminOnlyCodes: ADMIN_ONLY_CODES,
+    groupLeaderOnlyCodes: GROUP_LEADER_TERMINATE,
   };
 
   if (errors.length) {

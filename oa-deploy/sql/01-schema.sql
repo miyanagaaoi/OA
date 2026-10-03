@@ -4,7 +4,7 @@
 -- 生成器: tools/gen-init-sql.js sha256=4ff51bba65ea
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（可安全重跑生成器）。
 -- 请勿手工编辑本文件：改文档后重跑本脚本。
--- 真源文档: doc/data-model.md sha256=fb2b95f7f015
+-- 真源文档: doc/data-model.md sha256=055d9508aa9b
 --
 -- 执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。
 -- 包含：建表 28 张、索引 61 个、CHECK 11 个、外键若干、不可篡改触发器 4 个。
@@ -90,8 +90,9 @@ CREATE TABLE sys_org_leader (
   created_by   BIGINT UNSIGNED     NULL,
   updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   updated_by   BIGINT UNSIGNED     NULL,
+  category_key VARCHAR(32)  GENERATED ALWAYS AS (IFNULL(category, '')) STORED COMMENT '唯一键口径：category 为 NULL 时按空串参与唯一键（MySQL 唯一键对 NULL 不去重，否则同一组织/同一人/同一 leader_type 在 category 为 NULL 时可无限重复插入）。业务语义不变：NULL 与 NULL 视为同一组、非 NULL 仍按值区分',
   PRIMARY KEY (id),
-  UNIQUE KEY uk_org_leader (org_id, user_id, leader_type, category),
+  UNIQUE KEY uk_org_leader (org_id, user_id, leader_type, category_key),
   KEY idx_org_leader_user (user_id),
   KEY idx_org_leader_lookup (org_id, category, leader_type),
   CONSTRAINT fk_org_leader_org  FOREIGN KEY (org_id)  REFERENCES sys_org (id),
@@ -447,7 +448,7 @@ CREATE TABLE flow_node_instance (
   returned_count       INT          NOT NULL DEFAULT 0 COMMENT '被回退次数（上限 2，REQ-FLOW-021）',
   supplement_requested TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '本节点是否已请求过补件（上限 1 次）',
   add_sign_chain_json  JSON             NULL COMMENT '加签链记录',
-  started_at           DATETIME         NULL,
+  started_at           DATETIME         NULL COMMENT '**本轮**开始时间（不是「首次开始时间」）：节点每次被激活都刷新为当前时间 —— 包括被下一节点「回退上一节点」退回后重新进入 active 的那一次。理由：本轮决议只能统计**本轮主任务** —— 轮次边界就是这个 started_at，判定 SQL 见 `FlowTaskMapper.xml#selectRoundPrimaryByNodeInstance`（`flow_task.created_at >= started_at`）。若沿用「首次开始时间」，回退重审会把上一轮的同意票算作本轮结论，节点未经重新审批即通过（2026-10-03 运行期实测发现）。要追溯「首次进入本节点的时间」，请看 `created_at` 与 `sys_thread` 轨迹',
   finished_at          DATETIME         NULL,
   created_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

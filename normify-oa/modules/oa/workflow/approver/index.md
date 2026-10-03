@@ -11,8 +11,8 @@ description:
   en: >
       Approver resolution (direct leader, group Finance owner, subsidiary leader, GM, collaborating departments picked at approval time, group line leader, chairman, fixed person/role, initiator choice) resolved once at submission into an immutable snapshot; empty candidate sets block submission.
       
-revision: e3b34a3c59417096ade647fab4261b06f6b605e2
-updated_at: "2026-10-03T02:30:28.801Z"
+revision: c974d064e39527a7b4ddd8fe34345b4615b42437
+updated_at: "2026-10-03T03:27:10.293Z"
 fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
 source:
   - path: "doc/prd-0.1.md"

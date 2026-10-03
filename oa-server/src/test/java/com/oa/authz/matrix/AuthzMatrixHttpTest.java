@@ -28,8 +28,9 @@ import org.junit.jupiter.api.Test;
  * 阶段 1 DoD：<b>逐接口越权矩阵测试（角色 × 数据域 × 入口）——HTTP 层（真实运行的应用）</b>。
  *
  * <p>与 {@link AuthzMatrixMySqlIntegrationTest}（SQL 层）互补：本类打的是**真接口**
- * （手改 URL / 直连接口 / 换 id 参数三条 DoD 断言都在这一层落地）。夹具沿用
- * {@code .cache/oa-authz-matrix-fixture.sql}（5 个角色各 1 人），测试只把口令哈希与
+ * （手改 URL / 直连接口 / 换 id 参数三条 DoD 断言都在这一层落地）。夹具默认读**已入库**的
+ * {@code oa-deploy/fixtures/40-authz-matrix.sql}（5 个角色各 1 人，等价于旧的
+ * {@code .cache/oa-authz-matrix-fixture.sql}），测试只把口令哈希与
  * {@code last_login_at} 补成可登录状态（口令每次运行随机生成，不写进任何入库文件）。
  *
  * <h2>期望三态</h2>
@@ -46,12 +47,14 @@ import org.junit.jupiter.api.Test;
  * mvn -B test -Dtest=AuthzMatrixHttpIT
  * </pre>
  * 未提供连接参数 / 应用未启动 / 未给管理员口令 → 整类跳过（CI 无环境时不会红）。
+ * <b>但「已提供连接参数却找不到夹具」是失败，不是跳过</b>（见 {@link AuthzMatrixFixture}）：
+ * 夹具缺失时静默跳过 = 测试全绿而覆盖为零。
  */
 class AuthzMatrixHttpTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** 夹具账号（与 .cache/oa-authz-matrix-fixture.sql 一致）。 */
+    /** 夹具账号（与 `oa-deploy/fixtures/40-authz-matrix.sql` 一致）。 */
     private static final String CA = "mtx_ca01";
 
     private static final String DL = "mtx_dl01";
@@ -481,10 +484,9 @@ class AuthzMatrixHttpTest {
 
     /** 执行夹具 SQL，并把夹具人员的口令改成可登录状态（口令随每次运行随机生成，不入库文件）。 */
     private static void applyFixtureAndCredentials() throws Exception {
-        String fixturePath = config("oa.it.fixture", "OA_IT_FIXTURE",
-                Path.of("..", ".cache", "oa-authz-matrix-fixture.sql").toString());
-        Path path = Path.of(fixturePath);
-        assumeTrue(Files.isReadable(path), "未找到夹具 SQL：" + path.toAbsolutePath());
+        Path path = AuthzMatrixFixture.resolve(dbUrl);
+        // 走到这里 dbUrl 必非空（setUp 已对空 URL 做过 skip）；null 仅是「完全没提供 DB 环境」的兜底
+        assumeTrue(path != null, "未提供数据库连接参数，跳过 HTTP 越权矩阵测试");
         String script = Files.readString(path, StandardCharsets.UTF_8);
         try (Connection connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
              Statement statement = connection.createStatement()) {
