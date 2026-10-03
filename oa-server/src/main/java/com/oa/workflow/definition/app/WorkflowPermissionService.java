@@ -92,6 +92,23 @@ public class WorkflowPermissionService {
         return principal;
     }
 
+    /**
+     * <b>AC-49 终止入口闸门</b>：系统管理员 ∪ {@code group_leader} 角色 ∪ {@code flow:task:terminate} 权限。
+     *
+     * <p>与 {@link #requireInitiator} <b>刻意不同</b>：后者放行 {@code flow} 或 {@code admin:flow}，
+     * 而 {@code flow} 是门户基础权限（{@code employee} 经由祖先闭包也持有），拿它当终止入口的凭据
+     * 会让入口层形同虚设、只剩引擎兜底。终止入口必须按 AC-49 自身口径判定。
+     *
+     * <p>判定逻辑落在纯函数 {@link FlowConfigPermission#requireTerminate}（可穷举单测）；
+     * 引擎侧 {@code FlowEngineService#terminate} 复用同一判据作第二层兜底。
+     */
+    public CurrentUser requireTerminate() {
+        CurrentUser principal = requirePrincipal();
+        FlowConfigPermission.requireTerminate(isSuperAdmin(principal), permissionCodes(principal),
+                hasRole(principal, "group_leader"));
+        return principal;
+    }
+
     /** 是否持有某角色码（如 {@code group_leader} 才能终止流程，AC-49）。 */
     public boolean hasRole(CurrentUser principal, String roleCode) {
         return principal != null && principal.hasRole(roleCode);

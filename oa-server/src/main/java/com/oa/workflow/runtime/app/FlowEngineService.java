@@ -16,6 +16,7 @@ import com.oa.workflow.approver.domain.ApproverSnapshot;
 import com.oa.workflow.approver.domain.ApproverSnapshot.SnapshotNode;
 import com.oa.workflow.approver.infra.FlowInstanceMapper;
 import com.oa.workflow.approver.infra.row.FlowInstanceRow;
+import com.oa.workflow.definition.app.FlowConfigPermission;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
 import com.oa.workflow.definition.domain.FlowDefinitionEnums.DecisionMode;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.ActionResult;
@@ -875,14 +876,17 @@ public class FlowEngineService {
      * <p>放行条件 = 系统管理员 ∪ 持有 {@code group_leader} 角色 ∪ 持有 {@code flow:task:terminate} 权限。
      * 三者是**并集**：后台「角色与权限」界面若调整了授权，group_leader 仍按 AC-49 角色口径放行；
      * 而任何不持有该角色/权限的账号（含 {@code company_admin}，REQ-ADMIN-003）一律 403。
+     *
+     * <p><b>这是第二层（引擎兜底）</b>：第一层在 {@code FlowRuntimeController#terminate} 的入口闸门
+     * （{@code WorkflowPermissionService#requireTerminate}）。两层共用判据
+     * {@link FlowConfigPermission#isTerminateSubject}（单一口径），但**务必都在** ——
+     * 本层兜的是「绕过控制器直调服务」以及「入口闸门被后续改动误删」，删掉本层即安全回归。
      */
     @Transactional
     public InstanceView terminate(Long instanceId, String reason) {
         CurrentUser actor = permissionService.requirePrincipal();
-        boolean allowed = permissionService.isSuperAdmin(actor)
-                || permissionService.hasRole(actor, "group_leader")
-                || permissionService.permissionCodes(actor).contains(FlowAction.TERMINATE.permission());
-        if (!allowed) {
+        if (!FlowConfigPermission.isTerminateSubject(permissionService.isSuperAdmin(actor),
+                permissionService.permissionCodes(actor), permissionService.hasRole(actor, "group_leader"))) {
             throw new BizException(ErrorCode.FORBIDDEN,
                     "「终止流程」仅系统管理员与集团分管领导可执行（AC-49 / REQ-FLOW-010）");
         }

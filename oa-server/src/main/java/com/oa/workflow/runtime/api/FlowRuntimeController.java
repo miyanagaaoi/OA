@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/reopen}</td><td>回到草稿（驳回/撤回后）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/resubmit}</td><td><b>重提</b>：重新解析快照与版本 → 回草稿 → 提交</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/withdraw}</td><td>撤回（仅发起人；仅节点②通过前）</td></tr>
- *   <tr><td>POST</td><td>{@code /flow-instances/{id}/terminate}</td><td>终止（系统管理员 / 集团分管领导）</td></tr>
+ *   <tr><td>POST</td><td>{@code /flow-instances/{id}/terminate}</td><td>终止（系统管理员 / 集团分管领导；<b>入口闸门 = AC-49 专用判据</b>，见下）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/supplement}</td><td>提交补件（仅发起人）</td></tr>
  *   <tr><td>POST</td><td>{@code /flow-instances/{id}/cc}</td><td>抄送登记（不产生待办、不参与决议）</td></tr>
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/runtime}</td><td><b>运行态总览</b>（三层状态 + 轨迹 + 流转链 + 补件 + 抄送 + Q6 剩余）</td></tr>
@@ -56,8 +56,24 @@ import org.springframework.web.bind.annotation.RestController;
  *   <tr><td>GET</td><td>{@code /flow-instances/{id}/cc}</td><td>抄送记录</td></tr>
  * </table>
  *
- * <p>权限：全部走 {@code flow} 或 {@code admin:flow}（{@code WorkflowPermissionService#requireInitiator}），
- * 叠加数据域织入（域外实例一律 404）；动作级权限码在引擎层按 {@code FlowAction.permission()} 校验。
+ * <h2>两层权限（纵深防御，不要合并）</h2>
+ * <ol>
+ *   <li><b>入口层</b>（本控制器）：
+ *     <ul>
+ *       <li>动作端点（{@code reopen} / {@code resubmit} / {@code withdraw} / {@code supplement} /
+ *           {@code cc}）默认 {@code flow} 或 {@code admin:flow}
+ *           （{@code WorkflowPermissionService#requireInitiator}）；</li>
+ *       <li>{@code /terminate} 用 <b>AC-49 专用闸门</b>
+ *           {@code WorkflowPermissionService#requireTerminate}（系统管理员 ∪ {@code group_leader} 角色 ∪
+ *           {@code flow:task:terminate} 权限）—— 因为 {@code flow} 是门户基础权限，
+ *           {@code employee} 经祖先闭包也持有，不能代表「终止」的资格；</li>
+ *       <li>只读视图（{@code /runtime}、{@code /node-instances}、{@code /task-list}、{@code /thread}、
+ *           {@code /routing}、{@code /supplements}、{@code /cc}）**不设入口闸门**，
+ *           仅靠数据域织入（域外实例一律 404）。</li>
+ *     </ul></li>
+ *   <li><b>引擎层</b>（{@code FlowEngineService}）：动作级权限码按 {@code FlowAction.permission()} 复核，
+ *       并做发起人身份、状态机、闸门计数等业务判定 —— 入口放行不等于业务放行。</li>
+ * </ol>
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -145,13 +161,28 @@ public class FlowRuntimeController {
         return ApiResponse.success(engine.withdraw(instanceId, request.reason()));
     }
 
-    /** 终止（系统管理员 / 集团分管领导；必填原因；终态）。 */
+    /**
+     * 终止（系统管理员 / 集团分管领导；必填原因；终态）。
+     *
+     * <p><b>入口闸门 = AC-49 自身口径</b>（不是 {@code requireInitiator}）：
+     * {@code WorkflowPermissionService#requireTerminate} = 系统管理员 ∪ {@code group_leader} 角色
+     * ∪ {@code flow:task:terminate} 权限。
+     *
+     * <p>改前这里是 {@code requireInitiator("终止流程")}（放行 {@code flow} 或 {@code admin:flow}）。
+     * {@code flow} 是门户基础权限，{@code employee} 经祖先闭包也持有 —— 入口因此会放行一个
+     * 本不该有入口的账号，拒人只剩引擎一层。现入口与引擎共用 AC-49 判据，**两层都在**：
+     * <ol>
+     *   <li><b>入口层</b>（本方法）：不持有该角色/权限 → 403 / {@code 40301}，
+     *       「终止流程」仅系统管理员与集团分管领导可执行（AC-49 / REQ-FLOW-010）；</li>
+     *   <li><b>引擎层</b>（{@code FlowEngineService#terminate}）：同一判据再判一次，兜住绕过控制器直调服务的情形。</li>
+     * </ol>
+     */
     @PostMapping("/flow-instances/{instanceId}/terminate")
     @Audited(action = "terminate", targetType = "instance", targetId = "#instanceId", recordArgs = true,
             recordAfter = false)
     public ApiResponse<InstanceView> terminate(@PathVariable("instanceId") Long instanceId,
                                               @Valid @RequestBody ReasonRequest request) {
-        permissionService.requireInitiator("终止流程");
+        permissionService.requireTerminate();
         return ApiResponse.success(engine.terminate(instanceId, request.reason()));
     }
 
