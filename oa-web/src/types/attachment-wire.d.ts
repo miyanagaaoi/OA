@@ -12,7 +12,15 @@
  *   GET    /api/v1/forms/instances/{id}/attachments              `flow` ∪ `admin:flow`（按 round 分组）
  *   GET    /api/v1/forms/attachments/{id}/download               `flow` ∪ `admin:flow`（恒 attachment）
  *   GET    /api/v1/forms/attachments/{id}/preview                `flow` ∪ `admin:flow`（仅安全类型内联）
- *   DELETE /api/v1/forms/attachments/{id}                        `flow`（上传者本人或系统管理员）
+ *   DELETE /api/v1/forms/attachments/{id}                        `flow`
+ *
+ * ⚠ **删除与上传的身份口径不同**（2026-10-05 裁定，服务端同源）：
+ *   上传 = 发起人本人或系统管理员（`requireInitiatorOrAdmin`）；
+ *   删除 = **上传者本人 ∪ 单据发起人本人 ∪ 系统管理员**，且同样限草稿/待补件窗口。
+ *   取「发起人本人」的理由：单据归发起人，管理员**代传**后本人若不能删，
+ *   等于代传剥夺了本人的处置权 —— 代传只应「多一个能删的人」。
+ *   前端判定见 `utils/attachment.ts#canDeleteAttachment`（只决定渲不渲染入口），
+ *   被拒时 `40310` 的**服务端原文照旧展示**。
  *
  * ⚠ 序列化口径（与 `types/form-wire.d.ts` / `types/flow-wire.d.ts` 一致）：
  *   `com.oa.common.config.JacksonConfig` 对 `Long`/`long` 注册了 `ToStringSerializer`，

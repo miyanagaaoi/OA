@@ -118,10 +118,12 @@ export const ATTACHMENT_ERROR_HINT: Record<number, string> = {
     '或格式（15 种允许、9 种禁止；扩展名 + MIME + 魔数三层校验）被拒 —— 按服务端文案里的具体原因处理。',
   40304: '三态白名单拒绝：附件**只能在草稿与待补件期**上传或删除；审批中与已完结一律只读（doc/forms.md §1.2、§7）。',
   40308: '附件只能挂在**实例锁定版本 schema** 里已登记的 file/files 字段上；该字段码未登记（doc/templates.md §2.5）。',
-  40310: '删除被拒：只能删除**本人上传**的附件（或由系统管理员删除）（AC-41 最小权限）。',
+  40310: '删除被拒：只有**上传者本人 / 单据发起人本人 / 系统管理员**可以删除附件，' +
+    '且仅限草稿 / 待补件窗口（AC-41 最小权限）。',
   40402: '附件不存在或不在你的数据域内 —— 服务端对「域外」与「不存在」用**同一个码**，不区分（避免 id 枚举）。',
   50004: '附件存储不可用（落盘/删除失败）：服务端已回滚，元数据保留，可稍后重试。',
-  403: '只有**发起人本人或系统管理员**可以上传/删除该单据的附件（服务端 `requireInitiatorOrAdmin`）。',
+  403: '**上传**只有发起人本人或系统管理员可以做（服务端 `requireInitiatorOrAdmin`）；' +
+    '**删除**则是上传者本人 / 发起人本人 / 系统管理员三档（拒绝码 40310）。',
 }
 
 /** 错误码的补充说明（无则空串；服务端原文不在此处、不得被本函数取代） */
@@ -248,11 +250,20 @@ export interface AttachmentPrecheck {
   /** 被预检拦下的文件（含逐条原因） */
   rejected: AttachmentPrecheckItem[]
   /**
-   * 整批级提示（数量档位等）。**不阻断提交**：档位可能被模板收窄/放宽，
-   * 且服务端才是裁决方 —— 这里把话说清楚，由用户决定是否继续。
+   * 整批级**违反档位**的提示（单次数量 / 字段累计 / 单据合计）。**不阻断提交**：
+   * 档位可能被模板收窄/放宽，且服务端才是裁决方 —— 这里把话说清楚，由用户决定是否继续。
    */
   batchMessages: string[]
-  /** 全是逐文件错误（`rejected.length === 0` 且无 batchMessages 时为 `true`） */
+  /**
+   * 与本次选择无关、但必须让用户看见的**语义说明**（不表示违规）。
+   *
+   * <p>当前只有一条：本页是「**逐文件分别 POST**」，因此服务端的
+   * 「单次上传 ≤ `maxPerUpload` 个」在**一次性提交**时才生效 —— 本页不会被它拦下，
+   * 但「字段累计」「单据合计（含补件）」仍由服务端逐单累计判定。
+   * 不写这一条，用户会把「选了 25 个也照样上传成功」理解成「单次上限这条规则不存在」。
+   */
+  notes: string[]
+  /** 无逐文件错误、也无档位提示时为 `true` */
   ok: boolean
 }
 
@@ -272,8 +283,11 @@ export interface AttachmentPrecheckContext {
  * 前端**看不到文件内容**（魔数）也拿不到客户端 MIME 的可信版本，因此
  * 「扩展名合法」只说明**大概率**能过；「文件内容与扩展名不符」只能由服务端发现。
  *
- * <p>数量判定只是提示：`maxCount` 缺省 20、`maxPerInstance` 恒 50
- * （`doc/forms.md` §1.4；AC-45 第 21 个文件被拒）。
+ * <p>数量判定分两层，**不要混为一谈**（本函数返回 `batchMessages` 与 `notes` 两处）：
+ *   · `maxPerUpload`（单次 ≤20）是**单次请求**的档位 —— 本页逐文件分别请求，
+ *     因此它**不会**触发（说清楚即可，见 `notes`，不要让用户以为规则不存在）；
+ *   · `maxCount`（字段累计）与 `maxPerInstance`（单据合计含补件）是**逐单累计**的档位 ——
+ *     无论怎么拆请求都由服务端强制，因此仍按违规提示（`batchMessages`）。
  */
 export function precheckAttachmentFiles(
   files: readonly AttachmentCandidate[],
@@ -310,8 +324,9 @@ export function precheckAttachmentFiles(
   const incoming = files.length
   if (incoming > bounds.maxPerUpload) {
     batchMessages.push(
-      `本次选择 ${incoming} 个文件，超过单次上传上限 ${bounds.maxPerUpload} 个（doc/forms.md §1.4）——` +
-        '服务端会按 40012 拒绝整批，请分批上传。',
+      `本次选择 ${incoming} 个文件，超过服务端的「单次上传 ≤ ${bounds.maxPerUpload} 个」（doc/forms.md §1.4；AC-45 第 21 个文件被拒）。` +
+        '注意这是**单次请求**的档位：本页逐个上传（每个请求 1 个文件），所以本次不会被它拦下；' +
+        '在一次性提交（或调用方一次性 POST 多个文件）时它才生效。',
     )
   }
   if (accepted.length > 0) {
@@ -320,23 +335,30 @@ export function precheckAttachmentFiles(
       batchMessages.push(
         `该字段累计将达到 ${fieldTotal} 个，超过档位上限 ${bounds.maxCount} 个` +
           `${bounds.source === 'template' ? '（模板 filePolicy.maxCount）' : '（服务端缺省 filePolicy.maxCount）'}——` +
-          '服务端会按 40012 拒绝。',
+          '服务端会按 40012 拒绝（这条是**逐单累计**的，拆成多少个请求都一样）。',
       )
     }
     const instanceTotal = existingInInstance + accepted.length
     if (instanceTotal > bounds.maxPerInstance) {
       batchMessages.push(
         `单张单据附件总数将达到 ${instanceTotal} 个，超过上限 ${bounds.maxPerInstance} 个（含补件；doc/forms.md §1.4）——` +
-          '服务端会按 40012 拒绝。',
+          '服务端会按 40012 拒绝（这条是**逐单累计**的，拆成多少个请求都一样）。',
       )
     }
   }
+
+  const notes = [
+    `**本页逐个上传以便逐条反馈**（每个文件一次 POST，成功/失败逐文件给出）；` +
+      `服务端的「单次上传 ≤ ${bounds.maxPerUpload} 个」在**一次性提交**时生效 —— 本页不会被它拦下，` +
+      `但「字段累计 ≤ ${bounds.maxCount} 个」与「单据合计 ≤ ${bounds.maxPerInstance} 个（含补件）」仍由服务端逐单累计判定。`,
+  ]
 
   return {
     items,
     accepted,
     rejected,
     batchMessages,
+    notes,
     ok: rejected.length === 0 && batchMessages.length === 0,
   }
 }
@@ -476,9 +498,14 @@ export interface AttachmentSubject {
 export interface AttachmentWindow {
   /** 三态白名单是否放行（草稿 / 待补件） */
   stateOpen: boolean
-  /** 是否可以上传（状态 ∧ 身份） */
+  /** 是否可以上传（状态 ∧ 身份：发起人本人或系统管理员） */
   canUpload: boolean
-  /** 是否可以删除**本人上传**的附件（状态 ∧ 身份） */
+  /**
+   * 窗口内是否存在**任一**允许删除的身份（状态 ∧ 发起人/管理员；上传者身份按附件逐条判）。
+   *
+   * <p>注意这是**粗判**（用来决定「删除这件事对这单有没有意义」）：
+   * 逐条附件的最终结论一律走 {@link canDeleteAttachment}。
+   */
   canDeleteOwn: boolean
   /** 面向用户的说明（不可写时给出原因；可写时也说明边界在服务端） */
   reason: string
@@ -489,10 +516,13 @@ export interface AttachmentWindow {
  *
  * <p>后端 `AttachmentService#upload / #delete` 的顺序是：
  * 数据域 → 字段登记 → **三态白名单**（`FormStateWriteGuard#assertStateWritable`，
- * 草稿 / 待补件可写，审批中与已完结 40304）→ **身份**（`requireInitiatorOrAdmin`：
- * 发起人本人或系统管理员）。
+ * 草稿 / 待补件可写，审批中与已完结 40304）→ **身份**。
  *
- * <p>本函数把这两条如实摊开，用于「入口显示或不显示」。**判定权仍在服务端**。
+ * <p>上传与删除的**身份口径不同**（2026-10-05 裁定）：
+ *   · 上传：`requireInitiatorOrAdmin`，**只有发起人本人或系统管理员**；
+ *   · 删除：**上传者本人 ∪ 单据发起人本人 ∪ 系统管理员**，且仍限草稿/待补件窗口。
+ *     理由是「单据归发起人」：管理员**代传**后，发起人若不能删自己单据上的附件，
+ *     等于代传这个动作**剥夺**了本人的处置权 —— 代传只应「多一个能删的人」。
  */
 export function resolveAttachmentWindow(
   state: FormWriteStateCode | null | undefined,
@@ -500,7 +530,7 @@ export function resolveAttachmentWindow(
 ): AttachmentWindow {
   const stateOpen = state === 'DRAFT' || state === 'PENDING_SUPPLEMENT'
   const identityOk = subject.isInitiator || subject.isAdmin
-  const serverDecides = '服务端仍是边界（越权上传/删除按 40304 / 403 拒绝）。'
+  const serverDecides = '服务端仍是边界（越权上传/删除按 40304 / 403 / 40310 拒绝）。'
 
   if (state === null || state === undefined) {
     return {
@@ -529,8 +559,8 @@ export function resolveAttachmentWindow(
       stateOpen: true,
       canUpload: false,
       canDeleteOwn: false,
-      reason: '只有**发起人本人或系统管理员**可以上传/删除该单据的附件（服务端 `requireInitiatorOrAdmin`）；' +
-        `你当前既不是发起人也不是系统管理员。${serverDecides}`,
+      reason: '上传附件只有**发起人本人或系统管理员**可以做（服务端 `requireInitiatorOrAdmin`）；' +
+        `删除则是**上传者本人 / 发起人本人 / 系统管理员**三档。你当前既不是发起人也不是系统管理员。${serverDecides}`,
     }
   }
   return {
@@ -538,23 +568,40 @@ export function resolveAttachmentWindow(
     canUpload: true,
     canDeleteOwn: true,
     reason: state === 'PENDING_SUPPLEMENT'
-      ? `待补件期：附件与补件说明是唯一可写项（本次上传计入第轮次 round）。${serverDecides}`
+      ? `待补件期：附件与补件说明是唯一可写项（本次上传计入第 N 轮补件）。${serverDecides}`
       : `草稿期：全部字段可写，附件可上传/删除（上传的 round=0，属原始附件）。${serverDecides}`,
   }
 }
 
+/**
+ * 删除身份档位（三档 + 无关人员）。
+ *
+ * <p>`uploader` / `initiator` / `admin` 三档在**同一顺序**上取第一个命中的，
+ * 用于把「为什么我能删」讲清楚（而不是笼统地给一个按钮）。
+ */
+export type AttachmentDeleteCapacity = 'uploader' | 'initiator' | 'admin' | 'none'
+
 /** 单个附件的删除入口结论 */
 export interface AttachmentDeleteVerdict {
+  /** 是否渲染删除入口（且可否调用 DELETE） */
   allowed: boolean
+  /** 命中的身份档位（`none` = 三档都不命中） */
+  capacity: AttachmentDeleteCapacity
+  /** 面向用户的说明：`allowed` 时说明**凭什么能删**，否则说明为什么不能删 */
   reason: string
 }
 
 /**
- * 是否可以**显示**某个附件的删除入口。
+ * 是否可以**显示**某个附件的删除入口（2026-10-05 裁定）。
  *
- * <p>任务书口径：**仅上传者本人 + 可写窗口内**才给删除入口。
- * 服务端另允许系统管理员删除（`isAdmin`），但界面**不为管理员扩大入口**
- * ——避免在他人单据上误删；管理员需要时走接口或由上传者本人操作（已在面板文案里声明）。
+ * <p><b>可删 = 上传者本人 ∪ 单据发起人本人 ∪ 系统管理员</b>，且**仅草稿/待补件窗口**。
+ * 三条理由逐条对应后端 `AttachmentService#delete` 的判据：
+ *   · **窗口**先于身份（`writeGuard.assertStateWritable` → 40304）；
+ *   · 身份命中 `isUploader(attachment, principal) || isAdmin(principal)`；
+ *   · 追加「单据发起人本人」——单据归发起人，管理员代传后本人仍必须能删（否则
+ *     代传等于剥夺本人的处置权）。
+ *
+ * <p>⚠ 界面只决定「渲不渲染入口」：服务端仍是裁决方，拒绝时 40310 的**原文照旧展示**。
  */
 export function canDeleteAttachment(
   file: Pick<AttachmentFile, 'uploaderId' | 'fileName'>,
@@ -562,19 +609,35 @@ export function canDeleteAttachment(
   window: AttachmentWindow,
 ): AttachmentDeleteVerdict {
   if (!window.stateOpen) {
-    return { allowed: false, reason: window.reason }
+    return { allowed: false, capacity: 'none', reason: window.reason }
   }
-  if (!subject.isInitiator && !subject.isAdmin) {
-    return { allowed: false, reason: window.reason }
-  }
-  if (file.uploaderId === '' || file.uploaderId !== subject.userId) {
+  if (subject.userId !== '' && file.uploaderId === subject.userId) {
     return {
-      allowed: false,
-      reason: '该附件不是你上传的：服务端只允许上传者本人或系统管理员删除（否则 40310）——' +
-        '界面只对上传者本人开放删除入口。',
+      allowed: true,
+      capacity: 'uploader',
+      reason: '可删：你是该附件的**上传者本人**；窗口限草稿/待补件（服务端仍是边界）。',
     }
   }
-  return { allowed: true, reason: '' }
+  if (subject.isInitiator) {
+    return {
+      allowed: true,
+      capacity: 'initiator',
+      reason: '可删：你是**本单发起人**（单据归发起人，他人代传的附件你同样可删）；窗口限草稿/待补件。',
+    }
+  }
+  if (subject.isAdmin) {
+    return {
+      allowed: true,
+      capacity: 'admin',
+      reason: '可删：你是**系统管理员**（最小权限：删除会记 attachment_delete 轨迹）；窗口限草稿/待补件。',
+    }
+  }
+  return {
+    allowed: false,
+    capacity: 'none',
+    reason: '该附件不是你上传的，你也不是本单发起人或系统管理员：服务端只允许' +
+      '**上传者本人 / 发起人本人 / 系统管理员**删除（否则 40310）——界面因此不显示删除入口。',
+  }
 }
 
 // ================================================================ 预览判定

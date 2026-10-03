@@ -173,12 +173,19 @@ const readonlyNotice = computed(() => {
 })
 
 /**
- * 删除入口（**仅上传者本人 + 可写窗口内**；任务书口径，判定见
- * `utils/attachment.ts#canDeleteAttachment`）。
+ * 删除入口（2026-10-05 裁定：**可删 = 上传者本人 ∪ 单据发起人本人 ∪ 系统管理员**，
+ * 且仅草稿/待补件窗口；判定见 `utils/attachment.ts#canDeleteAttachment`）。
+ *
+ * <p>`writable` 再与一次：详情页等**只读视图**即使窗口开着也不给删除入口。
+ * 服务端仍是裁决方 —— 被拒时 40310 的**原文照旧展示**，这里只决定渲不渲染按钮。
  */
 function deleteVerdict(file: AttachmentFile) {
   const verdict = canDeleteAttachment(file, subject.value, writeWindow.value)
-  return { allowed: props.writable && verdict.allowed, reason: verdict.reason }
+  return {
+    allowed: props.writable && verdict.allowed,
+    capacity: verdict.capacity,
+    reason: verdict.reason,
+  }
 }
 
 function previewVerdict(file: AttachmentFile) {
@@ -517,6 +524,10 @@ function outcomeHint(code: number | string | null): string {
         <ul v-if="(precheck?.batchMessages.length ?? 0) > 0" class="batch">
           <li v-for="(message, index) in precheck?.batchMessages ?? []" :key="index">{{ message }}</li>
         </ul>
+        <!-- 预检的**语义说明**（不与"违规"混在一起）：逐文件上传 vs 单次上限 -->
+        <ul v-if="(precheck?.notes.length ?? 0) > 0" class="notes">
+          <li v-for="(note, index) in precheck?.notes ?? []" :key="index">{{ note }}</li>
+        </ul>
         <div class="row">
           <button
             class="btn btn-primary"
@@ -531,7 +542,7 @@ function outcomeHint(code: number | string | null): string {
           </button>
           <span class="meta">
             上传按**逐文件**分别请求：服务端对一次请求是「任一不合格即整体拒绝」，
-            拆开才能给出「成功几个 / 失败哪个 / 为什么」；单字段与单据合计的档位仍由服务端累计判定。
+            拆开才能给出「成功几个 / 失败哪个 / 为什么」。
           </span>
         </div>
       </div>
@@ -632,13 +643,14 @@ function outcomeHint(code: number | string | null): string {
                 v-if="deleteVerdict(file).allowed"
                 class="btn btn-ghost is-danger"
                 type="button"
+                :title="deleteVerdict(file).reason"
                 :disabled="deletingId === file.id"
                 @click="doDelete(file)"
               >
                 {{ deletingId === file.id ? '删除中…' : '删除' }}
               </button>
               <span v-else class="meta" :title="deleteVerdict(file).reason">
-                {{ props.writable ? '仅上传者本人可删' : '只读窗口' }}
+                {{ props.writable ? '不可删（非上传者/发起人/管理员）' : '只读窗口' }}
               </span>
             </span>
           </li>
@@ -650,7 +662,9 @@ function outcomeHint(code: number | string | null): string {
       预览口径：服务端仅对 <span class="oa-mono">jpeg / png / pdf</span> 且 ≤20MB 内联渲染，
       其余（含 heic、wps、zip、office 文档）返回
       <span class="oa-mono">Content-Disposition: attachment</span> 降级 —— 界面据此只给下载并说明原因；
-      实际动作以响应头为准。删除入口只对**上传者本人**开放（服务端另允许系统管理员删除，界面不代其扩大入口）。
+      实际动作以响应头为准。删除入口按**三档**开放：<b>上传者本人 / 单据发起人本人 / 系统管理员</b>
+      （单据归发起人，他人代传的附件本人同样可删），且仅草稿 / 待补件窗口；
+      服务端仍是裁决方，被拒时 40310 原文照旧展示。
     </p>
   </div>
 </template>
@@ -761,6 +775,17 @@ function outcomeHint(code: number | string | null): string {
   margin: 4px 0 0;
   padding-left: 18px;
   color: var(--oa-color-warning);
+  font: var(--oa-font-caption);
+}
+
+/* 预检的语义说明（不是违规）：与 batch 同形但用中性色，避免读成"又出错了" */
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--oa-color-ink-muted);
   font: var(--oa-font-caption);
 }
 

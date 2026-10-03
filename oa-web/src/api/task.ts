@@ -41,7 +41,6 @@
 import { get, post, put, withDemoFallback } from './http'
 import {
   demoActionAvailability,
-  demoAttachments,
   demoDetailForm,
   demoDetailHeader,
   demoPrintDocument,
@@ -54,7 +53,6 @@ import {
 } from './demo'
 import type {
   ActionAvailability,
-  AttachmentItem,
   BatchApprovePayload,
   BatchTransferPayload,
   DetailAction,
@@ -160,13 +158,6 @@ export function fetchAvailableActions(instanceId: string): Promise<ActionAvailab
 
 export function fetchTrail(instanceId: string): Promise<TrailResult> {
   return withDemoFallback(() => get<TrailResult>(`/portal/detail/${instanceId}/trail`), () => demoTrail)
-}
-
-export function fetchAttachments(instanceId: string): Promise<AttachmentItem[]> {
-  return withDemoFallback(
-    () => get<AttachmentItem[]>(`/forms/instances/${instanceId}/attachments`),
-    () => demoAttachments,
-  )
 }
 
 /** 提交审批动作：同意 / 驳回 / 流转 / 回退 / 终止 / 补件 */
