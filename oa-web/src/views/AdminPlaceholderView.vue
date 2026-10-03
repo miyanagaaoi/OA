@@ -13,7 +13,7 @@
  */
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { canManageOrg, canManageRole, canManageUser, canOpenRoleAdmin } from '@/utils/admin'
+import { canManageOrg, canManageRole, canManageUser, canOpenRoleAdmin, canReadFlowTemplate } from '@/utils/admin'
 
 const userStore = useUserStore()
 
@@ -37,11 +37,17 @@ const ready = computed(() =>
       path: '/admin/roles',
       visible: canOpenRoleAdmin(userStore) || canManageRole(userStore),
     },
+    {
+      name: '流程模板与节点',
+      note: '四类单据 × 7 节点、决议模式与阈值、签名/超时/加签/跳转、Q6/Q7 闸门配置、12 条发布前校验、版本累积与在途锁版本',
+      path: '/admin/flow/template',
+      visible: canReadFlowTemplate(userStore),
+    },
   ].filter((item) => item.visible),
 )
 
 const modules = [
-  { name: '流程模板与节点', note: '7 节点定义、决议模式、超时、加签与流转策略、版本发布' },
+  { name: '表单模板', note: '四类单据字段字典、三态白名单、校验规则、打印标签映射' },
   { name: '表单模板', note: '四类单据字段字典、三态白名单、校验规则、打印标签映射' },
   { name: '数据字典', note: '事项类别、合同类型、用印类型、证照类型、付款方式、其他会审部门、归还状态' },
   { name: '运行期配置', note: '决议模式、闸门次数、补件上限、强制签名节点、会话与锁定、保留期、导出权限' },
@@ -54,13 +60,15 @@ const modules = [
   <div class="oa-admin">
     <header class="head">
       <h1>管理后台</h1>
-      <span class="oa-tag is-info">阶段 1 · 1.1 已落地组织与人员；1.4 已落地角色与权限</span>
+      <span class="oa-tag is-info">阶段 1 · 1.1 组织与人员；1.4 角色与权限；2a.6 流程设计器</span>
     </header>
 
     <p class="lead">
       组织架构与人员管理已按 <code>doc/prd-0.1.md</code> 5.1 / 5.5 与
       <code>doc/import-spec.md</code> 的中文↔code 口径实现；角色与权限树（REQ-ADMIN-003）按
-      PRD 5.2 做<b>逐级勾选</b>与数据域配置，变更一律留痕（REQ-LOG-004）；其余管理能力
+      PRD 5.2 做<b>逐级勾选</b>与数据域配置，变更一律留痕（REQ-LOG-004）；
+      流程模板与节点（<code>doc/templates.md</code> §1 / §3.3 / §4.1）按 2a.6 流程设计器交付：
+      节点序列、节点配置、Q6/Q7 闸门、12 条发布前校验与版本历史；其余管理能力
       （REQ-ADMIN-002 / 004 / 005）排在后续阶段，承接方式见 <code>doc/tech-design.md</code> §5.3 与
       <code>normify-oa/modules/oa/admin/**</code>。
     </p>

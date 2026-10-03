@@ -12,6 +12,7 @@
  */
 import { computed } from 'vue'
 import {
+  flowStatusStyle,
   leaderTypeStyle,
   orgStatusStyle,
   primaryPillStyle,
@@ -26,9 +27,9 @@ const props = withDefaults(
   defineProps<{
     /**
      * 徽标语义域：
-     * 组织状态 / 人员状态 / 负责人类型 / 岗位主岗 / 角色层级 / 是否内置角色
+     * 组织状态 / 人员状态 / 负责人类型 / 岗位主岗 / 角色层级 / 是否内置角色 / 流程模板状态
      */
-    kind: 'org' | 'user' | 'leader' | 'position' | 'role-scope' | 'role-builtin'
+    kind: 'org' | 'user' | 'leader' | 'position' | 'role-scope' | 'role-builtin' | 'flow-status'
     /** 对应枚举 code（position 域用 isPrimary、role-builtin 域用 isBuiltIn） */
     status?: OrgStatus | UserStatus | LeaderType | string
     /** position 域：是否主岗（E-POS-005 每人最多一个主岗） */
@@ -53,6 +54,9 @@ const style = computed<IdentityPillStyle>(() => {
       return roleScopeStyle(props.status)
     case 'role-builtin':
       return roleBuiltInStyle(props.isBuiltIn)
+    // 流程模板状态机（doc/templates.md §3.3）：draft / published / archived
+    case 'flow-status':
+      return flowStatusStyle(props.status)
     case 'position':
     default:
       return primaryPillStyle(props.isPrimary)

@@ -20,6 +20,9 @@
  *     /admin/users            人员管理（阶段 1 · 1.1：人员列表 + 岗位 + 离职/调岗/交接）
  *     /admin/roles            角色与权限（阶段 1 · 1.4：角色 + 权限树逐级勾选 + 数据域）
  *     /admin/authz-logs       权限变更日志（阶段 1 · 1.4：REQ-LOG-004，只读）
+ *     /admin/flow/template    流程模板列表（阶段 2a.6：2a.2 模板接口；code/formType/status 过滤）
+ *     /admin/flow/template/:templateId  流程设计器（阶段 2a.6：节点序列 + 节点配置 + Q6/Q7 闸门 +
+ *                              12 条发布前校验 + 版本历史只读查看）
  *   /:pathMatch(.*)*          404
  */
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
@@ -31,6 +34,7 @@ import {
   canManageUser,
   canOpenAuthzLogAdmin,
   canOpenRoleAdmin,
+  canReadFlowTemplate,
 } from '@/utils/admin'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
@@ -158,6 +162,31 @@ const routes: RouteRecordRaw[] = [
           adminSection: 'authz-log',
         },
       },
+      {
+        // 阶段 2a.6 流程设计器：模板列表（四类单据各不相同；筛选走服务端 @RequestParam）
+        // 判据：系统管理员 / `admin:flow:template`（读）；写入口（开新草稿/发布/归档）在页内
+        // 再按 `admin:flow:publish` 收紧，服务端仍是裁决方（越权一律 403 / 40906）
+        path: 'admin/flow/template',
+        name: 'admin-flow-templates',
+        component: () => import('@/views/admin/FlowTemplateListView.vue'),
+        meta: {
+          title: '流程模板',
+          adminSection: 'flow-template',
+        },
+      },
+      {
+        // 阶段 2a.6 流程设计器：单个模板的节点/闸门/发布前校验/版本历史
+        // 判据同列表页（`admin:flow:template`）；节点写入按 `admin:flow:node`、
+        // 版本写入按 `admin:flow:publish` 在页内收紧
+        path: 'admin/flow/template/:templateId',
+        name: 'admin-flow-designer',
+        component: () => import('@/views/admin/FlowDesignerView.vue'),
+        meta: {
+          title: '流程设计器',
+          adminSection: 'flow-template',
+        },
+        props: true,
+      },
     ],
   },
   {
@@ -223,6 +252,12 @@ router.beforeEach(async (to) => {
     return { path: '/task/pending' }
   }
   if (adminSection === 'bulk-import' && !canImportOrgUser(userStore)) {
+    return { path: '/task/pending' }
+  }
+  // 阶段 2a.6：流程模板（列表 + 设计器）只要求**读**权限 `admin:flow:template`；
+  // 节点写（admin:flow:node）与发布写（admin:flow:publish）在页面内按权限收紧入口，
+  // 服务端（FlowConfigPermission）才是裁决方。
+  if (adminSection === 'flow-template' && !canReadFlowTemplate(userStore)) {
     return { path: '/task/pending' }
   }
 

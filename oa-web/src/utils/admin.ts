@@ -10,6 +10,7 @@
  *     §7.4（影响程度=高 且未确认 → 阻断，确认动作写 sys_log）、
  *     §2.3（9 个权威角色码）
  *   · `doc/prd-0.1.md` 5.5「强制继续」唯一例外（2026-10-02 裁定：仅系统管理员 + 必填原因 + 双留痕）
+ *   · `doc/templates.md` §3.3 / §4.1（模板状态机与「改配置必须开新版本」，2a.2 流程设计器）
  *   · `DESIGN.md` Agent Usage Rules 第 6 条「权限不可见优于不可用」
  *
  * 口径：入口与按钮**不渲染**（而非置灰）；服务端（`ForceReasonPolicy` / 数据域拦截器 /
@@ -253,8 +254,95 @@ export function canEnterAdmin(store: UserStore): boolean {
     canManageOrg(store) ||
     canManageUser(store) ||
     canOpenRoleAdmin(store) ||
-    canOpenAuthzLogAdmin(store)
+    canOpenAuthzLogAdmin(store) ||
+    canReadFlowTemplate(store)
   )
+}
+
+// ---------------------------------------------------------------------------
+// 流程域（2a.2 已交付 FlowDefinitionController）
+// ----------------------------------------------------------------------------
+//  权限码出自 `oa-deploy/sql/04-permissions.sql` 的 `admin:flow*` 三个精确码
+//  （`admin:flow` / `admin:flow:template` / `admin:flow:node` / `admin:flow:publish`）：
+//    · 读模板与节点、跑发布前校验（读）：`admin:flow:template`；
+//    · 写节点配置：`admin:flow:node`（`GET /approver-rules` 也要求它，见控制器注释）；
+//    · 开新版本 / 发布 / 归档 / 写模板级闸门：`admin:flow:publish`。
+//  三者是**精确码**（种子里没有 `admin:flow:xxx` 的孙项），因此用精确匹配而不是前缀匹配。
+//  ⚠ 与既有函数同口径：本文件只决定「渲不渲染」，服务端（`WorkflowPermissionService`
+//     → `FlowConfigPermission`）才是裁决方，越权请求一律 403。
+// ---------------------------------------------------------------------------
+
+/** 流程域权限码（**冒号风格**，权威源 `oa-deploy/sql/04-permissions.sql`） */
+export const FLOW_PERMISSION = {
+  /** 流程管理父项（仅用于「后台是否可见」的兜底判断） */
+  flow: 'admin:flow',
+  /** 读模板 / 节点 / 版本 / 发布前校验（`GET /flow-templates/**`、`GET /flow-nodes/**` 读接口） */
+  templateRead: 'admin:flow:template',
+  /** 写节点配置 + 读 `GET /approver-rules`（解析规则清单） */
+  nodeWrite: 'admin:flow:node',
+  /** 开新版本 / 发布 / 归档 / 写模板级闸门配置 */
+  publish: 'admin:flow:publish',
+} as const
+
+/**
+ * 流程管理判据的**最小只读投影**。
+ *
+ * <p>为什么不用 `UserStore`：这三项都是只读字段，用结构类型可以让权限判据**脱离 Pinia**
+ * 单独复核（`oa-web` 没有前端测试框架，纯函数越好验证越好）；Pinia 的 `useUserStore()`
+ * 返回值在结构上天然满足本接口，调用点写法不变。
+ */
+export interface FlowPermissionSubject {
+  readonly isSuperAdmin: boolean
+  readonly permissions: readonly string[]
+  readonly roles: readonly { readonly roleCode: string }[]
+}
+
+/**
+ * 流程域判据：**权限码优先，`company_admin` 角色码兜底**。
+ *
+ * <p>兜底口径与 `hasPermissionOrRole` 完全一致：只有在 `permissions` 为空
+ * （旧后端 / 未初始化权限数据）时才看角色码——`04-permissions.sql` 里
+ * `company_admin` 确实持有 `admin:flow:template` / `:node` / `:publish` 三项
+ * （分公司流程管理员可维护本公司流程模板），因此这个兜底不会放宽红线。
+ */
+function hasFlowPermissionOrCompanyAdmin(
+  store: FlowPermissionSubject,
+  permissionCodes: readonly string[],
+): boolean {
+  if (store.isSuperAdmin) return true
+  if (permissionCodes.some((code) => store.permissions.includes(code))) return true
+  if (store.permissions.length > 0) return false
+  return store.roles.some((role) => role.roleCode === COMPANY_ADMIN_ROLE)
+}
+
+/**
+ * 流程模板**读**入口（模板列表页 + 设计器页 + 侧栏「流程模板」）。
+ *
+ * <p>判据：`admin:flow:template`（或系统管理员 / 权限数据缺失时的 `company_admin`）。
+ * 设计器里的只读能力（查看节点、版本历史、跑发布前校验）都只需要本权限。
+ */
+export function canReadFlowTemplate(store: FlowPermissionSubject): boolean {
+  return hasFlowPermissionOrCompanyAdmin(store, [FLOW_PERMISSION.templateRead, FLOW_PERMISSION.flow])
+}
+
+/**
+ * 流程**节点配置写**入口：`admin:flow:node`。
+ *
+ * <p>决定设计器里的保存按钮是否渲染（决议模式/阈值、策略、跳过条件、解析规则、换序、增删节点）。
+ * 另外 `GET /api/v1/approver-rules`（9 条解析规则清单）在后端也要求本权限，
+ * 因此「审批人规则下拉」的可用性同样由本判据决定。
+ */
+export function canWriteFlowNode(store: FlowPermissionSubject): boolean {
+  return hasFlowPermissionOrCompanyAdmin(store, [FLOW_PERMISSION.nodeWrite])
+}
+
+/**
+ * 流程**发布/归档**入口：`admin:flow:publish`。
+ *
+ * <p>决定「开新草稿」「发布」「归档」「写入闸门配置（Q6/Q7）」是否渲染。
+ */
+export function canPublishFlowTemplate(store: FlowPermissionSubject): boolean {
+  return hasFlowPermissionOrCompanyAdmin(store, [FLOW_PERMISSION.publish])
 }
 
 /**

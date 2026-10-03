@@ -167,3 +167,29 @@ export function roleBuiltInStyle(builtIn: boolean): IdentityPillStyle {
     ? { pillClass: 'is-approved', label: '内置' }
     : { pillClass: 'is-closed', label: '自定义' }
 }
+
+// ---------------------------------------------------------------------------
+// 流程域状态徽标（模板状态机，`doc/templates.md` §3.3）
+// ----------------------------------------------------------------------------
+//  口径同上：**只从 `.oa-pill` 已有的五个类里选**，不新造配色。
+//    · published 已发布 → 生效中、可被新实例使用 → success（is-approved）
+//    · draft     草稿   → 唯一可编辑态、不可被新实例使用 → neutral（is-closed）
+//    · archived  已归档 → 只读、不可被新实例使用（在途继续） → neutral（is-closed）
+//  草稿与已归档同为 neutral 是刻意的：二者都不是「风险」也不是「生效」，
+//  界面靠**文字**区分（`FLOW_STATUS_LABEL`），不靠颜色（DESIGN.md 附录 B 不得扩展）。
+// ---------------------------------------------------------------------------
+const FLOW_STATUS_MAP: Record<'draft' | 'published' | 'archived', IdentityPillStyle> = {
+  draft: { pillClass: 'is-closed', label: '草稿' },
+  published: { pillClass: 'is-approved', label: '已发布' },
+  archived: { pillClass: 'is-closed', label: '已归档' },
+}
+
+/**
+ * 流程模板状态徽标。
+ * 入参已由 `api/flow.ts` 收窄为 `draft|published|archived`（未知取值在映射层一律按
+ * `archived` 处理，fail-safe 到只读），因此这里只需处理三个已知值，其余按中性兜底。
+ */
+export function flowStatusStyle(status: string): IdentityPillStyle {
+  if (status === 'published' || status === 'archived') return FLOW_STATUS_MAP[status]
+  return FLOW_STATUS_MAP.draft
+}

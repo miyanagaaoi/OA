@@ -21,6 +21,7 @@ import {
   canManageUser,
   canOpenAuthzLogAdmin,
   canOpenRoleAdmin,
+  canReadFlowTemplate,
 } from '@/utils/admin'
 import { fetchWorkbenchSummary } from '@/api/task'
 import Watermark from '@/components/Watermark.vue'
@@ -51,18 +52,20 @@ const navItems = [
 ] as const
 
 /**
- * 管理后台分组（阶段 1 · 1.1 组织与人员；阶段 1 · 1.4 角色与权限）。
+ * 管理后台分组（阶段 1 · 1.1 组织与人员；阶段 1 · 1.4 角色与权限；阶段 2a.6 流程模板）。
  * 可见性判据全部取自 `utils/admin.ts`，与**路由守卫**逐条一致，避免「侧栏看得到、点进去被弹回」。
  * 「角色与权限」「权限变更日志」两项按交付口径**仅系统管理员（或显式持有对应权限码）可见**：
  * 分公司流程管理员看不到后台结构（PRD 5.2「不可再向下分配权限」）。
+ * 「流程模板」只要求**读**权限 `admin:flow:template`（节点写与发布写入口在页面内再收紧）。
  */
-type AdminGate = 'console' | 'org' | 'user' | 'role' | 'authz-log' | 'bulk-import'
+type AdminGate = 'console' | 'org' | 'user' | 'role' | 'authz-log' | 'bulk-import' | 'flow-template'
 
 const adminNavItems: readonly { key: string; label: string; path: string; gate: AdminGate }[] = [
   { key: 'admin-console', label: '管理后台', path: '/admin', gate: 'console' },
   { key: 'admin-orgs', label: '组织架构', path: '/admin/orgs', gate: 'org' },
   { key: 'admin-users', label: '人员管理', path: '/admin/users', gate: 'user' },
   { key: 'admin-bulk-import', label: '批量导入', path: '/admin/bulk-import', gate: 'bulk-import' },
+  { key: 'admin-flow-templates', label: '流程模板', path: '/admin/flow/template', gate: 'flow-template' },
   { key: 'admin-roles', label: '角色与权限', path: '/admin/roles', gate: 'role' },
   { key: 'admin-authz-logs', label: '权限变更日志', path: '/admin/authz-logs', gate: 'authz-log' },
 ]
@@ -95,6 +98,8 @@ const visibleAdminNavItems = computed(() => {
         return canManageUser(userStore)
       case 'bulk-import':
         return canImportOrgUser(userStore)
+      case 'flow-template':
+        return canReadFlowTemplate(userStore)
       case 'console':
       default:
         return canEnterAdminConsole(userStore)
@@ -109,6 +114,7 @@ const activeKey = computed(() => {
   if (route.path.startsWith('/admin/roles')) return 'admin-roles'
   if (route.path.startsWith('/admin/bulk-import')) return 'admin-bulk-import'
   if (route.path.startsWith('/admin/authz-logs')) return 'admin-authz-logs'
+  if (route.path.startsWith('/admin/flow/template')) return 'admin-flow-templates'
   if (route.path.startsWith('/admin')) return 'admin-console'
   const tab = route.meta.tab as string | undefined
   if (tab) return tab

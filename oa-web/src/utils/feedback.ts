@@ -36,3 +36,28 @@ export function reportApiError(error: unknown, action = '操作'): void {
     showClose: true,
   })
 }
+
+/**
+ * 带**业务码**的错误提示（流程设计器专用）。
+ *
+ * <p>与 `reportApiError` 的差别：
+ *   1. 文案里带上稳定业务码（`40008` 主干不可删 / `40906` 已发布只读 / `40907` 草稿已存在 /
+ *      `40001` 参数校验 …），便于流程管理员按码对照文档，也便于报障时一句话说清；
+ *   2. **不跳过 4xx**：`api/flow.ts` 对本域请求关闭了拦截器 toast（`notify.* = false`），
+ *      由本函数做**唯一**呈现方，避免同一个错误弹两次。
+ *
+ * <p>因此调用方必须在 catch 里调用它——否则用户看不到任何错误。
+ */
+export function reportApiErrorWithCode(error: unknown, action = '操作'): void {
+  const apiError = error instanceof ApiError ? error : null
+  const code = apiError?.code
+  const codeText = code === undefined || code === null || code === '' ? '' : `［业务码 ${code}］`
+  const detail = apiError?.message || (error instanceof Error ? error.message : '') || '未知错误'
+  const trace = apiError?.traceId ? `（追踪号 ${apiError.traceId}）` : ''
+  ElMessage({
+    type: 'error',
+    message: `${action}失败${codeText}：${detail}${trace}`,
+    duration: 6000,
+    showClose: true,
+  })
+}
