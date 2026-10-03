@@ -39,6 +39,18 @@ oa:
   db:
     # 本机由开发者自己起 MySQL 时保持开启，幂等创建 4 个触发器
     immutable-triggers-enabled: true
+  security:
+    # 手机号加密密钥（阶段 1.7）。dev 便利口径：优先环境变量 OA_PHONE_KEY，
+    # 否则读用户目录下的密钥文件（**在仓库之外**，不会入库）：
+    #   %USERPROFILE%\.oa\oa-phone.key   （首行 = 32 字节 Base64；生成：openssl rand -base64 32）
+    # 两处都取不到 → 应用启动即失败（fail-fast，不允许明文降级）。
+    phone-key: ${OA_PHONE_KEY:}
+    phone-key-file: ${OA_PHONE_KEY_FILE:${user.home}/.oa/oa-phone.key}
+  authz:
+    export:
+      # 金额列导出：dev 与生产同口径，均按 PRD §5.3 / AC-18 —— 系统管理员与财务角色可导出金额，
+      # 其余角色在导出入口即 403（详见 application.yml 的说明）
+      amount-enabled: true
 
 logging:
   level:

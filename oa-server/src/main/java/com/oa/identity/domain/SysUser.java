@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
 /**
  * 用户（{@code sys_user}）—— 列名严格取自 doc/data-model.md §2.2 的 DDL，禁止臆造。
  *
- * <p>安全约定：{@code phone} 加密存储、展示按角色脱敏（{@link #maskedPhone()}）；
+ * <p>安全约定：{@code phone} **加密存储**（AES-256-GCM，密文自带 keyId，见
+ * {@code com.oa.platform.security.crypto.PhoneCipher}），展示值一律经
+ * {@code com.oa.authz.visibility.PhoneVisibilityService} 产出（默认脱敏 {@code 138****8888}，
+ * 仅本人与系统管理员可见完整值）；
  * {@code password_hash} 只允许通过 {@code PasswordService} 读写，永不进响应体。
  *
  * <p><b>本实体不再经 BaseMapper 读写</b>：{@code sys_user} 是受控表，其 Mapper
@@ -74,16 +77,15 @@ public class SysUser {
     @TableLogic(value = "null", delval = "now()")
     private LocalDateTime deletedAt;
 
-    /** 手机号脱敏：{@code 138****8888}（PRD §5.3 字段级限制）。 */
-    public String maskedPhone() {
-        if (phone == null || phone.isBlank()) {
-            return null;
-        }
-        if (phone.length() < 7) {
-            return "***";
-        }
-        return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
-    }
+    /**
+     * 手机号脱敏 —— <b>本方法已删除</b>（阶段 1.6/1.7 收口）。
+     *
+     * <p>原因：本实体持有的 {@code phone} 是**密文**（{@code v1:<keyId>:...}），
+     * 在实体上做 {@code substring(0,3) + "****"} 只会产出 {@code v1:****xxxx} 这类脏值，
+     * 而且会与「本人/系统管理员可见完整值」的判定分裂成两处实现。
+     * 唯一实现见 {@code com.oa.authz.visibility.PhoneVisibilityService}：
+     * 先经 {@code PhoneCryptoService} 解密，再按角色决定脱敏或完整值。
+     */
 
     public boolean isActive() {
         return STATUS_ACTIVE.equals(status);

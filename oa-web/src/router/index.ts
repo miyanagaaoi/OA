@@ -26,6 +26,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import {
   canEnterAdminConsole,
+  canImportOrgUser,
   canManageOrg,
   canManageUser,
   canOpenAuthzLogAdmin,
@@ -135,6 +136,18 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        // 阶段 1 · 1.8：组织人员批量导入（五步流水线：组织→人员→负责人→岗位→角色分配）
+        // 判据：系统管理员 / 分公司流程管理员 / 显式持有 `admin:user:import`
+        // 注意：入口可见 ≠ 可越域导入——分公司管理员只能导入本公司子树，服务端逐行 fail-closed
+        path: 'admin/bulk-import',
+        name: 'admin-bulk-import',
+        component: () => import('@/views/admin/BulkImportView.vue'),
+        meta: {
+          title: '批量导入',
+          adminSection: 'bulk-import',
+        },
+      },
+      {
         // 阶段 1 · 1.4：权限变更日志（REQ-LOG-004 / AC-59，只读、不可删改 REQ-LOG-006）
         // 判据：系统管理员，或显式持有 `admin:audit:permission`
         path: 'admin/authz-logs',
@@ -207,6 +220,9 @@ router.beforeEach(async (to) => {
     return { path: '/task/pending' }
   }
   if (adminSection === 'authz-log' && !canOpenAuthzLogAdmin(userStore)) {
+    return { path: '/task/pending' }
+  }
+  if (adminSection === 'bulk-import' && !canImportOrgUser(userStore)) {
     return { path: '/task/pending' }
   }
 

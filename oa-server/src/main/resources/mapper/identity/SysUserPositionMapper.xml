@@ -115,4 +115,16 @@
     DELETE FROM sys_user_position WHERE id = #{id}
   </delete>
 
+  <!-- 岗位任职主数据导出（import-spec §9.1 user_position.csv）：全量、主岗优先 -->
+  <select id="selectAllForExport" resultMap="PositionRowResultMap">
+    SELECT up.id, up.user_id, up.org_id, up.is_primary, up.position, up.remark,
+           up.created_at, up.updated_at,
+           o.name AS org_name, o.path AS org_path, o.org_type
+    FROM sys_user_position up
+    JOIN sys_org o ON o.id = up.org_id AND o.deleted_at IS NULL
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user_position, alias=up) */
+    ORDER BY up.user_id ASC, up.is_primary DESC, o.path ASC, up.id ASC
+  </select>
+
 </mapper>

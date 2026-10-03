@@ -16,6 +16,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import {
   canEnterAdminConsole,
+  canImportOrgUser,
   canManageOrg,
   canManageUser,
   canOpenAuthzLogAdmin,
@@ -55,12 +56,13 @@ const navItems = [
  * 「角色与权限」「权限变更日志」两项按交付口径**仅系统管理员（或显式持有对应权限码）可见**：
  * 分公司流程管理员看不到后台结构（PRD 5.2「不可再向下分配权限」）。
  */
-type AdminGate = 'console' | 'org' | 'user' | 'role' | 'authz-log'
+type AdminGate = 'console' | 'org' | 'user' | 'role' | 'authz-log' | 'bulk-import'
 
 const adminNavItems: readonly { key: string; label: string; path: string; gate: AdminGate }[] = [
   { key: 'admin-console', label: '管理后台', path: '/admin', gate: 'console' },
   { key: 'admin-orgs', label: '组织架构', path: '/admin/orgs', gate: 'org' },
   { key: 'admin-users', label: '人员管理', path: '/admin/users', gate: 'user' },
+  { key: 'admin-bulk-import', label: '批量导入', path: '/admin/bulk-import', gate: 'bulk-import' },
   { key: 'admin-roles', label: '角色与权限', path: '/admin/roles', gate: 'role' },
   { key: 'admin-authz-logs', label: '权限变更日志', path: '/admin/authz-logs', gate: 'authz-log' },
 ]
@@ -91,6 +93,8 @@ const visibleAdminNavItems = computed(() => {
         return canManageOrg(userStore)
       case 'user':
         return canManageUser(userStore)
+      case 'bulk-import':
+        return canImportOrgUser(userStore)
       case 'console':
       default:
         return canEnterAdminConsole(userStore)
@@ -103,6 +107,7 @@ const activeKey = computed(() => {
   if (route.path.startsWith('/admin/orgs')) return 'admin-orgs'
   if (route.path.startsWith('/admin/users')) return 'admin-users'
   if (route.path.startsWith('/admin/roles')) return 'admin-roles'
+  if (route.path.startsWith('/admin/bulk-import')) return 'admin-bulk-import'
   if (route.path.startsWith('/admin/authz-logs')) return 'admin-authz-logs'
   if (route.path.startsWith('/admin')) return 'admin-console'
   const tab = route.meta.tab as string | undefined

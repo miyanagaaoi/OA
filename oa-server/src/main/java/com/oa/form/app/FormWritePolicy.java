@@ -1,5 +1,6 @@
 package com.oa.form.app;
 
+import com.oa.authz.visibility.AmountFieldPolicy;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
 import java.util.Collections;
@@ -165,8 +166,7 @@ public final class FormWritePolicy {
         }
     }
 
-    /**
-     * 过滤提交载荷：只保留可写字段（服务端强制，静默丢弃越权字段并保留其余）。
+    /** 过滤提交载荷：只保留可写字段（服务端强制，静默丢弃越权字段并保留其余）。
      *
      * <p>与 {@link #assertWritable(Set, FormState, FormType, boolean, boolean, Set)} 的区别：
      * 前者「宽松过滤」（适合增量保存），后者「严格拒绝」（适合提交审批）。
@@ -182,6 +182,56 @@ public final class FormWritePolicy {
             if (writable.contains(entry.getKey())) {
                 filtered.put(entry.getKey(), entry.getValue());
             }
+        }
+        return filtered;
+    }
+
+    // ================================================================ 金额字段级限制（阶段 1.6）
+
+    /**
+     * 金额字段判定 —— 委托给 {@code com.oa.authz.visibility.AmountFieldPolicy}（**唯一实现**）。
+     *
+     * <p>把金额规则接进本类的原因：写入判定必须**一次给全**，否则调用方很容易只调用
+     * 三态白名单而漏掉角色规则（PRD §5.3：草稿态下非财务角色同样不能写金额）。
+     */
+    public static boolean isAmountField(String field) {
+        return AmountFieldPolicy.isAmountField(field);
+    }
+
+    /**
+     * 金额只读断言（角色规则，与单据状态无关）。
+     *
+     * @param amountWritable 调用人是否具备金额写权限（系统管理员 / 财务角色，见
+     *                       {@link AmountFieldPolicy#canWriteAmounts})
+     * @throws BizException 403 {@link ErrorCode#AMOUNT_READ_ONLY}
+     */
+    public static void assertAmountWritable(Set<String> fields, boolean amountWritable) {
+        if (amountWritable || fields == null || fields.isEmpty()) {
+            return;
+        }
+        AmountFieldPolicy.assertWritable(null, fields);
+    }
+
+    /**
+     * 组合断言：**状态白名单 ∧ 角色金额规则**（两者都通过才放行）。
+     *
+     * <p>这是表单保存路径应当调用的方法；只调 5 参版本等于漏掉 PRD §5.3 的金额只读口径。
+     */
+    public static void assertWritable(Set<String> fields, FormState state, FormType formType, boolean isInitiator,
+                                      boolean isArchiveNode, Set<String> allFields, boolean amountWritable) {
+        assertAmountWritable(fields, amountWritable);
+        assertWritable(fields, state, formType, isInitiator, isArchiveNode, allFields);
+    }
+
+    /**
+     * 组合过滤：先按状态白名单过滤，再按角色规则剥掉金额字段（宽容口径，适合增量保存）。
+     */
+    public static Map<String, Object> filterWritable(Map<String, Object> payload, FormState state, FormType formType,
+                                                     boolean isInitiator, boolean isArchiveNode, Set<String> allFields,
+                                                     boolean amountWritable) {
+        Map<String, Object> filtered = filterWritable(payload, state, formType, isInitiator, isArchiveNode, allFields);
+        if (!amountWritable) {
+            filtered.keySet().removeIf(FormWritePolicy::isAmountField);
         }
         return filtered;
     }

@@ -226,4 +226,25 @@
     DELETE FROM sys_org_leader WHERE id = #{id}
   </delete>
 
+  <!-- 批量导入 upsert：四元组命中后只更新 sort_no / remark（不覆盖 duty_title 与生效区间） -->
+  <update id="updateLeaderFromImport">
+    UPDATE sys_org_leader
+    SET sort_no = IFNULL(#{sortNo}, 0),
+        remark = #{remark},
+        updated_by = #{updatedBy},
+        updated_at = NOW()
+    WHERE id = #{id}
+  </update>
+
+  <!-- 负责人主数据导出（import-spec §9.1 org_leader.csv）：全量、按组织路径与正/副职排序 -->
+  <select id="selectAllForExport" resultMap="LeaderRowResultMap">
+    SELECT <include refid="LeaderRowColumns"/>
+    FROM sys_org_leader l
+    JOIN sys_org o ON o.id = l.org_id AND o.deleted_at IS NULL
+    LEFT JOIN sys_user u ON u.id = l.user_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_org_leader, alias=ol) */
+    ORDER BY o.path ASC, (l.leader_type = 'primary') DESC, l.sort_no ASC, l.id ASC
+  </select>
+
 </mapper>

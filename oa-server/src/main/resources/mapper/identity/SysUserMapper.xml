@@ -238,4 +238,44 @@
     WHERE id = #{id} AND deleted_at IS NULL
   </update>
 
+  <!--
+    手机号字段级加密（阶段 1.7）：只取 id + phone 做全量遍历（明文迁移 / 密钥轮换）。
+    受控表标记必须有：调用方（PhoneCryptoService）以 DataScopeContext.system() 执行，
+    标记在系统口径下退化为 1=1（全量），因此迁移不会漏行。
+  -->
+  <select id="selectPhoneRows" resultType="com.oa.identity.infra.row.PhoneRow">
+    SELECT u.id AS id, u.phone AS phone
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+    ORDER BY u.id ASC
+  </select>
+
+  <!-- 迁移/轮换回写：只写 phone 一列（写语句不需要 @dataScope 标记）。 -->
+  <update id="updatePhoneCipher">
+    UPDATE sys_user
+    SET phone = #{phone}, updated_by = #{updatedBy}, updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
+  <!--
+    批量导入 upsert（import-spec §6.1）：account 命中后覆盖档案字段，
+    password_hash 刻意不在列内（防重置在职人员口令）；org_id/company_id 允许置 NULL。
+  -->
+  <update id="updateUserImport" parameterType="com.oa.identity.domain.SysUser">
+    UPDATE sys_user
+    SET employee_no = #{employeeNo},
+        name = #{name},
+        phone = #{phone},
+        email = #{email},
+        org_id = #{orgId},
+        company_id = #{companyId},
+        status = IFNULL(#{status}, 'active'),
+        remark = #{remark},
+        updated_by = #{updatedBy},
+        updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
 </mapper>

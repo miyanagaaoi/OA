@@ -2,6 +2,7 @@ package com.oa.authz.infra;
 
 import com.oa.authz.domain.SysUserRole;
 import com.oa.authz.infra.row.RoleCountRow;
+import com.oa.authz.infra.row.UserRoleExportRow;
 import com.oa.authz.infra.row.UserRoleRow;
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * 用户角色 Mapper（{@code sys_user_role}）—— 本领域**唯一受数据域约束**的表。
@@ -79,6 +81,21 @@ public interface SysUserRoleMapper {
     List<Long> selectUserIdsByRoleId(@Param("roleId") Long roleId);
 
     /**
+     * 按唯一键取分配 id（批量导入 upsert 用；{@code scope_org_key = IFNULL(scope_org_id, 0)}）。
+     *
+     * <p>纯内部校验语句（不 JOIN 受控表、只按主键口径自限），因此不需要 {@code @dataScope} 标记。
+     */
+    @Select("SELECT id FROM sys_user_role"
+            + " WHERE user_id = #{userId} AND role_id = #{roleId} AND IFNULL(scope_org_id, 0) = #{scopeOrgKey}"
+            + " LIMIT 1")
+    Long selectIdByUniqueKey(@Param("userId") Long userId, @Param("roleId") Long roleId,
+                             @Param("scopeOrgKey") long scopeOrgKey);
+
+    /** 按分配 id 取备注（导入 upsert 的「无变更即跳过」需要比对备注）。 */
+    @Select("SELECT remark FROM sys_user_role WHERE id = #{id}")
+    String selectRemarkById(@Param("id") Long id);
+
+    /**
      * 多个角色的用户分配数（{@code GROUP BY role_id}，一次取回 —— 角色列表页禁止 N+1）。
      *
      * <p><b>刻意不 JOIN {@code sys_user}</b>，因此既不带 {@code @dataScope} 标记、
@@ -106,4 +123,28 @@ public interface SysUserRoleMapper {
     /** 撤销授权（硬删除：关联表无 {@code deleted_at}，留痕走 {@code sys_log}）。 */
     @Delete("DELETE FROM sys_user_role WHERE id = #{id}")
     int deleteById(@Param("id") Long id);
+
+    /**
+     * 批量导入 upsert（import-spec §6.1）：{@code (user_id, role_id, scope_org_key)} 命中后
+     * **只更新** {@code remark}（角色与数据域范围不由导入改写，避免误改他人授权面）。
+     */
+    @Update("UPDATE sys_user_role SET remark = #{remark} WHERE id = #{id}")
+    int updateRemark(@Param("id") Long id, @Param("remark") String remark);
+
+    /**
+     * 角色分配主数据导出（{@code user_role.csv}，import-spec §9.1）。
+     *
+     * <p>JOIN {@code sys_user}（受控表）→ 必须带 {@code @dataScope} 标记：
+     * 导出同样只能取数据域内的用户（系统管理员为全量口径）。
+     */
+    @Select("SELECT ur.id AS id, ur.user_id AS userId, u.account AS account, r.code AS roleCode,"
+            + " ur.scope_org_id AS scopeOrgId, so.path AS scopeOrgPath, ur.remark AS remark"
+            + " FROM sys_user_role ur"
+            + " JOIN sys_user u ON u.id = ur.user_id AND u.deleted_at IS NULL"
+            + " JOIN sys_role r ON r.id = ur.role_id AND r.deleted_at IS NULL"
+            + " LEFT JOIN sys_org so ON so.id = ur.scope_org_id AND so.deleted_at IS NULL"
+            + " WHERE 1 = 1"
+            + " AND /* @dataScope(table=sys_user, alias=u) */"
+            + " ORDER BY u.account ASC, r.code ASC, ur.id ASC")
+    List<UserRoleExportRow> selectAllForExport();
 }

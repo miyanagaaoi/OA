@@ -194,9 +194,23 @@ if (Test-Port $AppPort) {
     Start-Sleep -Seconds 3
 }
 
-# 生成启动包装脚本：显式设置 JAVA_HOME / Maven / 代理 / 数据源口令，并重定向日志
+# 生成启动包装脚本：显式设置 JAVA_HOME / Maven / 代理 / 数据源口令 / 手机号加密密钥，并重定向日志
 if (Test-Path $AppLog) {
     Move-Item $AppLog "$AppLog.prev" -Force
+}
+# 手机号 AES-256-GCM 密钥（1.7）：应用启动时**缺密钥即 fail-fast**，所以这里必须注入。
+# 取值优先级与数据库口令一致：local-secrets.ps1 → 环境变量 OA_PHONE_KEY → 提示后退出。
+# 密钥本身**绝不入库**；可用下列命令生成：
+#   $k = -join (1..32 | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })   # 32 字节 hex
+if (-not $PhoneKey) { $PhoneKey = $env:OA_PHONE_KEY }
+if (-not $PhoneKey) {
+    Write-Host ''
+    Write-Host '缺少手机号加密密钥 OA_PHONE_KEY（1.7 手机号 AES-256-GCM 落库必需，应用缺该密钥会拒绝启动）。' -ForegroundColor Yellow
+    Write-Host '  生成并写入本地凭据文件（该文件不入库）：'
+    Write-Host '    $k = -join (1..32 | ForEach-Object { ''{0:x2}'' -f (Get-Random -Max 256) })'
+    Write-Host "    Add-Content `"$secretsFile`" \"`n`$PhoneKey = '<上面生成的 64 位 hex>'\""
+    Write-Host ''
+    exit 3
 }
 $cmdBody = @"
 @echo off
@@ -205,6 +219,7 @@ set "JAVA_HOME=$JavaHome"
 set "PATH=C:\Tools\apache-maven-3.9.16\bin;%JAVA_HOME%\bin;%PATH%"
 set "HTTP_PROXY=http://127.0.0.1:7899"
 set "HTTPS_PROXY=http://127.0.0.1:7899"
+set "OA_PHONE_KEY=$PhoneKey"
 set "OA_DB_USERNAME=$DbUser"
 set "OA_DB_PASSWORD=$DbPass"
 cd /d "$Root\oa-server"

@@ -61,6 +61,8 @@ export const IDENTITY_PERMISSION = {
   userPrefix: 'admin:user:',
   /** 主数据导出：**精确**码，仅系统管理员（import-spec §9.2 T-11） */
   userExport: 'admin:user:export',
+  /** 人员批量导入（高危写操作，import-spec §2；与导出分开判定） */
+  userImport: 'admin:user:import',
 } as const
 
 /**
@@ -136,6 +138,24 @@ export function canManageOrg(store: UserStore): boolean {
 /** 人员管理入口：系统管理员，或命中 `admin:user:*` 任一权限（前缀匹配） */
 export function canManageUser(store: UserStore): boolean {
   return isSystemAdmin(store) || hasAnyPermission(store, [IDENTITY_PERMISSION.userPrefix])
+}
+
+/**
+ * 组织人员**批量导入**入口（阶段 1.8）。
+ *
+ * <p>判据：系统管理员、分公司流程管理员，或命中 `admin:user:import`（权限种子里的人员导入细项）。
+ * 与 `canManageUser` 的区别：导入是**高危写操作**（import-spec §2），普通 `admin:org:*` /
+ * `admin:user:profile` 权限不应自动获得导入能力，因此单列一个判据。
+ *
+ * <p>分公司管理员即使看得到入口，也只能导入**本公司子树**内的行——服务端逐行校验数据域，
+ * 域外行以 `E-XXX-020` fail-closed 拒绝整批（前端只如实展示报告）。
+ */
+export function canImportOrgUser(store: UserStore): boolean {
+  return (
+    isSystemAdmin(store) ||
+    isCompanyAdmin(store) ||
+    store.hasPermission(IDENTITY_PERMISSION.userImport)
+  )
 }
 
 /** 管理后台总览入口：系统管理员，或命中任一 `admin:*` 权限 */

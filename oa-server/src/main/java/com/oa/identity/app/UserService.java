@@ -2,6 +2,9 @@ package com.oa.identity.app;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.oa.authz.visibility.ExportFieldPolicy;
+import com.oa.authz.visibility.ExportTarget;
+import com.oa.authz.visibility.PhoneVisibilityService;
 import com.oa.common.api.PageResult;
 import com.oa.common.config.OaProperties;
 import com.oa.common.error.BizException;
@@ -24,7 +27,7 @@ import com.oa.identity.domain.SysUserSession;
 import com.oa.identity.infra.SysOrgMapper;
 import com.oa.identity.infra.SysUserMapper;
 import com.oa.identity.infra.SysUserPositionMapper;
-import java.security.SecureRandom;
+import com.oa.platform.security.crypto.PhoneCryptoService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,11 +87,7 @@ public class UserService {
     /** 工号格式（import-spec E-USER-014）：仅字母、数字与 {@code -}，≤32。 */
     private static final Pattern EMPLOYEE_NO_PATTERN = Pattern.compile("^[A-Za-z0-9-]{1,32}$");
 
-    /** 口令字符集（去掉易混淆的 l/1/I/o/0）。 */
-    private static final String LETTERS = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-
-    private static final String DIGITS = "23456789";
-
+    /** 口令字符集与随机源见 {@link InitialPasswordGenerator}（与批量导入共用同一规则）。 */
     private final SysUserMapper userMapper;
     private final SysOrgMapper orgMapper;
     private final SysUserPositionMapper positionMapper;
@@ -98,11 +97,15 @@ public class UserService {
     private final PasswordService passwordService;
     private final SessionStore sessionStore;
     private final OaProperties properties;
-    private final SecureRandom random = new SecureRandom();
+    /** 手机号密文读写（阶段 1.7：写加密、读解密、兼容历史明文）。 */
+    private final PhoneCryptoService phoneCrypto;
+    /** 手机号可见性（阶段 1.6：脱敏与「本人/系统管理员可见完整值」的**唯一实现**）。 */
+    private final PhoneVisibilityService phoneVisibility;
 
     public UserService(SysUserMapper userMapper, SysOrgMapper orgMapper, SysUserPositionMapper positionMapper,
                        OrgService orgService, OrgLeaderService leaderService, InFlightChecker inFlightChecker,
-                       PasswordService passwordService, SessionStore sessionStore, OaProperties properties) {
+                       PasswordService passwordService, SessionStore sessionStore, OaProperties properties,
+                       PhoneCryptoService phoneCrypto, PhoneVisibilityService phoneVisibility) {
         this.userMapper = userMapper;
         this.orgMapper = orgMapper;
         this.positionMapper = positionMapper;
@@ -112,6 +115,8 @@ public class UserService {
         this.passwordService = passwordService;
         this.sessionStore = sessionStore;
         this.properties = properties;
+        this.phoneCrypto = phoneCrypto;
+        this.phoneVisibility = phoneVisibility;
     }
 
     // ================================================================ 查询
@@ -161,14 +166,16 @@ public class UserService {
             SysOrg org = entry.getKey() == null ? null : orgIndex.get(entry.getKey());
             List<DirectoryDtos.DirectoryUser> items = new ArrayList<>(entry.getValue().size());
             for (SysUser user : entry.getValue()) {
-                boolean masked = !canSeeFullPhone(principal, user);
+                // 手机号：解密（1.7）+ 脱敏（1.6）都在 PhoneVisibilityService 内完成，此处不手写 substring
+                PhoneVisibilityService.PhoneDisplay phone =
+                        phoneVisibility.display(principal, user.getId(), user.getPhone());
                 items.add(new DirectoryDtos.DirectoryUser(
                         user.getId(),
                         user.getName(),
                         user.getAccount(),
                         user.getEmployeeNo(),
-                        masked ? user.maskedPhone() : user.getPhone(),
-                        masked,
+                        phone.value(),
+                        phone.masked(),
                         user.getPosition(),
                         user.getEmail(),
                         org == null ? null : org.getName()));
@@ -267,7 +274,8 @@ public class UserService {
         user.setName(request.name().trim());
         user.setEmployeeNo(employeeNo);
         user.setPasswordHash(passwordService.encode(initialPassword));
-        user.setPhone(blankToNull(request.phone()));
+        // 手机号写加密（阶段 1.7）：落库一律密文，禁止明文入库（PRD §5.3 / REQ-NFR-005）
+        user.setPhone(phoneCrypto.encryptForStore(blankToNull(request.phone())));
         user.setEmail(blankToNull(request.email()));
         user.setOrgId(dept == null ? null : dept.getId());
         user.setCompanyId(company.getId());
@@ -351,7 +359,9 @@ public class UserService {
         update.setId(id);
         update.setName(request.name().trim());
         update.setEmployeeNo(employeeNo);
-        update.setPhone(request.phone() == null ? "" : request.phone());
+        // 手机号整体覆盖语义保持不变：传 null/空白 = 清空；非空值先加密再落库（阶段 1.7）
+        String phoneInput = blankToNull(request.phone());
+        update.setPhone(phoneInput == null ? "" : phoneCrypto.encryptForStore(phoneInput));
         update.setEmail(request.email() == null ? "" : request.email());
         update.setRemark(request.remark() == null ? "" : request.remark());
         if (company != null) {
@@ -591,6 +601,8 @@ public class UserService {
      * 「导出 → 再导入」的往返校验（§9.1 往返约束 / AC-57）会失败。
      *
      * <p>口径说明：{@code phone} 对系统管理员**不脱敏**（§9.2「导出物即用于数据维护」）；
+     * 取值经 {@link PhoneVisibilityService#exportPlain} 解密（库中为密文），
+     * 并由该方法**内部再次校验系统管理员** —— 本方法无法绕过该约束，也不会把密文写进 CSV。
      * {@code status} 输出中文标签，其中 {@code 停用} 行按 T-05 定稿本就不参与导入往返。
      *
      * @param keyword      姓名/账号/工号关键字
@@ -611,15 +623,15 @@ public class UserService {
                 filter.orgId(), filter.pathPrefix(), companyId);
         Map<Long, String> pathIndex = orgService.businessPathIndex();
         StringBuilder builder = new StringBuilder(CsvSupport.UTF8_BOM);
-        CsvSupport.appendLine(builder, "account", "employee_no", "name", "phone", "email",
-                "company_path", "dept_path", "status", "remark");
+        // 列清单取自 ExportFieldPolicy 的 user.csv 目标（import-spec §9.1，九列；金额列天然不存在）
+        CsvSupport.appendLine(builder, ExportFieldPolicy.columnsFor(ExportTarget.USER, false).toArray(new String[0]));
         for (SysUser user : users) {
             UserStatus userStatus = UserStatus.ofCode(user.getStatus());
             builder.append(CsvSupport.line(
                     user.getAccount(),
                     user.getEmployeeNo(),
                     user.getName(),
-                    user.getPhone(),
+                    phoneVisibility.exportPlain(principal, user.getPhone()),
                     user.getEmail(),
                     user.getCompanyId() == null ? null : pathIndex.get(user.getCompanyId()),
                     user.getOrgId() == null ? null : pathIndex.get(user.getOrgId()),
@@ -703,14 +715,15 @@ public class UserService {
         return user;
     }
 
-    /** 手机号完整值可见性（PRD §5.3 / TC-AUTH-007）：本人与系统管理员可见完整值。 */
-    private boolean canSeeFullPhone(CurrentUser principal, SysUser target) {
-        if (principal == null) {
-            return false;
-        }
-        return Objects.equals(principal.id(), target.getId()) || principal.hasRole("admin");
-    }
-
+    /**
+     * 手机号完整值可见性 —— <b>已下线</b>（阶段 1.6/1.7 收口）。
+     *
+     * <p>判定与脱敏的唯一实现在 {@code com.oa.authz.visibility.PhoneVisibilityService}
+     * （先解密、再按「本人 or 系统管理员」决定是否脱敏）。此处曾是本类的第二份实现，
+     * 保留任一份都会造成口径漂移，故删除；调用点已改用该服务。
+     * 同理，口令字符集与随机源已迁到 {@link InitialPasswordGenerator}（见文件末尾的
+     * {@code randomPassword}）。
+     */
     private Long currentUserId() {
         return DataScopeContext.require().getUserId();
     }
@@ -781,15 +794,17 @@ public class UserService {
         SysOrg org = user.getOrgId() == null ? null : orgIndex.get(user.getOrgId());
         SysOrg company = user.getCompanyId() == null ? null : orgIndex.get(user.getCompanyId());
         UserStatus status = UserStatus.ofCode(user.getStatus());
-        boolean masked = !canSeeFullPhone(principal, user);
+        // 手机号：解密 + 脱敏一次完成（唯一实现，禁止在本类与别处手写 substring）
+        PhoneVisibilityService.PhoneDisplay phone =
+                phoneVisibility.display(principal, user.getId(), user.getPhone());
         Integer pending = pendingTaskCounts == null ? null : pendingTaskCounts.get(user.getId());
         return new UserDtos.UserView(
                 user.getId(),
                 user.getAccount(),
                 user.getName(),
                 user.getEmployeeNo(),
-                masked ? user.maskedPhone() : user.getPhone(),
-                masked,
+                phone.value(),
+                phone.masked(),
                 user.getEmail(),
                 user.getOrgId(),
                 org == null ? null : org.getName(),
@@ -825,17 +840,7 @@ public class UserService {
 
     /** 随机初始口令：≥8 位且**必然**同时含字母与数字（REQ-NFR-005），并用口令策略自校验。 */
     private String randomPassword(int length) {
-        int size = Math.max(8, length);
-        StringBuilder builder = new StringBuilder(size);
-        builder.append(LETTERS.charAt(random.nextInt(LETTERS.length())));
-        builder.append(DIGITS.charAt(random.nextInt(DIGITS.length())));
-        String alphabet = LETTERS + DIGITS;
-        for (int i = 2; i < size; i++) {
-            builder.append(alphabet.charAt(random.nextInt(alphabet.length())));
-        }
-        String password = builder.toString();
-        passwordService.assertStrong(password);
-        return password;
+        return InitialPasswordGenerator.generate(passwordService, length);
     }
 
     private static String blankToNull(String value) {

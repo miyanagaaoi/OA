@@ -79,4 +79,14 @@ public interface SysOrgMapper {
 
     /** 主负责人冗余回填（权威数据仍在 {@code sys_org_leader}）。 */
     int updateLeaderId(@Param("id") Long id, @Param("leaderId") Long leaderId, @Param("updatedBy") Long updatedBy);
+
+    /**
+     * 批量导入（{@code org.csv}）的 upsert 更新：按业务键 {@code org_path} 命中后
+     * **整体覆盖** {@code org_type / name / parent_id / status / path / depth / remark}。
+     *
+     * <p>为什么不复用 {@link #updateOrg}：后者是「改名/排序/备注」的增量语义（{@code <if>} 条件更新），
+     * 而导入是「以文件为准」的整字段覆盖 —— 尤其是 {@code org_type} 与 {@code parent_id}
+     * 必须能被写入（组织调整），且 {@code status} 需要能在同一语句内落库。
+     */
+    int updateOrgImport(SysOrg org);
 }

@@ -2,6 +2,7 @@ package com.oa.identity.infra;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oa.identity.domain.SysUser;
+import com.oa.identity.infra.row.PhoneRow;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -106,4 +107,34 @@ public interface SysUserMapper {
     /** 写入新口令哈希（改密唯一入口；口令只经 {@code PasswordService} 生成哈希）。 */
     int updatePasswordHash(@Param("id") Long id, @Param("passwordHash") String passwordHash,
                            @Param("updatedBy") Long updatedBy);
+
+    // ---------------------------------------------------------------- 敏感字段加密（阶段 1.7）
+
+    /**
+     * 全量手机号行（仅 {@code id} + {@code phone}）—— 一次性明文迁移与密钥轮换遍历用。
+     *
+     * <p><b>调用约定</b>：本语句带 {@code @dataScope} 标记，调用方必须显式使用
+     * {@code DataScopeContext.system()}（后台任务口径）执行；否则会按调用人的数据域裁剪，
+     * 迁移就会「只迁移自己看得到的行」——静默漏迁移，属不可接受的部分成功。
+     */
+    List<PhoneRow> selectPhoneRows();
+
+    /**
+     * 回写单个手机号（迁移/轮换专用，**不接受外部入参**）。
+     *
+     * <p>与 {@link #updateUserProfile} 分开的理由：迁移是系统级后台操作，需要绕过
+     * 「按人改档案」的字段覆盖语义，只写 {@code phone} 一列。
+     */
+    int updatePhoneCipher(@Param("id") Long id, @Param("phone") String phone, @Param("updatedBy") Long updatedBy);
+
+    /**
+     * 批量导入（{@code user.csv}）的 upsert 更新：按业务键 {@code account} 命中后
+     * **整体覆盖** {@code employee_no / name / phone / email / company_id / org_id / status / remark}
+     * （import-spec §6.1；{@code password_hash} **不覆盖**，防重置在职人员口令）。
+     *
+     * <p>与 {@link #updateUserProfile} 的区别：本语句显式写 {@code org_id}/{@code company_id}，
+     * 允许把「无部门」的人写成 {@code NULL}（{@code updateUserProfile} 的 {@code <if>}
+     * 条件更新无法表达「清空归属」，会把空值悄悄留在原部门 —— 那是静默错误）。
+     */
+    int updateUserImport(SysUser user);
 }

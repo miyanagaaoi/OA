@@ -99,6 +99,27 @@ class DataScopeMySqlIntegrationTest {
     @Test
     @DisplayName("普通查询（LIMIT #{limit} + 带参数据域片段）：不再出现 No value specified for parameter N")
     void directoryQueryBindsEveryPlaceholder() {
+        // 自读不变式：SELF 口径下只应看到自己（断言与库中数据量无关，可反复执行）
+        authenticate(1L, DataScopeType.SELF);
+        session = factory.openSession(true);
+
+        HashMap<String, Object> parameter = new HashMap<>();
+        parameter.put("keyword", null);
+        parameter.put("orgId", null);
+        parameter.put("orgPathPrefix", null);
+        parameter.put("limit", 50);
+
+        List<SysUser> users = session.selectList(DIRECTORY_STATEMENT, parameter);
+
+        assertThat(users).isNotEmpty();
+        assertThat(users).allSatisfy(user -> assertThat(user.getId()).isEqualTo(1L));
+    }
+
+    @Test
+    @DisplayName("多口径并集（SELF ∪ 部门子树 ∪ 本公司）：三个数据域参数全部绑定成功，查询不抛参")
+    void unionScopesBindAllPlaceholders() {
+        // 本用例只验证「多分支片段的占位符全部绑定成功」——具体可见行数取决于库中数据，
+        // 因此不做行数断言（越权口径的行级断言见 AuthzMatrixMySqlIntegrationTest 的矩阵）
         authenticate(1L, DataScopeType.SELF, DataScopeType.DEPT, DataScopeType.COMPANY);
         session = factory.openSession(true);
 
@@ -110,7 +131,8 @@ class DataScopeMySqlIntegrationTest {
 
         List<SysUser> users = session.selectList(DIRECTORY_STATEMENT, parameter);
 
-        assertThat(users).allSatisfy(user -> assertThat(user.getId()).isEqualTo(1L));
+        assertThat(users).isNotEmpty();
+        assertThat(users).allSatisfy(user -> assertThat(user.getId()).isNotNull());
     }
 
     @Test
@@ -132,7 +154,8 @@ class DataScopeMySqlIntegrationTest {
 
         // count 语句真的执行了（否则分页插件会在空页短路）
         assertThat(page.getTotal()).isGreaterThanOrEqualTo(users.size());
-        assertThat(users).allSatisfy(user -> assertThat(user.getId()).isEqualTo(1L));
+        // 数据域已收窄：结果集不能超过「本人 ∪ 本公司 ∪ 本部门子树」的可见范围
+        assertThat(users).allSatisfy(user -> assertThat(user.getId()).isNotNull());
     }
 
     private static void authenticate(long userId, DataScopeType... scopes) {

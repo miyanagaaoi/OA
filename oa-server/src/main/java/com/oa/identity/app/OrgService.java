@@ -1,5 +1,7 @@
 package com.oa.identity.app;
 
+import com.oa.authz.visibility.ExportFieldPolicy;
+import com.oa.authz.visibility.ExportTarget;
 import com.oa.common.config.OaProperties;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
@@ -525,7 +527,8 @@ public class OrgService {
         List<SysOrg> all = orgMapper.selectAll(true);
         Map<Long, SysOrg> index = indexById(all);
         StringBuilder builder = new StringBuilder(CsvSupport.UTF8_BOM);
-        CsvSupport.appendLine(builder, "org_path", "org_name", "org_type", "parent_path", "status", "remark");
+        // 列清单取自 ExportFieldPolicy（导出列的唯一来源）：org.csv 六列，天然不含任何金额列
+        CsvSupport.appendLine(builder, ExportFieldPolicy.columnsFor(ExportTarget.ORG, false).toArray(new String[0]));
         for (SysOrg org : exportOrder(all)) {
             String businessPath = businessPath(org, index);
             builder.append(CsvSupport.line(
@@ -636,11 +639,23 @@ public class OrgService {
      */
     public Map<Long, String> businessPathIndex() {
         List<SysOrg> all = orgMapper.selectAll(true);
+        return businessPathIndex(all);
+    }
+
+    /**
+     * 名称路径索引（**入参为既有节点集**的纯函数重载）。
+     *
+     * <p>用途：批量导入需要在**系统口径**下一次取全量节点后反复复用同一份索引
+     * （人员/负责人/岗位/角色的路径解析都依赖它），避免每类导入各查一次表。
+     */
+    public static Map<Long, String> businessPathIndex(List<SysOrg> all) {
         Map<Long, SysOrg> index = indexById(all);
         Map<Long, String> result = new HashMap<>();
-        for (SysOrg org : all) {
-            if (org.getId() != null) {
-                result.put(org.getId(), businessPath(org, index));
+        if (all != null) {
+            for (SysOrg org : all) {
+                if (org.getId() != null) {
+                    result.put(org.getId(), businessPath(org, index));
+                }
             }
         }
         return result;

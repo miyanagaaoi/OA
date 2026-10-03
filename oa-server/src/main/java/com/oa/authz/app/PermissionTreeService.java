@@ -41,16 +41,35 @@ public class PermissionTreeService {
     private final SysPermissionMapper permissionMapper;
     private final SysRolePermissionMapper rolePermissionMapper;
     private final EffectivePermissionService effectivePermissionService;
+    private final AuthzOperatorProvider operatorProvider;
 
     public PermissionTreeService(SysPermissionMapper permissionMapper,
                                  SysRolePermissionMapper rolePermissionMapper,
-                                 EffectivePermissionService effectivePermissionService) {
+                                 EffectivePermissionService effectivePermissionService,
+                                 AuthzOperatorProvider operatorProvider) {
         this.permissionMapper = permissionMapper;
         this.rolePermissionMapper = rolePermissionMapper;
         this.effectivePermissionService = effectivePermissionService;
+        this.operatorProvider = operatorProvider;
     }
 
-    /** 当前权限树（纯策略对象，供勾选规范化/还原复用）。 */
+    /**
+     * 权限树维护的准入（**仅系统管理员**，REQ-ADMIN-003）。
+     *
+     * <p>为什么必须有这一层：权限树是「谁能做什么」的定义本身——若任意已登录用户可读可写，
+     * 就等于任何人都能给自己加权限（越权零放行的底线）。阶段 1 DoD 的逐接口矩阵测试
+     * 明确把「直连接口换角色调用」列为必测项，本闸门是它的落点。
+     *
+     * @throws BizException 403 {@link ErrorCode#FORBIDDEN}（非系统管理员）
+     */
+    private void assertCanMaintainPermissionTree(String action) {
+        if (!operatorProvider.current().isSuperAdmin()) {
+            throw new BizException(ErrorCode.FORBIDDEN,
+                    "权限树" + action + "仅系统管理员可用（REQ-ADMIN-003）");
+        }
+    }
+
+    /** 当前权限树（纯策略对象，供勾选规范化/还原复用）。**内部调用不做准入**（调用方自行鉴权）。 */
     public PermissionTreePolicy.Tree loadTree() {
         List<PermissionTreePolicy.Node> nodes = new ArrayList<>();
         for (SysPermission permission : permissionMapper.selectAll()) {
@@ -59,8 +78,9 @@ public class PermissionTreeService {
         return PermissionTreePolicy.Tree.of(nodes);
     }
 
-    /** {@code GET /api/v1/authz/permissions/tree}：完整权限树。 */
+    /** {@code GET /api/v1/authz/permissions/tree}：完整权限树（仅系统管理员）。 */
     public List<AuthzDtos.PermissionNodeView> tree() {
+        assertCanMaintainPermissionTree("查看");
         List<SysPermission> all = permissionMapper.selectAll();
         PermissionTreePolicy.Tree policyTree = PermissionTreePolicy.Tree.of(toNodes(all));
         Map<Long, SysPermission> byId = new LinkedHashMap<>();
@@ -77,6 +97,7 @@ public class PermissionTreeService {
     /** {@code POST /api/v1/authz/permissions}。 */
     @Transactional
     public AuthzDtos.PermissionView create(AuthzDtos.PermissionUpsertRequest request) {
+        assertCanMaintainPermissionTree("维护");
         String code = requireValidCode(request.code());
         String permType = requireValidPermType(request.permType());
         if (request.parentId() != null) {
@@ -102,6 +123,7 @@ public class PermissionTreeService {
     /** {@code PUT /api/v1/authz/permissions/{id}}。 */
     @Transactional
     public AuthzDtos.PermissionView update(Long id, AuthzDtos.PermissionUpsertRequest request) {
+        assertCanMaintainPermissionTree("维护");
         SysPermission permission = requirePermission(id);
         Long previousParentId = permission.getParentId();
         String code = requireValidCode(request.code());
@@ -174,6 +196,7 @@ public class PermissionTreeService {
      */
     @Transactional
     public void delete(Long id) {
+        assertCanMaintainPermissionTree("维护");
         SysPermission permission = requirePermission(id);
         int children = permissionMapper.countChildren(id);
         if (children > 0) {

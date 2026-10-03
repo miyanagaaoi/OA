@@ -1,7 +1,9 @@
 package com.oa.common.config;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -21,6 +23,7 @@ public class OaProperties {
     private final Jackson jackson = new Jackson();
     private final Identity identity = new Identity();
     private final Watermark watermark = new Watermark();
+    private final Authz authz = new Authz();
 
     public Web getWeb() {
         return web;
@@ -52,6 +55,41 @@ public class OaProperties {
 
     public Watermark getWatermark() {
         return watermark;
+    }
+
+    public Authz getAuthz() {
+        return authz;
+    }
+
+    /**
+     * 字段级限制（阶段 1.6，{@code oa.authz.*}）。
+     *
+     * <p>PRD §5.3 明文规定「金额对非财务类角色不可导出」；V0.4 又给出「系统管理员与财务角色可导出」
+     * 的例外。本开关决定**例外的开关状态**：默认 {@code false} = 一切角色都不导出金额列
+     * （最严口径，本工作包的验收口径）；置 {@code true} 时仅系统管理员与财务角色可随导出拿到金额列。
+     */
+    public static class Authz {
+
+        private final Export export = new Export();
+
+        public Export getExport() {
+            return export;
+        }
+
+        /** 导出策略开关。 */
+        public static class Export {
+
+            /** 是否允许系统管理员/财务角色导出金额列（默认关闭）。 */
+            private boolean amountEnabled = false;
+
+            public boolean isAmountEnabled() {
+                return amountEnabled;
+            }
+
+            public void setAmountEnabled(boolean amountEnabled) {
+                this.amountEnabled = amountEnabled;
+            }
+        }
     }
 
     /**
@@ -448,6 +486,66 @@ public class OaProperties {
 
         /** 失败计数窗口（分钟），窗口内计数、超窗清零。 */
         private int loginFailWindowMinutes = 15;
+
+        /**
+         * 敏感字段加密的**活动密钥**（Base64 或 hex，32 字节 = AES-256）。
+         *
+         * <p><b>生产一律由环境变量注入</b>（{@code OA_PHONE_KEY}），仓库内不得出现真实密钥：
+         * 缺失时 {@code PhoneCipher} 在启动期直接抛错（fail-fast），**不允许静默降级为明文存储**
+         * （PRD §5.3「手机号加密存储」+ REQ-NFR-005）。
+         */
+        private String phoneKey;
+
+        /**
+         * 活动密钥的**替代来源**：指向一个只含密钥（首行，支持 {@code #} 注释）的文件。
+         *
+         * <p>用途：本机 dev 免去「每次重启都要注入环境变量」的麻烦，密钥文件放在仓库之外的
+         * 用户目录（默认 {@code ${user.home}/.oa/oa-phone.key}）。生产不配置本项。
+         */
+        private String phoneKeyFile;
+
+        /** 活动密钥的 keyId（密文内会带该 id，便于将来轮换，默认 {@code k1}）。 */
+        private String phoneKeyId = "k1";
+
+        /**
+         * **历史密钥**（keyId → 密钥材料），仅用于解密（轮换期新旧密文共存）。
+         *
+         * <p>示例：{@code oa.security.phone-keys.k0=<旧密钥>}；轮换流程见
+         * {@code PhoneCryptoService#rotateToActiveKey()}。
+         */
+        private Map<String, String> phoneKeys = new LinkedHashMap<>();
+
+        public String getPhoneKey() {
+            return phoneKey;
+        }
+
+        public void setPhoneKey(String phoneKey) {
+            this.phoneKey = phoneKey;
+        }
+
+        public String getPhoneKeyFile() {
+            return phoneKeyFile;
+        }
+
+        public void setPhoneKeyFile(String phoneKeyFile) {
+            this.phoneKeyFile = phoneKeyFile;
+        }
+
+        public String getPhoneKeyId() {
+            return phoneKeyId;
+        }
+
+        public void setPhoneKeyId(String phoneKeyId) {
+            this.phoneKeyId = phoneKeyId;
+        }
+
+        public Map<String, String> getPhoneKeys() {
+            return phoneKeys;
+        }
+
+        public void setPhoneKeys(Map<String, String> phoneKeys) {
+            this.phoneKeys = phoneKeys == null ? new LinkedHashMap<>() : new LinkedHashMap<>(phoneKeys);
+        }
 
         public int getPasswordMinLength() {
             return passwordMinLength;

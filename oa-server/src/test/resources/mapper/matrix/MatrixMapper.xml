@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  越过权限矩阵测试专用语句（**仅测试资源**，不属于交付代码）
+  ============================================================================
+  用途：在真实 MySQL 上验证「受控表 + 数据域织入」的端到端行为：
+    1) 带标记 → 标记被替换为数据域片段，SQL 正常执行（占位符全部绑定）；
+    2) 不带标记 → 被 DataScopeInterceptor fail-closed 拒绝（40303）。
+  命名空间刻意独立于生产 Mapper，避免与生产语句混淆。
+  ============================================================================
+-->
+<mapper namespace="com.oa.matrix.MatrixMapper">
+
+  <!-- 实例类受控表：带标记（flow_instance kind=INSTANCE） -->
+  <select id="countInstances" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+  </select>
+
+  <select id="selectInstanceIds" resultType="java.lang.Long">
+    SELECT i.id
+    FROM flow_instance i
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+    ORDER BY i.id ASC
+  </select>
+
+  <!-- 用户类受控表：带标记（sys_user kind=USER） -->
+  <select id="countUsers" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user u
+    WHERE 1 = 1
+      AND /* @dataScope(table=sys_user, alias=u) */
+      AND u.deleted_at IS NULL
+  </select>
+
+  <!-- 裸查询（**无标记**）：必须被 40303 fail-closed 拒绝 —— 这是「直连接口」防线的机器证据 -->
+  <select id="countUsersBare" resultType="int">
+    SELECT COUNT(1)
+    FROM sys_user
+    WHERE deleted_at IS NULL
+  </select>
+</mapper>

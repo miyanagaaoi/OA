@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.oa.authz.visibility.PhoneVisibilityService;
 import com.oa.common.config.OaProperties;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
@@ -27,6 +28,7 @@ import com.oa.identity.infra.SysOrgLeaderMapper;
 import com.oa.identity.infra.SysOrgMapper;
 import com.oa.identity.infra.SysUserMapper;
 import com.oa.identity.infra.SysUserPositionMapper;
+import com.oa.platform.security.crypto.PhoneCryptoService;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
@@ -80,8 +82,10 @@ class InFlightForceOverrideServiceTest {
                 .as("默认必须是硬阻断，force 才谈得上覆盖")
                 .isTrue();
 
+        PhoneCryptoService phoneCrypto = new PhoneCryptoService(TestPhoneKeys.cipher(), userMapper);
         userService = new UserService(userMapper, orgMapper, positionMapper, mock(OrgService.class),
-                leaderService, checker, mock(PasswordService.class), sessionStore, properties);
+                leaderService, checker, mock(PasswordService.class), sessionStore, properties,
+                phoneCrypto, new PhoneVisibilityService(phoneCrypto));
         orgService = new OrgService(orgMapper, positionMapper, mock(SysOrgLeaderMapper.class), userMapper,
                 checker, properties);
 

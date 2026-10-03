@@ -63,5 +63,17 @@ public interface SysOrgLeaderMapper {
     /** 只更新可改字段（正/副职、岗位名、业务线、排序、备注、生效区间）。 */
     int updateLeader(SysOrgLeader leader);
 
+    /**
+     * 批量导入 upsert（import-spec §6.1）：四元组命中后**只更新** {@code sort_no} 与 {@code remark}。
+     *
+     * <p>刻意不复用 {@link #updateLeader}（全字段覆盖式 PUT）：导入模板不含
+     * {@code duty_title} 与生效区间，若用全字段更新会把后台维护的岗位名与生效期清空。
+     */
+    int updateLeaderFromImport(@Param("id") Long id, @Param("sortNo") Integer sortNo,
+                               @Param("remark") String remark, @Param("updatedBy") Long updatedBy);
+
+    /** 负责人主数据导出（{@code org_leader.csv}，import-spec §9.1）：与列表同口径，不分页。 */
+    List<LeaderRow> selectAllForExport();
+
     int deleteById(@Param("id") Long id);
 }

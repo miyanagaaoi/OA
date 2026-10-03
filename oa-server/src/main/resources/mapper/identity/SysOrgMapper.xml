@@ -196,4 +196,19 @@
     WHERE id = #{id} AND deleted_at IS NULL
   </update>
 
+  <!-- 批量导入 upsert（import-spec §6.1：org_path 命中后更新 name/org_type/parent_id/status/remark，并重算 path/depth） -->
+  <update id="updateOrgImport" parameterType="com.oa.identity.domain.SysOrg">
+    UPDATE sys_org
+    SET org_type = #{orgType},
+        name = #{name},
+        parent_id = #{parentId},
+        path = #{path},
+        depth = #{depth},
+        status = IFNULL(#{status}, 'active'),
+        remark = #{remark},
+        updated_by = #{updatedBy},
+        updated_at = NOW()
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
+
 </mapper>

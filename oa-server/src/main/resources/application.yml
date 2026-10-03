@@ -184,6 +184,32 @@ oa:
     login-max-failures: 5       # 连续失败 5 次
     login-lock-minutes: 15      # 锁定 15 分钟
     login-fail-window-minutes: 15
+    # ---------------------------------------------------------------------------
+    # 手机号字段级加密（阶段 1.7，AES-256-GCM）
+    #   phone-key      活动密钥（32 字节 Base64 或 hex）——生产**只能**由环境变量注入；
+    #                  为空且 phone-key-file 也读不到时，应用启动直接失败（fail-fast，
+    #                  绝不静默降级为明文存储，PRD §5.3 / REQ-NFR-005）。
+    #   phone-key-file 活动密钥的文件来源（首行，支持 # 注释）；dev 用它免去每次注入环境变量。
+    #   phone-key-id   活动密钥的 keyId（写入密文 v1:<keyId>:...，供将来轮换）。
+    #   phone-keys     历史密钥 { keyId: 密钥材料 }，仅用于解密（轮换期新旧密文共存）。
+    # 生成密钥示例：openssl rand -base64 32
+    # ---------------------------------------------------------------------------
+    phone-key: ${OA_PHONE_KEY:}
+    phone-key-file: ${OA_PHONE_KEY_FILE:}
+    phone-key-id: ${OA_PHONE_KEY_ID:k1}
+    phone-keys: {}
+  authz:
+    export:
+      # 金额列导出开关（PRD §5.3 / AC-18 为准）。
+      #
+      # **默认 true**：PRD §5.3 原文是「合同金额、资金金额对非财务类角色只读展示，不可导出；
+      # 导出功能仅系统管理员与财务角色可用」，AC-18 进一步明确「非财务角色导出按钮不存在/不可用
+      # （系统管理员与财务角色可用）」。因此**正确的闸门是导出端点的角色权限**，
+      # 而不是把金额从所有人的导出物里一律剔除——后者会让财务角色也导不出金额，与 PRD 相悖。
+      # 置 true 时：仅系统管理员与 finance_owner 可随导出拿到金额列（其余角色在导出入口即 403），
+      # 且导出行为写入审计日志（REQ-AUTH-003）。
+      # 置 false 仅在需要「极端保守形态（任何人导出的文件都不含金额）」时使用，属**收紧**而非 PRD 要求。
+      amount-enabled: true
   db:
     immutable-triggers-enabled: true
     immutable-triggers-location: classpath:db/trigger/immutable-triggers.sql

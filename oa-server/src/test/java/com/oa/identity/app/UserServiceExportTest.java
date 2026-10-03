@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.oa.authz.visibility.PhoneVisibilityService;
 import com.oa.common.config.OaProperties;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
@@ -18,6 +19,8 @@ import com.oa.identity.domain.SysUser;
 import com.oa.identity.infra.SysOrgMapper;
 import com.oa.identity.infra.SysUserMapper;
 import com.oa.identity.infra.SysUserPositionMapper;
+import com.oa.platform.security.crypto.PhoneCipher;
+import com.oa.platform.security.crypto.PhoneCryptoService;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,9 +52,26 @@ class UserServiceExportTest {
     void setUp() {
         userMapper = mock(SysUserMapper.class);
         orgService = mock(OrgService.class);
+        // 阶段 1.6/1.7：手机号经 PhoneCryptoService（写加密/读解密）+ PhoneVisibilityService（脱敏）
+        PhoneCipher cipher = new PhoneCipher(testProperties());
+        PhoneCryptoService phoneCrypto = new PhoneCryptoService(cipher, userMapper);
+        PhoneVisibilityService phoneVisibility = new PhoneVisibilityService(phoneCrypto);
         service = new UserService(userMapper, mock(SysOrgMapper.class), mock(SysUserPositionMapper.class),
                 orgService, mock(OrgLeaderService.class), mock(InFlightChecker.class),
-                mock(PasswordService.class), mock(SessionStore.class), new OaProperties());
+                mock(PasswordService.class), mock(SessionStore.class), new OaProperties(),
+                phoneCrypto, phoneVisibility);
+    }
+
+    /** 测试用 AES-256 密钥（32 字节 Base64；**非真实密钥**，仅存在于测试代码内）。 */
+    private static OaProperties testProperties() {
+        OaProperties properties = new OaProperties();
+        byte[] raw = new byte[32];
+        for (int i = 0; i < raw.length; i++) {
+            raw[i] = (byte) (11 + i);
+        }
+        properties.getSecurity().setPhoneKey(java.util.Base64.getEncoder().encodeToString(raw));
+        properties.getSecurity().setPhoneKeyId("k1");
+        return properties;
     }
 
     @AfterEach

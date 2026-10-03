@@ -40,5 +40,13 @@ public interface SysUserPositionMapper {
     int updatePosition(@Param("id") Long id, @Param("position") String position,
                        @Param("remark") String remark, @Param("isPrimary") Integer isPrimary);
 
+    /**
+     * 岗位任职主数据导出（{@code user_position.csv}，import-spec §9.1）：全量、不分页。
+     *
+     * <p>返回 {@link PositionRow}（含 {@code org_path} 真实路径），导出时由服务层
+     * 经名称路径索引还原为业务键 {@code org_path}。
+     */
+    List<PositionRow> selectAllForExport();
+
     int deleteById(@Param("id") Long id);
 }
