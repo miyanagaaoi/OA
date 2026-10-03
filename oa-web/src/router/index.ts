@@ -11,9 +11,11 @@
  *     /task/pending           待我审批（默认落地页）
  *     /task/approved          我已审批
  *     /task/initiated         我发起的
- *     /task/cc                抄送我的
+ *     /task/cc                抄送我的（**接口未实现**，页面如实标注「待实现」）
  *     /archive                历史库（满 3 年归档，只读、可按单号检索）
- *     /task/:id               单据详情（表单 + 轨迹 + 操作区 + 水印）
+ *     /form/new/:formType      发起单据（阶段 2b：schema 驱动表单页，四类共用）
+ *     /form/instance/:instanceId  继续填单 / 补件 / 重提（实例锁定版本 schema）
+ *     /task/:id               单据详情（表单 + 轨迹 + 审批动作 + 水印）
  *     /print/:id              A4 打印预览（正式打印签名栏空栏）
  *   /admin                    管理后台总览（其余模块占位）
  *     /admin/orgs             组织架构（阶段 1 · 1.1：组织树 + 负责人 + 岗位）
@@ -35,6 +37,7 @@ import {
   canOpenAuthzLogAdmin,
   canOpenRoleAdmin,
   canReadFlowTemplate,
+  FLOW_USE_PERMISSION,
 } from '@/utils/admin'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
@@ -73,6 +76,26 @@ const routes: RouteRecordRaw[] = [
         name: 'task-cc',
         component: () => import('@/views/TaskCenterView.vue'),
         meta: { tab: 'cc', title: '抄送我的' },
+      },
+      {
+        // 阶段 2b：发起单据（schema 驱动表单页，四类共用一套渲染器）
+        // 判据：**写**入口要 `flow` 单码（与 `POST /flow-instances` 的入口闸门同源）
+        path: 'form/new/:formType',
+        name: 'form-new',
+        component: () => import('@/views/FormFillView.vue'),
+        meta: { title: '发起单据', formSection: 'initiate', requiredAnyPermission: [FLOW_USE_PERMISSION.use] },
+      },
+      {
+        // 阶段 2b：继续填单 / 补件 / 重提（按**实例锁定版本**的 schema 渲染，AC-09）
+        // 判据：既要能读实例（flow ∪ admin:flow）也可能要写 → 用只读判据放行，写按钮在页内按 `flow` 收紧
+        path: 'form/instance/:instanceId',
+        name: 'form-edit',
+        component: () => import('@/views/FormFillView.vue'),
+        meta: {
+          title: '单据填单',
+          formSection: 'initiate',
+          requiredAnyPermission: [FLOW_USE_PERMISSION.use, FLOW_USE_PERMISSION.adminFlow],
+        },
       },
       {
         path: 'archive',

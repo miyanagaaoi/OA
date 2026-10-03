@@ -1,268 +1,164 @@
 <script setup lang="ts">
 /**
- * oa-web · 审批中心 · 列表页（待我审批 / 我已审批 / 我发起的 / 抄送我的）
+ * oa-web · 审批中心 · 列表页（阶段 2b：接**真实引擎**，替换此前的演示数据）
  * ----------------------------------------------------------------------------
- * 来源：
- *   · `DESIGN.md` › Layout（审批列表栏固定 380px、列表项两行结构；业务表格仍用 table）
- *     › Components › Data Display（44px 行高、金额 tnum 右对齐、状态徽标、
- *       分页 32px + 每页条数、表头粘性）
- *     › Responsive Strategy（≥1025px 用表格；≤768px 单列流式 —— 卡片列表）
- *   · `doc/prd-0.1.md` 6.2（四类单据）、6.9（审计日志用紧凑表格）
- *   · `normify-oa/modules/oa/portal/workbench/**`（tabs / filter / table / batch / empty）
+ * 数据源（`flow-task.ts`，全部为 2a 已交付接口）：
+ *   · 待我审批 = `GET /api/v1/flow-tasks/todo?page=&size=`（`pending` 且我是处理人）
+ *   · 我已审批 = `GET /api/v1/flow-tasks/done`
+ *   · 我发起的 = `GET /api/v1/flow-tasks/initiated`
+ *   · 抄送我的 = **接口未实现** —— 后端只有上述三个列表；`flow_instance_cc` 只能在**单实例**
+ *     维度通过 `GET /flow-instances/{id}/cc` 读出。本页**不伪造**「抄送我的」列表，
+ *     如实显示「待实现」并说明替代路径（任务书硬要求 7）。
+ *   · 历史库（`/archive`）= **阶段 3**：归档检索接口未交付，本页同样如实标注（不再展示假数据）。
  *
- * 交互要点：
- *   · 筛选：关键字 + 单据类型 + 状态 + 日期区间
- *   · 分页：10/20/50 + 总条数；当前页 primary + primary-subtle 底
- *   · 批量：勾选后出现批量同意 / 批量转办，危险操作二次确认且确认文案写明动作与对象
- *   · 状态标签：只从附录 B 的五个 status-pill 里选
- *   · 金额 ≥100 万同时显示"万元"换算
- *   · 一屏一主按钮：本页主按钮为「批量同意」，仅在勾选后出现
+ * 来源：`doc/enums.md` §8（三层状态）、§2（主干 7 节点）；`doc/prd-0.1.md` §6.2（四类单据）；
+ *       `DESIGN.md` › Layout（列表栏 / 表格 44px 行高 / 表头粘性 / 分页 32px）
+ *
+ * 与旧实现的差异（本页是**替换**，不是叠加）：
+ *   1. 去掉批量同意 / 批量转办 —— 真实后端**没有**批量端点（`FlowTaskController` 只有逐任务动作），
+ *      假入口会让用户以为已批量处理；批量需求属后续工作包。
+ *   2. 去掉关键字/类型/状态/日期筛选 —— 三个列表接口**只接受 page/size**（无筛选参数），
+ *      前端筛选会变成「只筛当前页」的骗人功能；列表页因此只做分页与跳转。
+ *   3. 待办徽标与 Tab 计数取自各自列表的 `total`（服务端分页总数，`long` → JSON 字符串已归一）。
  */
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import {
-  batchApprove,
-  batchTransfer,
-  fetchWorkbenchFilters,
-  fetchWorkbenchSummary,
-  queryWorkbench,
-} from '@/api/task'
 import { ApiError } from '@/api/http'
-import { useUserStore } from '@/stores/user'
-import { formatAmount, formatDateTime, formatWan } from '@/utils/format'
-import { FORM_TYPE_GLYPH, nodeNoGlyphSafe, statusLabel, statusPillClass } from '@/utils/status'
-import type {
-  WorkbenchFilterOption,
-  WorkbenchItem,
-  WorkbenchQuery,
-  WorkbenchSummary,
-  WorkbenchTab,
-} from '@/types/api'
+import { listDoneTasks, listInitiatedTasks, listTodoTasks } from '@/api/flow-task'
+import { formatDateTime } from '@/utils/format'
+import { FORM_DOC_TYPE_GLYPH, FORM_DOC_TYPE_LABEL, toFormDocType } from '@/utils/form-rules'
+import { instancePillStatus, instanceStatusLabel, taskStatusLabel, subStatusLabel, toCount } from '@/utils/flow-task'
+import { statusPillClass } from '@/utils/status'
+import type { FlowListKind, FlowTaskListItem } from '@/types/flow-task'
 
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
 
-const tabs: Array<{ key: WorkbenchTab; label: string; path: string }> = [
-  { key: 'pending', label: '待我审批', path: '/task/pending' },
-  { key: 'approved', label: '我已审批', path: '/task/approved' },
+const tabs: Array<{ key: FlowListKind; label: string; path: string }> = [
+  { key: 'todo', label: '待我审批', path: '/task/pending' },
+  { key: 'done', label: '我已审批', path: '/task/approved' },
   { key: 'initiated', label: '我发起的', path: '/task/initiated' },
   { key: 'cc', label: '抄送我的', path: '/task/cc' },
 ]
 
-const activeTab = computed<WorkbenchTab>(() => (route.meta.tab as WorkbenchTab | undefined) ?? 'pending')
+const activeTab = computed<FlowListKind>(() => (route.meta.tab as FlowListKind | undefined) ?? 'todo')
 const isArchive = computed(() => route.meta.archiveOnly === true)
+/** 抄送列表接口是否可用（后端未实现 → 本页如实标注，不发请求） */
+const ccImplemented = false
 
-const summary = ref<WorkbenchSummary>({ pending: 0, approved: 0, initiated: 0, cc: 0, timeoutRisk: 0 })
-const filters = ref<WorkbenchFilterOption[]>([])
-const list = ref<WorkbenchItem[]>([])
+const items = ref<FlowTaskListItem[]>([])
 const total = ref(0)
 const loading = ref(false)
-const selected = ref<WorkbenchItem[]>([])
+const errorText = ref('')
+const counts = reactive<Record<FlowListKind, number>>({ todo: 0, done: 0, initiated: 0, cc: 0 })
+const page = ref(1)
+const pageSize = ref(20)
 
-const query = reactive<WorkbenchQuery>({
-  tab: 'pending',
-  keyword: '',
-  formTypes: [],
-  statuses: [],
-  dateFrom: '',
-  dateTo: '',
-  page: 1,
-  pageSize: 20,
-})
-
-const formTypeOptions = computed(
-  () => filters.value.find((item) => item.key === 'formType')?.options ?? [
-    { value: 'matter', label: '事项审批单' },
-    { value: 'fund', label: '资金审批单' },
-    { value: 'contract', label: '合同审批单' },
-    { value: 'seal_cert', label: '印鉴证照审批单' },
-  ],
-)
-
-const statusOptions = computed(
-  () => filters.value.find((item) => item.key === 'status')?.options ?? [],
-)
-
-const hasSelection = computed(() => selected.value.length > 0)
-const selectedTaskIds = computed(() =>
-  selected.value.map((item) => item.taskId).filter((id): id is string => Boolean(id)),
-)
-
-/** 表格批量操作只对「待我审批」开放 */
-const batchEnabled = computed(() => activeTab.value === 'pending' && !isArchive.value)
+const activeTabLabel = computed(() => tabs.find((tab) => tab.key === activeTab.value)?.label ?? '待我审批')
+const totalPages = computed(() => (total.value > 0 ? Math.ceil(total.value / pageSize.value) : 1))
 
 onMounted(async () => {
-  await Promise.all([loadSummary(), loadFilters()])
-  await loadList()
+  await Promise.all([loadList(), loadCounts()])
 })
 
 watch(
   () => route.fullPath,
   async () => {
-    query.page = 1
-    query.tab = activeTab.value
-    selected.value = []
-    await loadList()
+    page.value = 1
+    errorText.value = ''
+    await Promise.all([loadList(), loadCounts()])
   },
 )
 
-async function loadSummary(): Promise<void> {
-  try {
-    summary.value = await fetchWorkbenchSummary()
-  } catch {
-    summary.value = { pending: 0, approved: 0, initiated: 0, cc: 0, timeoutRisk: 0 }
-  }
-}
-
-async function loadFilters(): Promise<void> {
-  try {
-    filters.value = await fetchWorkbenchFilters()
-  } catch {
-    filters.value = []
-  }
-}
-
 async function loadList(): Promise<void> {
+  if (isArchive.value || (!ccImplemented && activeTab.value === 'cc')) {
+    items.value = []
+    total.value = 0
+    return
+  }
   loading.value = true
-  query.tab = activeTab.value
+  errorText.value = ''
   try {
-    const result = await queryWorkbench({ ...query })
-    list.value = result.list
+    const result = await fetchByKind(activeTab.value, page.value, pageSize.value)
+    items.value = result.items
     total.value = result.total
   } catch (error) {
-    list.value = []
+    items.value = []
     total.value = 0
-    if (error instanceof ApiError && error.httpStatus !== 401) {
-      ElMessage({ type: 'error', message: error.message })
-    }
+    errorText.value = error instanceof ApiError ? `${error.message}${error.code ? `（业务码 ${error.code}）` : ''}` : '列表加载失败'
   } finally {
     loading.value = false
   }
 }
 
-function search(): void {
-  query.page = 1
-  void loadList()
+/** 四个 Tab 的计数（抄送跳过请求） */
+async function loadCounts(): Promise<void> {
+  const kinds: FlowListKind[] = ['todo', 'done', 'initiated']
+  await Promise.all(
+    kinds.map(async (kind) => {
+      try {
+        const result = await fetchByKind(kind, 1, 1)
+        counts[kind] = toCount(result.total, 0)
+      } catch {
+        counts[kind] = 0
+      }
+    }),
+  )
 }
 
-function resetFilters(): void {
-  query.keyword = ''
-  query.formTypes = []
-  query.statuses = []
-  query.dateFrom = ''
-  query.dateTo = ''
-  query.page = 1
-  void loadList()
+function fetchByKind(kind: FlowListKind, targetPage: number, size: number) {
+  switch (kind) {
+    case 'done':
+      return listDoneTasks(targetPage, size)
+    case 'initiated':
+      return listInitiatedTasks(targetPage, size)
+    case 'todo':
+    default:
+      return listTodoTasks(targetPage, size)
+  }
 }
 
-function changePage(page: number): void {
-  query.page = page
+function goto(path: string): void {
+  void router.push(path)
+}
+
+function openDetail(item: FlowTaskListItem): void {
+  void router.push({ name: 'task-detail', params: { id: item.instanceId } })
+}
+
+function formTypeLabelOf(item: FlowTaskListItem): string {
+  const type = toFormDocType(item.formType)
+  return type ? FORM_DOC_TYPE_LABEL[type] : item.formType || '未知类型'
+}
+
+function formTypeGlyphOf(item: FlowTaskListItem): string {
+  const type = toFormDocType(item.formType)
+  return type ? FORM_DOC_TYPE_GLYPH[type] : '单'
+}
+
+function changePage(next: number): void {
+  const target = Math.max(1, Math.min(next, totalPages.value))
+  if (target === page.value) return
+  page.value = target
   void loadList()
 }
 
 function changePageSize(size: number): void {
-  query.pageSize = size
-  query.page = 1
+  pageSize.value = size
+  page.value = 1
   void loadList()
 }
 
-function openDetail(item: WorkbenchItem): void {
-  void router.push({ name: 'task-detail', params: { id: item.instanceId } })
-}
-
-function tabCount(key: WorkbenchTab): number {
-  return summary.value[key] ?? 0
-}
-
-/** 批量同意：危险度低，但仍二次确认（告知数量与对象范围） */
-async function handleBatchApprove(): Promise<void> {
-  const ids = selectedTaskIds.value
-  if (ids.length === 0) {
-    ElMessage({ type: 'warning', message: '所选单据没有可操作的待办任务' })
-    return
-  }
-
-  let opinion = ''
-  try {
-    const result = await ElMessageBox.prompt(
-      `将对选中的 ${ids.length} 张单据执行同意操作，请填写审批意见。`,
-      `确认同意 ${ids.length} 张单据`,
-      {
-        confirmButtonText: '确认同意',
-        cancelButtonText: '取消',
-        inputType: 'textarea',
-        inputPlaceholder: '审批意见（选填，最多 500 字）',
-        inputValidator: (value: string) => (value?.length ?? 0) <= 500 || '审批意见不得超过 500 字',
-      },
-    )
-    opinion = result.value ?? ''
-  } catch {
-    return
-  }
-
-  try {
-    const result = await batchApprove({ taskIds: ids, opinion })
-    const failed = result.failed?.length ?? 0
-    ElMessage({
-      type: failed > 0 ? 'warning' : 'success',
-      message: failed > 0 ? `已同意 ${result.succeeded.length} 张，${failed} 张失败（状态已变更）` : `已同意 ${result.succeeded.length} 张单据`,
-    })
-    selected.value = []
-    await Promise.all([loadList(), loadSummary()])
-  } catch (error) {
-    ElMessage({ type: 'error', message: error instanceof Error ? error.message : '批量同意失败' })
-  }
-}
-
-/** 批量转办：必须填写转办原因与接收人 */
-async function handleBatchTransfer(): Promise<void> {
-  const ids = selectedTaskIds.value
-  if (ids.length === 0) {
-    ElMessage({ type: 'warning', message: '所选单据没有可操作的待办任务' })
-    return
-  }
-
-  let targetUserId = ''
-  let reason = ''
-  try {
-    const result = await ElMessageBox.prompt(
-      `将把选中的 ${ids.length} 个任务转办给他人，转办对象必须是同一数据域内可见该单据的人。请填写「接收人工号 / 转办原因」。`,
-      `确认转办 ${ids.length} 个任务`,
-      {
-        confirmButtonText: '确认转办',
-        cancelButtonText: '取消',
-        inputPlaceholder: '例：10086 / 外出期间由同事代办',
-        inputValidator: (value: string) => {
-          if (!value || !value.includes('/')) return '请按「接收人工号 / 转办原因」填写'
-          return true
-        },
-      },
-    )
-    const [uid, ...rest] = (result.value ?? '').split('/')
-    targetUserId = uid.trim()
-    reason = rest.join('/').trim()
-  } catch {
-    return
-  }
-
-  try {
-    const result = await batchTransfer({ taskIds: ids, targetUserId, reason })
-    ElMessage({ type: 'success', message: `已转办 ${result.succeeded.length} 个任务` })
-    selected.value = []
-    await Promise.all([loadList(), loadSummary()])
-  } catch (error) {
-    ElMessage({ type: 'error', message: error instanceof Error ? error.message : '批量转办失败' })
-  }
+/** 待办行主按钮文案（非待办不出现主按钮） */
+function canAct(item: FlowTaskListItem): boolean {
+  return activeTab.value === 'todo' && item.taskId !== '' && item.taskStatus === 'pending'
 }
 </script>
 
 <template>
-  <div class="oa-center" :class="{ 'is-h5': false }">
+  <div class="oa-center">
     <!-- ================= 列表栏 ================= -->
     <section class="list-pane">
-      <!-- 标签页：待办数量用徽标显示在标签右侧，不使用彩色圆点 -->
       <nav class="tabs" aria-label="工作台标签">
         <button
           v-for="tab in tabs"
@@ -270,214 +166,149 @@ async function handleBatchTransfer(): Promise<void> {
           class="tab"
           :class="{ 'is-active': activeTab === tab.key && !isArchive }"
           type="button"
-          @click="router.push(tab.path)"
+          @click="goto(tab.path)"
         >
           {{ tab.label }}
-          <i class="oa-tnum">{{ tabCount(tab.key) }}</i>
+          <i v-if="tab.key !== 'cc'" class="oa-tnum">{{ counts[tab.key] }}</i>
         </button>
       </nav>
 
-      <h1 class="page-title">{{ isArchive ? '历史库' : (route.meta.title || '待我审批') }}</h1>
+      <h1 class="page-title">{{ isArchive ? '历史库' : activeTabLabel }}</h1>
 
-      <!-- 筛选区 -->
-      <div class="filters">
-        <input
-          v-model="query.keyword"
-          class="control"
-          type="search"
-          placeholder="搜索单号 / 标题 / 发起人"
-          @keyup.enter="search"
-        />
-
-        <div class="filter-row">
-          <select v-model="query.formTypes" class="control" multiple size="1" aria-label="单据类型">
-            <option v-for="opt in formTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
-          <select v-model="query.statuses" class="control" multiple size="1" aria-label="单据状态">
-            <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
-        </div>
-
-        <div class="filter-row">
-          <input v-model="query.dateFrom" class="control" type="date" aria-label="起始日期" />
-          <span class="tilde">—</span>
-          <input v-model="query.dateTo" class="control" type="date" aria-label="结束日期" />
-        </div>
-
-        <div class="filter-actions">
-          <button class="btn btn-secondary" type="button" @click="resetFilters">重置</button>
-          <button class="btn btn-primary" type="button" @click="search">查询</button>
-        </div>
-
-        <p v-if="!isArchive && summary.timeoutRisk > 0" class="timeout-hint">
-          其中 <b class="oa-tnum">{{ summary.timeoutRisk }}</b> 张已进入超时预警，请优先处理。
+      <!-- 历史库：阶段 3（归档检索接口未交付） -->
+      <div v-if="isArchive" class="notice">
+        <p class="notice-title">历史库待阶段 3 实现</p>
+        <p>
+          归档检索接口（`admin:archive:search` 对应的查询端点）尚未交付，本页**不再展示演示数据**。
+          已归档单据仍可通过「我已审批 / 我发起的」查到其单号，再进入详情页只读查看。
         </p>
       </div>
 
-      <!-- 批量操作条：仅勾选后出现，主按钮一屏只出现一次 -->
-      <div v-if="hasSelection" class="batch-bar">
-        <span class="batch-count">已选 <b class="oa-tnum">{{ selected.length }}</b> 张</span>
-        <button class="btn btn-ghost" type="button" @click="selected = []">取消选择</button>
-        <span class="spacer" />
-        <button v-if="batchEnabled" class="btn btn-secondary" type="button" @click="handleBatchTransfer">批量转办</button>
-        <button v-if="batchEnabled" class="btn btn-primary" type="button" @click="handleBatchApprove">批量同意</button>
+      <!-- 抄送我的：后端未实现列表接口 -->
+      <div v-else-if="!ccImplemented && activeTab === 'cc'" class="notice">
+        <p class="notice-title">「抄送我的」列表待实现</p>
+        <p>
+          后端当前只有 `todo` / `done` / `initiated` 三个列表（`FlowTaskController`），
+          **没有**「抄送我的」查询端点；被抄送人只能从**单据详情页**看该单的抄送清单
+          （`GET /flow-instances/{id}/cc`）。本页如实标注，不伪造列表。
+        </p>
+        <button class="btn btn-secondary" type="button" @click="goto('/task/initiated')">去「我发起的」</button>
       </div>
 
-      <!-- 桌面：数据表（44px 行高 / 表头粘性 / 金额右对齐等宽） -->
-      <div class="table-wrap">
-        <table class="oa-table">
-          <thead>
-            <tr>
-              <th class="c" style="width: 36px">
-                <input
-                  type="checkbox"
-                  :checked="selected.length > 0 && selected.length === list.length"
-                  aria-label="全选"
-                  @change="
-                    selected = ($event.target as HTMLInputElement).checked
-                      ? list.filter((item) => item.taskId)
-                      : []
-                  "
-                />
-              </th>
-              <th style="width: 148px">单号</th>
-              <th>标题</th>
-              <th style="width: 150px">发起人 / 部门</th>
-              <th class="r" style="width: 168px">金额</th>
-              <th style="width: 120px">当前节点</th>
-              <th style="width: 96px">状态</th>
-              <th style="width: 132px">发起时间</th>
-            </tr>
-          </thead>
+      <template v-else>
+        <div v-if="errorText" class="notice is-error">
+          <p class="notice-title">列表加载失败</p>
+          <p>{{ errorText }}</p>
+          <button class="btn btn-secondary" type="button" @click="loadList">重试</button>
+        </div>
 
-          <tbody>
-            <tr v-if="loading">
-              <td class="c empty" colspan="8">正在加载…</td>
-            </tr>
-            <tr v-else-if="list.length === 0">
-              <td class="c empty" colspan="8">
-                <div class="oa-empty">
-                  <p>当前筛选条件下没有单据。</p>
-                  <button class="btn btn-secondary" type="button" @click="resetFilters">清空筛选条件</button>
-                </div>
-              </td>
-            </tr>
-            <tr
-              v-for="item in list"
-              v-else
-              :key="item.instanceId"
-              :class="{ 'is-selected': selected.some((s) => s.instanceId === item.instanceId) }"
-              @click="openDetail(item)"
-            >
-              <td class="c" @click.stop>
-                <input
-                  v-model="selected"
-                  type="checkbox"
-                  :value="item"
-                  :disabled="!item.taskId"
-                  :aria-label="`选择 ${item.bizNo}`"
-                />
-              </td>
-              <td class="oa-mono">{{ item.bizNo }}</td>
-              <td>
-                <div class="cell-title">
-                  <span class="type-ico" aria-hidden="true">{{ FORM_TYPE_GLYPH[item.formType] }}</span>
-                  <span class="title-text">{{ item.title }}</span>
-                  <span v-if="item.collaborationProgress" class="oa-tag is-info">
-                    协同 {{ item.collaborationProgress }}
+        <div class="table-wrap">
+          <table class="oa-table">
+            <thead>
+              <tr>
+                <th style="width: 156px">单号</th>
+                <th>单据 / 当前节点</th>
+                <th style="width: 130px">发起人</th>
+                <th style="width: 120px">我的任务</th>
+                <th style="width: 110px">单据状态</th>
+                <th style="width: 150px">时间</th>
+                <th style="width: 96px">操作</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-if="loading">
+                <td class="c empty" colspan="7">正在加载…</td>
+              </tr>
+              <tr v-else-if="items.length === 0">
+                <td class="c empty" colspan="7">
+                  <div class="oa-empty">
+                    <p>当前列表没有单据。</p>
+                    <p class="oa-text-caption oa-text-subtle">
+                      待办为空说明没有分配给你的待处理任务；「我发起的」只列出你本人发起的单据（数据域过滤由服务端执行）。
+                    </p>
+                  </div>
+                </td>
+              </tr>
+              <tr v-for="item in items" v-else :key="`${item.instanceId}-${item.taskId}`" @click="openDetail(item)">
+                <td class="oa-mono">{{ item.bizNo || item.instanceId }}</td>
+                <td>
+                  <div class="cell-title">
+                    <span class="type-ico" aria-hidden="true">{{ formTypeGlyphOf(item) }}</span>
+                    <span class="title-text">{{ formTypeLabelOf(item) }}</span>
+                    <span v-if="item.addSignType" class="oa-tag is-info">
+                      {{ item.addSignType === 'pre' ? '前加签' : '后加签' }}
+                    </span>
+                  </div>
+                  <div class="cell-meta">
+                    节点{{ item.currentNodeSeq ?? item.nodeSeq ?? '—' }} · {{ item.nodeName || '—' }}
+                    <template v-if="subStatusLabel(item.subStatus)"> · {{ subStatusLabel(item.subStatus) }}</template>
+                  </div>
+                </td>
+                <td>{{ item.initiatorName || '—' }}</td>
+                <td>
+                  <span v-if="item.taskStatus" class="oa-pill" :class="item.taskStatus === 'pending' ? 'is-pending' : 'is-closed'">
+                    {{ taskStatusLabel(item.taskStatus, item.taskStatusLabel) }}
                   </span>
-                  <span v-if="item.ccOnly" class="oa-tag">抄送</span>
-                </div>
-                <div class="cell-meta">
-                  {{ item.formTypeLabel }}
-                  <template v-if="item.dueAt">
-                    · 截止 <i class="oa-mono">{{ formatDateTime(item.dueAt) }}</i>
-                  </template>
-                </div>
-              </td>
-              <td>
-                <div class="cell-strong">{{ item.initiatorName }}</div>
-                <div class="cell-meta">{{ item.deptName }}</div>
-              </td>
-              <td class="oa-amount">
-                <template v-if="item.amount">
-                  {{ formatAmount(item.amount) }}
-                  <span v-if="formatWan(item.amount)" class="wan">{{ formatWan(item.amount) }}</span>
-                </template>
-                <span v-else class="cell-meta">—</span>
-              </td>
-              <td>
-                <span v-if="item.currentNodeName" class="node-cell">
-                  <i v-if="nodeNoGlyphSafe(item.currentNodeNo)" class="node-no">
-                    {{ nodeNoGlyphSafe(item.currentNodeNo) }}
-                  </i>
-                  {{ item.currentNodeName }}
-                </span>
-                <span v-else class="cell-meta">—</span>
-              </td>
-              <td>
-                <span class="oa-pill" :class="statusPillClass(item.status)">
-                  {{ statusLabel(item.status, item.statusLabel) }}
-                </span>
-              </td>
-              <td class="oa-mono">{{ formatDateTime(item.createdAt) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                  <span v-else class="cell-meta">—</span>
+                </td>
+                <td>
+                  <span class="oa-pill" :class="statusPillClass(instancePillStatus(item.instanceStatus) as never)">
+                    {{ instanceStatusLabel(item.instanceStatus) }}
+                  </span>
+                </td>
+                <td class="oa-mono">{{ formatDateTime(item.decidedAt ?? item.taskCreatedAt) }}</td>
+                <td class="c">
+                  <button class="btn btn-ghost" type="button" @click.stop="openDetail(item)">
+                    {{ canAct(item) ? '去审批' : '查看' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <!-- 分页：32px 高、每页条数切换 + 总条数 -->
-      <footer class="table-foot">
-        <span>共 <b class="oa-tnum">{{ total }}</b> 条</span>
-        <label class="page-size">
-          每页
-          <select :value="query.pageSize" @change="changePageSize(Number(($event.target as HTMLSelectElement).value))">
-            <option :value="10">10</option>
-            <option :value="20">20</option>
-            <option :value="50">50</option>
-          </select>
-          条
-        </label>
-        <span class="spacer" />
-        <span class="pager">
-          <button
-            class="pgbtn"
-            type="button"
-            :disabled="query.page <= 1"
-            @click="changePage(query.page - 1)"
-          >
-            上一页
-          </button>
-          <button class="pgbtn is-active" type="button">
-            <i class="oa-tnum">{{ query.page }}</i>
-          </button>
-          <button
-            class="pgbtn"
-            type="button"
-            :disabled="query.page * query.pageSize >= total"
-            @click="changePage(query.page + 1)"
-          >
-            下一页
-          </button>
-        </span>
-      </footer>
+        <footer class="table-foot">
+          <span>共 <b class="oa-tnum">{{ total }}</b> 条</span>
+          <label class="page-size">
+            每页
+            <select
+              :value="pageSize"
+              @change="changePageSize(Number(($event.target as HTMLSelectElement).value))"
+            >
+              <option :value="10">10</option>
+              <option :value="20">20</option>
+              <option :value="50">50</option>
+            </select>
+            条
+          </label>
+          <span class="spacer" />
+          <span class="pager">
+            <button class="pgbtn" type="button" :disabled="page <= 1" @click="changePage(page - 1)">上一页</button>
+            <button class="pgbtn is-active" type="button">
+              <i class="oa-tnum">{{ page }}</i>
+              <span class="pg-total">/ {{ totalPages }}</span>
+            </button>
+            <button class="pgbtn" type="button" :disabled="page >= totalPages" @click="changePage(page + 1)">下一页</button>
+          </span>
+        </footer>
+      </template>
     </section>
 
-    <!-- ================= 详情栏（桌面并置；窄屏点击列表项跳详情页） ================= -->
+    <!-- ================= 详情栏 ================= -->
     <aside class="detail-pane">
       <header class="detail-head">
         <h2 class="detail-title">单据详情</h2>
-        <span class="oa-text-caption oa-text-subtle">选择左侧任一单据，或打开独立详情页</span>
+        <span class="oa-text-caption oa-text-subtle">点任意一行进入详情页（含表单、轨迹与审批动作）</span>
       </header>
 
       <div class="detail-body">
         <div class="oa-empty">
           <p>审批中心采用「列表 + 详情」双栏并置。</p>
           <p class="oa-text-body-sm oa-text-muted">
-            点击列表中的单据即在右侧就地加载详情，不跳页；窄屏（≤768px）自动切换为「列表 → 详情」两级。
-          </p>
-          <p class="oa-text-caption oa-text-subtle">
-            当前登录：{{ userStore.displayName }} · 工号 {{ userStore.employeeNo }}
+            列表数据来自真实引擎（`/flow-tasks/todo|done|initiated`）；详情页的审批动作可用性
+            由服务端的动作面清单（`GET /flow-actions`）+ 实例状态 + 节点开关共同判定，
+            不可用时**直接说明原因**。
           </p>
         </div>
       </div>
@@ -489,7 +320,6 @@ async function handleBatchTransfer(): Promise<void> {
 .oa-center {
   display: grid;
   grid-template-columns: var(--oa-panel-list) minmax(0, 1fr);
-  gap: 0;
   min-height: 100%;
   background: var(--oa-color-canvas);
   border: 1px solid var(--oa-color-hairline);
@@ -497,7 +327,6 @@ async function handleBatchTransfer(): Promise<void> {
   overflow: hidden;
 }
 
-/* ---------------- 列表栏 ---------------- */
 .list-pane {
   display: flex;
   flex-direction: column;
@@ -531,10 +360,6 @@ async function handleBatchTransfer(): Promise<void> {
   cursor: pointer;
 }
 
-.tab:hover {
-  color: var(--oa-color-ink);
-}
-
 .tab.is-active {
   color: var(--oa-color-primary);
   border-bottom-color: var(--oa-color-primary);
@@ -566,112 +391,34 @@ async function handleBatchTransfer(): Promise<void> {
   color: var(--oa-color-ink);
 }
 
-.filters {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--oa-space-xs);
-  padding: var(--oa-space-sm) var(--oa-space-md);
-  border-bottom: 1px solid var(--oa-color-hairline);
-}
-
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: var(--oa-space-xs);
-}
-
-.tilde {
-  color: var(--oa-color-ink-disabled);
-}
-
-.control {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: var(--oa-space-control);
-  padding: 0 var(--oa-space-sm);
-  border: 1px solid var(--oa-color-hairline);
+.notice {
+  margin: var(--oa-space-sm) var(--oa-space-md);
+  padding: var(--oa-space-sm);
+  border: 1px dashed var(--oa-color-hairline-strong);
   border-radius: var(--oa-radius-sm);
-  background: var(--oa-color-canvas);
-  color: var(--oa-color-ink);
+  background: var(--oa-color-canvas-subtle);
   font: var(--oa-font-body-sm);
+  color: var(--oa-color-ink-muted);
 }
 
-.control:focus {
-  border-color: var(--oa-color-primary);
-  outline: none;
-  box-shadow: var(--oa-shadow-focus-ring);
+.notice p {
+  margin: 0 0 4px;
 }
 
-.filter-actions {
-  display: flex;
-  gap: var(--oa-space-xs);
-  justify-content: flex-end;
-}
-
-.timeout-hint {
-  font: var(--oa-font-caption);
-  color: var(--oa-color-warning);
-}
-
-.batch-bar {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: var(--oa-space-xs);
-  padding: var(--oa-space-xs) var(--oa-space-md);
-  background: var(--oa-color-primary-subtle);
-  border-bottom: 1px solid var(--oa-color-hairline);
-  font: var(--oa-font-body-sm);
+.notice-title {
   color: var(--oa-color-ink);
-}
-
-.batch-count b {
   font-weight: 500;
 }
 
-.spacer {
-  flex: 1 1 auto;
+.notice.is-error {
+  border-color: var(--oa-color-error);
+  color: var(--oa-color-error);
 }
 
-/* 通用按钮（本页用原生按钮 + 令牌，避免 Element Plus 默认观感渗入） */
-.btn {
-  height: var(--oa-space-control);
-  padding: 0 var(--oa-space-md);
-  border: 1px solid transparent;
-  border-radius: var(--oa-radius-sm);
-  font: var(--oa-font-button);
-  white-space: nowrap;
-  cursor: pointer;
+.notice .btn {
+  margin-top: var(--oa-space-xs);
 }
 
-.btn-primary {
-  background: var(--oa-color-primary);
-  color: var(--oa-color-on-primary);
-}
-
-.btn-primary:hover {
-  background: var(--oa-color-primary-hover);
-}
-
-.btn-secondary {
-  background: var(--oa-color-canvas);
-  color: var(--oa-color-ink);
-  border-color: var(--oa-color-hairline-strong);
-}
-
-.btn-secondary:hover {
-  background: var(--oa-color-canvas-subtle);
-}
-
-.btn-ghost {
-  height: var(--oa-space-control-compact);
-  padding: 0 var(--oa-space-xs);
-  background: transparent;
-  color: var(--oa-color-primary);
-}
-
-/* ---------------- 表格 ---------------- */
 .table-wrap {
   flex: 1 1 auto;
   min-height: 0;
@@ -714,26 +461,13 @@ async function handleBatchTransfer(): Promise<void> {
   background: var(--oa-color-canvas-subtle);
 }
 
-/* 选中态：primary-subtle 底 + 左侧 2px 指示条 */
-.oa-table tbody tr.is-selected td {
-  background: var(--oa-color-primary-subtle);
-}
-
-.oa-table tbody tr.is-selected td:first-child {
-  box-shadow: inset 2px 0 0 var(--oa-color-primary);
-}
-
 .oa-table .c {
   text-align: center;
 }
 
-.oa-table .r {
-  text-align: right;
-}
-
 .oa-table .empty {
   height: auto;
-  padding: 0;
+  padding: var(--oa-space-md);
 }
 
 .cell-title {
@@ -758,7 +492,7 @@ async function handleBatchTransfer(): Promise<void> {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 320px;
+  max-width: 260px;
 }
 
 .cell-meta {
@@ -766,30 +500,34 @@ async function handleBatchTransfer(): Promise<void> {
   color: var(--oa-color-ink-subtle);
 }
 
-.cell-strong {
+.oa-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--oa-space-xs);
+  align-items: center;
+  text-align: center;
+}
+
+.btn {
+  height: var(--oa-space-control-compact);
+  padding: 0 var(--oa-space-xs);
+  border: 1px solid transparent;
+  border-radius: var(--oa-radius-sm);
+  font: var(--oa-font-button);
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: var(--oa-color-canvas);
   color: var(--oa-color-ink);
+  border-color: var(--oa-color-hairline-strong);
 }
 
-.node-cell {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  font: var(--oa-font-body-sm);
-}
-
-.node-no {
-  font-style: normal;
+.btn-ghost {
+  background: transparent;
   color: var(--oa-color-primary);
 }
 
-.oa-amount .wan {
-  margin-left: 4px;
-  font-size: var(--oa-font-size-caption);
-  font-weight: 400;
-  color: var(--oa-color-ink-subtle);
-}
-
-/* ---------------- 分页 ---------------- */
 .table-foot {
   flex: none;
   display: flex;
@@ -811,6 +549,10 @@ async function handleBatchTransfer(): Promise<void> {
   font: var(--oa-font-caption);
 }
 
+.spacer {
+  flex: 1 1 auto;
+}
+
 .pager {
   display: flex;
   gap: 2px;
@@ -828,10 +570,6 @@ async function handleBatchTransfer(): Promise<void> {
   cursor: pointer;
 }
 
-.pgbtn:hover:not(:disabled) {
-  background: var(--oa-color-canvas-subtle);
-}
-
 .pgbtn:disabled {
   color: var(--oa-color-ink-disabled);
   cursor: not-allowed;
@@ -840,10 +578,13 @@ async function handleBatchTransfer(): Promise<void> {
 .pgbtn.is-active {
   background: var(--oa-color-primary-subtle);
   color: var(--oa-color-primary);
-  font-weight: 500;
 }
 
-/* ---------------- 详情栏 ---------------- */
+.pg-total {
+  margin-left: 4px;
+  color: var(--oa-color-ink-subtle);
+}
+
 .detail-pane {
   display: flex;
   flex-direction: column;
@@ -856,8 +597,8 @@ async function handleBatchTransfer(): Promise<void> {
   display: flex;
   align-items: baseline;
   gap: var(--oa-space-sm);
-  height: var(--oa-detail-head-h);
-  padding: 0 var(--oa-space-lg);
+  min-height: var(--oa-detail-head-h);
+  padding: var(--oa-space-xs) var(--oa-space-lg);
   border-bottom: 1px solid var(--oa-color-hairline);
 }
 
@@ -873,22 +614,12 @@ async function handleBatchTransfer(): Promise<void> {
   padding: var(--oa-space-lg);
 }
 
-.oa-empty {
-  display: flex;
-  flex-direction: column;
-  gap: var(--oa-space-xs);
-  align-items: center;
-  text-align: center;
-}
-
-/* ---------------- 断点 ---------------- */
 @media (max-width: 1280px) {
   .oa-center {
     grid-template-columns: var(--oa-panel-list-min) minmax(0, 1fr);
   }
 }
 
-/* ≤1024px：列表与详情切换为两级，本页只渲染列表 */
 @media (max-width: 1024px) {
   .oa-center {
     grid-template-columns: minmax(0, 1fr);
@@ -900,34 +631,6 @@ async function handleBatchTransfer(): Promise<void> {
 
   .list-pane {
     border-right: 0;
-  }
-}
-
-/* ≤768px：单列流式；隐藏表格化列，触控目标抬到 44px */
-@media (max-width: 768px) {
-  .oa-center {
-    border: 0;
-    border-radius: 0;
-  }
-
-  .oa-table th:nth-child(4),
-  .oa-table td:nth-child(4),
-  .oa-table th:nth-child(6),
-  .oa-table td:nth-child(6),
-  .oa-table th:nth-child(8),
-  .oa-table td:nth-child(8) {
-    display: none;
-  }
-
-  .control,
-  .btn,
-  .pgbtn {
-    min-height: var(--oa-space-control-h5);
-  }
-
-  .title-text {
-    max-width: 100%;
-    white-space: normal;
   }
 }
 </style>

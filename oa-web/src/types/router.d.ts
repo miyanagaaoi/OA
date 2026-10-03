@@ -17,6 +17,11 @@ declare module 'vue-router' {
     tab?: 'pending' | 'approved' | 'initiated' | 'cc'
     /** 历史库模式（归档后只读，按单号检索） */
     archiveOnly?: boolean
+    /**
+     * 单据运行域（阶段 2b）的侧栏分组标识：
+     * `initiate` = 发起与填单（四类单据共用同一套 schema 驱动表单页）。
+     */
+    formSection?: 'initiate'
     /** 需要的权限码，缺失则不渲染入口（权限不可见优于不可用） */
     requiredPermission?: string
     /** 命中其中任意一个权限码即可放行（管理后台总览：多种管理权限任一即可） */

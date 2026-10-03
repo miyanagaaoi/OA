@@ -21,9 +21,11 @@ import {
   canManageUser,
   canOpenAuthzLogAdmin,
   canOpenRoleAdmin,
+  canReadFlowInstance,
   canReadFlowTemplate,
+  canWriteFlowInstance,
 } from '@/utils/admin'
-import { fetchWorkbenchSummary } from '@/api/task'
+import { listTodoTasks } from '@/api/flow-task'
 import Watermark from '@/components/Watermark.vue'
 
 const route = useRoute()
@@ -39,17 +41,30 @@ const overlayOpen = ref(false)
 const isMobile = ref(false)
 
 /**
- * 审批中心导航。
- * 权限码**逐条对应** `oa-deploy/sql/04-permissions.sql` 的 `portal:*` 种子
- * （冒号风格 `域:子域:动作`；点号码在这套种子里不存在）。
+ * 审批中心导航（阶段 2b 起由**真实引擎**驱动）。
+ *
+ * 可见性判据改为单据运行域口径（与 `FlowInstanceController` / `FormTaskController` 的
+ * 入口闸门同源）：只读入口 = `flow` ∪ `admin:flow`。
+ * ⚠ 历史库仍走归档域权限码 `portal:archive:search`（那是归档检索，不是单据运行域）。
  */
 const navItems = [
-  { key: 'pending', label: '待我审批', path: '/task/pending', permission: 'portal:workbench:todo' },
-  { key: 'approved', label: '我已审批', path: '/task/approved', permission: 'portal:workbench:done' },
-  { key: 'initiated', label: '我发起的', path: '/task/initiated', permission: 'portal:workbench:mine' },
-  { key: 'cc', label: '抄送我的', path: '/task/cc', permission: 'portal:workbench:cc' },
-  { key: 'archive', label: '历史库', path: '/archive', permission: 'portal:archive:search' },
+  { key: 'pending', label: '待我审批', path: '/task/pending', gate: 'flow' },
+  { key: 'approved', label: '我已审批', path: '/task/approved', gate: 'flow' },
+  { key: 'initiated', label: '我发起的', path: '/task/initiated', gate: 'flow' },
+  { key: 'cc', label: '抄送我的', path: '/task/cc', gate: 'flow' },
+  { key: 'archive', label: '历史库', path: '/archive', gate: 'archive' },
 ] as const
+
+/**
+ * 发起与填单（阶段 2b）：四类单据各一个入口，共用同一套 schema 驱动表单页。
+ * 判据：**写**入口要 `flow` 单码（与 `POST /flow-instances` 的入口闸门同源）。
+ */
+const initiateNavItems: readonly { key: string; label: string; path: string }[] = [
+  { key: 'initiate-matter', label: '事项审批单', path: '/form/new/matter' },
+  { key: 'initiate-fund', label: '资金审批单', path: '/form/new/fund' },
+  { key: 'initiate-contract', label: '合同审批单', path: '/form/new/contract' },
+  { key: 'initiate-seal', label: '印鉴证照审批单', path: '/form/new/seal' },
+]
 
 /**
  * 管理后台分组（阶段 1 · 1.1 组织与人员；阶段 1 · 1.4 角色与权限；阶段 2a.6 流程模板）。
@@ -72,13 +87,25 @@ const adminNavItems: readonly { key: string; label: string; path: string; gate: 
 
 /**
  * 权限不可见优于不可用：无权限的入口不渲染（DESIGN.md Agent Usage Rules 第 6 条）。
- * 权限数据尚未取回时（阶段 1 骨架）不做隐藏，避免整栏空白。
+ * 权限数据尚未取回时不做隐藏，避免整栏空白。
+ *
+ * 单据运行域（阶段 2b）改用 `utils/admin.ts` 的 `canReadFlowInstance` / `canWriteFlowInstance`
+ * （`flow` ∪ `admin:flow` 与 `flow` 单码的两档口径，与后端入口闸门逐条一致）；
+ * 历史库仍按归档域权限码判定。
  */
 const visibleNavItems = computed(() => {
-  const hasPermissionData = userStore.permissions.length > 0
-  if (!hasPermissionData) return navItems
-  return navItems.filter((item) => userStore.isSuperAdmin || userStore.hasPermission(item.permission))
+  return navItems.filter((item) => {
+    if (item.gate === 'archive') {
+      if (userStore.permissions.length === 0) return true
+      return userStore.isSuperAdmin || userStore.hasPermission('portal:archive:search')
+    }
+    return canReadFlowInstance(userStore)
+  })
 })
+
+/** 发起与填单分组的可见性：`flow` 单码（写入口口径） */
+const canInitiate = computed(() => canWriteFlowInstance(userStore))
+const visibleInitiateNavItems = computed(() => (canInitiate.value ? initiateNavItems : []))
 
 /**
  * 管理入口的判定更严格：权限数据未取回时**一律不渲染**。
@@ -116,6 +143,8 @@ const activeKey = computed(() => {
   if (route.path.startsWith('/admin/authz-logs')) return 'admin-authz-logs'
   if (route.path.startsWith('/admin/flow/template')) return 'admin-flow-templates'
   if (route.path.startsWith('/admin')) return 'admin-console'
+  if (route.name === 'form-new') return `initiate-${String(route.params.formType ?? '')}`
+  if (route.name === 'form-edit') return 'initiate-matter'
   const tab = route.meta.tab as string | undefined
   if (tab) return tab
   if (route.name === 'task-detail' || route.name === 'print-preview') return 'pending'
@@ -131,8 +160,12 @@ const breadcrumb = computed(() => {
   const parts = ['审批中心']
   if (route.path.startsWith('/archive')) {
     parts.push('历史库')
+  } else if (route.name === 'form-new') {
+    parts.push('发起单据', String(route.meta.title || '填单'))
+  } else if (route.name === 'form-edit') {
+    parts.push('我发起的', '填单')
   } else if (route.name === 'task-detail') {
-    parts.push('待我审批', '单据详情')
+    parts.push('单据详情')
   } else if (route.name === 'print-preview') {
     parts.push('单据详情', '打印预览')
   } else {
@@ -163,8 +196,10 @@ onMounted(() => {
     await userStore.hydrate()
     await Promise.all([userStore.hydrateWatermark(), userStore.hydrateClientConfig()])
     try {
-      const summary = await fetchWorkbenchSummary()
-      pendingCount.value = summary.pending
+      // 待办徽标改由**真实引擎**驱动（阶段 2b）：`GET /flow-tasks/todo` 的 total
+      // （`PageResult.total` 后端是 long → JSON 字符串，映射层已归一为 number）
+      const page = await listTodoTasks(1, 1)
+      pendingCount.value = page.total
     } catch {
       pendingCount.value = 0
     }
@@ -223,7 +258,7 @@ function toggleWatermark(enabled: boolean): void {
         </span>
       </button>
 
-      <!-- 导航分组：一期只预留「审批中心」 -->
+      <!-- 导航分组：审批中心（阶段 2b 起由真实引擎驱动） -->
       <nav class="oa-nav" aria-label="主导航">
         <p class="nav-caption">审批中心</p>
         <button
@@ -240,8 +275,26 @@ function toggleWatermark(enabled: boolean): void {
           <span v-if="item.key === 'pending'" class="nav-badge">{{ pendingCount }}</span>
         </button>
 
+        <!-- 发起与填单：四类单据共用同一套 schema 驱动表单页（阶段 2b）
+             判据 `flow` 单码（与 POST /flow-instances 的入口闸门同源） -->
+        <template v-if="visibleInitiateNavItems.length > 0">
+          <p class="nav-caption">发起与填单</p>
+          <button
+            v-for="item in visibleInitiateNavItems"
+            :key="item.key"
+            class="nav-item"
+            :class="{ 'is-active': activeKey === item.key }"
+            type="button"
+            :data-tip="item.label"
+            @click="goto(item.path)"
+          >
+            <span class="nav-glyph" aria-hidden="true">{{ item.label.slice(0, 1) }}</span>
+            <span class="nav-label">{{ item.label }}</span>
+          </button>
+        </template>
+
         <p class="nav-placeholder">
-          未来模块（合同管理、计划管理、经营决策、人力资源）按同一分组样式追加，不改抽屉机制。
+          未来模块（计划管理、经营决策、人力资源）按同一分组样式追加，不改抽屉机制。
         </p>
 
         <!-- 管理后台分组：仅管理员可见（权限不可见优于不可用） -->

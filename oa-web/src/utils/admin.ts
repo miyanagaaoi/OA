@@ -355,6 +355,61 @@ export function canExportMasterData(store: UserStore): boolean {
   return isSystemAdmin(store) || store.hasPermission(IDENTITY_PERMISSION.userExport)
 }
 
+// ---------------------------------------------------------------------------
+// 单据运行域（阶段 2b：发起与填单 + 审批中心接真实引擎）
+// ----------------------------------------------------------------------------
+//  权限码是一**精确码 + 一个父项**，口径见 `FlowInstanceController` / `FormDataController`
+//  的类注释（2026-10-04 收敛）：
+//    · **写**（`POST /flow-instances` 建草稿、`PUT /forms/instances/{id}/draft` 保存、
+//      `POST .../submit` 提交）= `flow` **单码**——「发起」这一动作自己的权限码；
+//    · **只读**（预检 / 列表 / 详情 / 快照 / schema / 可写字段）= `flow` ∪ `admin:flow`。
+//  为什么写口不收 `admin:flow`：`company_admin` 持 `admin:flow` 一族但（在旧种子下）不持 `flow`，
+//  入口若放行它，就会出现「入口过、引擎 403」的错位（详见上述类注释）。
+//  ⚠ 与既有函数同口径：本文件只决定「渲不渲染 / 放不放行」，服务端才是裁决方。
+// ---------------------------------------------------------------------------
+
+/** 单据运行域权限码（**冒号风格**，权威源 `oa-deploy/sql/04-permissions.sql` 的 `flow` 一族） */
+export const FLOW_USE_PERMISSION = {
+  /** 门户基础权限：发起、保存、提交、撤回、补件等**写**入口的动作码 */
+  use: 'flow',
+  /** 流程管理父项：**只读**入口的并集另一支 */
+  adminFlow: 'admin:flow',
+} as const
+
+/**
+ * 单据运行域判据的**最小只读投影**（结构类型，便于脱离 Pinia 单独复核；
+ * `useUserStore()` 的返回值在结构上天然满足本接口）。
+ */
+export interface FlowUseSubject {
+  readonly isSuperAdmin: boolean
+  readonly permissions: readonly string[]
+  readonly roles: readonly { readonly roleCode: string }[]
+}
+
+/**
+ * 内置角色兜底：`permissions` 一个都没取回（旧后端 / 未初始化权限数据）时，
+ * 只要拿到了角色码就放行——`04-permissions.sql` 里 9 个内置角色**全部**持有 `flow`，
+ * 因此这个兜底不会放宽红线，只是避免「功能好了但入口永远不出现」。
+ */
+function flowFallback(store: FlowUseSubject): boolean {
+  return store.permissions.length === 0 && store.roles.length > 0
+}
+
+/** 单据**只读**入口（审批中心列表 / 单据详情 / 预检 / schema）：`flow` ∪ `admin:flow` */
+export function canReadFlowInstance(store: FlowUseSubject): boolean {
+  if (store.isSuperAdmin) return true
+  if (store.permissions.includes(FLOW_USE_PERMISSION.use)) return true
+  if (store.permissions.includes(FLOW_USE_PERMISSION.adminFlow)) return true
+  return flowFallback(store)
+}
+
+/** 单据**写**入口（发起 / 保存草稿 / 提交 / 撤回 / 补件）：`flow` 单码 */
+export function canWriteFlowInstance(store: FlowUseSubject): boolean {
+  if (store.isSuperAdmin) return true
+  if (store.permissions.includes(FLOW_USE_PERMISSION.use)) return true
+  return flowFallback(store)
+}
+
 /**
  * 是否可对「在途/待办非零」的阻断执行强制继续。
  *
