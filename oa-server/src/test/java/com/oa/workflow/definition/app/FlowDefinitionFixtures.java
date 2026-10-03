@@ -7,6 +7,7 @@ import com.oa.workflow.definition.domain.FlowDefinitionEnums.SignPolicy;
 import com.oa.workflow.definition.domain.FlowDefinitionEnums.TemplateStatus;
 import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
 import com.oa.workflow.definition.domain.FlowGateEnums.TimeoutAction;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import com.oa.workflow.definition.domain.FlowGatePolicy;
 import com.oa.workflow.definition.domain.FlowNode;
 import com.oa.workflow.definition.domain.FlowTemplate;
@@ -128,12 +129,28 @@ public final class FlowDefinitionFixtures {
     /** 「未配置闸门」的模板（Q6/Q7 均为不限）。 */
     public static FlowTemplate unlimitedGateTemplate(Long id, int version, String status) {
         FlowTemplate template = matter(id, version, status);
-        template.applyGatePolicy(new FlowGatePolicy(null, null, null, null, TimeoutAction.NOTIFY));
+        template.applyGatePolicy(new FlowGatePolicy(null, null, null, null, TimeoutAction.NOTIFY, null));
         return template;
     }
 
     /** 带工作日的闸门配置（用于读回断言）。 */
     public static FlowGatePolicy customGate() {
-        return new FlowGatePolicy(9, 4, 15, DeadlineType.CALENDAR, TimeoutAction.AUTO_PASS);
+        return new FlowGatePolicy(9, 4, 15, DeadlineType.CALENDAR, TimeoutAction.AUTO_PASS,
+                WithdrawWindow.UNTIL_FINANCE_STARTED);
+    }
+
+    /** 撤回窗口为**严格口径**（AC-16 口径）的模板：②一旦开始处理即不可撤回。 */
+    public static FlowTemplate strictWithdrawTemplate(Long id, int version, String status) {
+        FlowTemplate template = matter(id, version, status);
+        template.applyGatePolicy(FlowGatePolicy.v04Defaults()
+                .withWithdrawWindow(WithdrawWindow.UNTIL_FINANCE_STARTED));
+        return template;
+    }
+
+    /** 撤回窗口为**默认口径**（REQ-FLOW-009 口径，列为 NULL）的模板。 */
+    public static FlowTemplate defaultWithdrawTemplate(Long id, int version, String status) {
+        FlowTemplate template = matter(id, version, status);
+        template.applyGatePolicy(FlowGatePolicy.v04Defaults());
+        return template;
     }
 }

@@ -222,7 +222,7 @@ class FlowDefinitionServiceTest {
         when(nodeMapper.countByTemplateId(V2_ID)).thenReturn(7);
 
         TemplateView view = service.putGatePolicy(V2_ID, new GatePolicyRequest(9, 4, 15,
-                "calendar", "auto_pass"));
+                "calendar", "auto_pass", null));
 
         assertThat(view.gatePolicy().maxReturnCount()).isEqualTo(9);
         assertThat(view.gatePolicy().maxSupplementCount()).isEqualTo(4);
@@ -231,11 +231,35 @@ class FlowDefinitionServiceTest {
         assertThat(view.gatePolicy().onSupplementTimeout()).isEqualTo("auto_pass");
         assertThat(view.gatePolicy().unlimited()).isFalse();
         assertThat(view.gatePolicy().v04Default()).isFalse();
+        // 撤回窗口未给 = 取默认口径（回显生效值，并标明「未显式配置」）
+        assertThat(view.gatePolicy().withdrawWindow()).isEqualTo("until_finance_approved");
+        assertThat(view.gatePolicy().withdrawWindowConfigured()).isFalse();
+        assertThat(draft.getWithdrawWindow()).isNull();
 
         // 落库值就是读回值（同一份 FlowTemplate 实例）
         assertThat(draft.getMaxReturnCount()).isEqualTo(9);
         assertThat(draft.getSupplementDeadlineType()).isEqualTo(DeadlineType.CALENDAR.code());
         assertThat(draft.getOnSupplementTimeout()).isEqualTo(TimeoutAction.AUTO_PASS.code());
+        verify(templateMapper).updateDraft(draft);
+    }
+
+    @Test
+    @DisplayName("撤回窗口：严格口径写入后读回 until_finance_started（纯追加字段，既有 5 个键语义不变）")
+    void withdrawWindowRoundTrip() {
+        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
+        when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
+        when(nodeMapper.countByTemplateId(V2_ID)).thenReturn(7);
+
+        TemplateView view = service.putGatePolicy(V2_ID, new GatePolicyRequest(5, 3, 3,
+                "working", "notify", "until_finance_started"));
+
+        assertThat(view.gatePolicy().withdrawWindow()).isEqualTo("until_finance_started");
+        assertThat(view.gatePolicy().withdrawWindowConfigured()).isTrue();
+        // 既有 5 个键的读回完全不变
+        assertThat(view.gatePolicy().maxReturnCount()).isEqualTo(5);
+        assertThat(view.gatePolicy().supplementDeadlineType()).isEqualTo("working");
+        assertThat(view.gatePolicy().onSupplementTimeout()).isEqualTo("notify");
+        assertThat(draft.getWithdrawWindow()).isEqualTo("until_finance_started");
         verify(templateMapper).updateDraft(draft);
     }
 
@@ -246,13 +270,14 @@ class FlowDefinitionServiceTest {
         when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
         when(nodeMapper.countByTemplateId(V2_ID)).thenReturn(7);
 
-        TemplateView view = service.putGatePolicy(V2_ID, new GatePolicyRequest(0, null, null, null, null));
+        TemplateView view = service.putGatePolicy(V2_ID, new GatePolicyRequest(0, null, null, null, null, null));
 
         assertThat(view.gatePolicy().maxReturnCount()).isNull();
         assertThat(view.gatePolicy().maxSupplementCount()).isNull();
         assertThat(view.gatePolicy().supplementDeadlineDays()).isNull();
         assertThat(view.gatePolicy().onSupplementTimeout()).isEqualTo("notify");
         assertThat(view.gatePolicy().unlimited()).isTrue();
+        assertThat(view.gatePolicy().withdrawWindow()).isEqualTo("until_finance_approved");
     }
 
     @Test
@@ -261,22 +286,81 @@ class FlowDefinitionServiceTest {
         FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
         when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
 
-        assertThatThrownBy(() -> service.putGatePolicy(V2_ID, new GatePolicyRequest(-1, null, null, null, null)))
+        assertThatThrownBy(() -> service.putGatePolicy(V2_ID,
+                new GatePolicyRequest(-1, null, null, null, null, null)))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("maxReturnCount");
-        assertThatThrownBy(() -> service.putGatePolicy(V2_ID, new GatePolicyRequest(null, null, 0, null, null)))
+        assertThatThrownBy(() -> service.putGatePolicy(V2_ID,
+                new GatePolicyRequest(null, null, 0, null, null, null)))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("supplementDeadlineDays");
         assertThatThrownBy(() -> service.putGatePolicy(V2_ID,
-                new GatePolicyRequest(null, null, 3, "hours", null)))
+                new GatePolicyRequest(null, null, 3, "hours", null, null)))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("supplementDeadlineType");
         assertThatThrownBy(() -> service.putGatePolicy(V2_ID,
-                new GatePolicyRequest(null, null, 3, "working", "auto_skip")))
+                new GatePolicyRequest(null, null, 3, "working", "auto_skip", null)))
                 .isInstanceOf(BizException.class)
                 .hasMessageContaining("onSupplementTimeout");
 
         verify(templateMapper, never()).updateDraft(any());
+    }
+
+    @Test
+    @DisplayName("撤回窗口：非法枚举 400 / 40008（文案含两个合法取值），且不写库")
+    void withdrawWindowRejectsIllegalValue() {
+        FlowTemplate draft = FlowDefinitionFixtures.matter(V2_ID, 2, "draft");
+        when(templateMapper.selectTemplateById(V2_ID)).thenReturn(draft);
+
+        assertThatThrownBy(() -> service.putGatePolicy(V2_ID,
+                new GatePolicyRequest(null, null, null, null, null, "before_finance")))
+                .isInstanceOf(BizException.class)
+                .hasMessageContaining("withdrawWindow")
+                .hasMessageContaining("until_finance_approved")
+                .hasMessageContaining("until_finance_started")
+                .satisfies(ex -> {
+                    BizException biz = (BizException) ex;
+                    assertThat(biz.getErrorCode()).isEqualTo(ErrorCode.FLOW_DEFINITION_INVALID);
+                    assertThat(biz.getErrorCode().getCode()).isEqualTo(40008);
+                    assertThat(biz.getErrorCode().getHttpStatus()).isEqualTo(400);
+                });
+
+        verify(templateMapper, never()).updateDraft(any());
+    }
+
+    @Test
+    @DisplayName("撤回窗口：只读版本（published）写入一律 40906（沿用既有守卫）")
+    void withdrawWindowRespectsReadOnlyVersionGuard() {
+        FlowTemplate published = FlowDefinitionFixtures.matter(V2_ID, 1, "published");
+        when(templateMapper.selectTemplateById(V2_ID)).thenReturn(published);
+
+        assertThatThrownBy(() -> service.putGatePolicy(V2_ID,
+                new GatePolicyRequest(null, null, null, null, null, "until_finance_started")))
+                .isInstanceOf(BizException.class)
+                .satisfies(ex -> assertThat(((BizException) ex).getErrorCode().getCode()).isEqualTo(40906));
+
+        verify(templateMapper, never()).updateDraft(any());
+    }
+
+    @Test
+    @DisplayName("撤回窗口：发布前报告 R-GATE 的标题含撤回窗口，warnings 回显生效口径与取值")
+    void withdrawWindowVisibleInPrePublishReport() {
+        FlowTemplate draft = FlowDefinitionFixtures
+                .defaultWithdrawTemplate(V2_ID, 2, "draft");
+        PrePublishReport report = PrePublishChecker.run(draft, FlowDefinitionFixtures.matterNodes(V2_ID));
+
+        assertThat(PrePublishChecker.RULES.get(PrePublishChecker.R_GATE)).contains("撤回窗口");
+        assertThat(report.warnings())
+                .anyMatch(warning -> warning.contains("撤回窗口")
+                        && warning.contains("until_finance_approved")
+                        && warning.contains("未显式配置"));
+
+        FlowTemplate strict = FlowDefinitionFixtures
+                .strictWithdrawTemplate(V2_ID, 2, "draft");
+        PrePublishReport strictReport = PrePublishChecker.run(strict, FlowDefinitionFixtures.matterNodes(V2_ID));
+        assertThat(strictReport.warnings())
+                .anyMatch(warning -> warning.contains("撤回窗口") && warning.contains("until_finance_started"))
+                .noneMatch(warning -> warning.contains("撤回窗口") && warning.contains("未显式配置"));
     }
 
     // ================================================================ 节点增删改

@@ -11,8 +11,8 @@ description:
   en: >
       Single and multi-select fields print as the text symbols `☑ / ☐` at body size rather than input[type=checkbox], keeping print and photocopy consistent; plan_category, payment_belong and the other joint-review departments line follow the paper form's look.
       
-revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
-updated_at: "2026-10-03T04:41:37.353Z"
+revision: 257a32acb48c626488a22291ada46052401b64c8
+updated_at: "2026-10-03T05:17:27.344Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

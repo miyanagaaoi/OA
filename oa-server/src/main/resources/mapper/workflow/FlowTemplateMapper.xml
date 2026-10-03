@@ -32,22 +32,25 @@
     <result property="createdBy" column="created_by"/>
     <result property="updatedAt" column="updated_at"/>
     <result property="updatedBy" column="updated_by"/>
-    <!-- Q6 / Q7 闸门配置：列定义见 doc/data-model.md §4.1（随 Flyway V1__schema.sql 建列），
+    <!-- Q6 / Q7 闸门配置 + 撤回窗口：列定义见 doc/data-model.md §4.1（随 Flyway V1__schema.sql 建列），
          种子默认值见 oa-deploy/sql/03-templates.sql → V3__templates.sql。
          历史：曾由手写迁移 V5__flow_gate_policy.sql 追加；列进入 V1 后该迁移已删除
-         （否则全新库上重复加列会报 1060 Duplicate column name）。 -->
+         （否则全新库上重复加列会报 1060 Duplicate column name）。
+         withdraw_window 的 NULL 是**有语义的**（= 取默认 until_finance_approved，见 doc/templates.md §1.8）：
+         resultMap 与写入都不得把它归一成显式默认值，否则历史行会被无意义地改写。 -->
     <result property="maxReturnCount" column="max_return_count"/>
     <result property="maxSupplementCount" column="max_supplement_count"/>
     <result property="supplementDeadlineDays" column="supplement_deadline_days"/>
     <result property="supplementDeadlineType" column="supplement_deadline_type"/>
     <result property="onSupplementTimeout" column="on_supplement_timeout"/>
+    <result property="withdrawWindow" column="withdraw_window"/>
   </resultMap>
 
   <sql id="TemplateColumns">
     t.id, t.code, t.name, t.form_type, t.version, t.status, t.node_count, t.form_schema_json,
     t.published_at, t.created_at, t.created_by, t.updated_at, t.updated_by,
     t.max_return_count, t.max_supplement_count, t.supplement_deadline_days,
-    t.supplement_deadline_type, t.on_supplement_timeout
+    t.supplement_deadline_type, t.on_supplement_timeout, t.withdraw_window
   </sql>
 
   <select id="selectByCode" resultMap="FlowTemplateResultMap">
@@ -105,11 +108,11 @@
           useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     INSERT INTO flow_template (code, name, form_type, version, status, node_count, form_schema_json,
                                max_return_count, max_supplement_count, supplement_deadline_days,
-                               supplement_deadline_type, on_supplement_timeout,
+                               supplement_deadline_type, on_supplement_timeout, withdraw_window,
                                created_by, updated_by)
     VALUES (#{code}, #{name}, #{formType}, #{version}, #{status}, IFNULL(#{nodeCount}, 0), #{formSchemaJson},
             #{maxReturnCount}, #{maxSupplementCount}, #{supplementDeadlineDays},
-            #{supplementDeadlineType}, #{onSupplementTimeout},
+            #{supplementDeadlineType}, #{onSupplementTimeout}, #{withdrawWindow},
             #{createdBy}, #{createdBy})
   </insert>
 
@@ -123,6 +126,7 @@
         supplement_deadline_days = #{supplementDeadlineDays},
         supplement_deadline_type = #{supplementDeadlineType},
         on_supplement_timeout = #{onSupplementTimeout},
+        withdraw_window = #{withdrawWindow},
         updated_by = #{updatedBy},
         updated_at = NOW()
     WHERE id = #{id} AND status = 'draft'

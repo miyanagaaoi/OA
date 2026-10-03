@@ -24,6 +24,7 @@ import com.oa.workflow.approver.infra.FlowInstanceMapper;
 import com.oa.workflow.approver.infra.row.FlowInstanceRow;
 import com.oa.workflow.definition.app.FlowConfigPermission;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import com.oa.workflow.runtime.domain.FlowAction;
 import com.oa.workflow.runtime.domain.RuntimeEnums.InstanceStatus;
 import com.oa.workflow.runtime.domain.RuntimeEnums.NodeStatus;
@@ -108,6 +109,10 @@ class FlowWithdrawWindowTest {
         runtimeMapper = mock(FlowRuntimeMapper.class);
         routingMapper = mock(FlowRoutingMapper.class);
         gateService = mock(FlowGateService.class);
+        // 撤回窗口（2026-10-04 配置化）：本类聚焦**默认口径**（until_finance_approved = REQ-FLOW-009 口径）
+        // 下的窗口判据；严格口径（until_finance_started = AC-16 口径）见 WithdrawWindowPolicyTest，
+        // 「按实例锁定版本取策略」见 FlowWithdrawLockedVersionTest。
+        when(gateService.withdrawWindowOf(any())).thenReturn(WithdrawWindow.UNTIL_FINANCE_APPROVED);
         threadWriter = mock(FlowThreadWriter.class);
         auditLogWriter = mock(AuditLogWriter.class);
         instanceService = mock(FlowInstanceService.class);

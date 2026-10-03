@@ -34,6 +34,7 @@ import com.oa.workflow.definition.domain.FlowDefinitionEnums.TemplateStatus;
 import com.oa.workflow.definition.domain.FlowGateEnums;
 import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
 import com.oa.workflow.definition.domain.FlowGateEnums.TimeoutAction;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import com.oa.workflow.definition.domain.FlowGatePolicy;
 import com.oa.workflow.definition.domain.FlowNode;
 import com.oa.workflow.definition.domain.FlowTemplate;
@@ -994,9 +995,16 @@ public class FlowDefinitionService {
                 new BizException(ErrorCode.FLOW_DEFINITION_INVALID,
                         "onSupplementTimeout 非法（notify / auto_pass / auto_return）："
                                 + request.onSupplementTimeout()));
+        // 撤回窗口（2026-10-04 裁定新增；纯追加字段）：留空 = 取默认 until_finance_approved（REQ-FLOW-009 口径），
+        // 非法枚举一律 400（与上面两个枚举逐字同口径），错误码 FLOW_DEFINITION_INVALID = 40008。
+        WithdrawWindow window = request.withdrawWindow() == null ? null
+                : WithdrawWindow.of(request.withdrawWindow()).orElseThrow(() ->
+                new BizException(ErrorCode.FLOW_DEFINITION_INVALID,
+                        "withdrawWindow 非法（until_finance_approved ②通过前，含②审批中 / "
+                                + "until_finance_started ②开始前）：" + request.withdrawWindow()));
         FlowGatePolicy policy = new FlowGatePolicy(request.maxReturnCount(), request.maxSupplementCount(),
-                request.supplementDeadlineDays(), type, action);
-        policy.assertValid("Q6/Q7 闸门配置");
+                request.supplementDeadlineDays(), type, action, window);
+        policy.assertValid("Q6/Q7 闸门配置与撤回窗口");
         return policy;
     }
 
@@ -1063,6 +1071,10 @@ public class FlowDefinitionService {
                 policy.effectiveSupplementDeadlineDays(),
                 policy.effectiveDeadlineType() == null ? null : policy.effectiveDeadlineType().code(),
                 policy.effectiveTimeoutAction().code(),
+                // 撤回窗口：回显**生效值**（列 NULL 时即默认口径），并另给一个「是否显式配置」标志，
+                // 让前端能同时表达「当前口径」与「取默认 / 已显式配置」。
+                policy.effectiveWithdrawWindow().code(),
+                policy.withdrawWindowConfigured(),
                 policy.isUnlimited(),
                 policy.isV04Default());
         TemplateStatus status = template.statusEnum();

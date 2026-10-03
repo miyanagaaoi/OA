@@ -367,8 +367,10 @@
 | TC-FLOW-017 | AC-14 / REQ-FLOW-015 | 同上（节点② 会签，3 人） | ① U-21 驳回（意见 ≥5 字）；② 观察其余任务与单据状态 | ① 节点② 立即 `rejected`，单据 `status='rejected'` 并回到发起人；② U-20、U-22 任务 `status='auto_closed'`；③ 其余节点实例 `status='cancelled'`；④ 站内信通知发起人 U-07 | P0 | 二 | 单据 OA-2026-210009 |
 | TC-FLOW-018 | AC-15 / REQ-FLOW-017 | 单据 OA-2026-210009 已驳回 | ① 以 U-07 修改内容后重新提交；② 观察节点与快照 | ① 流程**从节点① 重新开始**（`current_node_seq=1`）；② 审批人按**当前组织**重新解析（快照 `parsed_at` 刷新）；③ 已审过的节点不保留旧结论（`flow_node_instance` 重新生成） | P1 | 二 | 同上 |
 | TC-FLOW-019 | AC-15 | 同上 | 查询重提后单据的轨迹与 `sys_thread` | 上一轮驳回记录**仍在**（`action='reject'` + 意见 + 时间可查）；轨迹按轮次可区分；`flow_instance.status='approving'` | P1 | 二 | 同上 |
-| TC-FLOW-020 | AC-16 / REQ-FLOW-009 | 单据处于节点② 审批中（U-20 未处理） | 以发起人 U-07 点「撤回」 | **撤回失败**，提示「单据已进入财务部复核，不可撤回」；`status` 仍为 `approving`；`sys_log` 记录失败尝试 | P0 | 二 | 单据 OA-2026-210010 |
-| TC-FLOW-021 | AC-16（边界） | 单据停在节点①（U-01 未处理） | 以 U-07 撤回 → 编辑内容 → 重新提交 | ① 撤回成功，`status` 经 `withdrawn` 立即回到 `draft`；② 可修改全部字段；③ 重提后重新解析快照并回到节点① | P1 | 二 | 单据 OA-2026-210011 |
+| TC-FLOW-020 | AC-16 / REQ-FLOW-009（撤回窗口：**默认口径** `withdraw_window` 未配置 或 `= until_finance_approved`） | 单据处于节点② 审批中（② `active`，U-20 未处理） | 以发起人 U-07 点「撤回」 | **撤回成功**：`status` 经 `withdrawn` 立即回到 `draft`；② 节点实例 `cancelled`、待办 `auto_closed`；提示语不出现「不可撤回」（默认口径 = REQ-FLOW-009 口径，2026-10-04 裁定；AC-16 原「②审批中失败」的描述由严格口径覆盖） | P0 | 二 | 单据 OA-2026-210010 |
+| TC-FLOW-078 | AC-16（撤回窗口：**严格口径** `withdraw_window = until_finance_started`） | 同上，但模板的 `withdraw_window` 显式配为 `until_finance_started` 并已发布 | 以发起人 U-07 点「撤回」 | **撤回失败**：HTTP `409` / 错误码 `40910`，提示「撤回仅限「财务部复核（节点②）」通过之前…」；`status` 仍为 `approving`；无任何写副作用（节点实例、任务、轨迹、`status` 均不变）；`sys_log` 记录失败尝试 | P0 | 二 | 模板变体：`matter` 严格口径版本；单据 OA-2026-210010 |
+| TC-FLOW-079 | AC-16 / AC-09（**锁定版本**：改模板不影响在途单据） | ① 用 `until_finance_started` 的模板 vK 发起一张单据并走到② `active`；② 基于 vK 开新版本 vK+1，把 `withdraw_window` 改成 `until_finance_approved` 并发布 | 以发起人身份对**在途那张**点「撤回」，再对新版本发起的新单据重复同一操作 | ① 在途单据**仍按发起时版本 vK 的严格口径** → `409` / `40910` 拒绝（`flow_instance.template_id` 指向 vK，其 `withdraw_window` 未被改动）；② 新版本发起的新单据按宽松口径 → `200` 且回 `draft`；③ 反方向（vK 宽松 → vK+1 严格）同理：在途仍按宽松放行 | P0 | 二 | 模板 `fund` vK / vK+1 |
+| TC-FLOW-021 | AC-16（边界；**两种口径都成立**） | 单据停在节点①（U-01 未处理） | 以 U-07 撤回 → 编辑内容 → 重新提交 | ① 撤回成功，`status` 经 `withdrawn` 立即回到 `draft`；② 可修改全部字段；③ 重提后重新解析快照并回到节点①。**默认口径与严格口径（`until_finance_started`）下均必须成功**——严格口径只收紧「②已开始处理」这一档 | P1 | 二 | 单据 OA-2026-210011 |
 | TC-FLOW-022 | AC-16（越权） | 单据停在节点① | ① 以审批人 U-01 打开详情寻找撤回入口；② 以 U-01 的会话调用撤回接口 | ① 无撤回入口；② 接口返回 403 并提示「仅发起人可撤回」 | P1 | 二 | 同上 |
 | TC-FLOW-023 | AC-19 / REQ-FLOW-011 | 单据在节点① 审批中（快照已固化） | ① 把节点④ 审批人从 U-31 冯总调整为 U-03 张丙；② 继续走完流程 | ① 该单据节点④ 候选人**仍为 U-31**（`flow_node_instance.approver_ids_json` 不变）；② U-03 不产生任何待办；③ 新发起的单据节点④ 为 U-03 | P0 | 二 | 单据 OA-2026-210012；执行后恢复 U-31 |
 | TC-FLOW-024 | AC-19 / PRD 5.4 | 承接 TC-FLOW-023 | 检查快照字段 | `approver_snapshot_json.parsed_at`、`basis.initiator_org_path` 有值；每个节点含 `rule` 与 `evidence` 说明（如「按业务线 economy 映射的集团分管领导」） | P2 | 二 | 同上 |
@@ -638,7 +640,7 @@
 | 4 | TC-FLOW-015 | 会签阈值达标 | A | 达阈值即通过，剩余任务 `auto_closed` |
 | 5 | TC-FLOW-017 | 会签驳回级联 | A | 节点驳回、其余任务关闭、单据回发起人 |
 | 6 | TC-FLOW-018 | 驳回后重提从①重走 | A | `current_node_seq=1`、快照重解析 |
-| 7 | TC-FLOW-020 | 撤回边界（②通过前） | A | ② 审批中撤回失败且提示正确 |
+| 7 | TC-FLOW-020 / TC-FLOW-078 | 撤回边界（②通过前；默认口径允许 / 严格口径拒绝） | A | 默认口径：② 审批中撤回**成功**回 `draft`；`withdraw_window=until_finance_started` 时**同一时刻**撤回被拒（409 / 40910） |
 | 8 | TC-FLOW-026 | 流转 3 + 回退 2 = 5 后拒绝 | A | `routing_count=5`，第 6 次动作被拒 |
 | 9 | TC-FLOW-027 | 禁止回流已处理部门 | A | 回流被拒，无新 `flow_routing` 记录 |
 | 10 | TC-FLOW-032 | 补件请求进入待补件 | A | `sub_status='pending_supplement'`，仅发起人收到通知 |
@@ -683,7 +685,7 @@
 | AC-13 | 会签通过阈值 | 二 | TC-FLOW-015, TC-FLOW-016, TC-FLOW-054, TC-FLOW-055, TC-FLOW-057 | 全部 | 含并发幂等边界 |
 | AC-14 | 会签驳回即终止 | 二 | TC-FLOW-017, TC-FLOW-056 | 全部 | 含其余任务自动关闭断言 |
 | AC-15 | 驳回后重提 | 二 | TC-FLOW-018, TC-FLOW-019 | 全部 | 断言快照与版本重解析 |
-| AC-16 | 撤回边界 | 二 | TC-FLOW-020, TC-FLOW-021, TC-FLOW-022 | 全部 | ② 通过前/后两侧均覆盖 |
+| AC-16 | 撤回边界（撤回窗口为模板级配置项，2026-10-04 裁定） | 二 | TC-FLOW-020（默认口径允许）, TC-FLOW-021, TC-FLOW-022, TC-FLOW-078（严格口径拒绝）, TC-FLOW-079（锁定版本） | 全部 | ② 通过前/后两侧均覆盖；**两种口径 × ②`pending`/`active`/`approved` 三时刻**全覆盖；「改模板不影响在途单据」（AC-09）为必测项 |
 | AC-17 | 跨公司越权 | 一 | TC-AUTH-003, TC-AUTH-004, TC-AUTH-016, TC-AUTH-017, TC-AUTH-025 | TC-AUTH-003/016/017 | 组织节点不渲染为人工抽查 |
 | AC-18 | 字段级限制 | 一 | TC-AUTH-005, TC-AUTH-006, TC-AUTH-007, TC-AUTH-020, TC-AUTH-021 | TC-AUTH-006/020/021 | 导出权限三组对比 |
 | AC-19 | 快照稳定性 | 二 | TC-FLOW-023, TC-FLOW-024 | 全部 | 执行后须恢复组织负责人 |

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.oa.common.error.BizException;
 import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
 import com.oa.workflow.definition.domain.FlowGateEnums.TimeoutAction;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ class FlowGatePolicyTest {
     @Test
     @DisplayName("0 与 null 等价于「不限」（Q6 键位语义）")
     void zeroMeansUnlimited() {
-        FlowGatePolicy policy = new FlowGatePolicy(0, 0, null, null, null).normalized();
+        FlowGatePolicy policy = new FlowGatePolicy(0, 0, null, null, null, null).normalized();
         assertThat(policy.effectiveMaxReturnCount()).isNull();
         assertThat(policy.effectiveMaxSupplementCount()).isNull();
         assertThat(policy.isUnlimited()).isTrue();
@@ -76,7 +77,7 @@ class FlowGatePolicyTest {
     @DisplayName("给了口径却没给天数 → 明确提示「不设时限，口径不生效」（避免误以为生效）")
     void deadlineTypeWithoutDaysWarns() {
         FlowGatePolicy policy = new FlowGatePolicy(null, null, null, DeadlineType.CALENDAR,
-                TimeoutAction.AUTO_PASS);
+                TimeoutAction.AUTO_PASS, null);
         assertThat(policy.violations("模板")).anyMatch(problem -> problem.contains("口径不生效"));
         // 未给天数时口径归一为 null，但超时策略仍然生效（可预置）
         assertThat(policy.normalized().effectiveDeadlineType()).isNull();
@@ -86,7 +87,7 @@ class FlowGatePolicyTest {
     @Test
     @DisplayName("枚举合法性与读写往返：天数已配置但口径缺省 → 按工作日（V0.4 口径）")
     void enumRoundTrip() {
-        FlowGatePolicy partial = new FlowGatePolicy(5, 3, 3, null, null);
+        FlowGatePolicy partial = new FlowGatePolicy(5, 3, 3, null, null, null);
         assertThat(partial.effectiveDeadlineType()).isEqualTo(DeadlineType.WORKING);
         assertThat(partial.effectiveTimeoutAction()).isEqualTo(TimeoutAction.NOTIFY);
 
@@ -101,7 +102,7 @@ class FlowGatePolicyTest {
         // 往返：normalized 后的语义与原始一致（sameAs 忽略 null 与显式默认值的差异）
         assertThat(partial.sameAs(partial.normalized())).isTrue();
         assertThat(FlowGatePolicy.v04Defaults()
-                .sameAs(new FlowGatePolicy(5, 3, 3, DeadlineType.WORKING, TimeoutAction.NOTIFY))).isTrue();
+                .sameAs(new FlowGatePolicy(5, 3, 3, DeadlineType.WORKING, TimeoutAction.NOTIFY, null))).isTrue();
         assertThat(FlowGatePolicy.unlimited().sameAs(FlowGatePolicy.v04Defaults())).isFalse();
     }
 
@@ -125,7 +126,8 @@ class FlowGatePolicyTest {
     @DisplayName("模板实体：闸门配置列 ↔ 值对象互通（落库与读回同一口径）")
     void templateEntityRoundTrip() {
         FlowTemplate template = new FlowTemplate();
-        template.applyGatePolicy(new FlowGatePolicy(7, 2, 10, DeadlineType.CALENDAR, TimeoutAction.AUTO_RETURN));
+        template.applyGatePolicy(new FlowGatePolicy(7, 2, 10, DeadlineType.CALENDAR,
+                TimeoutAction.AUTO_RETURN, WithdrawWindow.UNTIL_FINANCE_STARTED));
 
         assertThat(template.getMaxReturnCount()).isEqualTo(7);
         assertThat(template.getMaxSupplementCount()).isEqualTo(2);
@@ -142,11 +144,93 @@ class FlowGatePolicyTest {
     }
 
     @Test
-    @DisplayName("Q6/Q7 字段清单稳定（键位契约：5 个键，改名即破坏运维脚本）")
+    @DisplayName("Q6/Q7 字段清单稳定（键位契约：6 个键，改名即破坏运维脚本）")
     void fieldNamesAreContract() {
         assertThat(List.of("maxReturnCount", "maxSupplementCount", "supplementDeadlineDays",
-                        "supplementDeadlineType", "onSupplementTimeout"))
-                .hasSize(5);
+                        "supplementDeadlineType", "onSupplementTimeout", "withdrawWindow"))
+                .hasSize(6);
         assertThat(FlowGatePolicy.unlimited().toString()).contains("maxReturnCount", "onSupplementTimeout");
+        assertThat(FlowGatePolicy.unlimited().toString()).contains("withdrawWindow");
+    }
+
+    // ================================================================ 撤回窗口（2026-10-04 裁定）
+
+    @Test
+    @DisplayName("撤回窗口｜NULL = 取默认 until_finance_approved（REQ-FLOW-009 口径，历史行为不变）")
+    void withdrawWindowNullMeansDefault() {
+        FlowGatePolicy policy = FlowGatePolicy.unlimited();
+        assertThat(policy.withdrawWindow()).isNull();
+        assertThat(policy.withdrawWindowConfigured()).isFalse();
+        assertThat(policy.effectiveWithdrawWindow()).isEqualTo(WithdrawWindow.UNTIL_FINANCE_APPROVED);
+
+        // 种子默认值（V0.4）与「未配置」等价：撤回窗口不参与 V0.4 判定差异
+        assertThat(FlowGatePolicy.v04Defaults().effectiveWithdrawWindow())
+                .isEqualTo(WithdrawWindow.UNTIL_FINANCE_APPROVED);
+        assertThat(FlowGatePolicy.v04Defaults().withdrawWindowConfigured()).isFalse();
+        // 显式配置成默认口径 → 语义等价（sameAs 为真、isV04Default 仍为真）
+        FlowGatePolicy explicitDefault = FlowGatePolicy.v04Defaults()
+                .withWithdrawWindow(WithdrawWindow.UNTIL_FINANCE_APPROVED);
+        assertThat(explicitDefault.withdrawWindowConfigured()).isTrue();
+        assertThat(explicitDefault.sameAs(FlowGatePolicy.v04Defaults())).isTrue();
+        assertThat(explicitDefault.isV04Default()).isTrue();
+        // 显式配置成严格口径 → 与 V0.4 默认**不等价**（sameAs / isV04Default 都必须为假）
+        FlowGatePolicy strict = FlowGatePolicy.v04Defaults()
+                .withWithdrawWindow(WithdrawWindow.UNTIL_FINANCE_STARTED);
+        assertThat(strict.sameAs(FlowGatePolicy.v04Defaults())).isFalse();
+        assertThat(strict.isV04Default()).isFalse();
+    }
+
+    @Test
+    @DisplayName("撤回窗口｜CRUD 往返：applyGatePolicy 落库 null / 严格值，读回同一口径")
+    void withdrawWindowRoundTrip() {
+        FlowTemplate template = new FlowTemplate();
+        template.applyGatePolicy(FlowGatePolicy.v04Defaults());
+        assertThat(template.getWithdrawWindow()).isNull();
+        assertThat(template.gatePolicy().effectiveWithdrawWindow())
+                .isEqualTo(WithdrawWindow.UNTIL_FINANCE_APPROVED);
+
+        template.applyGatePolicy(FlowGatePolicy.v04Defaults()
+                .withWithdrawWindow(WithdrawWindow.UNTIL_FINANCE_STARTED));
+        assertThat(template.getWithdrawWindow()).isEqualTo("until_finance_started");
+        assertThat(template.gatePolicy().withdrawWindow()).isEqualTo(WithdrawWindow.UNTIL_FINANCE_STARTED);
+
+        // 显式设回默认口径：落库为显式值（区别于 null「未配置」，但语义等价）
+        template.applyGatePolicy(FlowGatePolicy.v04Defaults()
+                .withWithdrawWindow(WithdrawWindow.UNTIL_FINANCE_APPROVED));
+        assertThat(template.getWithdrawWindow()).isEqualTo("until_finance_approved");
+        assertThat(template.gatePolicy().withdrawWindowConfigured()).isTrue();
+
+        template.applyGatePolicy(null);
+        assertThat(template.getWithdrawWindow()).isNull();
+    }
+
+    @Test
+    @DisplayName("撤回窗口｜枚举解析：大小写不敏感、非法值返回空（由 DB CHECK 与接口校验双保险拒绝）")
+    void withdrawWindowEnumParsing() {
+        assertThat(WithdrawWindow.of("until_finance_approved"))
+                .contains(WithdrawWindow.UNTIL_FINANCE_APPROVED);
+        assertThat(WithdrawWindow.of("UNTIL_FINANCE_STARTED"))
+                .contains(WithdrawWindow.UNTIL_FINANCE_STARTED);
+        assertThat(WithdrawWindow.of(" until_finance_started "))
+                .contains(WithdrawWindow.UNTIL_FINANCE_STARTED);
+        assertThat(WithdrawWindow.of("before_finance")).isEmpty();
+        assertThat(WithdrawWindow.of("until-finance-approved")).isEmpty();
+        assertThat(WithdrawWindow.of("")).isEmpty();
+        assertThat(WithdrawWindow.of(null)).isEmpty();
+        assertThat(WithdrawWindow.defaultWindow()).isEqualTo(WithdrawWindow.UNTIL_FINANCE_APPROVED);
+        assertThat(WithdrawWindow.UNTIL_FINANCE_APPROVED.code()).isEqualTo("until_finance_approved");
+        assertThat(WithdrawWindow.UNTIL_FINANCE_STARTED.code()).isEqualTo("until_finance_started");
+    }
+
+    @Test
+    @DisplayName("撤回窗口｜遵守 templates.md §1.8 的键位与取值契约（枚举只有 2 个值）")
+    void withdrawWindowIsContract() {
+        assertThat(WithdrawWindow.values()).hasSize(2);
+        assertThat(List.of(WithdrawWindow.UNTIL_FINANCE_APPROVED.code(),
+                        WithdrawWindow.UNTIL_FINANCE_STARTED.code()))
+                .containsExactly("until_finance_approved", "until_finance_started");
+        // 默认口径 = REQ-FLOW-009 的「②通过前」，标签里必须写明「含②审批中」，否则运维会误读
+        assertThat(WithdrawWindow.UNTIL_FINANCE_APPROVED.label()).contains("②").contains("通过");
+        assertThat(WithdrawWindow.UNTIL_FINANCE_STARTED.label()).contains("②").contains("开始");
     }
 }

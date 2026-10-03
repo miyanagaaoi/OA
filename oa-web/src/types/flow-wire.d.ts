@@ -45,9 +45,11 @@ export type WireJson = string | number | boolean | null | WireJson[] | { [key: s
 // ================================================================ Q6 / Q7 闸门配置
 
 /**
- * `GatePolicyView` —— 模板级 Q6/Q7 闸门配置（`doc/templates.md` §1.7）。
+ * `GatePolicyView` —— 模板级 Q6/Q7 闸门配置 + 撤回窗口（`doc/templates.md` §1.7 / §1.8）。
  *
- * 语义：次数 `null`/`0` = 不限；`supplementDeadlineDays` `null` = 不设时限。
+ * 语义：次数 `null`/`0` = 不限；`supplementDeadlineDays` `null` = 不设时限；
+ * `withdrawWindow` **恒非空**（后端把 `flow_template.withdraw_window` 的 `NULL` 归一为默认
+ * `until_finance_approved` = REQ-FLOW-009 口径），`withdrawWindowConfigured=false` 表示列本来为 NULL。
  * `unlimited` / `v04Default` 是后端给出的**可读判断**（前端直接渲染「不限」，
  * 不再自己拼口径，避免与 `FlowGatePolicy.isUnlimited()/isV04Default()` 判据漂移）。
  */
@@ -62,9 +64,13 @@ export interface WireGatePolicyView {
   supplementDeadlineType?: string | null
   /** `notify` 仅提醒 / `auto_pass` 自动通过 / `auto_return` 自动退回（恒非空） */
   onSupplementTimeout: string
+  /** `until_finance_approved`（默认，②通过前含②审批中）/ `until_finance_started`（②开始前）；恒非空 */
+  withdrawWindow: string
+  /** 撤回窗口是否被显式配置过（`false` = 列 NULL、取默认口径） */
+  withdrawWindowConfigured: boolean
   /** 次数是否不限（含补件无时限） */
   unlimited: boolean
-  /** 是否等价于 V0.4 定稿默认值（5 / 3 / 3 工作日 / notify） */
+  /** 是否等价于 V0.4 定稿默认值（5 / 3 / 3 工作日 / notify / 撤回窗口取默认） */
   v04Default: boolean
 }
 
@@ -74,6 +80,9 @@ export interface WireGatePolicyView {
  * 校验（`@Min`，失败回 `40001 参数校验失败`，HTTP 400）：
  *   · `maxReturnCount` / `maxSupplementCount` ≥ 0（0 = 不限）；
  *   · `supplementDeadlineDays` ≥ 1（**0 与负数一律拒绝**：不设时限请留空）。
+ *
+ * `withdrawWindow` 是 2026-10-04 的**纯追加**字段（既有 5 个键的语义不变）：
+ * 省略/`null` = 取默认口径；非法枚举回 `40008`（`withdrawWindow 非法（…）`）。
  */
 export interface WireGatePolicyRequest {
   maxReturnCount?: number | null
@@ -81,6 +90,7 @@ export interface WireGatePolicyRequest {
   supplementDeadlineDays?: number | null
   supplementDeadlineType?: string | null
   onSupplementTimeout?: string | null
+  withdrawWindow?: string | null
 }
 
 // ================================================================ 模板

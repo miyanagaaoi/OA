@@ -11,8 +11,8 @@ description:
   en: >
       Every colour token: brand and accent (the single corporate blue), the four-step surface ladder with two hairlines, four levels of ink, the sidebar inverse set, the five semantic status colours and the overlay and focus ring; each colour has an explicit responsibility boundary, and crossing it is the most common review rejection.
       
-revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
-updated_at: "2026-10-03T04:41:37.339Z"
+revision: 257a32acb48c626488a22291ada46052401b64c8
+updated_at: "2026-10-03T05:17:27.310Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

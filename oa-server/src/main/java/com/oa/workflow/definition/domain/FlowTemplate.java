@@ -2,6 +2,7 @@ package com.oa.workflow.definition.domain;
 
 import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
 import com.oa.workflow.definition.domain.FlowGateEnums.TimeoutAction;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import java.time.LocalDateTime;
 
 /**
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
  * 每次发布 {@code version + 1}；已发布版本**只读**，改配置必须开新草稿版本。
  * 在途实例通过 {@code flow_instance.template_id + template_version} 锁定执行依据（V-02）。
  *
- * <p>Q6/Q7 闸门配置（本次裁定新增的 5 列）见 {@link FlowGatePolicy}。
+ * <p>Q6/Q7 闸门配置（裁定新增的 5 列）+ 撤回窗口口径（2026-10-04 裁定新增的第 6 列）见
+ * {@link FlowGatePolicy}（键位与语义表见 doc/templates.md §1.7 / §1.8）。
  */
 public class FlowTemplate {
 
@@ -31,12 +33,14 @@ public class FlowTemplate {
     private LocalDateTime updatedAt;
     private Long updatedBy;
 
-    // ---- Q6 / Q7 闸门配置（列定义见 doc/data-model.md §4.1，随 Flyway V1 建列）----
+    // ---- Q6 / Q7 闸门配置 + 撤回窗口（列定义见 doc/data-model.md §4.1，随 Flyway V1 建列）----
     private Integer maxReturnCount;
     private Integer maxSupplementCount;
     private Integer supplementDeadlineDays;
     private String supplementDeadlineType;
     private String onSupplementTimeout;
+    /** 撤回窗口口径：{@code until_finance_approved}（默认口径）/ {@code until_finance_started}（严格口径）；{@code NULL} = 取默认。 */
+    private String withdrawWindow;
 
     public Long getId() {
         return id;
@@ -182,17 +186,26 @@ public class FlowTemplate {
         this.onSupplementTimeout = onSupplementTimeout;
     }
 
-    /** Q6/Q7 闸门配置视图（枚举列解析失败时按 {@code null}，由校验环节报错）。 */
+    public String getWithdrawWindow() {
+        return withdrawWindow;
+    }
+
+    public void setWithdrawWindow(String withdrawWindow) {
+        this.withdrawWindow = withdrawWindow;
+    }
+
+    /** Q6/Q7 闸门配置 + 撤回窗口视图（枚举列解析失败时按 {@code null}，由校验环节报错）。 */
     public FlowGatePolicy gatePolicy() {
         return new FlowGatePolicy(
                 maxReturnCount,
                 maxSupplementCount,
                 supplementDeadlineDays,
                 supplementDeadlineType == null ? null : DeadlineType.of(supplementDeadlineType).orElse(null),
-                onSupplementTimeout == null ? null : TimeoutAction.of(onSupplementTimeout).orElse(null));
+                onSupplementTimeout == null ? null : TimeoutAction.of(onSupplementTimeout).orElse(null),
+                withdrawWindow == null ? null : WithdrawWindow.of(withdrawWindow).orElse(null));
     }
 
-    /** 写入闸门配置（{@code null} 表示「不限/不设时限」，枚举按 {@code code()} 落库）。 */
+    /** 写入闸门配置（{@code null} 表示「不限/不设时限/取默认撤回窗口」，枚举按 {@code code()} 落库）。 */
     public void applyGatePolicy(FlowGatePolicy policy) {
         FlowGatePolicy effective = policy == null ? FlowGatePolicy.unlimited() : policy.normalized();
         this.maxReturnCount = effective.effectiveMaxReturnCount();
@@ -201,6 +214,9 @@ public class FlowTemplate {
         DeadlineType type = effective.effectiveDeadlineType();
         this.supplementDeadlineType = type == null ? null : type.code();
         this.onSupplementTimeout = effective.effectiveTimeoutAction().code();
+        // 撤回窗口：null 落 NULL（= 取默认 until_finance_approved），不把默认值回填成显式值
+        WithdrawWindow window = effective.withdrawWindow();
+        this.withdrawWindow = window == null ? null : window.code();
     }
 
     /** 模板状态枚举（非法值返回 {@code null}）。 */

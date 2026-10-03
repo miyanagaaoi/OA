@@ -11,8 +11,8 @@ description:
   en: >
       Design tokens: the single corporate blue accent, ink and surface scales, inverse scale for the dark left navigation, semantic status colours, spacing and panel layout tokens, with the token-to-CSS-variable mapping and the global status-to-colour table.
       
-revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
-updated_at: "2026-10-03T04:41:37.342Z"
+revision: 257a32acb48c626488a22291ada46052401b64c8
+updated_at: "2026-10-03T05:17:27.314Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

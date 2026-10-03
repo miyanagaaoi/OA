@@ -243,7 +243,8 @@ class NodeDefinitionValidatorTest {
     @DisplayName("R-GATE：Q6/Q7 闸门取值范围进入发布前报告（负次数 / 天数 0 / 越界）")
     void gatePolicyInReport() {
         FlowTemplate broken = FlowDefinitionFixtures.matter(1L, 2, "draft");
-        broken.applyGatePolicy(new FlowGatePolicy(-1, 100, 0, DeadlineType.WORKING, TimeoutAction.NOTIFY));
+        broken.applyGatePolicy(new FlowGatePolicy(-1, 100, 0, DeadlineType.WORKING, TimeoutAction.NOTIFY,
+                null));
 
         PrePublishReport report = PrePublishChecker.run(broken, FlowDefinitionFixtures.matterNodes(1L));
         assertThat(report.passed()).isFalse();

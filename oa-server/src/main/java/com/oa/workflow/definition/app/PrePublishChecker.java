@@ -1,6 +1,7 @@
 package com.oa.workflow.definition.app;
 
 import com.oa.workflow.definition.domain.FlowDefinitionEnums.NodeCode;
+import com.oa.workflow.definition.domain.FlowGateEnums;
 import com.oa.workflow.definition.domain.FlowNode;
 import com.oa.workflow.definition.domain.FlowTemplate;
 import java.time.LocalDateTime;
@@ -81,7 +82,8 @@ public final class PrePublishChecker {
         map.put(R_SIGN, "签名策略合法（⑤⑥ 默认强制、⑦ 默认不签名）");
         map.put(R_TIMEOUT, "超时 ≥24h；开启抄送上级时必须配置超时时长");
         map.put(R_SKIP, "跳过条件字段存在于表单模板，且仅事项审批单②可跳过");
-        map.put(R_GATE, "Q6/Q7 闸门配置取值范围合法（次数 0~99 / 天数 1~365）");
+        map.put(R_GATE, "Q6/Q7 闸门配置取值范围合法（次数 0~99 / 天数 1~365）与撤回窗口口径合法"
+                + "（until_finance_approved 默认 / until_finance_started 严格）");
         // 保序只读视图：Map.copyOf 会丢插入顺序（见 RULES 的类注释），此处刻意用 LinkedHashMap
         return Collections.unmodifiableMap(new LinkedHashMap<>(map));
     }
@@ -141,6 +143,14 @@ public final class PrePublishChecker {
         if (template != null && template.gatePolicy().isUnlimited()) {
             warnings.add("Q6/Q7 未配置：流转/回退与补件次数**不限**、补件**不设时限**"
                     + "（templates.md §1.7；如需与 V0.4 默认值一致请配 5 / 3 / 3 工作日 / notify）");
+        }
+        if (template != null) {
+            // 撤回窗口的**取值回显**（2026-10-04 裁定）：报告里必须能看到该配置与取值，
+            // 否则管理员无法在 dry-run 阶段确认「这批单据按哪种口径撤回」（doc/templates.md §1.8）。
+            FlowGateEnums.WithdrawWindow window = template.gatePolicy().effectiveWithdrawWindow();
+            warnings.add("撤回窗口：配置为 " + window.code() + "（" + window.label() + "）"
+                    + (template.gatePolicy().withdrawWindowConfigured() ? "" : "［未显式配置，取默认口径］")
+                    + " —— 在途实例按其**发起时锁定版本**的口径判定，本次改动不影响它们（AC-09）");
         }
         return warnings;
     }

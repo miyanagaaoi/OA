@@ -33,6 +33,7 @@ import type {
   FlowThresholdBasis,
   FlowTimeoutAction,
   FlowTrunkNodeCode,
+  FlowWithdrawWindow,
 } from '@/types/flow'
 
 // ================================================================ 枚举中文 / 候选
@@ -87,6 +88,20 @@ export const FLOW_TIMEOUT_ACTION_LABEL: Record<FlowTimeoutAction, string> = {
   auto_return: '自动退回',
 }
 
+/** 撤回窗口口径（`doc/templates.md` §1.8，2026-10-04 裁定） */
+export const FLOW_WITHDRAW_WINDOW_LABEL: Record<FlowWithdrawWindow, string> = {
+  until_finance_approved: '②通过前（含②审批中）',
+  until_finance_started: '②开始前（受理后不可撤回）',
+}
+
+/** 撤回窗口口径的两句说明（面板下拉与提示共用，逐字对齐 `WithdrawWindow.label()`） */
+export const FLOW_WITHDRAW_WINDOW_HINT: Record<FlowWithdrawWindow, string> = {
+  until_finance_approved:
+    '默认口径（REQ-FLOW-009）：财务部复核（节点②）**通过之前**都可撤回，②审批中也能撤回。与既有行为逐字一致。',
+  until_finance_started:
+    '严格口径（AC-16）：仅在节点②**开始处理之前**可撤回；②一旦受理（active / 待补件 / 被回退）即不可撤回。',
+}
+
 /** 阈值判定依据（`ThresholdPolicy.Threshold.basis`） */
 export const FLOW_THRESHOLD_BASIS_LABEL: Record<FlowThresholdBasis, string> = {
   any: '或签（阈值不参与判定）',
@@ -119,6 +134,12 @@ export const FLOW_DEADLINE_TYPE_OPTIONS: readonly FlowDeadlineType[] = ['calenda
 
 /** 补件超时处理候选 */
 export const FLOW_TIMEOUT_ACTION_OPTIONS: readonly FlowTimeoutAction[] = ['notify', 'auto_pass', 'auto_return']
+
+/** 撤回窗口口径候选（顺序 = 文档 §1.8 的表格顺序：默认口径在前） */
+export const FLOW_WITHDRAW_WINDOW_OPTIONS: readonly FlowWithdrawWindow[] = [
+  'until_finance_approved',
+  'until_finance_started',
+]
 
 /**
  * 主干 7 节点（`doc/enums.md` §2）：**码 → 固定 seq → 中文名**。
@@ -402,6 +423,19 @@ export function checkGatePolicy(payload: FlowGatePolicyPayload): string[] {
         '不设时限，口径不生效（服务端会拒绝该组合）',
     )
   }
+  // 撤回窗口（`doc/templates.md` §1.8）：前端只挡「既不是两个合法值、也不是留空」的脏值；
+  // 服务端对非法枚举回 `40008`，文案含两个合法取值（见 `FlowDefinitionService#toGatePolicy`）。
+  if (
+    payload.withdrawWindow !== null &&
+    payload.withdrawWindow !== undefined &&
+    payload.withdrawWindow !== 'until_finance_approved' &&
+    payload.withdrawWindow !== 'until_finance_started'
+  ) {
+    problems.push(
+      `withdrawWindow 非法（until_finance_approved ②通过前，含②审批中 / until_finance_started ②开始前）：` +
+        `${payload.withdrawWindow}`,
+    )
+  }
   return problems
 }
 
@@ -426,7 +460,25 @@ export function describeGatePolicy(policy: FlowGatePolicy): string {
     parts.push(`补件时限 ${policy.supplementDeadlineDays} ${type ? FLOW_DEADLINE_TYPE_LABEL[type] : '工作日'}`)
   }
   parts.push(`超时${FLOW_TIMEOUT_ACTION_LABEL[policy.onSupplementTimeout]}`)
+  // 撤回窗口（`doc/templates.md` §1.8）：摘要里带上口径，并标注「默认 / 已配置」，
+  // 让管理员一眼看出该模板与默认行为是否一致（AC-16 严格口径必须显式可见）。
+  parts.push(
+    `撤回${FLOW_WITHDRAW_WINDOW_LABEL[policy.withdrawWindow]}` +
+      (policy.withdrawWindowConfigured ? '' : '（默认）'),
+  )
   return parts.join(' · ')
+}
+
+/**
+ * 撤回窗口的一句话说明（设计器右栏「闸门配置」面板下方，与「在途实例按发起时版本」提示并列）。
+ *
+ * 依据 `doc/templates.md` §1.8：默认口径是 REQ-FLOW-009，严格口径是 AC-16。
+ */
+export function describeWithdrawWindow(policy: FlowGatePolicy): string {
+  const base = FLOW_WITHDRAW_WINDOW_HINT[policy.withdrawWindow]
+  return policy.withdrawWindowConfigured
+    ? base
+    : `${base}（当前**未显式配置**，数据库列为 NULL，按默认口径生效）`
 }
 
 // ================================================================ 节点换序（纯数组重排）

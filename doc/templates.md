@@ -269,6 +269,7 @@
 
 > **本段 JSON 的定稿要点（V0.4）**：① `timeout_hours` 按 T-01 定稿——**② = 48，其余节点 = 24**；② seq = 7 的 `decision_mode` 与 `pass_threshold` 均为 **`null`**（登记节点无决议，见 B-01）；③ `allow_route` 仅 ②⑤⑥ 为 `true`；④ 全部节点 `allow_jump = false`（T-08）；⑤ ⑦ 的留痕动作在轨迹中记为 `archive_register`。
 > **2026-10-03 补充（Q6/Q7 复议）**：`template` 对象新增 5 个**闸门配置键**（`max_return_count` / `max_supplement_count` / `supplement_deadline_days` / `supplement_deadline_type` / `on_supplement_timeout`），语义与取值范围见 §1.7；上面 JSON 中的取值为 **V0.4 定稿默认值**（即默认行为不变）。
+> **2026-10-04 补充（撤回窗口裁定）**：`template` 对象再新增 1 个键 `withdraw_window`（撤回窗口口径，`NULL` = `until_finance_approved`），键位与判定差异见 **§1.8**；上面 JSON 未写该键 = 取默认口径，行为不变。
 
 **协同子任务组的存储**：不新增 `flow_node` 行。运行时在 `flow_node_instance` 中新增 `node_seq = 2` + 不同 `dept_id` 的行（唯一键 `(instance_id, node_seq, dept_id)`），`approver_ids_json` 存该协同部门负责人快照；**每个协同部门一条 `collaboration` 站内信**。
 
@@ -288,6 +289,7 @@
 | `supplement_deadline_days` | int / NULL | **NULL = 不设时限**（种子模板写 3） | `NULL` 或 `1..365`（`0` / 负数**一律拒绝**：不设时限请留空） | 补件时限天数 |
 | `supplement_deadline_type` | enum / VARCHAR(16) | `working`（给了天数但未给口径时按工作日） | `calendar` 自然日 / `working` 工作日 | 时限口径（法定节假日排班属阶段 3） |
 | `on_supplement_timeout` | enum / VARCHAR(16) | `notify`（**与 V0.4「超时仅催办」逐字一致，默认行为不变**） | `notify` 仅提醒 / `auto_pass` 自动通过 / `auto_return` 自动退回 | 补件超时处理策略 |
+| `withdraw_window` | enum / VARCHAR(32) | **`NULL` = 取默认 `until_finance_approved`**（= REQ-FLOW-009 口径，**当前行为不变**） | `until_finance_approved` / `until_finance_started`（其余值被 DB CHECK 拒绝） | **撤回窗口口径**（2026-10-04 产品裁定：模板级配置项）——详表见 **§1.8** |
 
 **校验（发布前 dry-run 必检，见 §4.1 第 5 步）**：次数 `0..99`（负数与 >99 拒绝）、天数 `1..365`（`0`/负数拒绝）、两个枚举必须在值域内；
 另有一条**提示项**（不阻止发布）：配了 `supplement_deadline_type` 却没配 `supplement_deadline_days` → 提示「不设时限，口径不生效」。
@@ -298,6 +300,51 @@
   **超时触发与调度**属 2b / 阶段 3（`TODO(阶段3): 按 supplement_deadline_days/type 与 on_supplement_timeout 调度`）。
 - 与 §1.0「闸门」行的关系：`≤5 / ≤2 / ≤2 / ≤1 / ≤3` 中，`≤5`（全单）与 `≤3`（全单补件）由本表两项配置承担；
   `≤2`（同节点被回退）、`≤2`（连续回到本部门）、`≤1`（同节点补件）是**动作/节点级**常量，仍按 §1.0 执行（如需配置化须另立裁定）。
+
+---
+
+### 1.8 撤回窗口配置项 `withdraw_window`（**2026-10-04 产品裁定：模板级可配置项**）
+
+> **裁定原文**：`withdraw_window` **不再**在 AC-16 与 REQ-FLOW-009 之间二选一，而是**每个单据类型（每个流程模板）可配**；
+> 两种口径都要支持，**默认值取 REQ-FLOW-009 口径**（保持现状、行为不变）。
+> **真源矛盾背景**：`prd-0.1.md` 的 REQ-FLOW-009（第 372/407 行）与 V0.4 澄清（第 787 行）、附录B 状态机图（第 501/773 行）
+> 写的是「撤回**仅限节点②通过之前**」⇒ ②**审批中**可撤；而同文件 AC-16（第 611 行）写的是「②**审批中** → 撤回**失败**」。
+> 本配置项即该矛盾的**唯一收敛点**：REQ 口径 = 默认值，AC-16 描述的严格口径 = 显式配置值。
+
+| 键（JSON / 列名） | 类型 | 默认值 | 取值范围 | 语义 |
+| --- | --- | --- | --- | --- |
+| `withdraw_window`（列 `withdraw_window`） | enum / VARCHAR(32) | **`NULL` = `until_finance_approved`** | `until_finance_approved` ②通过前（含②审批中）/ `until_finance_started` ②开始前 | 撤回窗口口径；`NULL` 与显式 `until_finance_approved` **语义等价** |
+
+**两种取值的判定差异**（判据只依赖 `flow_node_instance` 的 `node_seq` 与 `status`，不依赖 `flow_instance.current_node_seq`）：
+
+| 取值 | `seq==2 && approved` | `seq>2` 且已离开 `pending` | `seq==2 && status ∈ {active, waiting_supplement, returned}` | 其余（含 `seq>2` 的 `pending` / `cancelled`） |
+| --- | --- | --- | --- | --- |
+| `until_finance_approved`（默认 / `NULL`）——**REQ-FLOW-009 口径** | 拒 | 拒 | **放行** | 放行 |
+| `until_finance_started`——**AC-16 严格口径** | 拒 | 拒 | **拒** | 放行 |
+
+> **为什么严格口径取 `{active, waiting_supplement, returned}`**：这三个是「节点②**已开始处理**」的全部在途态
+> （`active` 已受理 / `waiting_supplement` 已发出补件请求 / `returned` 已被回退待重审，见 `enums.md` §5）。
+> `pending` = 尚未轮到本节点（未开始，仍可撤），`cancelled` = 终态级联的产物（不算越界），`approved` 由上表第一列兜住，
+> `skipped` / `rejected` 是②的终态（`skipped` 意味着②未产生待办即跳过、`rejected` 是驳回路径，均已有其它守卫）。
+>
+> **不得削弱的既有语义**（两种口径**都要**保留，本次改动**只增不减**）：②通过后一律拒、`seq>2` 被推进即拒、
+> 终态（`approved` / `terminated`）不可撤回、数据域与权限层次（入口 `flow:task:withdraw` + 引擎身份层）全部不变。
+
+**配置读写与校验**：
+- 入口：与 Q6/Q7 **同一入口** `PUT /api/v1/flow-templates/{template_id}/gate-policy`，请求体**纯追加** `withdrawWindow` 字段
+  （既有 5 个字段的语义与校验完全不变）；响应 `gatePolicy.withdrawWindow` 回显**生效值**（`NULL` 输入回显 `until_finance_approved`）；
+  同步随 `GET /api/v1/flow-templates/{id}`（详情与列表）的 `gatePolicy` 出参下发。
+- 非法枚举 → **400 / `40008`**（`FLOW_DEFINITION_INVALID`，文案含合法取值清单），与同入口两个既有枚举逐字同口径。
+- DB 层双保险：`flow_template` 的 `chk_flow_template_gates` 含 `withdraw_window IN (...)`，非法值**被数据库拒绝**（见 `data-model.md` §4.1）。
+- 只读版本（`published` / `archived`）写入一律 `40906`（沿用 `TemplateVersionPolicy` 既有守卫，本项不改）。
+- 发布前检查：归 **`R-GATE`** 规则（与 Q6/Q7 同规则）；报告 `warnings[]` 里另有一条**取值回显**行
+  （`撤回窗口：until_finance_approved（②通过前，含②审批中）—— …`），使管理员在 dry-run 报告里能直接看到该配置与取值。
+
+**引擎取数（AC-09 关键）**：`FlowEngineService#withdrawAllowed` **不读当前 published 模板**，而是按
+`flow_instance.template_id`（发起时锁定）经 `FlowGateService`（与 Q6/Q7 **同一取数路径**）读回该版本模板的 `withdraw_window`，
+缺行/`NULL` → 默认 `until_finance_approved`。因此「改模板不影响在途单据」：在途实例始终按其**发起时版本**的口径判定。
+
+**实现边界**：本项**只落配置 + 校验 + 读回 + 引擎判定**；`withdraw_window` 不影响其余动作（驳回 / 终止 / 流转 / 回退 / 补件）。
 
 ---
 
@@ -790,6 +837,7 @@
 | V0.4 | 2026-07-09 | 首版：给出四类单据 × 7 节点共 28 行节点配置表与事项单 `flow_node` 种子 JSON；定义 `form_schema_json` 顶层与字段项结构契约（含 `rules[]` 规则类型表）与事项单最小可用完整示例；明确三层版本与 8 条快照规则；给出六步模板变更流程与 4 类禁止事项；建立 `printLabel` / `printVisible` 与 `DESIGN.md` 打印规格的对应关系及四类单据版式映射 |
 | V0.4（业务裁定后修订） | 2026-07-09 | §0 待业务确认项**全部关闭**，改为「定稿默认值」表（T-01–T-08）并新增 §0.1 技术执行项；超时定稿 **② = 48h、其余节点 = 24h**（四类模板与 `flow_node` 种子 JSON 同步）；⑦ `archive_register` 明确**默认「仅登记不审批」**：`decision_mode` / `pass_threshold` 置 `null`、不产生审批决议、不计入审批时长与效率统计、仅留痕 `sys_thread.action = archive_register`；协同任务**每个协同部门一条站内信**；附件 `allowExt` 13 → **15 种**（放行 `heic` / `wps` + 预览降级）；字段 code 统一为 `other_review_depts`（字典类型仍为 `review_dept_other`）；`allow_route` 仅 ②⑤⑥、`allow_jump` 全关闭标为定稿 |
 | V0.4（工程收口后修订） | 2026-10-04 | §3.3 补**状态迁移表**（draft/published/archived 各自允许的动作）与两条守卫的理由（**唯一 `published` 不可归档**、**恢复需重跑发布前校验**）；新增 §4.4 模板/版本迁移接口表与 `restore` 路由、`40914` / `40915` 两个错误码；§0.1 的 B-01（⑦ 决议可空）、B-03（`archive_register` 轨迹动作）经复核在真源与实现两侧均已落地，标注为**已关闭** |
+| V0.4（撤回窗口配置化） | 2026-10-04 | 新增 §1.8 **撤回窗口配置项 `withdraw_window`**（产品裁定：不再在 AC-16 与 REQ-FLOW-009 之间二选一，按模板可配；`until_finance_approved` = 默认 = REQ-FLOW-009 口径，`until_finance_started` = AC-16 严格口径，`NULL` = 取默认）；§1.7 表补同族键位一行、§1.6 补充说明补一句、§1.7 校验段引用本项；配置落 `flow_template` 第 6 个可空列（见 `data-model.md` §4.1），读写沿用 `PUT /flow-templates/{id}/gate-policy` 纯追加字段，引擎按实例锁定版本取值 |
 
 ---
 

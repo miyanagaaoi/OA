@@ -19,6 +19,7 @@ import com.oa.workflow.approver.infra.row.FlowInstanceRow;
 import com.oa.workflow.definition.app.FlowConfigPermission;
 import com.oa.workflow.definition.app.WorkflowPermissionService;
 import com.oa.workflow.definition.domain.FlowDefinitionEnums.DecisionMode;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.ActionResult;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.GateView;
 import com.oa.workflow.runtime.api.dto.RuntimeDtos.SupplementDeadlineView;
@@ -34,6 +35,7 @@ import com.oa.workflow.runtime.domain.RuntimeEnums.TaskStatus;
 import com.oa.workflow.runtime.domain.RuntimeEnums.ThreadAction;
 import com.oa.workflow.runtime.domain.SupplementDeadlinePolicy;
 import com.oa.workflow.runtime.domain.SupplementDeadlinePolicy.Deadline;
+import com.oa.workflow.runtime.domain.WithdrawWindowPolicy;
 import com.oa.workflow.runtime.infra.FlowNodeInstanceMapper;
 import com.oa.workflow.runtime.infra.FlowRoutingMapper;
 import com.oa.workflow.runtime.infra.FlowRuntimeMapper;
@@ -71,7 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 补件请求与提交、流转与回退、上限拒绝）—— 这些规则必须在**引擎层统一实现，不允许各页面自行处理**」。
  * 因此本类是全部动作（{@link FlowAction}）的唯一执行者；规则本身来自**纯函数**：
  * {@link FlowLinkage}（§7.2 联动）、{@link TaskDecisionPolicy}（或签/会签/依次）、
- * {@link GateCounterPolicy}（Q6）、{@link SupplementDeadlinePolicy}（Q7）、
+ * {@link GateCounterPolicy}（Q6）、{@link SupplementDeadlinePolicy}（Q7）、{@link WithdrawWindowPolicy}（撤回窗口）、
  * {@link AddSignPolicy} / {@link JumpPolicy} / {@link ApprovalOpinionPolicy}（2a.5 准入）。
  * Controller / Service 层不含任何状态迁移判断。
  *
@@ -846,12 +848,17 @@ public class FlowEngineService {
     // ================================================================ 撤回 / 终止 / 抄送
 
     /**
-     * 撤回（REQ-FLOW-009）：仅发起人、仅节点②通过前；{@code withdrawn} 为到达态，立即回草稿。
+     * 撤回（REQ-FLOW-009）：仅发起人、仅撤回窗口内（窗口口径见下）；{@code withdrawn} 为到达态，立即回草稿。
      *
-     * <p><b>窗口判据见 {@link #withdrawAllowed}（2026-10-04 修正）</b>：看「节点②是否已通过 /
+     * <p><b>窗口判据见 {@link #withdrawAllowed}（2026-10-04 修正 + 配置化）</b>：看「节点②是否已通过 /
      * ②之后的节点是否被推进过」，**不再**看「②之后的节点是否被取消」——
      * 后者因 {@link #submit} 一次性物化全部 7 个节点实例（全 {@code pending}）而恒为「已越过②」，
      * 使撤回在提交后永远失败。{@code pending}（未开始）不构成越界的证据。
+     *
+     * <p><b>窗口口径是模板级配置项</b>（{@code flow_template.withdraw_window}，doc/templates.md §1.8）：
+     * 默认 {@code until_finance_approved}（②通过前，含②审批中 = REQ-FLOW-009 口径 = 历史行为），
+     * 可配 {@code until_finance_started}（②开始前 = AC-16 严格口径）。取值按**实例锁定的模板版本**读
+     * （{@link FlowGateService#withdrawWindowOf}，与 Q6/Q7 同一条取数路径），因此改模板不影响在途单据（AC-09）。
      *
      * <p><b>这是第二层（引擎兜底）</b>：第一层是 {@code FlowRuntimeController#withdraw} 的入口闸门，
      * 两处都取同一权限码 {@code FlowAction.WITHDRAW.permission()}（{@code flow:task:withdraw}），
@@ -859,7 +866,7 @@ public class FlowEngineService {
      * <ul>
      *   <li>入口层只判权限（无该权限码 → 403，不进引擎）；</li>
      *   <li>本层判**身份**（{@code instance.initiatorId} 本人，或系统管理员）、状态机（终态拒绝）与
-     *       时间窗（{@code withdrawAllowed}：节点②通过前）—— 删掉本层即安全回归：
+     *       时间窗（{@code withdrawAllowed}：按锁定版本的撤回窗口）—— 删掉本层即安全回归：
      *       「有 {@code flow:task:withdraw} 但不是发起人」会拿到别人的单。</li>
      * </ul>
      */
@@ -884,10 +891,12 @@ public class FlowEngineService {
             throw new BizException(ErrorCode.CONFLICT,
                     "单据已处于终态（" + status.code() + "），不可撤回（REQ-FLOW-010 / AC-49）");
         }
-        if (!withdrawAllowed(instanceId)) {
+        WithdrawWindow window = effectiveWindowOf(instance);
+        if (!withdrawAllowed(instance, window)) {
             throw new BizException(ErrorCode.FLOW_ACTION_NOT_ALLOWED,
                     "撤回仅限「财务部复核（节点②）」通过之前（REQ-FLOW-009），当前流程已越过②，已拒绝"
-                            + "（错误码 " + ErrorCode.FLOW_ACTION_NOT_ALLOWED.getCode() + "）");
+                            + "（本单锁定版本的撤回窗口口径：" + window.code() + " = " + window.label()
+                            + "；错误码 " + ErrorCode.FLOW_ACTION_NOT_ALLOWED.getCode() + "）");
         }
         FlowLinkage.TerminalCascade cascade = FlowLinkage.instanceTerminal(InstanceStatus.WITHDRAWN);
         threadWriter.append(instanceId, null, actor, ThreadAction.WITHDRAW, normalized);
@@ -1440,15 +1449,23 @@ public class FlowEngineService {
     }
 
     /**
-     * 撤回闸门：**仅节点②通过前**（REQ-FLOW-009 / doc/prd-0.1.md 第 372、407、787 行；附录B 状态机）。
+     * 撤回闸门：**按实例锁定的模板版本**取撤回窗口口径后判定（REQ-FLOW-009 / AC-16 / doc/templates.md §1.8）。
      *
-     * <h2>判据（2026-10-04 修正：由「未被取消」改为「未被推进」）</h2>
-     * <p>越没越过②，看的是**节点实例有没有被推进过**，而不是「有没有被取消」：
+     * <h2>取数（AC-09 关键）</h2>
+     * <p>口径从 {@link FlowGateService#withdrawWindowOf} 取 —— 与 Q6/Q7 **同一取数路径**
+     * （按 {@code flow_instance.template_id} 即发起时锁定的模板行读列，缺行/{@code NULL} → 默认口径）。
+     * <b>刻意不读当前 published 模板</b>：否则改模板会改到在途单据的撤回窗口，违反 AC-09。
+     * <p>调用方（{@link #withdraw}）已把实例行读出来，这里复用同一行，避免二次查询与「两处读到的实例不一致」；
+     * 生效口径由 {@link #effectiveWindowOf} 解析成**非空**枚举后再传入（mock 返回 {@code null} 也安全）。
+     *
+     * <h2>判据（2026-10-04：由硬编码口径改为配置化口径）</h2>
+     * <p>真正的判定在纯策略 {@link WithdrawWindowPolicy#allowed}：
      * <ol>
-     *   <li>{@code seq = 2} 的节点已 {@code approved} ⇒ 已越过② → <b>拒绝</b>（REQ-FLOW-009 正面口径）；</li>
-     *   <li>{@code seq > 2} 的节点只要**离开 {@code pending} 且未被取消**（{@code active} /
-     *       {@code waiting_supplement} / {@code returned} / {@code approved} / {@code skipped} /
-     *       {@code rejected}）⇒ 主干已推进到②之后 → <b>拒绝</b>；</li>
+     *   <li>公共拒绝：{@code seq = 2} 的节点已 {@code approved} ⇒ 已越过②；
+     *       或 {@code seq > 2} 的节点只要**离开 {@code pending} 且未被取消** ⇒ 主干已推进到②之后；</li>
+     *   <li>口径增量：{@code until_finance_started}（AC-16 严格口径）在①之外**再加一条** ——
+     *       {@code seq = 2} 且状态 ∈ { {@code active} / {@code waiting_supplement} / {@code returned} } ⇒ 拒
+     *       （②一旦开始处理即不可撤回）；</li>
      *   <li>其余（含 {@code seq > 2} 的 {@code pending}、已被上级动作取消的 {@code cancelled}）→ 放行。</li>
      * </ol>
      *
@@ -1458,34 +1475,17 @@ public class FlowEngineService {
      * 这条判据在**单据一提交就恒为「已越过②」** —— 撤回永远失败（上一轮运行期实测：两张单分别
      * 409 / 40910）。{@code pending} 的语义是「尚未轮到本节点」（doc/enums.md §5），
      * **未到达的节点不得阻止撤回**。
-     *
-     * <p>判据只依赖节点实例状态，不依赖 {@code flow_instance.current_node_seq}：流转/回退会把
-     * 当前序号改到别的部门节点上，而撤回窗口是**沿②这条主干**判定的。
      */
-    private boolean withdrawAllowed(Long instanceId) {
-        for (FlowNodeInstanceRow row : nodeInstanceMapper.selectByInstance(instanceId)) {
-            if (row.getNodeSeq() == null) {
-                continue;
-            }
-            // ① ②已通过 ⇒ 已越过撤回窗口（REQ-FLOW-009 的正面口径）
-            if (row.getNodeSeq() == 2 && NodeStatus.APPROVED.code().equals(row.getStatus())) {
-                return false;
-            }
-            // ② ②之后的节点「被推进过」即视为已越过②；未到达的 pending 与终态级联的 cancelled 都不算
-            if (row.getNodeSeq() > 2 && advancedBeyondPending(row.getStatus())) {
-                return false;
-            }
-        }
-        return true;
+    private boolean withdrawAllowed(FlowInstanceRow instance, WithdrawWindow window) {
+        return WithdrawWindowPolicy.allowed(window, nodeInstanceMapper.selectByInstance(instance.getId()));
     }
 
-    /** 节点实例是否「已离开未开始态」（{@code pending} = 未开始，不构成「已越过②」的证据）。 */
-    private static boolean advancedBeyondPending(String status) {
-        if (status == null) {
-            return false;
-        }
-        NodeStatus parsed = NodeStatus.of(status).orElse(null);
-        return parsed != null && parsed != NodeStatus.PENDING && parsed != NodeStatus.CANCELLED;
+    /**
+     * 该实例**生效的**撤回窗口口径：按发起时锁定的模板版本读（与 Q6/Q7 同一取数路径），
+     * {@code null}（列未配置 / 模板行缺失）→ 默认口径。**唯一入口**，见 {@link WithdrawWindowPolicy#effective}。
+     */
+    private WithdrawWindow effectiveWindowOf(FlowInstanceRow instance) {
+        return WithdrawWindowPolicy.effective(gateService.withdrawWindowOf(instance));
     }
 
     /** 内部用（无权限包装）的回到草稿：清未完成节点与待决议任务，写审计。 */

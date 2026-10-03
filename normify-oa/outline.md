@@ -485,7 +485,7 @@
         - oa.workflow.exception.resubmit.snapshot [计划] — 重解析审批人快照 / Re-resolve Approver Snapshot — 重新提交时重新解析审批人快照与流程版本：按发起时点的最新模板版本与新组织关系解析候选人，覆盖旧的 approver_snapshot_json 与 templa… — [模块 1 · API 2]
       - oa.workflow.exception.terminate [计划] — 终止 / Terminate — 系统管理员与集团分管领导可终止流程，必须填写原因；终止后实例状态置「已终止」（终态，不可再提交），全部进行中节点实例与任务取消或自动关闭，并通知发起人；终止动作… — [模块 1 · API 2]
       - oa.workflow.exception.timeout [计划] — 超时仅催办 / Timeout Reminder Only — 每个节点可配置超时时长（须显式配置且 ≥24h）；超时后向审批人发送站内信与邮件催办，并可配置抄送其上级；一期明确不做超时自动跳过或自动升级，避免误判。 — [模块 1 · API 3]
-      - oa.workflow.exception.withdraw [计划] — 撤回 / Withdraw — 仅发起人可撤回，且仅限财务部复核节点（节点②）审批通过前；撤回后实例状态置「已撤回」并回到草稿，发起人可修改后重新提交；撤回动作通知相关审批人并写入轨迹。 — [模块 1 · API 2]
+      - oa.workflow.exception.withdraw [计划] — 撤回 / Withdraw — 仅发起人可撤回；撤回窗口是**模板级配置项**（flow_template.withdraw_window，doc/templates.md §1.8）：默认 … — [模块 1 · API 2]
     - oa.workflow.routing [计划] — 集团层流转与回退 / Group Routing & Rollback — 集团层链式流转：指定下一承接部门并填原因、支持连续流转（A→B→C）、回退上一已完成节点（同节点≤2 次）、回到本部门（连续≤2 次）；两道闸门：流转+回退总数… — [模块 11 · API 17]
       - oa.workflow.routing.back-home [计划] — 回到本部门 / Return to Own Department — 把后续流转收束回本部门，由本部门决定下一步；同一部门连续「回到本部门」不超过 2 次，超出拒绝；该动作不计入流转+回退总次数，但必须记入审计日志；是「禁止回流已… — [模块 1 · API 2]
       - oa.workflow.routing.forward [计划] — 集团层流转 / Group-level Routing — 集团层链式流转：②及之后节点的审批人可指定下一个承接部门接手，单据继续在集团层流转并支持连续流转 A→B→C；必须选择承接部门并填写流转原因，承接部门须对本案可… — [模块 3 · API 5]

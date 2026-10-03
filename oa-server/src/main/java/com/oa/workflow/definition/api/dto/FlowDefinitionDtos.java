@@ -23,10 +23,12 @@ public final class FlowDefinitionDtos {
     // ================================================================ Q6 / Q7 闸门配置
 
     /**
-     * Q6 / Q7 闸门配置（模板级；2026-10-03 产品裁定：**两者均为可配置项**）。
+     * Q6 / Q7 闸门配置 + 撤回窗口（模板级；2026-10-03 裁定 Q6/Q7 为可配置项，
+     * 2026-10-04 裁定**撤回窗口**为可配置项）。
      *
-     * <p>键位与语义见 {@code doc/templates.md} §1.7；{@code null}/{@code 0} 次数 = 不限，
-     * {@code null} 天数 = 不设时限。
+     * <p>键位与语义见 {@code doc/templates.md} §1.7 与 §1.8；{@code null}/{@code 0} 次数 = 不限，
+     * {@code null} 天数 = 不设时限，{@code withdrawWindow} 的 {@code null} = 取默认
+     * {@code until_finance_approved}（REQ-FLOW-009 口径）。
      */
     public record GatePolicyView(
             /** 回退次数上限（null/0 = 不限）。 */
@@ -39,14 +41,27 @@ public final class FlowDefinitionDtos {
             String supplementDeadlineType,
             /** 超时处理：notify 仅提醒 / auto_pass 自动通过 / auto_return 自动退回。 */
             String onSupplementTimeout,
+            /**
+             * 撤回窗口口径（**回显的是生效值**，永不为 {@code null}）：
+             * {@code until_finance_approved} ②通过前（含②审批中，默认，REQ-FLOW-009 口径）/
+             * {@code until_finance_started} ②开始前（AC-16 严格口径）。
+             */
+            String withdrawWindow,
+            /** 撤回窗口是否被显式配置过（{@code false} = 列为 NULL、取默认口径）。 */
+            boolean withdrawWindowConfigured,
             /** 次数是否不限（含补件无时限）——便于前端直接渲染「不限」。 */
             boolean unlimited,
-            /** 是否等价于 V0.4 定稿默认值（5 / 3 / 3 工作日 / notify）。 */
+            /** 是否等价于 V0.4 定稿默认值（5 / 3 / 3 工作日 / notify / 撤回窗口取默认）。 */
             boolean v04Default
     ) {
     }
 
-    /** 闸门配置写入请求（PUT）；字段可空，{@code null} 即「不限 / 不设时限」。 */
+    /**
+     * 闸门配置写入请求（PUT）；字段可空，{@code null} 即「不限 / 不设时限 / 撤回窗口取默认」。
+     *
+     * <p><b>纯追加</b>：{@code withdrawWindow} 为 2026-10-04 新增，既有 5 个字段的语义与校验完全不变；
+     * 非法枚举 → 400 / {@code 40008}（与同入口两个既有枚举逐字同口径）。
+     */
     public record GatePolicyRequest(
             @Min(value = 0, message = "回退次数上限不得为负数（0 或留空 = 不限）")
             Integer maxReturnCount,
@@ -55,7 +70,12 @@ public final class FlowDefinitionDtos {
             @Min(value = 1, message = "补件时限天数必须 ≥1（不设时限请留空）")
             Integer supplementDeadlineDays,
             String supplementDeadlineType,
-            String onSupplementTimeout
+            String onSupplementTimeout,
+            /**
+             * 撤回窗口口径（可空 = 取默认 {@code until_finance_approved}）：
+             * {@code until_finance_approved} / {@code until_finance_started}；其余值一律 400。
+             */
+            String withdrawWindow
     ) {
     }
 

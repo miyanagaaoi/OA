@@ -4,16 +4,18 @@ import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
 import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
 import com.oa.workflow.definition.domain.FlowGateEnums.TimeoutAction;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * 模板级 Q6 / Q7 闸门配置（**纯值对象 + 纯校验**，不依赖 Spring / DB）。
+ * 模板级 Q6 / Q7 闸门配置 + <b>撤回窗口口径</b>（**纯值对象 + 纯校验**，不依赖 Spring / DB）。
  *
- * <p>持久化落点：{@code flow_template} 的 5 个可空列
+ * <p>持久化落点：{@code flow_template} 的 6 个可空列
  * （{@code max_return_count} / {@code max_supplement_count} /
- * {@code supplement_deadline_days} / {@code supplement_deadline_type} / {@code on_supplement_timeout}），
+ * {@code supplement_deadline_days} / {@code supplement_deadline_type} / {@code on_supplement_timeout} /
+ * {@code withdraw_window}），
  * 真源为 {@code doc/data-model.md} §4.1（随 Flyway {@code V1__schema.sql} 建列），
  * 种子默认值见 {@code oa-deploy/sql/03-templates.sql} → {@code V3__templates.sql}。
  * 历史：曾由手写迁移 {@code V5__flow_gate_policy.sql} 追加；列并入 V1 后该迁移已删除。
@@ -28,25 +30,31 @@ import java.util.Objects;
  *       {@link DeadlineType#WORKING}（V0.4 定稿口径：3 个工作日）。</li>
  *   <li>{@code onSupplementTimeout}：{@link TimeoutAction}；{@code null} → {@link TimeoutAction#NOTIFY}
  *       （与 V0.4「超时仅催办」逐字一致，默认行为不变）。</li>
+ *   <li>{@code withdrawWindow}（2026-10-04 裁定新增）：{@link WithdrawWindow}；{@code null} = <b>取默认</b>
+ *       {@link WithdrawWindow#UNTIL_FINANCE_APPROVED}（= REQ-FLOW-009 口径 = 历史行为，见 doc/templates.md §1.8）。
+ *       「保留 null」是刻意的：历史数据与既有实例读到的仍是 {@code NULL}，语义即默认口径，无需回填。</li>
  * </ul>
  *
  * <h2>本期边界</h2>
  * <p>只做「配置 + 校验 + 持久化 + 读回」。**不做**计数判定与超时调度 —— 消费点是
  * {@link FlowGateEnums#CONSUMER}（2a.4 运行时状态机：{@code GateCounterPolicy}）与
  * {@link FlowGateEnums#DEADLINE_TODO}（阶段 3 调度器；Q7 的**时限计算**已在 2a.4 落地，
- * 见 {@code com.oa.workflow.runtime.domain.SupplementDeadlinePolicy}）。
+ * 见 {@code com.oa.workflow.runtime.domain.SupplementDeadlinePolicy}）；
+ * {@code withdrawWindow} 的消费点是 {@code com.oa.workflow.runtime.app.FlowEngineService#withdraw} 的窗口判据
+ * （{@code FlowGateService#withdrawWindowOf} 按实例锁定版本取值 → {@code WithdrawWindowPolicy} 判定）。
  */
 public record FlowGatePolicy(
         Integer maxReturnCount,
         Integer maxSupplementCount,
         Integer supplementDeadlineDays,
         DeadlineType supplementDeadlineType,
-        TimeoutAction onSupplementTimeout
+        TimeoutAction onSupplementTimeout,
+        WithdrawWindow withdrawWindow
 ) {
 
-    /** 次数不限 / 无时限 / 仅提醒（**未配置时的口径**）。 */
+    /** 次数不限 / 无时限 / 仅提醒 / 撤回窗口取默认（**未配置时的口径**）。 */
     public static FlowGatePolicy unlimited() {
-        return new FlowGatePolicy(null, null, null, null, TimeoutAction.NOTIFY);
+        return new FlowGatePolicy(null, null, null, null, TimeoutAction.NOTIFY, null);
     }
 
     /**
@@ -56,9 +64,13 @@ public record FlowGatePolicy(
      * 补件同节点 ≤1 且全单 ≤3；补件时限默认 3 个工作日、超时仅催办。
      * 其中「单次上限」属节点/动作级常量（见 doc/templates.md §1.0「闸门」行），
      * 落到模板可配置面上的是**全单累计**两项：≤5 与 ≤3。
+     *
+     * <p>{@code withdrawWindow} 用 {@code null} 表达「默认口径 {@code until_finance_approved}」——
+     * 与种子里该列为 {@code NULL} 逐字一致，从而 {@link #isV04Default()} 的判据对历史行仍然成立
+     * （默认行为不变，见 doc/templates.md §1.8）。
      */
     public static FlowGatePolicy v04Defaults() {
-        return new FlowGatePolicy(5, 3, 3, DeadlineType.WORKING, TimeoutAction.NOTIFY);
+        return new FlowGatePolicy(5, 3, 3, DeadlineType.WORKING, TimeoutAction.NOTIFY, null);
     }
 
     /** 出参/入库前把 {@code null} 归一（仅枚举列，数字列保留 null 以表达「不限」）。 */
@@ -69,7 +81,9 @@ public record FlowGatePolicy(
                 supplementDeadlineDays == null
                         ? null
                         : (supplementDeadlineType == null ? DeadlineType.WORKING : supplementDeadlineType),
-                onSupplementTimeout == null ? TimeoutAction.NOTIFY : onSupplementTimeout);
+                onSupplementTimeout == null ? TimeoutAction.NOTIFY : onSupplementTimeout,
+                // 撤回窗口**刻意不归一**：null 就是「取默认」，回填成显式值会让历史行产生无意义的写与 diff
+                withdrawWindow);
     }
 
     /** {@code null}/{@code 0} → {@code null}（表示「不限」）；其余原样。 */
@@ -85,13 +99,13 @@ public record FlowGatePolicy(
     /** 只改回退次数上限（其余字段保持）。 */
     public FlowGatePolicy withReturnCount(Integer value) {
         return new FlowGatePolicy(value, maxSupplementCount, supplementDeadlineDays, supplementDeadlineType,
-                onSupplementTimeout);
+                onSupplementTimeout, withdrawWindow);
     }
 
     /** 只改补件次数上限。 */
     public FlowGatePolicy withSupplementCount(Integer value) {
         return new FlowGatePolicy(maxReturnCount, value, supplementDeadlineDays, supplementDeadlineType,
-                onSupplementTimeout);
+                onSupplementTimeout, withdrawWindow);
     }
 
     /** 只改补件时限天数（天数非空且未给口径时口径按工作日补全）。 */
@@ -99,7 +113,13 @@ public record FlowGatePolicy(
         return new FlowGatePolicy(maxReturnCount, maxSupplementCount, days,
                 days == null ? supplementDeadlineType
                         : (supplementDeadlineType == null ? DeadlineType.WORKING : supplementDeadlineType),
-                onSupplementTimeout);
+                onSupplementTimeout, withdrawWindow);
+    }
+
+    /** 只改撤回窗口口径（{@code null} = 取默认 {@code until_finance_approved}）。 */
+    public FlowGatePolicy withWithdrawWindow(WithdrawWindow window) {
+        return new FlowGatePolicy(maxReturnCount, maxSupplementCount, supplementDeadlineDays,
+                supplementDeadlineType, onSupplementTimeout, window);
     }
 
     /** 回退次数上限（{@code null} = 不限）。 */
@@ -128,6 +148,21 @@ public record FlowGatePolicy(
     /** 超时处理策略（{@code null} → {@link TimeoutAction#NOTIFY}）。 */
     public TimeoutAction effectiveTimeoutAction() {
         return onSupplementTimeout == null ? TimeoutAction.NOTIFY : onSupplementTimeout;
+    }
+
+    /**
+     * 生效的撤回窗口口径（{@code null} → {@link WithdrawWindow#defaultWindow()} = {@code until_finance_approved}）。
+     *
+     * <p>这是**唯一**允许被引擎/接口消费的取值入口：调用方不必自己判 {@code null}，
+     * 也就不会出现「某个地方把 null 当成不限、另一个地方当成默认」的口径分叉。
+     */
+    public WithdrawWindow effectiveWithdrawWindow() {
+        return withdrawWindow == null ? WithdrawWindow.defaultWindow() : withdrawWindow;
+    }
+
+    /** 撤回窗口是否显式配置过（{@code false} = 列为 {@code NULL}，取默认口径）。 */
+    public boolean withdrawWindowConfigured() {
+        return withdrawWindow != null;
     }
 
     // ================================================================ 校验
@@ -183,7 +218,9 @@ public record FlowGatePolicy(
 
     /** 是否与 V0.4 默认值等价（用于「默认行为不变」的可读判断）。 */
     public boolean isV04Default() {
-        return equals(v04Defaults());
+        // 用 sameAs 而非 equals：撤回窗口列的 NULL 与显式 until_finance_approved 语义等价（见 §1.8），
+        // equals 会把「种子行未配置」误判成「非 V0.4 默认」。
+        return sameAs(v04Defaults());
     }
 
     /** 是否「次数不限且无时限」（未配置口径）。 */
@@ -200,6 +237,7 @@ public record FlowGatePolicy(
                 && Objects.equals(effectiveMaxSupplementCount(), other.effectiveMaxSupplementCount())
                 && Objects.equals(effectiveSupplementDeadlineDays(), other.effectiveSupplementDeadlineDays())
                 && Objects.equals(effectiveDeadlineType(), other.effectiveDeadlineType())
-                && effectiveTimeoutAction() == other.effectiveTimeoutAction();
+                && effectiveTimeoutAction() == other.effectiveTimeoutAction()
+                && effectiveWithdrawWindow() == other.effectiveWithdrawWindow();
     }
 }

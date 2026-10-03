@@ -4,7 +4,7 @@
 -- 生成器: tools/gen-init-sql.js sha256=4ff51bba65ea
 -- 确定性: 无墙钟时间戳/随机量；同一输入重复生成逐字节一致（可安全重跑生成器）。
 -- 请勿手工编辑本文件：改文档后重跑本脚本。
--- 真源文档: doc/data-model.md sha256=055d9508aa9b
+-- 真源文档: doc/data-model.md sha256=1b412b0d7b55
 --
 -- 执行顺序：按文档顺序执行（身份与组织 → 权限 → 流程定义 → 运行时 → 签名/附件/消息/审计 → 表单数据）。
 -- 包含：建表 28 张、索引 61 个、CHECK 11 个、外键若干、不可篡改触发器 4 个。
@@ -322,6 +322,7 @@ CREATE TABLE flow_template (
   supplement_deadline_days INT          NULL COMMENT 'Q7 补件时限天数（NULL = 不设时限；1..365；0 与负数一律拒绝，不设时限请留空）',
   supplement_deadline_type VARCHAR(16)  NULL COMMENT 'Q7 补件时限口径：calendar 自然日 / working 工作日（给了天数但未给口径时按 working）',
   on_supplement_timeout    VARCHAR(16)  NULL COMMENT 'Q7 补件超时处理：notify 仅提醒（默认，与 V0.4「超时仅催办」一致）/ auto_pass 自动通过 / auto_return 自动退回',
+  withdraw_window   VARCHAR(32)  NULL COMMENT '撤回窗口口径（模板级配置项，2026-10-04 产品裁定）：until_finance_approved = 允许撤回到节点②通过之前（含②审批中，**默认**，REQ-FLOW-009 口径）/ until_finance_started = 仅允许在节点②开始前撤回（②一旦 active/waiting_supplement/returned 即不可撤，AC-16 严格口径）；**NULL = 取默认 until_finance_approved**（历史数据与既有实例不受影响）。键名与语义见 templates.md §1.8；引擎按实例**发起时锁定的模板版本**取该值（AC-09 / templates.md V-02）',
   created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_by        BIGINT UNSIGNED     NULL,
   updated_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -334,9 +335,10 @@ CREATE TABLE flow_template (
     (max_supplement_count     IS NULL OR max_supplement_count     BETWEEN 0 AND 99)   AND
     (supplement_deadline_days IS NULL OR supplement_deadline_days BETWEEN 1 AND 365)  AND
     (supplement_deadline_type IS NULL OR supplement_deadline_type IN ('calendar','working')) AND
-    (on_supplement_timeout    IS NULL OR on_supplement_timeout    IN ('notify','auto_pass','auto_return'))
+    (on_supplement_timeout    IS NULL OR on_supplement_timeout    IN ('notify','auto_pass','auto_return')) AND
+    (withdraw_window          IS NULL OR withdraw_window          IN ('until_finance_approved','until_finance_started'))
   )
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程模板（按版本累积，不覆盖历史；末 5 列为 Q6/Q7 模板级闸门配置，种子取 V0.4 默认值 5 / 3 / 3 / working / notify）';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='流程模板（按版本累积，不覆盖历史；末 6 列为模板级闸门与撤回窗口配置 —— Q6/Q7 五项种子取 V0.4 默认值 5 / 3 / 3 / working / notify，withdraw_window 种子留 NULL = 取默认 until_finance_approved）';
 
 -- ============================================================
 -- 4.2 流程节点定义

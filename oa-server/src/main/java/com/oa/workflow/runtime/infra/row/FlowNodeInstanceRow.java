@@ -1,5 +1,6 @@
 package com.oa.workflow.runtime.infra.row;
 
+import com.oa.workflow.runtime.domain.WithdrawWindowPolicy;
 import java.time.LocalDateTime;
 
 /**
@@ -12,8 +13,11 @@ import java.time.LocalDateTime;
  * <p>{@code approver_ids_json} 是**本节点实例的运行时候选人**：
  * 主干节点从快照派生（doc/data-model.md §7.1 实现要求第 2 条）；
  * 协同组 / 流转承接部门 / 加签产生的实例行由运行时解析结果填充。
+ *
+ * <p>本类实现 {@link WithdrawWindowPolicy.NodeView}（2026-10-04）：撤回窗口纯判定只需要
+ * {@code nodeSeq} 与 {@code status} 两个字段，暴露成接口后策略层不必依赖 MyBatis 行对象。
  */
-public class FlowNodeInstanceRow {
+public class FlowNodeInstanceRow implements WithdrawWindowPolicy.NodeView {
 
     private Long id;
     private Long instanceId;
@@ -176,5 +180,19 @@ public class FlowNodeInstanceRow {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // ---------------------------------------------------------------- WithdrawWindowPolicy.NodeView
+
+    /** 撤回窗口判定的最小视图（{@link #getNodeSeq()} 的接口别名；**只读**）。 */
+    @Override
+    public Integer nodeSeq() {
+        return nodeSeq;
+    }
+
+    /** 撤回窗口判定的最小视图（{@link #getStatus()} 的接口别名；**只读**）。 */
+    @Override
+    public String status() {
+        return status;
     }
 }

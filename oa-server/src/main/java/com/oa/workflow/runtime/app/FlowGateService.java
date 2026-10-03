@@ -2,12 +2,14 @@ package com.oa.workflow.runtime.app;
 
 import com.oa.workflow.approver.infra.row.FlowInstanceRow;
 import com.oa.workflow.definition.domain.FlowGateEnums.DeadlineType;
+import com.oa.workflow.definition.domain.FlowGateEnums.WithdrawWindow;
 import com.oa.workflow.definition.domain.FlowGatePolicy;
 import com.oa.workflow.definition.domain.FlowTemplate;
 import com.oa.workflow.definition.infra.FlowTemplateMapper;
 import com.oa.workflow.runtime.domain.GateCounterPolicy;
 import com.oa.workflow.runtime.domain.SupplementDeadlinePolicy;
 import com.oa.workflow.runtime.domain.SupplementDeadlinePolicy.Deadline;
+import com.oa.workflow.runtime.domain.WithdrawWindowPolicy;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -18,11 +20,13 @@ import org.springframework.stereotype.Service;
  * <b>Q6 / Q7 的运行期读取与判定入口</b>（2a.4）。
  *
  * <h2>为什么单独一层</h2>
- * <p>Q6/Q7 的配置是**模板级**的（{@code flow_template} 的 5 个可空列，doc/templates.md §1.7），
+ * <p>Q6/Q7 的配置是**模板级**的（{@code flow_template} 的可空列，doc/templates.md §1.7；撤回窗口见 §1.8），
  * 但在途实例只认**发起时锁定的那一行模板**（{@code flow_instance.template_id}，REQ-FLOW-006 / AC-09）。
  * 因此「读配置」这件事只有一个正确落点：按实例锁定的 {@code template_id} 取回模板行，
- * 再交给纯策略 {@link GateCounterPolicy}（Q6）与 {@link SupplementDeadlinePolicy}（Q7）判定。
+ * 再交给纯策略 {@link GateCounterPolicy}（Q6）与 {@link SupplementDeadlinePolicy}（Q7）判定，
+ * 撤回窗口交 {@link WithdrawWindowPolicy}。
  * 引擎与接口都从这里取，避免「有的地方reads 最新版本、有的地方 reads 锁定版本」的口径分叉。
+ * 2026-10-04 新增的 {@link #withdrawWindowOf} 复用**同一条**取数路径（不另造一套）。
  *
  * <h2>读不到模板行怎么办</h2>
  * <p>{@code flow_instance.template_id} 有外键约束且不可为空，正常不会读不到；真读不到时按
@@ -113,6 +117,32 @@ public class FlowGateService {
     /** 时限口径（{@code calendar} / {@code working}）。 */
     public DeadlineType deadlineTypeOf(FlowInstanceRow instance) {
         return policyOf(instance).effectiveDeadlineType();
+    }
+
+    // ================================================================ 撤回窗口
+
+    /**
+     * 该实例**生效的撤回窗口口径**（2026-10-04 裁定新增；与 Q6/Q7 走**同一条取数路径**）。
+     *
+     * <p>口径只认**发起时锁定的模板版本**（{@code flow_instance.template_id}，REQ-FLOW-006 / AC-09）：
+     * 读不到模板行、或该列为 {@code NULL} 时按 {@link WithdrawWindow#defaultWindow()}
+     * （{@code until_finance_approved} = REQ-FLOW-009 口径 = 历史行为）处理并打 WARN。
+     * **刻意不读当前 published 模板** —— 否则「管理员改模板 → 在途单据的撤回窗口跟着变」，
+     * 直接违反 AC-09（已发起实例按发起时版本执行）。
+     *
+     * @return 永不为 {@code null}；消费点见
+     *         {@code FlowEngineService#withdrawAllowed} → {@link WithdrawWindowPolicy}
+     */
+    public WithdrawWindow withdrawWindowOf(FlowInstanceRow instance) {
+        FlowTemplate template = lockedTemplate(instance).orElse(null);
+        if (template == null) {
+            log.warn("实例 {} 锁定模板 id={} 不存在，撤回窗口按默认口径 {} 降级",
+                    instance == null ? null : instance.getId(),
+                    instance == null ? null : instance.getTemplateId(),
+                    WithdrawWindow.defaultWindow().code());
+            return WithdrawWindow.defaultWindow();
+        }
+        return template.gatePolicy().effectiveWithdrawWindow();
     }
 
     private static int used(Integer count) {

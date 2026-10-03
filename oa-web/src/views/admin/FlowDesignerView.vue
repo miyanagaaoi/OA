@@ -61,6 +61,9 @@ import {
   FLOW_TIMEOUT_ACTION_OPTIONS,
   FLOW_TRUNK_NODES,
   FLOW_TRUNK_NODE_COUNT,
+  FLOW_WITHDRAW_WINDOW_HINT,
+  FLOW_WITHDRAW_WINDOW_LABEL,
+  FLOW_WITHDRAW_WINDOW_OPTIONS,
   checkGatePolicy,
   checkRuleRank,
   describeGatePolicy,
@@ -85,6 +88,7 @@ import type {
   FlowTemplate,
   FlowTemplateDetail,
   FlowTimeoutAction,
+  FlowWithdrawWindow,
 } from '@/types/flow'
 
 const route = useRoute()
@@ -171,6 +175,9 @@ function applyTemplate(next: FlowTemplate): void {
     supplementDeadlineDays: next.gatePolicy.supplementDeadlineDays,
     supplementDeadlineType: next.gatePolicy.supplementDeadlineType,
     onSupplementTimeout: next.gatePolicy.onSupplementTimeout,
+    // 撤回窗口（doc/templates.md §1.8）：列 NULL（未显式配置）时映射为 `null`（而不是把生效值写回），
+    // 以保留「留空 = 取默认口径」的三态语义 —— 否则一次保存就会把历史模板「升级」成已配置。
+    withdrawWindow: next.gatePolicy.withdrawWindowConfigured ? next.gatePolicy.withdrawWindow : null,
   })
 }
 
@@ -532,6 +539,7 @@ const gate = reactive<FlowGatePolicyPayload>({
   supplementDeadlineDays: null,
   supplementDeadlineType: null,
   onSupplementTimeout: 'notify',
+  withdrawWindow: null,
 })
 
 /** 归一后的提交体（`0` → `null` = 不限，与后端 `FlowGatePolicy.normalizeCount` 同口径） */
@@ -542,7 +550,24 @@ const gatePayload = computed<FlowGatePolicyPayload>(() => ({
   supplementDeadlineType:
     gate.supplementDeadlineDays === null ? null : (gate.supplementDeadlineType ?? null),
   onSupplementTimeout: gate.onSupplementTimeout,
+  // 留空 = 取默认口径（后端落 NULL；`until_finance_approved` 亦与之语义等价）
+  withdrawWindow: gate.withdrawWindow ?? null,
 }))
+
+/** 生效的撤回窗口口径（留空 = 默认 REQ-FLOW-009 口径），用于面板回显与提示 */
+const effectiveWithdrawWindow = computed<FlowWithdrawWindow>(
+  () => gate.withdrawWindow ?? 'until_finance_approved',
+)
+/** 是否显式配置过（`false` = 数据库列为 NULL，按默认口径生效） */
+const withdrawWindowConfigured = computed(() => gate.withdrawWindow !== null)
+/** 面板下方的口径说明（两句 + 未配置时的显式标注） */
+const withdrawWindowHint = computed(
+  () =>
+    FLOW_WITHDRAW_WINDOW_HINT[effectiveWithdrawWindow.value] +
+    (withdrawWindowConfigured.value
+      ? ''
+      : '（当前未显式配置 → 按默认口径生效，与既有单据行为完全一致）'),
+)
 
 const gateProblems = computed(() => checkGatePolicy(gatePayload.value))
 const gateUnlimited = computed(
@@ -569,6 +594,8 @@ function fillV04Defaults(): void {
     supplementDeadlineDays: 3,
     supplementDeadlineType: 'working' as FlowDeadlineType,
     onSupplementTimeout: 'notify' as FlowTimeoutAction,
+    // V0.4 默认 = REQ-FLOW-009 口径 = 留空取默认（`null` 落库为 NULL，不写显式值）
+    withdrawWindow: null,
   })
 }
 
@@ -579,6 +606,7 @@ function fillUnlimited(): void {
     supplementDeadlineDays: null,
     supplementDeadlineType: null,
     onSupplementTimeout: 'notify' as FlowTimeoutAction,
+    withdrawWindow: null,
   })
 }
 
@@ -1031,6 +1059,33 @@ function timeoutText(row: unknown): string {
                 />
               </el-select>
               <p class="hint">默认「仅提醒」，与 V0.4「超时仅催办」逐字一致（默认行为不变）。</p>
+            </el-form-item>
+            <el-form-item label="撤回窗口 withdraw_window">
+              <el-select
+                v-model="gate.withdrawWindow"
+                class="fill"
+                clearable
+                :disabled="!canPublish || templateReadOnly"
+                placeholder="留空 = 取默认口径 until_finance_approved"
+              >
+                <el-option
+                  v-for="item in FLOW_WITHDRAW_WINDOW_OPTIONS"
+                  :key="item"
+                  :value="item"
+                  :label="`${FLOW_WITHDRAW_WINDOW_LABEL[item]}（${item}）`"
+                />
+              </el-select>
+              <p class="hint">{{ withdrawWindowHint }}</p>
+              <p class="hint">
+                生效口径：
+                <code>{{ effectiveWithdrawWindow }}</code>
+                <span v-if="!withdrawWindowConfigured">（未显式配置 → 数据库中该列为 NULL）</span>
+                <span v-else>（已显式配置）</span>
+              </p>
+              <p class="hint">
+                变更只影响**之后发起**的新单据；**在途实例按发起时锁定的模板版本**判定（AC-09 / templates.md V-02），
+                本面板的修改不会改变它们。
+              </p>
             </el-form-item>
           </el-form>
 

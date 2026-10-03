@@ -11,8 +11,8 @@ description:
   en: >
       The six hard rules plus the Do and Don't list: one primary button per screen; ask whether a list can be a table first; pick status only from the five status-pill tokens; amounts are always tnum, right-aligned with two decimals; destructive actions need a second confirmation naming action and object; invisible beats disabled for permissions — plus the forbidden list (blue backgrounds, a second accent colour, pill buttons, gradients, Toast as a flow-result channel).
       
-revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
-updated_at: "2026-10-03T04:41:37.333Z"
+revision: 257a32acb48c626488a22291ada46052401b64c8
+updated_at: "2026-10-03T05:17:27.295Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -102,6 +102,7 @@ import type {
   FlowThresholdBasis,
   FlowTimeoutAction,
   FlowValidation,
+  FlowWithdrawWindow,
 } from '@/types/flow'
 
 // ---------------------------------------------------------------------------
@@ -251,6 +252,23 @@ function toTimeoutAction(value: string | null | undefined): FlowTimeoutAction {
   }
 }
 
+/**
+ * 撤回窗口口径（`doc/templates.md` §1.8）。
+ *
+ * 未知 / 缺字段一律回落**默认口径** `until_finance_approved`（= REQ-FLOW-009 = 历史行为），
+ * 与后端 `FlowGatePolicy.effectiveWithdrawWindow()` / `WithdrawWindow.defaultWindow()` 同口径：
+ * 界面宁可显示「默认」也不能显示空口径。
+ */
+function toWithdrawWindow(value: string | null | undefined): FlowWithdrawWindow {
+  switch (value) {
+    case 'until_finance_started':
+    case 'until_finance_approved':
+      return value
+    default:
+      return 'until_finance_approved'
+  }
+}
+
 function toThresholdBasis(value: string | null | undefined): FlowThresholdBasis {
   switch (value) {
     case 'any':
@@ -295,6 +313,10 @@ function mapGatePolicy(wire: WireGatePolicyView | null | undefined): FlowGatePol
     supplementDeadlineDays: numOrNull(wire?.supplementDeadlineDays),
     supplementDeadlineType: toDeadlineType(wire?.supplementDeadlineType),
     onSupplementTimeout: toTimeoutAction(wire?.onSupplementTimeout),
+    // 撤回窗口：后端回显的是**生效值**（列 NULL 时归一为默认口径），因此这里不再兜底成 null，
+    // 缺字段（老后端）也按默认口径解释，避免界面出现「空口径」。
+    withdrawWindow: toWithdrawWindow(wire?.withdrawWindow),
+    withdrawWindowConfigured: wire?.withdrawWindowConfigured === true,
     unlimited: wire?.unlimited === true,
     v04Default: wire?.v04Default === true,
   }
@@ -409,6 +431,8 @@ function gatePolicyBody(payload: FlowGatePolicyPayload): WireGatePolicyRequest {
     supplementDeadlineDays: payload.supplementDeadlineDays,
     supplementDeadlineType: payload.supplementDeadlineType,
     onSupplementTimeout: payload.onSupplementTimeout,
+    // 纯追加字段：`null` = 取默认口径（不清空历史语义，后端把 null 落 NULL）
+    withdrawWindow: payload.withdrawWindow,
   }
 }
 

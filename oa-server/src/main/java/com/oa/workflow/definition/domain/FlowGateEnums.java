@@ -108,6 +108,54 @@ public final class FlowGateEnums {
         }
     }
 
+    /**
+     * <b>撤回窗口口径</b>（2026-10-04 产品裁定：模板级配置项，落 {@code flow_template.withdraw_window}）。
+     *
+     * <p>真源矛盾：{@code doc/prd-0.1.md} 的 REQ-FLOW-009（第 372/407 行）与 V0.4 澄清（第 787 行）、附录B 状态机图
+     * （第 501/773 行）写「撤回仅限节点②<b>通过</b>之前」（②审批中可撤），而 AC-16（第 611 行）写「②审批中 → 撤回失败」。
+     * 裁定：**不再二选一**，两种口径都支持、按模板可配，默认取 REQ-FLOW-009 口径（行为不变）；
+     * 键位、判定差异表与读写契约见 {@code doc/templates.md} §1.8。
+     *
+     * <p>取数：引擎**按实例发起时锁定的模板版本**读该值（{@code FlowGateService#withdrawWindowOf}），
+     * 不读当前 published 模板 —— 否则「改模板影响在途单据」会违反 AC-09。
+     */
+    public enum WithdrawWindow {
+
+        /**
+         * 允许撤回到**节点②通过之前**（含②审批中）—— <b>REQ-FLOW-009 口径，也是默认值</b>（= 历史行为）。
+         */
+        UNTIL_FINANCE_APPROVED("②通过前（含②审批中）"),
+
+        /**
+         * 仅允许在**节点②开始前**撤回（②一旦 {@code active} / {@code waiting_supplement} / {@code returned}
+         * 即不可撤）—— <b>AC-16 的严格口径</b>。
+         */
+        UNTIL_FINANCE_STARTED("②开始前（②一旦受理即不可撤回）");
+
+        private final String label;
+
+        WithdrawWindow(String label) {
+            this.label = label;
+        }
+
+        public String label() {
+            return label;
+        }
+
+        public String code() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+
+        /** 未配置（列 {@code NULL}）时的生效口径：REQ-FLOW-009 口径（默认行为不变）。 */
+        public static WithdrawWindow defaultWindow() {
+            return UNTIL_FINANCE_APPROVED;
+        }
+
+        public static Optional<WithdrawWindow> of(String code) {
+            return byCode(values(), code);
+        }
+    }
+
     private static <E extends Enum<E>> Optional<E> byCode(E[] values, String code) {
         if (code == null || code.isBlank()) {
             return Optional.empty();

@@ -11,8 +11,8 @@ description:
   en: >
       Field groups of the fund approval form: basics (reason/category/amount), payee (payee name/account), payment (method/planned date/linked contract/urgency) and attachments (invoice/contract/statement). The category defaults to economy, never drives routing, and central ownership is always finance.
       
-revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
-updated_at: "2026-10-03T04:41:37.348Z"
+revision: 257a32acb48c626488a22291ada46052401b64c8
+updated_at: "2026-10-03T05:17:27.329Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

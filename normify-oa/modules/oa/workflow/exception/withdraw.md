@@ -6,18 +6,19 @@ state: planned
 name: {zh: "撤回", en: "Withdraw"}
 description:
   zh: >
-      仅发起人可撤回，且仅限财务部复核节点（节点②）审批通过前；撤回后实例状态置「已撤回」并回到草稿，发起人可修改后重新提交；撤回动作通知相关审批人并写入轨迹。
+      仅发起人可撤回；撤回窗口是**模板级配置项**（flow_template.withdraw_window，doc/templates.md §1.8）：默认 until_finance_approved 允许撤回到财务部复核节点（节点②）通过之前（含②审批中，REQ-FLOW-009 口径，行为不变），可选 until_finance_started 仅在②开始处理前可撤（AC-16 严格口径）。引擎按**实例发起时锁定的模板版本**取该口径，故改模板不影响在途单据（AC-09）。撤回后实例回草稿，动作写入轨迹。
       
   en: >
-      Only the initiator may withdraw, and only before the finance node has approved. Withdrawing sets the instance to withdrawn and back to draft, after which the initiator may modify and resubmit; the action notifies the involved approvers and is written to the trail.
+      Only the initiator may withdraw. The window is a template-level setting (flow_template.withdraw_window, templates.md 1.8): the default until_finance_approved allows withdrawal until the finance node (node 2) approves, node 2 in approval included (REQ-FLOW-009); the optional until_finance_started allows it only before node 2 starts (strict AC-16). The engine reads it from the version locked at instance creation, so edits never affect in-flight documents (AC-09).
       
-revision: 966907fad0c5f0d01bc6a76ddba80bbbf67f586a
-updated_at: "2026-10-03T04:41:37.439Z"
-fingerprint: 9fd64de2f67f7b0a8cc7047fb4bd8b44ebe03e4d2344e11d6ccc469b5b3bda3c
+revision: 257a32acb48c626488a22291ada46052401b64c8
+updated_at: "2026-10-03T05:20:23.234Z"
+fingerprint: 8d16cf2ade0b836c969a1d24ebfe8370cf368f4e374aabc5aa266a360273d630
 source:
   - path: "doc/prd-0.1.md"
   - path: "doc/prd-0.1.md"
   - path: "doc/prd-0.1.md"
+  - path: "doc/templates.md"
 apis:
   - protocol: http
     method: POST
@@ -52,3 +53,4 @@ deps:
 
 ## 证据锚点
 - `doc/prd-0.1.md` → `REQ-FLOW-009`（§6.4 流程引擎核心能力）
+- `doc/templates.md` → `### 1.8 撤回窗口配置项`（§1.8）

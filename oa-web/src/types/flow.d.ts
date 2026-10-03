@@ -45,6 +45,14 @@ export type FlowDeadlineType = 'calendar' | 'working'
 /** 补件超时处理（`doc/templates.md` §1.7） */
 export type FlowTimeoutAction = 'notify' | 'auto_pass' | 'auto_return'
 
+/**
+ * 撤回窗口口径（`doc/templates.md` §1.8，2026-10-04 产品裁定：模板级配置项）。
+ *
+ * · `until_finance_approved` = 允许撤回到**节点②通过之前**（含②审批中）—— **默认**，REQ-FLOW-009 口径；
+ * · `until_finance_started`  = 仅允许在**节点②开始前**撤回（②一旦受理即不可撤回）—— AC-16 严格口径。
+ */
+export type FlowWithdrawWindow = 'until_finance_approved' | 'until_finance_started'
+
 /** 阈值判定依据（`ThresholdPolicy.Threshold.basis`） */
 export type FlowThresholdBasis = 'any' | 'absolute' | 'percent' | 'majority'
 
@@ -58,7 +66,7 @@ export type FlowCheckStatus = 'pass' | 'fail' | 'warn'
  */
 export type FlowJsonValue = string | number | boolean | null | FlowJsonValue[] | { [key: string]: FlowJsonValue }
 
-/** Q6 / Q7 闸门配置（模板级；`doc/templates.md` §1.7 的五键 + 两个可读判断） */
+/** Q6 / Q7 闸门配置 + 撤回窗口（模板级；`doc/templates.md` §1.7 / §1.8） */
 export interface FlowGatePolicy {
   /** 回退次数上限；`null` = 不限（`0` 亦为不限，映射层归一为 `null`） */
   maxReturnCount: number | null
@@ -70,19 +78,25 @@ export interface FlowGatePolicy {
   supplementDeadlineType: FlowDeadlineType | null
   /** 超时处理：恒有值（后端缺省 `notify`） */
   onSupplementTimeout: FlowTimeoutAction
+  /** 撤回窗口口径：恒有值（后端把列 `NULL` 归一为默认 `until_finance_approved`） */
+  withdrawWindow: FlowWithdrawWindow
+  /** 撤回窗口是否被**显式配置**过（`false` = 数据库列为 NULL、取默认口径） */
+  withdrawWindowConfigured: boolean
   /** 次数是否不限（含补件无时限）——后端判断，界面直接渲染「不限」 */
   unlimited: boolean
-  /** 是否等价于 V0.4 定稿默认值（5 / 3 / 3 工作日 / notify） */
+  /** 是否等价于 V0.4 定稿默认值（5 / 3 / 3 工作日 / notify / 撤回窗口取默认） */
   v04Default: boolean
 }
 
-/** 闸门配置写入入参（0 或留空 = 不限；天数留空 = 不设时限） */
+/** 闸门配置写入入参（0 或留空 = 不限；天数留空 = 不设时限；撤回窗口留空 = 取默认） */
 export interface FlowGatePolicyPayload {
   maxReturnCount: number | null
   maxSupplementCount: number | null
   supplementDeadlineDays: number | null
   supplementDeadlineType: FlowDeadlineType | null
   onSupplementTimeout: FlowTimeoutAction
+  /** `null` = 取默认口径（`until_finance_approved`，REQ-FLOW-009） */
+  withdrawWindow: FlowWithdrawWindow | null
 }
 
 /** 模板（列表项 / 版本历史项 / 详情头） */
