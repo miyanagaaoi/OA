@@ -10,8 +10,8 @@ description:
   en: >
       Preview and commit for the user_role.csv template: role_code must hit the initialised role set (E-ROLE-001; import never creates roles), (user_account, role_code, scope_org_path) must be unique (E-ROLE-003, exactly matching uk_sys_user_role(user_id, role_id, scope_org_key), empty scope normalised to 0) and the E-ROLE-020 data-scope gate applies; then idempotently upsert sys_user_role in one transaction; a matching export (system admin only) is provided.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.289Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.411Z"
 fingerprint: 88327b4b36a96e6763bfd037d931545e5ebbdd51674512ea9fb681dbfebacef6
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/strategy/UserRoleImportStrategy.java"

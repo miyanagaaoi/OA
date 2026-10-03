@@ -1,15 +1,17 @@
 {
   "schema_version": 1,
   "id": "oa.form.template.attachment",
-  "updated_at": "2026-10-02T08:05:07.920Z",
-  "mode": "grid",
+  "updated_at": "2026-10-03T07:42:02.044Z",
+  "mode": "layers",
+  "max_columns": 2,
   "reading": {
-    "zh": "按上传链路：策略校验（格式与大小）→ 私有存储与鉴权下载 → 补件轮次标记。",
-    "en": "Along the upload path: policy checks (format and size), private storage with authorized download, then supplement round marking."
+    "zh": "先读「上传策略」看三档限额与格式三重判断（真源 forms.md §1.4 / enums.md §12.1-12.2），再看「补件轮次」理解 round 的判定，然后看「私有存储与鉴权下载」理解落盘布局与数据域，最后看「附件删除与三态窗口」理解删除的两条闸门与元数据/文件的一致取舍。",
+    "en": "Start with Upload Policy for the three limits and the three-way format check (forms.md 1.4 / enums.md 12.1-12.2), then Round Marking for how round is derived, then Private Storage & Authorized Download for the on-disk layout and data scope, and finally Attachment Deletion Guard for the two delete gates and the metadata/file consistency tradeoff."
   },
   "order": [
     "oa.form.template.attachment.upload-policy",
+    "oa.form.template.attachment.round-marking",
     "oa.form.template.attachment.storage-access",
-    "oa.form.template.attachment.round-marking"
+    "oa.form.template.attachment.delete-guard"
   ]
 }

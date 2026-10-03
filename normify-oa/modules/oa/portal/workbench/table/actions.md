@@ -10,8 +10,8 @@ description:
   en: >
       Row-level actions: at most three ghost buttons (view / approve / transfer), the rest folded into a More dropdown; the selected row uses a primary-subtle fill with a 2px primary indicator bar on the left; destructive actions such as reject use red text on white and a confirmation that names both the action and the object.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.388Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.518Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

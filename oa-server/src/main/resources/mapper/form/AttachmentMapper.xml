@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ============================================================================
+  附件元数据 Mapper（flow_attachment）—— 受控表（阶段 2b.7）
+  ============================================================================
+  · flow_attachment 由 Attachment 上的 @DataScopeTable(kind=NONE) 登记为受控表：
+    每条 SELECT **恰好 1 个** /* @dataScope(...) */ 标记，否则 40303 DATA_SCOPE_MISSING。
+  · 本表没有 initiator_id / initiator_org_path / initiator_company_id 列，
+    因此**过滤主体恒为 flow_instance**（别名 i）：每条 SELECT 都
+    JOIN flow_instance i ON i.id = a.instance_id，标记写成
+    /* @dataScope(table=flow_instance, alias=i) */。
+    （写成 table=flow_attachment 会在运行期拼出 a.initiator_id → Unknown column，
+     与 form_data 的 2026-10-03 实测教训同源，见 FormMapperXmlTest#markerTablesMatchOwnership。）
+  · 写语句（insert/delete）不需要标记 —— 拦截器只约束 SELECT。
+  ============================================================================
+-->
+<mapper namespace="com.oa.form.attachment.infra.AttachmentMapper">
+
+  <resultMap id="AttachmentResultMap" type="com.oa.form.attachment.domain.Attachment">
+    <id property="id" column="id"/>
+    <result property="instanceId" column="instance_id"/>
+    <result property="taskId" column="task_id"/>
+    <result property="round" column="round"/>
+    <result property="fieldCode" column="field_code"/>
+    <result property="fileName" column="file_name"/>
+    <result property="fileSize" column="file_size"/>
+    <result property="fileExt" column="file_ext"/>
+    <result property="mimeType" column="mime_type"/>
+    <result property="storagePath" column="storage_path"/>
+    <result property="sha256" column="sha256"/>
+    <result property="uploaderId" column="uploader_id"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <sql id="AttachmentColumns">
+    a.id, a.instance_id, a.task_id, a.round, a.field_code, a.file_name, a.file_size,
+    a.file_ext, a.mime_type, a.storage_path, a.sha256, a.uploader_id, a.created_at
+  </sql>
+
+  <select id="selectById" resultMap="AttachmentResultMap">
+    SELECT <include refid="AttachmentColumns"/>
+    FROM flow_attachment a
+    JOIN flow_instance i ON i.id = a.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND a.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectByInstance" resultMap="AttachmentResultMap">
+    SELECT <include refid="AttachmentColumns"/>
+    FROM flow_attachment a
+    JOIN flow_instance i ON i.id = a.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND a.instance_id = #{instanceId}
+    ORDER BY a.round ASC, a.created_at ASC, a.id ASC
+  </select>
+
+  <select id="countByInstanceAndField" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_attachment a
+    JOIN flow_instance i ON i.id = a.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND a.instance_id = #{instanceId}
+      AND a.field_code = #{fieldCode}
+  </select>
+
+  <select id="countByInstance" resultType="int">
+    SELECT COUNT(1)
+    FROM flow_attachment a
+    JOIN flow_instance i ON i.id = a.instance_id
+    WHERE 1 = 1
+      AND /* @dataScope(table=flow_instance, alias=i) */
+      AND a.instance_id = #{instanceId}
+  </select>
+
+  <!-- ============================== 写 ============================== -->
+
+  <insert id="insert" parameterType="com.oa.form.attachment.domain.Attachment"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO flow_attachment (instance_id, task_id, round, field_code, file_name, file_size,
+                                 file_ext, mime_type, storage_path, sha256, uploader_id)
+    VALUES (#{instanceId}, #{taskId}, IFNULL(#{round}, 0), #{fieldCode}, #{fileName}, #{fileSize},
+            #{fileExt}, #{mimeType}, #{storagePath}, #{sha256}, #{uploaderId})
+  </insert>
+
+  <delete id="deleteById">
+    DELETE FROM flow_attachment WHERE id = #{id}
+  </delete>
+
+</mapper>

@@ -10,8 +10,8 @@ description:
   en: >
       The disabled boundary: ink-disabled sits at about 2.0:1 and means currently unavailable only (disabled labels, nodes not yet reached), never carrying content that has to be read; text that is secondary yet still needs reading uses ink-subtle; a disabled primary button is a primary-border fill with ink-muted text so it still reads as a button that simply cannot be pressed.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.295Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.418Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

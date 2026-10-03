@@ -5,38 +5,44 @@ parent: oa.form.template.attachment
 name: {zh: "上传策略与格式白名单", en: "Upload Policy"}
 description:
   zh: >
-      单文件 ≤ 50 MB、单次上传 ≤ 20 个、单张单据附件总数 ≤ 50 个（含补件）；允许 pdf/doc/docx/wps/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/zip/rar/7z（V0.4 放行 wps 与 heic：heic 转 jpg 预览、wps 提示下载查看），禁止 exe/bat/cmd/js/vbs/ps1/dll/msi/scr，服务端按扩展名与 MIME 双重判断，上传即拒绝。
+      三档限额 + 单次上限：单文件 ≤ 50 MB、单次上传 ≤ 20 个、单字段 ≤ filePolicy.maxCount（缺省 20）、单张单据附件总数 ≤ 50 个（含补件）。格式**三重判断**：禁止格式 9 种（黑名单优先）→ 允许格式 15 种（含 wps / heic）→ 客户端声明 MIME 危险清单 → 魔数嗅探须与扩展名一致；文件名剥离路径与 ..，展示名与随机存储名分离。
       
   en: >
-      ≤50MB per file, ≤20 files per upload, ≤50 attachments per document including supplements; allows pdf/doc/docx/wps/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/zip/rar/7z (V0.4 adds wps and heic - heic is converted to jpg for preview, wps is download-only), and rejects exe/bat/cmd/js/vbs/ps1/dll/msi/scr on both extension and MIME checks at upload time.
+      Three limits plus a per-request cap: ≤50MB per file, ≤20 files per upload, ≤filePolicy.maxCount per field (20 by default), ≤50 attachments per document including supplements. Format is judged three ways: 9 forbidden formats first (blacklist wins), then the 15 allowed formats (wps/heic included), then a dangerous declared-MIME list, then magic-number sniffing that must match the extension; file names are stripped of paths and .., with display name kept separate from the random storage name.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.331Z"
-fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.459Z"
+fingerprint: fef487217b82b4a893cea05e8502fa512aaf9ff7a2f294856ff491c0bb6913c8
 source:
   - path: "doc/forms.md"
+  - path: "doc/enums.md"
+  - path: "doc/templates.md"
+  - path: "oa-server/src/main/java/com/oa/form/attachment/domain/AttachmentPolicy.java"
+  - path: "oa-server/src/main/java/com/oa/form/template/validate/FormPayloadValidator.java"
 apis:
   - protocol: http
     method: POST
-    path: "/api/v1/forms/attachments/policy-check"
+    path: "/api/v1/forms/instances/{instance_id}/attachments"
     description:
       zh: >
-          校验附件扩展名、MIME、大小与数量。
+          上传附件（multipart，字段名 files，可带 fieldCode）：三档限额 + 格式三重判断 + 内容嗅探，失败不落盘不落库。
           
       en: >
-          Validates attachment extension, MIME, size and count.
+          Uploads attachments (multipart, part name files, optional fieldCode): three limits, three-way format check and content sniffing, with no file or row left behind on failure.
           
-  - protocol: http
-    method: GET
-    path: "/api/v1/forms/attachments/policy"
-    description:
-      zh: >
-          读取附件限制策略（格式白名单与上限）。
-          
-      en: >
-          Reads the attachment policy (format whitelist and limits).
-          
+deps:
+  - kind: call
+    to: oa.form.template.write-model.state-whitelist
+    from_api: "POST /api/v1/forms/instances/{instance_id}/attachments"
+    label: {zh: "复用三态白名单（草稿/待补件可传，审批中不可传）", en: "Reuses state whitelist"}
+  - kind: call
+    to: oa.form.template.attachment.storage-access
+    from_api: "POST /api/v1/forms/instances/{instance_id}/attachments"
+    label: {zh: "落盘到私有存储", en: "Persists into private storage"}
 ---
 
 ## 证据锚点
 - `doc/forms.md` → `### 1.4 附件通用限制`（§1.4 附件通用限制）
+- `doc/enums.md` → `### 12.1 允许格式（15 种）`（§12.1 允许格式）
+- `doc/enums.md` → `### 12.2 禁止格式（9 种，上传即拒绝）`（§12.2 禁止格式）
+- `doc/templates.md` → `### 2.5 服务端校验要求（不可省略）`（§2.5：rules 必须由服务端执行；filePolicy 的参数表见 §2.3）

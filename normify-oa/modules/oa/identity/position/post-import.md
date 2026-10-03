@@ -10,8 +10,8 @@ description:
   en: >
       Preview and commit for the user_position.csv template: enforce unique (user_account, org_path) (uk_user_org, E-POS-004), at most one primary post per person (E-POS-005) and the E-POS-020 data-scope gate; then upsert sys_user_position in one transaction and mirror the primary post into sys_user.position; a matching export (system admin only) is provided.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.345Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.475Z"
 fingerprint: c495f617ae85329f4ef3aba77f178c3a545740fd5d83bb748ae25e44dfcfce36
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/strategy/UserPositionImportStrategy.java"

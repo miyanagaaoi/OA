@@ -10,8 +10,8 @@ description:
   en: >
       Validates format, size and count for file / files fields with the message 「{标签}仅支持 {格式}，单个文件不超过 {N}MB」; the rules reuse the shared attachment limits.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.335Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.464Z"
 fingerprint: 8c925f5e1097577033569ef7cc3590e51284551800485f9474b6835096b34430
 source:
   - path: "doc/forms.md"

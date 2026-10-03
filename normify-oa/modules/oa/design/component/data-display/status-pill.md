@@ -10,8 +10,8 @@ description:
   en: >
       The status-pill badges: rounded.sm with a light same-hue fill and 12px dark text, one-to-one and globally unique mapping between state and colour (draft and closed neutral, pending warning, in approval info, approved success, rejected or terminated error); no document type may invent its own palette and saturated blocks are forbidden.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.297Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.420Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

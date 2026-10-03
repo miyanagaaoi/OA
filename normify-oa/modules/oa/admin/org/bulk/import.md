@@ -10,8 +10,8 @@ description:
   en: >
       The contract of the five CSV templates and their error dictionary: which files exist (org / user / org_leader / user_position / user_role), their exact columns and per-row error codes (E-*-001..020, incl. the E-*-020 data-scope codes) with fix suggestions; the kinds endpoint exposes the same metadata to the UI so the five-step pipeline cannot drift from the templates.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.264Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.386Z"
 fingerprint: 4e4f9da0fc6ef91304cf003737b5802df520dd0939ec9845b1bdda2d914324dc
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/ImportKind.java"

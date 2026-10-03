@@ -10,8 +10,8 @@ description:
   en: >
       Excel bulk import and export of users including org and post columns: account uniqueness, org existence and required fields are validated first, conflicts are previewed and an admin confirms execution.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.350Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.479Z"
 fingerprint: 0d926276edc133b5faf063ca8b494521d02f00a762f9dc601c276b71886ffba9
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/strategy/UserImportStrategy.java"

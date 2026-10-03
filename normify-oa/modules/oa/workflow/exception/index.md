@@ -10,8 +10,8 @@ description:
   en: >
       Exception paths: rejection always returns to the initiator (blank rejection forbidden), countersign or collaboration rejection closes the remaining tasks, withdrawal is allowed only before the Finance node approves, resubmission re-resolves the snapshot and template version, termination by admins or the group line leader, and timeouts only remind - never auto-skip.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.407Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.538Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

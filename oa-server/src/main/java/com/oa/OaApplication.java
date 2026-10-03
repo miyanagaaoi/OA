@@ -26,7 +26,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
         "com.oa.workflow.runtime.infra",
         // 阶段 2b.1 / 2b.4：表单数据读写（form_data，受控表）与数据字典（sys_dict_item，配置数据）
         "com.oa.form.infra",
-        "com.oa.form.dict.infra"
+        "com.oa.form.dict.infra",
+        // 阶段 2b.7：附件元数据（flow_attachment，受控表；每条 SELECT 恰好 1 个 @dataScope 标记，
+        // 过滤主体恒为 flow_instance）
+        "com.oa.form.attachment.infra"
 })
 public class OaApplication {
 

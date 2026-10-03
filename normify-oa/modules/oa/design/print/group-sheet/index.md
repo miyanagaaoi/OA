@@ -10,8 +10,8 @@ description:
   en: >
       Structure shared by the group-level sheets: a centred bold 16pt heading with 2px tracking, a three-column header row (submitting unit, responsible department, submission time), the repeated document receipt and handling block (up to three), multi-round signature bands, the merged leader-opinion cell, a closing row (document return or system linkage), text checkboxes and fillable value cells; these cover the group contract routing sheet, the fund approval sheet and the seal-and-licence sheet.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.300Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.422Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

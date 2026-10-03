@@ -10,8 +10,8 @@ description:
   en: >
       Preset signatures in the personal center (sys_user_signature): upload an image or draw and save, list, replace and delete (owner only); images live in private local storage with only a path or base64 in the database.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.394Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.524Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

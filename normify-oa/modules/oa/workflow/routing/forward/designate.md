@@ -10,8 +10,8 @@ description:
   en: >
       Entry point of the routing action: the approver picks the next receiving department from the eligible set and must give a routing reason. Candidates are filtered by routing visibility (the department must be able to see the document) and by the departments already handled; on success action_type=route is written and the current department updated.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.411Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.542Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

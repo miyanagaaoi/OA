@@ -10,8 +10,8 @@ description:
   en: >
       Required checks (empty string and all-whitespace count as empty) and max-length checks, with the messages 「请填写{标签}」 and 「{标签}不能超过 {N} 个字符」; Chinese counts by character.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.336Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.466Z"
 fingerprint: 8c925f5e1097577033569ef7cc3590e51284551800485f9474b6835096b34430
 source:
   - path: "doc/forms.md"

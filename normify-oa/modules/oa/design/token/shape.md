@@ -10,8 +10,8 @@ description:
   en: >
       The radius scale: none 0px for panels, tables and the sidebar, xs 2px for badges and checkboxes, sm 4px for buttons and inputs, md 6px for cards, modals and the upload area, lg 8px for large panels and the designer canvas, pill and full 9999px reserved for switch tracks and avatars; buttons are always 4px and never pill-shaped, because capsule buttons weaken the formality of an approval system.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.306Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.428Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

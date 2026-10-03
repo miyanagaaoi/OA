@@ -10,8 +10,8 @@ description:
   en: >
       Field groups of the matter approval form: basics (title/category/description), cost (involves cost/involved amount/cost bearer), expected date and CC recipients, attachments. The category is chosen by the initiator and is only a classification label and statistics dimension - it never decides the owning department (Finance owns all categories).
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.318Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.442Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

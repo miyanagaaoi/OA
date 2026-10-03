@@ -2,13 +2,13 @@
   "schema_version": 1,
   "ok": true,
   "project": "normify-oa",
-  "compiled_at": "2026-10-03T07:18:30.807Z",
+  "compiled_at": "2026-10-03T07:45:05.155Z",
   "stats": {
     "tree_count": 1,
-    "module_count": 526,
-    "leaf_count": 384,
-    "api_count": 880,
-    "dep_count": 535,
+    "module_count": 527,
+    "leaf_count": 385,
+    "api_count": 879,
+    "dep_count": 539,
     "cross_tree_dep_count": 0,
     "max_depth": 6,
     "layout_count": 142,
@@ -25,19 +25,19 @@
   },
   "artifacts": {
     "tree.json": {
-      "sha256": "ed7ed6b2256e57789e6cf362cf3cd0b7f08b38be577aa72a43c831213a89842b",
-      "bytes": 1618593
+      "sha256": "57236bc76fa3b0955671a6c0206059fede553a60154255ec30841b9c12db77a7",
+      "bytes": 1627910
     },
     "outline.md": {
-      "sha256": "b238126b18e9047152ab02c96cbba04dc5799a2043fd4bbcf9126b15fc62524d",
-      "bytes": 150621
+      "sha256": "0d4f7ddf4954111d6a32f5b5e8ad02616f2dde8d13c7633e8482ecb5142d29f4",
+      "bytes": 150978
     },
     "api-index.json": {
-      "sha256": "dd3c31c89007547e438f341e95d74c4fb34698a9d4b81b2b3d6b36182bcb2afd",
-      "bytes": 69947
+      "sha256": "64d7e56c075356a14fef29e59b35940ada991ac1e45ab6ed6154c9a1357c4bf9",
+      "bytes": 69869
     },
     "receipt.json": {
-      "sha256": "dde2556bd332beda37585199f5deaf90c163130a484e24ec9bb58b205f1a9158",
+      "sha256": "e2db9cf88c9fc5bd62673336032e00719d358a6de81250beb85cc8a6576295b0",
       "bytes": 1003
     }
   }

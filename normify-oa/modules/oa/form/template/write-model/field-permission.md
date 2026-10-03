@@ -10,8 +10,8 @@ description:
   en: >
       Masks or hides amount and account fields per role: contract and fund amounts are read-only and non-exportable for non-finance roles (export is admin-only); the payee account shows `****1234` by default with the full value only for finance roles and admins. Phase one hardcodes these rules without per-field whitelists.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.337Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.466Z"
 fingerprint: df4e85fb53dbee7f3a7bfcd0c18da8975ffe593d9b42943f129d40a350ee17b8
 source:
   - path: "doc/forms.md"

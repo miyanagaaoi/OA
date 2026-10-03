@@ -10,8 +10,8 @@ description:
   en: >
       When seal_type is certificate borrow, `cert_name` is required and `seal_count` is hidden; for the four seal types (company/contract/finance/legal) `seal_count` is required (integer 1–999) and `cert_name` is hidden.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.328Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.453Z"
 fingerprint: d89254a4a362eeecf74041196101e27dfc2da4a3cda4140ddf808eea93895c61
 source:
   - path: "doc/forms.md"

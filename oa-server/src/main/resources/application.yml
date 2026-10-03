@@ -79,6 +79,7 @@ spring:
   servlet:
     multipart:
       # 单文件 ≤50MB、单次 ≤20 个（REQ/§5.4）；Nginx client_max_body_size 需同步
+      # 超限由 GlobalExceptionHandler#handleMaxUpload 转成 400/40012（AC-45：必须 4xx，不得 500）
       max-file-size: 50MB
       max-request-size: 1024MB
   jackson:
@@ -218,6 +219,15 @@ oa:
   db:
     immutable-triggers-enabled: true
     immutable-triggers-location: classpath:db/trigger/immutable-triggers.sql
+  # ---------------------------------------------------------------------------
+  # 附件私有存储（阶段 2b.7）。
+  #   root 缺省 = ${user.home}/.oa/attachments —— **在仓库之外**，且本工程不注册任何静态资源
+  #   映射，因此 storage_path 对应的文件没有任何 URL 可达（TC-FORM-024「直链 403」的拓扑保证）。
+  #   生产由 OA_ATTACHMENT_ROOT 指向独立数据盘（doc/tech-design.md §12 D6：本地私有目录 + 鉴权下载）。
+  # ---------------------------------------------------------------------------
+  attachment:
+    root: ${OA_ATTACHMENT_ROOT:}
+    max-inline-preview-bytes: 20971520
   jackson:
     serialize-big-decimal-as-string: true   # 金额 DECIMAL(18,2) 一律字符串，禁止浮点
     serialize-long-as-string: true          # BIGINT UNSIGNED 主键防 JS 精度丢失

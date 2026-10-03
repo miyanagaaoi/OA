@@ -10,8 +10,8 @@ description:
   en: >
       Resolves designated person/role (fixed by IT in the designer), initiator pick (chosen from the directory at submission) and collaborating departments (hooked by node ②'s approver at approval time; each department leader forms an independent countersign group and all groups must finish before moving on) (REQ-FLOW-005).
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.401Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.530Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

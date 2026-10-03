@@ -22,6 +22,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -91,6 +92,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiResponse<Void>> handleMethod(HttpRequestMethodNotSupportedException ex) {
         return build(ErrorCode.METHOD_NOT_ALLOWED, ErrorCode.METHOD_NOT_ALLOWED.getMessage());
+    }
+
+    /**
+     * <b>multipart 超过容器上限</b>（2b.7）：必须落 400 而不是 500。
+     *
+     * <p>为什么必须单独处理：{@code spring.servlet.multipart.max-file-size=50MB} 由容器在
+     * **进入 Controller 之前**生效（Tomcat {@code SizeLimitExceededException} 被 Spring 包装成
+     * {@link MaxUploadSizeExceededException}）。它不处理就落到 {@link #handleUnknown} 的兜底分支
+     * → 返回 500 + ERROR 日志，而 {@code doc/prd-0.1.md} AC-45 与
+     * {@code doc/test-cases.md} TC-FORM-023② 要求的是「**被拒**，提示单个文件不超过 50MB」（4xx）。
+     *
+     * <p>响应码取 {@link ErrorCode#ATTACHMENT_POLICY_DENIED}（40012，400），与
+     * {@code AttachmentPolicy} 在应用层判出的同档位拒绝**同码同文案口径** ——
+     * 前端不需要区分「容器拦的」与「服务端拦的」。
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUpload(MaxUploadSizeExceededException ex) {
+        log.warn("上传体积超过容器上限 traceId={} message={}", TraceIds.current(), ex.getMessage());
+        return build(ErrorCode.ATTACHMENT_POLICY_DENIED,
+                "单个文件不超过 50MB（doc/forms.md §1.4；如模板 filePolicy.maxSizeMb 更小，以模板为准）");
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

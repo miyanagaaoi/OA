@@ -10,8 +10,8 @@ description:
   en: >
       Non-empty checks gated by dependency fields: involve_cost=是 → amount/cost_bearer, contract_type=其他 → contract_type_other, seal_type=证照借用 → cert_name, return_status=已归还 → return_date; message 「{标签}为必填」.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.335Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.463Z"
 fingerprint: 5b74affda69b394b008faf8305f15187b4c12bf27e229cdfb74517116ed2f65c
 source:
   - path: "doc/forms.md"

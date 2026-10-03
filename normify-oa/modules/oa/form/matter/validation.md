@@ -10,8 +10,8 @@ description:
   en: >
       Matter-specific validation: title ≤60, description ≥10 and ≤2000, amount/cost_bearer required when involve_cost=yes, expect_date not earlier than today, cc_users ≤20 and de-duplicated, attachment format and size; all server-side.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.321Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.445Z"
 fingerprint: c8362be444f6a90c88f29f19a8fd1acb319a1897087de40102b77efc287a2113
 source:
   - path: "doc/forms.md"

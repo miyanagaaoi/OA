@@ -10,8 +10,8 @@ description:
   en: >
       Only system administrators may reassign a task, used when a snapshot approver has left or become unavailable; a reason is mandatory and every reassignment is audited. In-flight documents are never reassigned automatically - reassignment compensates for the immutable approver snapshot.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.427Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.557Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

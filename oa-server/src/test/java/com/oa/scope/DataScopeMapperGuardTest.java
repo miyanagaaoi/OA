@@ -75,7 +75,11 @@ class DataScopeMapperGuardTest {
             "com.oa.form.infra.FormDataMapper",
             // 阶段 2b.4：数据字典（sys_dict_item **不是**受控表 —— 配置数据不织入数据域，
             // 但保持同一纪律：不继承 BaseMapper、只走显式语句）
-            "com.oa.form.dict.infra.SysDictItemMapper");
+            "com.oa.form.dict.infra.SysDictItemMapper",
+            // 阶段 2b.7：附件元数据（flow_attachment 由 Attachment 上的
+            // @DataScopeTable(kind=NONE) 登记为受控表 → 每条 SELECT 恰好 1 个标记，
+            // 过滤主体恒为 flow_instance）
+            "com.oa.form.attachment.infra.AttachmentMapper");
 
     /** 非业务数据表（会话注册表）：整体豁免，是 BaseMapper 的唯一合法持有者。 */
     private static final String EXEMPT_MAPPER = "com.oa.identity.infra.SysUserSessionMapper";

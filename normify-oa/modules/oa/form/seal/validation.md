@@ -10,8 +10,8 @@ description:
   en: >
       Seal-specific validation: reason ≤60, purpose ≥5 (≥20 when external) and ≤500, copy count an integer 1–999, usage start not earlier than today, end ≥ start, `cert_name` required when seal_type is certificate borrow, and `return_date` required when the status is returned; all server-side.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.330Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.454Z"
 fingerprint: d89254a4a362eeecf74041196101e27dfc2da4a3cda4140ddf808eea93895c61
 source:
   - path: "doc/forms.md"

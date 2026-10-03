@@ -10,8 +10,8 @@ description:
   en: >
       Contract-specific validation: name ≤80, credit code of 18 digits/uppercase letters, amount > 0, term end ≥ start, the note required when the type is other, and at least one contract-text attachment; all server-side.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.309Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.433Z"
 fingerprint: 11bbd3786554d3a51174104886249a6056f8dfcab3ecd74c3806daca8830ed3c
 source:
   - path: "doc/forms.md"

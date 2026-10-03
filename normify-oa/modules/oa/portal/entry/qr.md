@@ -10,8 +10,8 @@ description:
   en: >
       The mobile entry QR code offered on the OA home page (REQ-USER-001): zero cost and no third-party integration; the code points at a short link that opens the H5 portal, and the page offers a downloadable and printable image plus expiry refresh and entry instructions.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.379Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.508Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

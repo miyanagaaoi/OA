@@ -10,8 +10,8 @@ description:
   en: >
       Seal and certificate approval form (form_type=seal): seal or certificate type, purpose, usage period and return status tracking, with the group Finance department still acting as the central owner node.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.328Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.453Z"
 fingerprint: b1de4a7b6bd346f504f0a10bab361f23f96cc60bab313732083efbb43a800989
 source:
   - path: "doc/forms.md"

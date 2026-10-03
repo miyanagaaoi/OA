@@ -10,8 +10,8 @@ description:
   en: >
       Account and employee-number uniqueness checks use system-scope statements (countByAccountSystem / countByEmployeeNoSystem), because uniqueness is a global constraint (uk_sys_user_account) unrelated to the caller's data scope. A hit returns 409 / 40902 citing import-spec E-USER-002 / E-USER-015, so employee numbers (which have no unique key) can no longer be silently duplicated. Both statements read only a COUNT; data-scope read limits are unchanged.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.352Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.482Z"
 fingerprint: cc417de0db1956a860697daa53b1b8bff5d6c4c0e7ccf5e8dadbd6a635ccacf0
 source:
   - path: "oa-server/src/main/java/com/oa/identity/app/UserService.java"

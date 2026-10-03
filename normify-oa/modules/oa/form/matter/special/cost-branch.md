@@ -10,8 +10,8 @@ description:
   en: >
       involve_cost is the only routing criterion in phase one: when no, node ② finance review is skipped with status skipped and no todo, yet the document's central-ownership field still records the finance department for reporting and audit; the trail records that the finance node was skipped. Amounts never drive routing.
       
-revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
-updated_at: "2026-10-03T07:15:53.320Z"
+revision: 132aa90a08178648b1a131bbeda138f5fe01cc16
+updated_at: "2026-10-03T07:42:28.444Z"
 fingerprint: 9109adf58d95348fe6fdef6b9bfb14a566386b7fddbc6b28cd58986d52653dd7
 source:
   - path: "doc/forms.md"

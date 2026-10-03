@@ -25,6 +25,7 @@ public class OaProperties {
     private final Watermark watermark = new Watermark();
     private final Authz authz = new Authz();
     private final Workflow workflow = new Workflow();
+    private final Attachment attachment = new Attachment();
 
     public Web getWeb() {
         return web;
@@ -114,6 +115,61 @@ public class OaProperties {
 
     public Authz getAuthz() {
         return authz;
+    }
+
+    public Attachment getAttachment() {
+        return attachment;
+    }
+
+    /**
+     * 附件私有存储（阶段 2b.7，{@code oa.attachment.*}）。
+     *
+     * <p>真源：{@code doc/forms.md} §1.4「存储 | 私有化本地存储，**不存公网**；下载必须经鉴权接口，
+     * 禁止直链」；{@code doc/tech-design.md} §12 D6「本地私有目录 + 鉴权下载」；
+     * {@code doc/test-cases.md} TC-FORM-024「直接访问 {@code storage_path} 对应的静态地址 → 返回 403」。
+     *
+     * <p><b>根目录绝不能是静态资源目录</b>：本工程不注册任何 {@code ResourceHandler}，
+     * 且默认值取用户目录下的 {@code .oa/attachments}（**在仓库之外**），
+     * dev 也不覆盖为仓库内路径 —— 保证「直链不可达」不是靠约定而是靠拓扑。
+     */
+    public static class Attachment {
+
+        /**
+         * 私有存储根目录（**绝对路径**；相对路径按 JVM 工作目录解析）。
+         *
+         * <p>为空或非绝对路径时，取 {@code ${user.home}/.oa/attachments}
+         * （与 {@code oa.security.phone-key-file} 同一「凭据/数据不进仓库」口径）。
+         */
+        private String root;
+
+        /** 单个附件预览时的内联体积上限（字节）；超过则强制 {@code attachment} 下载。 */
+        private long maxInlinePreviewBytes = 20L * 1024 * 1024;
+
+        public String getRoot() {
+            return root;
+        }
+
+        public void setRoot(String root) {
+            this.root = root;
+        }
+
+        public long getMaxInlinePreviewBytes() {
+            return maxInlinePreviewBytes;
+        }
+
+        public void setMaxInlinePreviewBytes(long maxInlinePreviewBytes) {
+            this.maxInlinePreviewBytes = maxInlinePreviewBytes;
+        }
+
+        /** 生效的存储根目录（保证绝对路径；空值回落用户目录）。 */
+        public java.nio.file.Path resolvedRoot() {
+            String configured = root == null ? "" : root.trim();
+            if (configured.isEmpty()) {
+                return java.nio.file.Path.of(System.getProperty("user.home", "."), ".oa", "attachments")
+                        .toAbsolutePath().normalize();
+            }
+            return java.nio.file.Path.of(configured).toAbsolutePath().normalize();
+        }
     }
 
     /**
