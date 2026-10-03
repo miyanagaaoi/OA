@@ -6,6 +6,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.oa.common.config.OaProperties;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
@@ -278,6 +281,7 @@ class ApproverPrecheckServiceTest {
                 inflight.template().getCode(), inflight.template().getVersion(), inflight.context(),
                 inflight.resolutions());
         String snapshotJsonBefore = ApproverSnapshotCodec.write(snapshot);
+        JsonNode semanticJsonBefore = semantic(snapshot);
         assertThat(snapshot.nodes()).hasSize(7);
         assertThat(snapshot.templateVersion()).isEqualTo(1);
 
@@ -302,9 +306,9 @@ class ApproverPrecheckServiceTest {
         ApproverSnapshot snapshotAfter = ApproverSnapshotCodec.assemble(stillV1.template().getId(),
                 stillV1.template().getCode(), stillV1.template().getVersion(), stillV1.context(),
                 stillV1.resolutions());
-        assertThat(ApproverSnapshotCodec.write(snapshotAfter))
-                .as("锁定版本的解析结果必须逐字节不变（AC-09）")
-                .isEqualTo(snapshotJsonBefore);
+        assertThat(semantic(snapshotAfter))
+                .as("锁定版本的解析结果必须语义不变（AC-09）；parsed_at 是秒级采集时间，不参与比较")
+                .isEqualTo(semanticJsonBefore);
         assertThat(stillV1.resolutions()).hasSize(7);
         assertThat(stillV1.resolutions().get(3).requiredApprovals()).isEqualTo(1);
         assertThat(stillV1.resolutions().get(3).threshold().basis()).isEqualTo("any");
@@ -388,4 +392,38 @@ class ApproverPrecheckServiceTest {
         return CurrentUser.of(208L, "u208", "普通员工", "A208", 138L, 12L, Set.of("employee"),
                 Set.of(com.oa.common.scope.DataScopeType.SELF), false);
     }
+
+    // ================================================================ 快照语义比较
+
+    /**
+     * 快照的<b>语义视图</b>：剔除采集时间类字段（{@code parsed_at}）后剩下的 JSON 树。
+     *
+     * <p>为什么不能直接比字符串：{@link ApproverSnapshotCodec#assemble} 用
+     * {@code LocalDateTime.now()}（秒级精度）填 {@code parsed_at}，两次解析只要跨秒就不同，
+     * 断言会偶发红（既有基线首跑即命中：{@code expected 14:59:21 vs actual 14:59:22}）。
+     *
+     * <p>剔除的是**只有时间语义**的字段，业务内容（{@code template_id}/{@code template_code}/
+     * {@code template_version}/{@code basis}/{@code nodes[]} 的节点、审批人、决议模式、
+     * 阈值、跳过原因、证据链）**全部参与比较** —— 所以「改 v2 后锁定 v1 结果不变」这条
+     * AC-09 断言仍然是真的在比内容，不是空转。
+     */
+    private static JsonNode semantic(ApproverSnapshot snapshot) {
+        return semantic(ApproverSnapshotCodec.write(snapshot));
+    }
+
+    private static JsonNode semantic(String snapshotJson) {
+        try {
+            ObjectNode root = (ObjectNode) SNAPSHOT_TREE_MAPPER.readTree(snapshotJson);
+            root.remove(PARSED_AT);
+            return root;
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("快照语义化失败：" + ex.getMessage(), ex);
+        }
+    }
+
+    /** 采集时间字段名（snake_case 契约，doc/data-model.md §7.1）。 */
+    private static final String PARSED_AT = "parsed_at";
+
+    /** 仅用于把快照 JSON 读成树做语义比较；不参与任何生产逻辑。 */
+    private static final ObjectMapper SNAPSHOT_TREE_MAPPER = new ObjectMapper();
 }
