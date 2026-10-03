@@ -2,7 +2,6 @@
 uid: 9aa4bd60
 id: oa.portal.entry
 parent: oa.portal
-state: planned
 name: {zh: "入口二维码与短链", en: "QR & Short Link Entry"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Mobile entry on the OA home page: a QR code plus a short link that lead to the H5 experience, needing no third-party integration.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.411Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.379Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -2,7 +2,6 @@
 uid: 1f79d071
 id: oa.portal.initiate.toc
 parent: oa.portal.initiate
-state: planned
 name: {zh: "本页导航吸附目录", en: "In-page Section Index"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A 140px sticky in-page index on the right of the form from 1440px up: it lists all section titles, highlights the current section in primary text colour and scrolls to a section on click; on narrower screens it disappears and the section header bands take over navigation.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.417Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.385Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

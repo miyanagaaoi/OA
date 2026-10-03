@@ -2,7 +2,6 @@
 uid: 1cfc3e48
 id: oa.portal.initiate.draft
 parent: oa.portal.initiate
-state: planned
 name: {zh: "草稿箱与续编提示", en: "Draft Box & Resume Prompt"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Top-bar entries for Save draft and Draft box (N); when an unsubmitted earlier edit is detected, an info bar appears with resume and delete actions on a semantic-info-surface fill; drafts keep the template version number and are re-resolved against the latest template on resubmission.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.415Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.384Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

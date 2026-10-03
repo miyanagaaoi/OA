@@ -2,7 +2,6 @@
 uid: aa8fd28c
 id: oa.design.component.navigation
 parent: oa.design.component
-state: planned
 name: {zh: "导航组件", en: "Navigation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The navigation family: the sidebar (224px, or a 64px rail, dark, with a 48px org switcher on top and the user block below), the active item (inverse-surface-1 fill with a 2px primary bar on the left), the four-level org tree node (12px indent per level, 32px tall), the 56px top bar (white with a 1px bottom border and no global search), breadcrumbs and the 60px H5 bottom action bar with safe-area padding.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.330Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.300Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

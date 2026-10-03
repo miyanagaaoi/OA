@@ -2,7 +2,6 @@
 uid: 07b4284d
 id: oa.workflow.definition.node-schema
 parent: oa.workflow.definition
-state: planned
 name: {zh: "节点定义与节点类型", en: "Node Definitions & Node Types"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The flow_node definition itself: sequence seq mapped to PRD 6.3's ①-⑦, node_code, display name and node_type (approve / condition reserved for phase 2 / cc / archive), keeping seq unique within a template and supporting node add, update and delete.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.438Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.404Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

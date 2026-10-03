@@ -2,7 +2,6 @@
 uid: 1c6f6dfa
 id: oa.sign.preset.default
 parent: oa.sign.preset
-state: planned
 name: {zh: "默认签名切换", en: "Default Preset Signature"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Marks one preset signature as the default per user (is_default is exclusive) so the approval dialog preselects it for one-tap use.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.426Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.393Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

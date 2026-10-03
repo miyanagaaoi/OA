@@ -2,7 +2,6 @@
 uid: 392fce96
 id: oa.form.matter.special.cc-dispatch
 parent: oa.form.matter.special
-state: planned
 name: {zh: "抄送人写入与通知", en: "CC Write & Notify"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       CC users (≤20, from the directory, de-duplicated) are persisted at submission and receive CC notices; they can view the document but get no todo and take no part in the decision.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.350Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.320Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

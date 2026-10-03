@@ -2,7 +2,6 @@
 uid: 1334f2b9
 id: oa.portal.initiate.form
 parent: oa.portal.initiate
-state: planned
 name: {zh: "单列表单渲染器", en: "Single-Column Form Renderer"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A form renderer driven by the template's form_schema_json, shared by all four document types with no hard-coded fields: single column, label above the control, controls filling the form width, content column capped at 760px and centred, 16px between field rows; from 1440px up a 140px sticky in-page index appears on the right.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.416Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.384Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

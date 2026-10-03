@@ -2,7 +2,6 @@
 uid: 23c2ed81
 id: oa.workflow.task.addsign.chain
 parent: oa.workflow.task.addsign
-state: planned
 name: {zh: "加签链与留痕", en: "Add-sign Chain & Trail"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Maintains the add-sign chain on the node instance: the type (before/after), the added signer, insertion position and time. Every add-sign action is written to the audit log and the approval trail for later accountability.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.457Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.423Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

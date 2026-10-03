@@ -2,7 +2,6 @@
 uid: 2c3d5e43
 id: oa.workflow
 parent: oa
-state: planned
 name: {zh: "流程引擎", en: "Workflow Engine"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The approval core: process templates and node definitions, visual designer, approver resolution and snapshot, instance runtime state machine, task decisions (any/all/sequential), group-level chained routing and rollback, supplements, and exception paths.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.444Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.410Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

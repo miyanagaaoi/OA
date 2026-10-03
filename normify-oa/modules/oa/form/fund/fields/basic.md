@@ -2,7 +2,6 @@
 uid: 3d6fdcb8
 id: oa.form.fund.fields.basic
 parent: oa.form.fund.fields
-state: planned
 name: {zh: "资金基础字段组", en: "Fund Basic Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Fund reason `title` (text ≤60, required), category `category` (select, configurable, defaults to economy, does not drive routing) and requested amount `amount` (amount, required, > 0; zero or empty blocks submission), stored as DECIMAL(18,2).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.344Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.314Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

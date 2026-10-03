@@ -2,7 +2,6 @@
 uid: 586879bf
 id: oa.workflow.supplement.limit.quota
 parent: oa.workflow.supplement.limit
-state: planned
 name: {zh: "补件次数控制", en: "Supplement Quota"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Supplement caps: a node may request a supplement only once (node instance flag supplement_requested) and a document accumulates at most three (instance supplement_count, consistent with the unique key on instance and round). Once the cap is reached the supplement action disappears and the approver may only pass, reject or terminate.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.455Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.421Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

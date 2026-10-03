@@ -2,7 +2,6 @@
 uid: 3330c9b9
 id: oa.form.matter.special
 parent: oa.form.matter
-state: planned
 name: {zh: "事项单专用规则与联动", en: "Matter-Specific Rules & Linkage"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Matter-only business rules: cost involvement as the document's single branch criterion (whether the finance review node is skipped), the category being frozen after submission (reclassification requires rejecting back to the initiator), and CC users being written and notified.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.351Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.321Z"
 fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
 source:
   - path: "doc/forms.md"

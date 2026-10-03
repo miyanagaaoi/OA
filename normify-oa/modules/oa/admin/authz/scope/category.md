@@ -2,7 +2,6 @@
 uid: 69afb9af
 id: oa.admin.authz.scope.category
 parent: oa.admin.authz.scope
-state: planned
 name: {zh: "归口类别绑定", en: "Category Binding"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Binds the matter categories that a group_category-scoped role may see, taking the category options from the shared dictionary so codes stay consistent with the forms.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.275Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.244Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

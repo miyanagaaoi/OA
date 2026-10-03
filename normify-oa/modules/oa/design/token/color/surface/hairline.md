@@ -2,7 +2,6 @@
 uid: 71e7c122
 id: oa.design.token.color.surface.hairline
 parent: oa.design.token.color.surface
-state: planned
 name: {zh: "细线两级", en: "Hairline Weights"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Two hairline weights: hairline #e2e5ea for the default border of cards, tables and inputs, and hairline-strong #c8cdd6 for input hover, nested panel outlines and table group separators; the boundary between the sidebar and the content area is also a 1px hairline rather than a shadow.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.334Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.305Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

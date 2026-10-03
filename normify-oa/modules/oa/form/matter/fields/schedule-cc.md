@@ -2,7 +2,6 @@
 uid: 2f57a1e6
 id: oa.form.matter.fields.schedule-cc
 parent: oa.form.matter.fields
-state: planned
 name: {zh: "期望日期与抄送字段组", en: "Schedule & CC Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Expected completion date `expect_date` (optional date not earlier than today) and CC users `cc_users` (user, ≤20 people, from the directory, de-duplicated); CC users are informed but do not approve.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.348Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.318Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

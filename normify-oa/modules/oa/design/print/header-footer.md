@@ -2,7 +2,6 @@
 uid: cc1b951f
 id: oa.design.print.header-footer
 parent: oa.design.print
-state: planned
 name: {zh: "页眉页脚与呈现", en: "Header, Footer & Presentation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A fixed three-column footer: system and document name on the left, number, template version and generation time in the middle and page N of M on the right; the on-screen tool bar hides itself when printing; the screen preview renders at true millimetre size (width 210mm) to match the printed result; the footer logo is 8mm tall.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.331Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.301Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

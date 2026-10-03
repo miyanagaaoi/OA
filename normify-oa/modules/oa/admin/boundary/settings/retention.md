@@ -2,7 +2,6 @@
 uid: de52a111
 id: oa.admin.boundary.settings.retention
 parent: oa.admin.boundary.settings
-state: planned
 name: {zh: "审计保留期", en: "Audit Retention"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Adjustable items: retention of audit logs and approval traces (never shorter than ten years) and of login logs (one year); values below the floor are refused on save.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.280Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.252Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

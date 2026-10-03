@@ -2,7 +2,6 @@
 uid: 148d14e4
 id: oa.sign.capture.binding
 parent: oa.sign.capture
-state: planned
 name: {zh: "签名与审批动作绑定", en: "Signature Binding & Forensics"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Binds a signature to a specific approval act: the timestamp is server-generated while device/browser fingerprint, IP and User-Agent are captured as forensic evidence alongside the image.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.424Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.391Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

@@ -2,7 +2,6 @@
 uid: "22725311"
 id: oa.form.template.attachment.upload-policy
 parent: oa.form.template.attachment
-state: planned
 name: {zh: "上传策略与格式白名单", en: "Upload Policy"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       ≤50MB per file, ≤20 files per upload, ≤50 attachments per document including supplements; allows pdf/doc/docx/wps/xls/xlsx/ppt/pptx/jpg/jpeg/png/heic/zip/rar/7z (V0.4 adds wps and heic - heic is converted to jpg for preview, wps is download-only), and rejects exe/bat/cmd/js/vbs/ps1/dll/msi/scr on both extension and MIME checks at upload time.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.362Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.331Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

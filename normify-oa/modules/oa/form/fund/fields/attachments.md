@@ -2,7 +2,6 @@
 uid: 446865c8
 id: oa.form.fund.fields.attachments
 parent: oa.form.fund.fields
-state: planned
 name: {zh: "资金单附件字段组", en: "Fund Attachments Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Fund attachments `attachments` (files, required, ≥1, invoices/contracts/statements, format and size per 1.4); after initiation they are writable only during supplement.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.344Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.314Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

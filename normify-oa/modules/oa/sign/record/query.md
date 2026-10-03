@@ -2,7 +2,6 @@
 uid: 46c4bc85
 id: oa.sign.record.query
 parent: oa.sign.record
-state: planned
 name: {zh: "签名记录查询与展示", en: "Signature Record Query"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Queries all signature records of a document (including historical versions, device fingerprints, IP and signing times) plus single-record detail, and serves the image behind an authenticated download.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.431Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.399Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

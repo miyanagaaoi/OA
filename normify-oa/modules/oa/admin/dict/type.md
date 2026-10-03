@@ -2,7 +2,6 @@
 uid: 72f1a156
 id: oa.admin.dict.type
 parent: oa.admin.dict
-state: planned
 name: {zh: "字典类型管理", en: "Dictionary Types"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Maintains the dictionary type catalogue (category, pay_method, contract_type, seal_type, cert_name and friends) and provides a reset back to the built-in defaults.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.284Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.256Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

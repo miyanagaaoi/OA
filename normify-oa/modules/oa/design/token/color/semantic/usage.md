@@ -2,7 +2,6 @@
 uid: 83e95c73
 id: oa.design.token.color.semantic.usage
 parent: oa.design.token.color.semantic
-state: planned
 name: {zh: "状态色使用边界", en: "Status Color Boundaries"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Status and colour mapping is globally unique and must not be extended: draft and closed are neutral, pending my approval is warning, in approval is info, approved is success, rejected or terminated is error, and transferred or countersigned is tag-info; no document type may invent its own palette, and when categories genuinely need separation use text plus a neutral grey tag.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.334Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.304Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

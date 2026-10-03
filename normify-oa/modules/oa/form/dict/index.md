@@ -10,8 +10,8 @@ description:
   en: >
       Dictionary options used by all forms - matter category, contract type, seal type, certificate type, payment ownership and planned category - maintained by admins at runtime without code changes; category values are configurable and historical documents keep the chosen value.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.341Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.310Z"
 fingerprint: 350a147c920a2bb4616252fa7969d626a2a793f4b99f9f83707013fc98c1a7d7
 source:
   - path: "doc/forms.md"

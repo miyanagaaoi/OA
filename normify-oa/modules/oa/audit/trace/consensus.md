@@ -2,7 +2,6 @@
 uid: 0cbe7b25
 id: oa.audit.trace.consensus
 parent: oa.audit.trace
-state: planned
 name: {zh: "决议模式结论汇总", en: "Decision Consensus"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Aggregates each approver's conclusion, opinion and timestamp per node under or-sign / countersign / sequential decision modes, producing the per-person outcome view that forms part of the approval trail.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.312Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.284Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

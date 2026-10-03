@@ -2,7 +2,6 @@
 uid: 29fe9dff
 id: oa.workflow.routing.forward
 parent: oa.workflow.routing
-state: planned
 name: {zh: "集团层流转", en: "Group-level Routing"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Group-level chained routing: approvers at the finance node and later may designate the next receiving department and keep the document inside the group layer, supporting continuous chains A-B-C; a receiving department and a reason are mandatory and the department must be able to see the document. Routing writes flow_routing and advances the routing sequence and current department.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.446Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.412Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

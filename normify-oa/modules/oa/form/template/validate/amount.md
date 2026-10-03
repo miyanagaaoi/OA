@@ -10,9 +10,9 @@ description:
   en: >
       Shared amount rules: > 0, at most two decimals, ≤ 99,999,999,999.99, stored as DECIMAL(18,2) fixed point, never persisted after float arithmetic; the error message is 「金额必须大于 0 且最多两位小数」; amounts never drive routing.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.365Z"
-fingerprint: 142a1e3d11e1b8e2ffed561214f9fbd7921c7dbbea36ea710cb5bd315a9fee99
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.334Z"
+fingerprint: 51c81033e188e0a521d5f073dea3f47f28b869a837de38302f0108709e0ebe3d
 source:
   - path: "doc/forms.md"
   - path: "doc/forms.md"

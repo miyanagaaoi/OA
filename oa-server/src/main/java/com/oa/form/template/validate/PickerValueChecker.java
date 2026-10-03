@@ -9,7 +9,8 @@ package com.oa.form.template.validate;
  *   <li>{@code doc/forms.md} §2 事项单字段表 {@code cc_users} 行：类型 {@code user}、
  *       校验「**通讯录内**、去重」、长度「≤20 人」；</li>
  *   <li>{@code doc/forms.md} §2 {@code cost_bearer} 行：类型 {@code org}、
- *       校验「限本公司及以下节点」（**范围**限制，见待决策：{@code rules[orgScope]} 尚未实现）。</li>
+ *       校验「限本公司及以下节点」（**范围**限制，由 {@link OrgScopeChecker} 承担
+ *       —— {@code rules[orgScope] = initiator_company_subtree}）。</li>
  * </ul>
  *
  * <h2>为什么是端口</h2>

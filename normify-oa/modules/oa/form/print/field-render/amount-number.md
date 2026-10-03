@@ -2,7 +2,6 @@
 uid: b5ce533d
 id: oa.form.print.field-render.amount-number
 parent: oa.form.print.field-render
-state: planned
 name: {zh: "金额与编号等宽格式", en: "Monospaced Amounts & Numbers"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Sheets use a monospaced face (Consolas / Courier New) for archival checking: amounts carry thousands separators and two decimals, and from 1,000,000 they also show the ten-thousand conversion (e.g. `1,250,000.00 ¥ / 125.00 万`); document, contract and application numbers are monospaced too, and no information may be lost in black-and-white copying.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.352Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.322Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

@@ -2,7 +2,6 @@
 uid: 8bbbe1da
 id: oa.design.token.elevation
 parent: oa.design.token
-state: planned
 name: {zh: "层级与投影令牌", en: "Elevation & Depth Tokens"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Six elevation levels: flat 0 with no shadow, hairline 1 as the default 1px border, surface lift 2 as a canvas-subtle fill plus hairline, layer 3 for dropdowns and date panels, layer 4 for modals with a 40% overlay scrim, layer 5 for right drawers, plus the two-ring focus style; anything solvable with a hairline and the surface ladder must not get a shadow, and table rows, form sections and grouping containers never carry one.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.336Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.305Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

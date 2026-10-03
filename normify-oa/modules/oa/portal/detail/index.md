@@ -2,7 +2,6 @@
 uid: 9aa4bd5e
 id: oa.portal.detail
 parent: oa.portal
-state: planned
 name: {zh: "单据详情与轨迹", en: "Document Detail & Trail"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Document detail: field values, attachments by round, approval trail timeline, routing chain and supplement history, with the approval action bar (approve/reject/route/rollback/supplement/transfer/add-sign) and the name-plus-employee-ID watermark.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.408Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.376Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

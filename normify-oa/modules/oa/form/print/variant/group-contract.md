@@ -2,7 +2,6 @@
 uid: 9cd9ac34
 id: oa.form.print.variant.group-contract
 parent: oa.form.print.variant
-state: planned
 name: {zh: "集团合同类文件流转审批单", en: "Group Contract Sheet"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Mirrors the paper form: heading, three-column header row, the repeated document-receipt block (up to three segments), the merged group-leader opinion cell and the closing row. Measured height 274mm with about 23mm spare, so added fields require a page-height recheck.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.356Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.325Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

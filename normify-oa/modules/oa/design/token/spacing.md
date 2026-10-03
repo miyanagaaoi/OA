@@ -2,7 +2,6 @@
 uid: 8532f035
 id: oa.design.token.spacing
 parent: oa.design.token
-state: planned
 name: {zh: "间距与控件尺寸令牌", en: "Spacing & Control Size Tokens"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A 4px base unit with spacing tokens xxs 4px through section 64px, plus control sizes: control 32px for desktop, control-compact 28px inside tables, control-comfortable 40px for the flow designer and control-h5 44px as the H5 touch minimum; common combinations are 24px card padding, 8px between field rows and 12px horizontal table cell padding.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.337Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.306Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -2,7 +2,6 @@
 uid: 6ba485f6
 id: oa.notify.mail.sender
 parent: oa.notify.mail
-state: planned
 name: {zh: "SMTP 投递", en: "SMTP Delivery"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Delivers mail through a privately deployed SMTP server with timeouts, retries and a connectivity self-check; results feed the failure module and never change document state.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.397Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.366Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

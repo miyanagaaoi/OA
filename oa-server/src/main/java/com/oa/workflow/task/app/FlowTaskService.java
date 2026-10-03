@@ -70,10 +70,18 @@ public class FlowTaskService {
         TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
         long total = taskMapper.countTodo(actor.id(), f);
         List<TaskListItemView> items = toItems(taskMapper.selectTodo(actor.id(), f, offset(p, s), s));
-        return new PageResult<>(items, total, p, s);
+        return new PageResult<>(items, total, p, s, PageResult.DATE_FIELD_CREATED_AT);
     }
 
-    /** 已办（我处理过的任务）。 */
+    /**
+     * 已办（我处理过的任务）。
+     *
+     * <p><b>日期口径（2026-10-05 裁定）</b>：本列表的 {@code dateFrom/dateTo} 按
+     * <b>我处理该任务的时间</b>（{@code flow_task.decided_at}）筛，<b>不按发起时间</b> ——
+     * 用户在这个列表里找的是「我哪天办的那张单」，发起时间会在单据流转多日后才落到我手上时
+     * 给出误导性结果。其余三个列表维持「按发起时间」不变（见 {@code TaskListFilter} 的类注释）。
+     * <p>出参 {@code dateField=decidedAt} 明示这一口径，条目上的 {@code decidedAt} 即筛选所依据的值。
+     */
     public PageResult<TaskListItemView> done(Integer page, Integer size, TaskListFilter filter) {
         CurrentUser actor = permissionService.requireInitiator("查看我已办");
         int p = normalizePage(page);
@@ -81,10 +89,10 @@ public class FlowTaskService {
         TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
         long total = taskMapper.countDone(actor.id(), f);
         List<TaskListItemView> items = toItems(taskMapper.selectDone(actor.id(), f, offset(p, s), s));
-        return new PageResult<>(items, total, p, s);
+        return new PageResult<>(items, total, p, s, PageResult.DATE_FIELD_DECIDED_AT);
     }
 
-    /** 我发起的（以实例发起人为准）。 */
+    /** 我发起的（以实例发起人为准；日期口径 = 发起时间）。 */
     public PageResult<TaskListItemView> initiated(Integer page, Integer size, TaskListFilter filter) {
         CurrentUser actor = permissionService.requireInitiator("查看我发起的");
         int p = normalizePage(page);
@@ -92,7 +100,7 @@ public class FlowTaskService {
         TaskListFilter f = filter == null ? TaskListFilter.none() : filter;
         long total = taskMapper.countInitiated(actor.id(), f);
         List<TaskListItemView> items = toItems(taskMapper.selectInitiated(actor.id(), f, offset(p, s), s));
-        return new PageResult<>(items, total, p, s);
+        return new PageResult<>(items, total, p, s, PageResult.DATE_FIELD_CREATED_AT);
     }
 
     /**
@@ -115,6 +123,14 @@ public class FlowTaskService {
      * AC-02 / TC-AUTH-024「6 个入口均无泄露」一致（宁可少显示，不可泄露）。
      *
      * <p>抄送**只读可见、不产生待办**（PRD REQ-MSG-003 / AC-54）：本列表不出任务维度字段。
+     *
+     * <p><b>日期口径（2026-10-05 裁定，与「其余列表按发起时间」一致）</b>：本列表的
+     * {@code dateFrom/dateTo} **仍按单据发起时间**（{@code i.created_at}）筛，出参
+     * {@code dateField=createdAt}；对应条目上的 {@code instanceCreatedAt}。
+     * 「抄送时间」（{@code c.created_at}）是另一条合理口径（该列表本来就是按抄送时间倒序的），
+     * 但同一套参数在四个端点里保持「同名同义」更不易误用，且抄送时间在条目上已可单独读取，
+     * 因此本轮不做切换 —— 若产品侧要求按抄送时间筛，只需把它与 {@code done} 一起切到
+     * 各自的列并同步 {@code dateField}（见交付说明待决策）。
      */
     public PageResult<CcListItemView> cc(Integer page, Integer size, TaskListFilter filter) {
         CurrentUser actor = permissionService.requireInitiator("查看抄送我的");
@@ -130,7 +146,7 @@ public class FlowTaskService {
                     row.getSubStatus(), row.getCcCreatedAt(), row.getCcSource(), row.getReadAt(),
                     row.getReadAt() != null));
         }
-        return new PageResult<>(items, total, p, s);
+        return new PageResult<>(items, total, p, s, PageResult.DATE_FIELD_CREATED_AT);
     }
 
     // ================================================================ 动作（一律委托引擎）
@@ -221,7 +237,8 @@ public class FlowTaskService {
                     row.getOpinion(), row.getTaskCreatedAt(), row.getDecidedAt(),
                     row.getInitiatorId(), row.getInitiatorName(), row.getCurrentNodeSeq(),
                     row.getInstanceStatus(), row.getSubStatus(),
-                    row.getTitle()));
+                    row.getTitle(),
+                    row.getInstanceCreatedAt()));
         }
         return items;
     }

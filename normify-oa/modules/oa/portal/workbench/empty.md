@@ -2,7 +2,6 @@
 uid: 0ddc6d0a
 id: oa.portal.workbench.empty
 parent: oa.portal.workbench
-state: planned
 name: {zh: "空状态与加载骨架", en: "Empty & Loading States"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Empty and loading states of the pending list: the empty state is a 64px monochrome line icon in ink-disabled plus one line of copy and a single primary button (Initiate approval), vertically centred with 48px of vertical whitespace; the loading skeleton uses surface-1 blocks that keep the row height stable to avoid layout shift.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.418Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.387Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

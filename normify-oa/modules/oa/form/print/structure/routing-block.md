@@ -2,7 +2,6 @@
 uid: a8c40497
 id: oa.form.print.structure.routing-block
 parent: oa.form.print.structure
-state: planned
 name: {zh: "公文接收及处理块", en: "Document Receipt Block"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The contract sheet's core feature, up to three segments: each holds receiving unit / receiver / receipt time (a three-cell inline table with vertical rules only), a multi-line handling opinion and a right-aligned sign-off with date; each segment corresponds to one group-level routing.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.356Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.324Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

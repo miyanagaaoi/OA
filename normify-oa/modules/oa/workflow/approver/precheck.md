@@ -2,7 +2,6 @@
 uid: 2e7c8c1a
 id: oa.workflow.approver.precheck
 parent: oa.workflow.approver
-state: planned
 name: {zh: "发起前拦截", en: "Pre-Submit Blockers"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Blocks submission when any node's candidate set is empty (department without a leader, GM vacancy), reporting "no valid approver for node XX" instead of silently skipping, and also blocks missing required fields and unauthorized org nodes (REQ-FLOW-012, AC-11).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.432Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.400Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

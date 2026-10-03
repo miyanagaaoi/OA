@@ -25,6 +25,15 @@ public class FlowTaskViewRow {
     private String handoverReason;
     private String taskCreatedAt;
     private String decidedAt;
+    /**
+     * 单据**发起时间**（{@code flow_instance.created_at}）。
+     *
+     * <p>为什么必须单列（2026-10-05）：三个列表的 {@code dateFrom/dateTo} 并不都筛发起时间 ——
+     * 「我已审批」筛的是 {@code flow_task.decided_at}（我处理该任务的时间）。出参必须能如实
+     * 回答「这个列表是按哪个时间筛的」，而 {@code taskCreatedAt} 对待办/已办是**任务**产生时间
+     * （{@code flow_task.created_at}，通常晚于发起），不能冒充发起时间。
+     */
+    private String instanceCreatedAt;
     private Long initiatorId;
     private String initiatorName;
     private Integer currentNodeSeq;
@@ -169,6 +178,14 @@ public class FlowTaskViewRow {
 
     public void setDecidedAt(String decidedAt) {
         this.decidedAt = decidedAt;
+    }
+
+    public String getInstanceCreatedAt() {
+        return instanceCreatedAt;
+    }
+
+    public void setInstanceCreatedAt(String instanceCreatedAt) {
+        this.instanceCreatedAt = instanceCreatedAt;
     }
 
     public Long getInitiatorId() {

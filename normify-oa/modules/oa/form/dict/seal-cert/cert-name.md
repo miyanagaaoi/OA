@@ -2,7 +2,6 @@
 uid: 5f943ff2
 id: oa.form.dict.seal-cert.cert-name
 parent: oa.form.dict.seal-cert
-state: planned
 name: {zh: "证照名称字典", en: "Certificate Name Dictionary"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Certificate name `cert_name`: business license, tax registration certificate, organization code certificate, qualification certificate and other; required when seal_type is certificate borrow.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.344Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.313Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

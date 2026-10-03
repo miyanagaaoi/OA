@@ -2,7 +2,6 @@
 uid: 2201602b
 id: oa.form.template.attachment
 parent: oa.form.template
-state: planned
 name: {zh: "附件通用限制", en: "Shared Attachment Rules"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Shared attachment rules: ≤50MB per file, ≤20 files per upload, ≤50 per document including supplements, 13 allowed formats, 9 forbidden formats (extension plus MIME), private on-premise storage with authorized download, and supplement round marking.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.361Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.330Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

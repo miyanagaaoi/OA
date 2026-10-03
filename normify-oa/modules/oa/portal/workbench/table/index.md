@@ -2,7 +2,6 @@
 uid: 08ba5655
 id: oa.portal.workbench.table
 parent: oa.portal.workbench
-state: planned
 name: {zh: "审批数据表", en: "Approval Data Table"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The list body follows PRD 13.2: a full-width data table with an overlay detail — all columns expanded (including a current-node column), 44px rows, sticky header, frozen first column (number/type) and frozen right action column; no column merging and no permanent detail pane, preserving vertical comparison of amount, node and time.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.421Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.389Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "doc/prd-0.1.md"

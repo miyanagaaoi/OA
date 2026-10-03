@@ -2,7 +2,6 @@
 uid: e32e7d34
 id: oa.design.a11y.disabled
 parent: oa.design.a11y
-state: planned
 name: {zh: "禁用态与不可读文本", en: "Disabled State Boundary"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The disabled boundary: ink-disabled sits at about 2.0:1 and means currently unavailable only (disabled labels, nodes not yet reached), never carrying content that has to be read; text that is secondary yet still needs reading uses ink-subtle; a disabled primary button is a primary-border fill with ink-muted text so it still reads as a button that simply cannot be pressed.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.326Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.295Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -10,8 +10,8 @@ description:
   en: >
       Matter approval form (form_type=matter): the initiator picks a configurable matter category which never reroutes the document, and this is the only type carrying the involves-cost flag that decides whether the Finance node is skipped.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.349Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.319Z"
 fingerprint: 2e5e7385be861a09ce95e0c6292674210e79f65c6ff5d78935219e0bf915ca82
 source:
   - path: "doc/forms.md"

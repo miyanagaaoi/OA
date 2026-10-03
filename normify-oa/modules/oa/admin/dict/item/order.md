@@ -2,7 +2,6 @@
 uid: 7e2e47b5
 id: oa.admin.dict.item.order
 parent: oa.admin.dict.item
-state: planned
 name: {zh: "排序与启停", en: "Item Order & State"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Manages the sort order and active state of dictionary items and reports reference counts so an operator can judge whether disabling an option is safe.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.284Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.256Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

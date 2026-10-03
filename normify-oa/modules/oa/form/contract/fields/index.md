@@ -2,7 +2,6 @@
 uid: 67510c84
 id: oa.form.contract.fields
 parent: oa.form.contract
-state: planned
 name: {zh: "合同单字段组", en: "Contract Form Field Groups"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Field groups of the contract approval form: basics (name, category fixed to business, contract type and other-type note), counterparty (name and unified social credit code), amount and term (amount / start / end / framework flag), intended seal type, and attachments (contract text plus counterparty credentials). Central ownership is always finance.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.338Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.307Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

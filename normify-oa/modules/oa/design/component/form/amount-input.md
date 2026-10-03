@@ -2,7 +2,6 @@
 uid: 9e3f1b44
 id: oa.design.component.form.amount-input
 parent: oa.design.component.form
-state: planned
 name: {zh: "金额输入控件", en: "Amount Input"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The amount control: typography.amount with tnum, right-aligned, thousands separators while typing, a fixed yuan prefix on the left and normalisation to two decimals on blur; an amount of zero or blank blocks submission, and above one million the display also shows a ten-thousand-yuan conversion to cut misreading risk.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.329Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.299Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

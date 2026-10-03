@@ -2,7 +2,6 @@
 uid: a694e74a
 id: oa.form.print.structure
 parent: oa.form.print
-state: planned
 name: {zh: "打印结构要件", en: "Print Structure Blocks"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Structure blocks shared by the group sheets: the document heading with its three-column header row, the repeated document-receipt block (one per group-level routing), multi-section signature blocks, and merged cells with closing rows.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.355Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.324Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

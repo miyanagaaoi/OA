@@ -2,7 +2,6 @@
 uid: 30af54b0
 id: oa.integration.masterdata.org.leader
 parent: oa.integration.masterdata.org
-state: planned
 name: {zh: "节点负责人", en: "Org Node Leaders"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Leaders bound to an org node with their type (primary/deputy) and sort order, used by downstream systems to route documents.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.389Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.357Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

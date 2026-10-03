@@ -2,7 +2,6 @@
 uid: 2d3d5e48
 id: oa.workflow.task
 parent: oa.workflow
-state: planned
 name: {zh: "审批任务与决议模式", en: "Tasks & Decision Modes"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Approval tasks including one row per approver on countersign nodes: decisions (approve/reject with a mandatory five-character opinion), decision modes (any/all with percentage or absolute threshold/sequential), deduplication, transfer, admin reassignment and add-sign before/after.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.459Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.426Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

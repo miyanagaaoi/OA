@@ -2,7 +2,6 @@
 uid: "1308e901"
 id: oa.audit.security.login
 parent: oa.audit.security
-state: planned
 name: {zh: "登录日志", en: "Login Log"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Records login and logout time, source IP, device information and failure reason, covering multi-device login, over-limit eviction and lockout scenarios; retained for one year.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.311Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.283Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

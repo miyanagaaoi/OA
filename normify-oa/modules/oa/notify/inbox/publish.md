@@ -2,7 +2,6 @@
 uid: 59933a92
 id: oa.notify.inbox.publish
 parent: oa.notify.inbox
-state: planned
 name: {zh: "站内信写入与类型", en: "In-App Message Publishing"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Writes in-app messages (sys_message) for new tasks, rejection, withdrawal, collaboration tasks, timeout reminders and results, keyed by msg_type with ref_instance_id for deep links, and publishes a creation event.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.395Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.363Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

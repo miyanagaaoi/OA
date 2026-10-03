@@ -2,7 +2,6 @@
 uid: 6396d753
 id: oa
 parent: null
-state: planned
 name: {zh: "集团OA审批系统", en: "Group OA Approval System"}
 description:
   zh: >
@@ -12,7 +11,7 @@ description:
       Enterprise approval system for a four-level org (group/company/department/section): org & data-scope RBAC, process definition and runtime engine, four approval form types (matter/fund/contract/seal), signatures, attachments, CC, messaging, audit and archiving. The workspace currently holds PRD, data model, form dictionary and design-language docs; code is not yet landed, so the root is planned.
       
 revision: 0c43a9d242a848aa27f0f7096f3f665de30618cc
-updated_at: "2026-10-02T09:05:00Z"
+updated_at: "2026-10-03T07:15:53.353Z"
 fingerprint: pending
 source: []
 ---

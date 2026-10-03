@@ -2,7 +2,6 @@
 uid: 4f5b7089
 id: oa.sign.record
 parent: oa.sign
-state: planned
 name: {zh: "签名记录与不可篡改", en: "Signature Records"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Per-node signature policy (mandatory/optional/none, with group line leader and chairman mandatory by default) and append-only signature records storing image, timestamp, approver, device fingerprint, IP and hash, bound to the document and never modified or deleted - re-signing adds a new version.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.431Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.399Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

@@ -2,7 +2,6 @@
 uid: 2240cd98
 id: oa.portal.detail.form
 parent: oa.portal.detail
-state: planned
 name: {zh: "单据表单只读呈现", en: "Read-only Document Form"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The document form inside the overlay: every field is read-only after submission (changes require an approver to reject and the initiator to resubmit) and read-only values use a canvas-subtle block; amounts are tnum right-aligned with two decimals and a ten-thousand-yuan conversion above one million; the header carries title, status badge and document number, with print / route / more as secondary actions on the right.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.408Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.375Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

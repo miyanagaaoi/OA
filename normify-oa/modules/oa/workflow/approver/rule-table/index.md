@@ -2,7 +2,6 @@
 uid: 1f956a6c
 id: oa.workflow.approver.rule-table
 parent: oa.workflow.approver
-state: planned
 name: {zh: "解析规则表", en: "Resolution Rule Table"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Implementation of the nine approver rules in PRD 5.4: org-chain derivation (direct department leader, branch line leader, subsidiary GM), Finance ownership (always the group Finance owner), group layer (line leader by category, chairman) and manual rules (designated person/role, initiator pick, collaborating departments picked at approval time).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.433Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.401Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

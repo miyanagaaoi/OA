@@ -2,7 +2,6 @@
 uid: 79ca5b85
 id: oa.admin.dict.item.crud
 parent: oa.admin.dict.item
-state: planned
 name: {zh: "字典项增删改", en: "Dictionary Item CRUD"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Creates, updates and deletes dictionary items keyed by dict_type plus item_code, refusing deletion once an item is referenced by any document.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.283Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.255Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

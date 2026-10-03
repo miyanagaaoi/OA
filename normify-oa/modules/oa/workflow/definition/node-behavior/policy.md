@@ -2,7 +2,6 @@
 uid: 0fddf872
 id: oa.workflow.definition.node-behavior.policy
 parent: oa.workflow.definition.node-behavior
-state: planned
 name: {zh: "签名策略与超时开关", en: "Signature Policy & Timeout Switches"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Node-level sign_policy (required/optional/none; group line leader and chairman default to required), timeout_hours (explicit and ≥24h, reminder only and never auto-skip), allow_add_sign, allow_jump (off by default) and allow_route for group-layer routing/return (REQ-FLOW-007/003/004/020, REQ-SIGN-003).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.437Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.403Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

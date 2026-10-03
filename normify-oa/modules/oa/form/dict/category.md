@@ -2,7 +2,6 @@
 uid: 4a4f90ca
 id: oa.form.dict.category
 parent: oa.form.dict
-state: planned
 name: {zh: "事项类别字典", en: "Category Dictionary"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Matter category `category`: business / economy / admin / hr / invest (added by Q10); configurable and extendable, with all five categories owned centrally by the finance department. Category never determines ownership - it is only a label and reporting dimension (V0.4: the code for 经营 changed from operate to business).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.341Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.309Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

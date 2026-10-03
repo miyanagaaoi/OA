@@ -2,7 +2,6 @@
 uid: 3375d2c9
 id: oa.workflow.routing.back-home
 parent: oa.workflow.routing
-state: planned
 name: {zh: "回到本部门", en: "Return to Own Department"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Funnels the subsequent routing back to the own department so that this department decides the next step; the same department may return home at most twice consecutively, after which the action is rejected. The action does not count towards the routing quota but must be written to the audit log, and it is the only exception to the no-reflux gate.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.445Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.410Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

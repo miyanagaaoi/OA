@@ -2,7 +2,6 @@
 uid: c6396824
 id: oa.design.print.subsidiary-sheet
 parent: oa.design.print
-state: planned
 name: {zh: "子公司内部审批单结构", en: "Subsidiary Internal Sheet"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The subsidiary sheet differs from the group sheet: an info strip (application number left, printer and print time right), a centred bold heading, a four-column vertical field table (label, value, label, value; one field per row), full-width centred group titles (approval detail, contract term, our side, counterparty, approval records), a trail of three-part rows (stage, handler/action/time, full-width opinion and attachments) and withdrawn and re-approved each on their own row.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.333Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.303Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -2,7 +2,6 @@
 uid: b7cd7395
 id: oa.design.print.group-sheet
 parent: oa.design.print
-state: planned
 name: {zh: "集团单结构", en: "Group Sheet Structure"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Structure shared by the group-level sheets: a centred bold 16pt heading with 2px tracking, a three-column header row (submitting unit, responsible department, submission time), the repeated document receipt and handling block (up to three), multi-round signature bands, the merged leader-opinion cell, a closing row (document return or system linkage), text checkboxes and fillable value cells; these cover the group contract routing sheet, the fund approval sheet and the seal-and-licence sheet.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.330Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.300Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

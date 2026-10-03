@@ -2,7 +2,6 @@
 uid: b253ad6a
 id: oa.design.print.rules.mono-copy
 parent: oa.design.print.rules
-state: planned
 name: {zh: "黑白复印可读性", en: "Monochrome Copy Safety"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       No information may be lost in a black-and-white copy: anything distinguished by colour alone must also carry text, status and risk and selection are expressed as words or as the check-box glyphs, and fillable cells get a 3–4% grey wash (#fafafa) visible on screen but all but invisible in print while label columns stay unfilled.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.332Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.302Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -10,8 +10,8 @@ description:
   en: >
       Field read/write rights across the three lifecycle stages (draft fully writable, in-approval fully read-only, awaiting supplement only attachments and the supplement note). The server enforces a state whitelist rather than trusting greyed-out UI; amount and account fields add role-based masking.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.370Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.338Z"
 fingerprint: c0490fc486d253a199c8879032b0ce102ff34e62c10a3b194a81a74a88b7d72d
 source:
   - path: "doc/forms.md"

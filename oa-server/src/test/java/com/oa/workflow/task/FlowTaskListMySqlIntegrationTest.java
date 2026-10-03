@@ -56,7 +56,7 @@ import org.junit.jupiter.api.Test;
  *   <tr><th>单据</th><th>发起人</th><th>公司</th><th>状态</th><th>发起时间</th><th>抄送</th><th>任务</th></tr>
  *   <tr><td>A（甲 / matter）</td><td>我</td><td>C1</td><td>approving</td><td>2020-01-01</td>
  *       <td>我（未读）</td><td>pending→我（**待办**）</td></tr>
- *   <tr><td>B（乙 / fund）</td><td>我</td><td>C1</td><td>approved</td><td>2020-01-02</td>
+ *   <tr><td>B（乙 / fund）</td><td>我</td><td>C1</td><td>approved</td><td>2020-01-02（**办结 2020-01-06**）</td>
  *       <td>我（已读）</td><td>agreed→我（**已办**）</td></tr>
  *   <tr><td>C（丙 / matter）</td><td>他（域外）</td><td>C2</td><td>approving</td><td>2020-01-03</td>
  *       <td>我</td><td>pending→他</td></tr>
@@ -66,6 +66,10 @@ import org.junit.jupiter.api.Test;
  *
  * <p>D 是「只能看到抄送给我的」的关键反例：它由我发起（数据域内可见），但**没有抄送我**，
  * 因此绝不能出现在「抄送我的一览」里。
+ *
+ * <p><b>日期筛选口径（2026-10-05）</b>：「我已审批」按 {@code flow_task.decided_at}（我处理该任务的
+ * 时间）筛，其余三个列表按 {@code flow_instance.created_at}（发起时间）。夹具里 B 的**发起日与办结日
+ * 刻意跨天**（01-02 / 01-06），因此这一条断言能真正证明口径切换，而不是「两边都命中」的假绿。
  *
  * <p><b>开启方式</b>：
  * <pre>
@@ -311,9 +315,43 @@ class FlowTaskListMySqlIntegrationTest {
     }
 
     @Test
-    @DisplayName("筛选｜组合生效：关键字 + 类型 + 状态 + 日期区间 → 唯一命中")
-    void combinedFiltersNarrowToOneRow() {
+    @DisplayName("筛选｜**我已审批按办结时间**（t.decided_at）筛，其余列表仍按发起时间（跨天夹具的对照）")
+    void doneDateFilterUsesDecidedAtWhileInitiatedKeepsCreatedAt() {
         authenticate(meId, companyOne, DataScopeType.SELF);
+        session = factory.openSession(true);
+
+        // 夹具：B 发起于 2020-01-02，我办结于 2020-01-06（跨天）
+        List<FlowTaskViewRow> doneByDecisionDay = done(TaskListFilter.of(null, null, null, "2020-01-06", "2020-01-06"));
+        assertThat(bizNos(doneByDecisionDay)).as("按**办结日**筛到 B").containsExactly(bizB);
+        assertThat(doneByDecisionDay.get(0).getDecidedAt())
+                .as("出参如实暴露「用于筛选的那个时间」").isEqualTo("2020-01-06 10:00:00");
+        assertThat(doneByDecisionDay.get(0).getInstanceCreatedAt())
+                .as("发起时间单列暴露（与办结时间不同一天）").isEqualTo("2020-01-02 09:00:00");
+
+        assertThat(bizNos(done(TaskListFilter.of(null, null, null, "2020-01-02", "2020-01-02"))))
+                .as("按**发起日**筛不到 —— 改前（按 i.created_at）这里会命中 B").isEmpty();
+        assertThat(count(COUNT_DONE, TaskListFilter.of(null, null, null, "2020-01-06", "2020-01-06")))
+                .as("total 与列表同一口径（办结时间）").isEqualTo(1);
+        assertThat(count(COUNT_DONE, TaskListFilter.of(null, null, null, "2020-01-02", "2020-01-02")))
+                .as("按发起日的 total 必须是 0（不是「当前页为空但 total 仍为 1」）").isZero();
+
+        // 对照：同一条 B 在「我发起的」里仍按**发起时间**筛
+        assertThat(bizNos(initiated(TaskListFilter.of(null, null, null, "2020-01-02", "2020-01-02"))))
+                .as("initiated 反之：按发起时间筛到 B").contains(bizB);
+        assertThat(bizNos(initiated(TaskListFilter.of(null, null, null, "2020-01-06", "2020-01-06"))))
+                .as("initiated 按办结日筛不到 B（口径没有跟着 done 一起漂）").doesNotContain(bizB);
+
+        // 待办：同样按发起时间筛（A 发起于 2020-01-01；其任务产生于同日 10:00）
+        FlowTaskViewRow todoA = todo(TaskListFilter.of(null, null, null, "2020-01-01", "2020-01-01")).get(0);
+        assertThat(todoA.getBizNo()).isEqualTo(bizA);
+        assertThat(todoA.getInstanceCreatedAt()).as("待办的筛选依据 = 发起时间").isEqualTo("2020-01-01 09:00:00");
+        assertThat(todoA.getTaskCreatedAt()).as("任务产生时间与发起时间不是同一列（所以必须单列暴露）")
+                .isEqualTo("2020-01-01 10:00:00");
+    }
+
+    @Test
+    @DisplayName("筛选｜组合生效：关键字 + 类型 + 状态 + 日期区间 → 唯一命中")
+    void combinedFiltersNarrowToOneRow() {        authenticate(meId, companyOne, DataScopeType.SELF);
         session = factory.openSession(true);
 
         TaskListFilter combined = TaskListFilter.of("乙", "fund", "approved", "2020-01-02", "2020-01-02");
@@ -454,9 +492,11 @@ class FlowTaskListMySqlIntegrationTest {
             instanceD = insertInstance(statement, bizD, "matter", meId, companyOne, "draft",
                     "IT 抄送我的一览 丁", "2020-01-04 09:00:00", templateId, templateVersion);
 
-            // 任务：A 待办给我；B 已办给我；C 待办给域外人
+            // 任务：A 待办给我；B 已办给我（**发起 2020-01-02、我办结 2020-01-06，跨天**）；C 待办给域外人
+            // B 的跨天是「已办按办结时间筛」的判别夹具：若仍按 i.created_at 筛，
+            // 按 2020-01-02 会（错误地）命中、按 2020-01-06 会（错误地）落空。
             insertTask(statement, instanceA, meId, "pending", null, "2020-01-01 10:00:00");
-            insertTask(statement, instanceB, meId, "agreed", "2020-01-02 10:00:00", "2020-01-02 10:00:00");
+            insertTask(statement, instanceB, meId, "agreed", "2020-01-06 10:00:00", "2020-01-02 10:00:00");
             insertTask(statement, instanceC, foreignId, "pending", null, "2020-01-03 10:00:00");
 
             // 抄送：A/B/C 抄送我（A 未读、B 已读）；D 抄送他人

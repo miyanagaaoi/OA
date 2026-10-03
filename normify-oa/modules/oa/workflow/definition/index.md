@@ -2,7 +2,6 @@
 uid: 2d3d5e44
 id: oa.workflow.definition
 parent: oa.workflow
-state: planned
 name: {zh: "流程模板与节点定义", en: "Templates & Node Definitions"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Process templates and node definitions: sequence, node type (approval/condition/CC/archive), approver rule, decision mode, pass threshold, signature policy, timeout hours, add-sign and jump switches; template changes create versions and in-flight instances stay on their original version.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.435Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.402Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

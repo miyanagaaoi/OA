@@ -2,7 +2,6 @@
 uid: 07654bc1
 id: oa.admin.org.staff
 parent: oa.admin.org
-state: planned
 name: {zh: "人员档案维护", en: "Staff Records Admin"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Console-side maintenance of user profiles and accounts, multi-post assignments and resignation; resignation is blocked until all of the user's tasks are handled, with the count surfaced and transfer/reassign enforced first.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.293Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.266Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

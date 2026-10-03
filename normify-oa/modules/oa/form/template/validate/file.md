@@ -10,9 +10,9 @@ description:
   en: >
       Validates format, size and count for file / files fields with the message 「{标签}仅支持 {格式}，单个文件不超过 {N}MB」; the rules reuse the shared attachment limits.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.366Z"
-fingerprint: b61603d361ccc3e3c05b44179a97c2c38b0f1c198a2891672392b4af0f6a647e
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.335Z"
+fingerprint: 8c925f5e1097577033569ef7cc3590e51284551800485f9474b6835096b34430
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/validate/FormPayloadValidator.java"

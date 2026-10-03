@@ -170,6 +170,85 @@ class ApproverRulesTest {
         assertThat(outcome.missingConfig().get(0)).contains("分公司分管领导");
     }
 
+    // ---------------------------------------------------------------- ③ 两种空候选人成因（文案分流）
+
+    /**
+     * 成因 (a)：发起人**有**所属公司，但该公司没配副职 —— 缺配说明必须指向「配公司副职」。
+     *
+     * <p>与成因 (b) 的对照是本组的重点：两者都拦截（{@code missingConfig} 非空 ⇒ AC-19 的 40007），
+     * 但管理员要做的事**完全不同**，文案指错方向等于让人白跑一趟。
+     */
+    @Test
+    @DisplayName("③ branch_leader 成因(a)：公司有、副职没配 → 提示「请为公司配置副职负责人（leader_type=deputy）」")
+    void branchLeaderMissingDeputyPointsToDeputyConfig() {
+        InMemoryApproverDirectory noDeputy = new InMemoryApproverDirectory()
+                .org(1L, null, "group", "集团", "/1/")
+                .org(12L, 1L, "company", "公司A", "/1/12/")
+                .org(138L, 12L, "section", "科室1A", "/1/12/138/")
+                .user(204L, "冯总", "A204", 12L, 12L)
+                .user(208L, "普通员工", "A208", 138L, 12L)
+                .primary(12L, 204L);
+
+        RuleOutcome outcome = new com.oa.workflow.approver.app.rules.BranchLeaderRule()
+                .resolve(node("branch_leader", null), initiatorInSection(), noDeputy);
+
+        assertThat(outcome.candidates()).isEmpty();
+        assertThat(outcome.missingConfig()).hasSize(1);
+        assertThat(outcome.missingConfig().get(0))
+                .as("(a) 的处置动作 = 配公司副职")
+                .contains("请为公司配置副职负责人")
+                .contains("leader_type=deputy");
+        assertThat(outcome.evidence())
+                .as("(a) 不应说成「发起人不在任何公司节点下」")
+                .contains("未配置副职")
+                .doesNotContain("不在任何公司节点下");
+    }
+
+    /**
+     * 成因 (b)-1：{@code sys_user.company_id} 为空（挂了组织但没有公司）——
+     * 提示必须指向「给这个人指定所属公司」，而不是「去配副职」。
+     */
+    @Test
+    @DisplayName("③ branch_leader 成因(b)：company_id 为空 → 提示「先指定所属公司」，不再说「请配公司副职」")
+    void branchLeaderWithoutCompanyPointsToUserCompany() {
+        RuleRequest noCompany = RuleRequest.of(208L, 138L, null, "/1/12/135/138/", "economy",
+                Map.of("involve_cost", true));
+
+        RuleOutcome outcome = new com.oa.workflow.approver.app.rules.BranchLeaderRule()
+                .resolve(node("branch_leader", null), noCompany, directory);
+
+        assertThat(outcome.candidates()).isEmpty();
+        assertThat(outcome.evidence()).contains("不在任何公司节点下").contains("科室1A");
+        assertThat(outcome.missingConfig().get(0))
+                .as("(b) 的处置动作 = 给发起人指定所属公司 / 换公司层账号发起")
+                .contains("请先为该人员指定所属公司")
+                .contains("company")
+                .doesNotContain("请为公司配置副职负责人");
+    }
+
+    /**
+     * 成因 (b)-2：{@code company_id} 指向**集团根**（非公司节点）——
+     * 夹具里集团层账号（{@code matrix_admin} id=1、{@code dev_gl01}）就是
+     * {@code org_id=1, company_id=1} 的形状；若不分流，文案会退化成
+     * 「公司 集团（id=1）未配置副职」，把管理员引向错误方向。
+     */
+    @Test
+    @DisplayName("③ branch_leader 成因(b)：company_id 指向集团根（非公司节点）→ 同样提示「先指定所属公司」")
+    void branchLeaderWithGroupCompanyIdPointsToUserCompany() {
+        RuleRequest groupLevel = RuleRequest.of(1L, 1L, 1L, "/1/", "economy", Map.of("involve_cost", true));
+
+        RuleOutcome outcome = new com.oa.workflow.approver.app.rules.BranchLeaderRule()
+                .resolve(node("branch_leader", null), groupLevel, directory);
+
+        assertThat(outcome.candidates()).isEmpty();
+        assertThat(outcome.evidence())
+                .contains("不在任何公司节点下")
+                .as("文案要给出当前实际挂载点，管理员才知道该把公司配到哪").contains("集团");
+        assertThat(outcome.missingConfig().get(0))
+                .contains("请先为该人员指定所属公司")
+                .doesNotContain("请为公司配置副职负责人");
+    }
+
     // ================================================================ ④ 子公司总经理
 
     @Test

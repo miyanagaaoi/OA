@@ -2,7 +2,6 @@
 uid: 2b04284d
 id: oa.archive.policy.migration.verify
 parent: oa.archive.policy.migration
-state: planned
 name: {zh: "迁移结果核对", en: "Migration Verification"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Reconciles row counts, document numbers and hashes between the live store and the history store after migration; a mismatch blocks subsequent batches and raises an alert.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.302Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.274Z"
 fingerprint: d27f073aa0b7d919258285e22376dd379c55e1e74d7e28c48440b1100569087a
 source:
   - path: "doc/data-model.md"

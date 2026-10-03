@@ -2,7 +2,6 @@
 uid: bb39bda5
 id: oa.form.print.attachment-list
 parent: oa.form.print
-state: planned
 name: {zh: "附件清单", en: "Attachment List"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The sheet carries an attachment list that names files only (never their bodies) and labels supplement rounds; the submitted-materials cell works together with that list.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.351Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.321Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

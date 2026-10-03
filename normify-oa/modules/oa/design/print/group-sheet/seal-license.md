@@ -2,7 +2,6 @@
 uid: bccffcd9
 id: oa.design.print.group-sheet.seal-license
 parent: oa.design.print.group-sheet
-state: planned
 name: {zh: "印鉴证照使用审批单", en: "Seal & Licence Sheet"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The seal-and-licence approval sheet derives from the group sheet layout because no paper original exists: using unit, seal type, licence name, period of use and return status follow the group sheet three-column header and value cells, with the same signature bands and closing row; it measures 205mm and is driven by the seal-type and licence-name fields.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.331Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.301Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

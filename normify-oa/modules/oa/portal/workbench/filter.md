@@ -2,7 +2,6 @@
 uid: 0d2e386b
 id: oa.portal.workbench.filter
 parent: oa.portal.workbench
-state: planned
 name: {zh: "列表检索与筛选", en: "List Search & Filters"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       In-list search (the system deliberately has no global search box): document type, status, submission date range, initiator/department, amount range and document-number keyword; filters persist across the four tabs; organisation nodes outside the caller's data scope never appear as filter options.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.419Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.387Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

@@ -2,7 +2,6 @@
 uid: 2e5847cd
 id: oa.form.matter.fields.cost
 parent: oa.form.matter.fields
-state: planned
 name: {zh: "费用字段组", en: "Cost Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Cost involved `involve_cost` (boolean, required, default no), amount `amount` (amount, conditionally required, see rule 1.5) and cost bearer `cost_bearer` (org, conditionally required, defaults to the initiator's company, limited to that company and below); involve_cost also decides whether the finance review node is skipped.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.348Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.318Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

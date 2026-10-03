@@ -2,7 +2,6 @@
 uid: 094f5e5a
 id: oa.audit.trace.timeline
 parent: oa.audit.trace
-state: planned
 name: {zh: "轨迹时间轴展示", en: "Trail Timeline"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Renders the per-document approval timeline by trail sequence and a node-grouped trail view reused by detail, print and archived preview; the read side never writes back.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.314Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.285Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

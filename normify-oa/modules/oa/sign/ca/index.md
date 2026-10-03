@@ -2,7 +2,6 @@
 uid: 4f5b708a
 id: oa.sign.ca
 parent: oa.sign
-state: planned
 name: {zh: "CA 升级预留", en: "CA Signature Reservations"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Reserved capability for a future CA-grade signature: signature type distinguishes handwritten from CA, reserved columns for signature value, certificate serial, issuer and trusted timestamp source plus verification result fields, and the record hash must already cover these reserved fields so history never needs rebuilding.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.422Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.390Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

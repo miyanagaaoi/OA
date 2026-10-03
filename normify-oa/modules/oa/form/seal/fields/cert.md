@@ -2,7 +2,6 @@
 uid: 7f3b98c1
 id: oa.form.seal.fields.cert
 parent: oa.form.seal.fields
-state: planned
 name: {zh: "证照名称字段组", en: "Certificate Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Certificate name `cert_name` (select, conditionally required, values per 6.5): mandatory only when seal_type is certificate borrow and hidden for the other seal types.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.358Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.326Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

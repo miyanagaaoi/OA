@@ -2,7 +2,6 @@
 uid: 4b97e5c4
 id: oa.integration.warehouse.extract.partition
 parent: oa.integration.warehouse.extract
-state: planned
 name: {zh: "月分区落盘", en: "Partitioned Output"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Writes extracted documents into year/month partitions so the warehouse can load incrementally and audits can locate a period.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.391Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.359Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

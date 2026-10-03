@@ -2,7 +2,6 @@
 uid: 5907126a
 id: oa.admin.authz.tree
 parent: oa.admin.authz
-state: planned
 name: {zh: "权限树勾选", en: "Permission Tree Ticking"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Tick permission-tree nodes for a role, set the role's data scope and category bindings, preview the resulting visibility, and log every change; IT assigns node by node and branch admins cannot re-delegate.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.277Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.249Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

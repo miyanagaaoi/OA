@@ -2,7 +2,6 @@
 uid: 2d3d5e47
 id: oa.workflow.runtime
 parent: oa.workflow
-state: planned
 name: {zh: "实例运行时与状态机", en: "Instance Runtime & State Machine"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Instance and node-instance runtime: draft → in approval → approved, with rejected/withdrawn/terminated reaches, the pending-supplement sub-status, current node pointer, routing and supplement counters, and the cascade rules that close tasks when a node or instance reaches a terminal state.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.449Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.417Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

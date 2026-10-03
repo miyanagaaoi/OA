@@ -2,7 +2,6 @@
 uid: 21e083c2
 id: oa.workflow.task.addsign.pre
 parent: oa.workflow.task.addsign
-state: planned
 name: {zh: "前加签", en: "Add-sign Before"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Add-sign before inserts the added signer ahead of the current approver; the signer decides first and, once finished, the task returns to the original approver. The node decision mode and threshold are unchanged and the signer owns their opinion.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.458Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.424Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

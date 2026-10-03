@@ -2,7 +2,6 @@
 uid: a307ccae
 id: oa.form.print.variant.seal-cert
 parent: oa.form.print.variant
-state: planned
 name: {zh: "印鉴证照使用审批单", en: "Seal & Certificate Sheet"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       No paper counterpart exists, so the layout derives from the group sheets; measured height 205mm leaves ample single-page room; it must show seal type, certificate name and certificate return status.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.357Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.326Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

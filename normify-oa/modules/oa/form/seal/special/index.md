@@ -2,7 +2,6 @@
 uid: 9380e75a
 id: oa.form.seal.special
 parent: oa.form.seal
-state: planned
 name: {zh: "印鉴单专用规则与联动", en: "Seal-Specific Rules & Linkage"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Seal-only rules: return status and return time are the system's only main fields editable during approval (archive node ⑦ only, explicitly whitelisted server-side), plus the mutual exclusion between certificate borrow and copy count.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.360Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.328Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

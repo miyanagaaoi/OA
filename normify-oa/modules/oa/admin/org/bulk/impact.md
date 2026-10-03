@@ -10,8 +10,8 @@ description:
   en: >
       Before a bulk adjustment such as a reorganisation, produce the list of affected in-flight documents with initiator, current node and snapshot approvers for administrator confirmation.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.292Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.263Z"
 fingerprint: f14582e3acc613af24e1f05d3533b5ef52f9d412505069347d50e921b1fdb382
 source:
   - path: "oa-server/src/main/java/com/oa/admin/bulk/BulkImportService.java"

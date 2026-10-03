@@ -2,7 +2,6 @@
 uid: 822926b5
 id: oa.admin.dict.delivery.spreadsheet
 parent: oa.admin.dict.delivery
-state: planned
 name: {zh: "字典导入导出", en: "Dictionary Spreadsheet"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Imports and exports the whole dictionary through Excel, keyed idempotently by dict_type plus item_code so repeated imports do not duplicate options.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.282Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.254Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

@@ -4,6 +4,7 @@ import com.oa.common.audit.AuditLogWriter;
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
 import com.oa.common.json.JsonText;
+import com.oa.common.scope.DataScopeContext;
 import com.oa.common.security.CurrentUser;
 import com.oa.authz.visibility.VisibilityRoles;
 import com.oa.form.document.FormRuleContext;
@@ -124,7 +125,8 @@ public class FormDataService {
         applyDefaults(schema, values);
         canonicalizeAmounts(schema, values);
         canonicalizePickers(schema, values);
-        FormValidationReport report = validator.validate(schema, values, mode, LocalDate.now(), null);
+        FormValidationReport report = validator.validate(schema, values, mode, LocalDate.now(), null,
+                initiatorCompanyId(null));
         FormTypeRules rules = ruleRegistry.require(schema.formType());
         FormValidationReport.Collector collector = collectorOf(report);
         rules.validate(ruleContext(schema, values, payload, Map.of(), mode, null), collector);
@@ -159,7 +161,8 @@ public class FormDataService {
         canonicalizeAmounts(schema, merged);
         canonicalizePickers(schema, merged);
         FormValidationReport.Collector collector = FormValidationReport.collector();
-        collector.addAll(validator.validate(schema, merged, mode, LocalDate.now(), instance.getSubmittedAt()));
+        collector.addAll(validator.validate(schema, merged, mode, LocalDate.now(), instance.getSubmittedAt(),
+                initiatorCompanyId(instance)));
         FormTypeRules rules = ruleRegistry.require(schema.formType());
         rules.validate(ruleContext(schema, merged, payload, stored, mode, instance), collector);
         Map<String, Object> view = new LinkedHashMap<>();
@@ -213,7 +216,8 @@ public class FormDataService {
         FormRuleContext ruleContext = ruleContext(schema, forValidation, payload, stored, mode, instance);
         FormTypeRules rules = ruleRegistry.require(schema.formType());
         FormValidationReport.Collector collector = FormValidationReport.collector();
-        collector.addAll(validator.validate(schema, forValidation, mode, LocalDate.now(), instance.getSubmittedAt()));
+        collector.addAll(validator.validate(schema, forValidation, mode, LocalDate.now(), instance.getSubmittedAt(),
+                initiatorCompanyId(instance)));
         rules.validate(ruleContext, collector);
         collector.build().fail();
 
@@ -274,7 +278,7 @@ public class FormDataService {
         FormRuleContext ruleContext = ruleContext(schema, forValidation, payload, stored, ValidationMode.DRAFT, instance);
         FormValidationReport.Collector collector = FormValidationReport.collector();
         collector.addAll(validator.validate(schema, forValidation, ValidationMode.DRAFT, LocalDate.now(),
-                instance.getSubmittedAt()));
+                instance.getSubmittedAt(), initiatorCompanyId(instance)));
         ruleRegistry.require(schema.formType()).validate(ruleContext, collector);
         collector.build().fail();
 
@@ -353,7 +357,7 @@ public class FormDataService {
         FormRuleContext context = ruleContext(schema, forValidation, Map.of(), stored, mode, instance);
         FormValidationReport.Collector collector = FormValidationReport.collector();
         collector.addAll(validator.validate(schema, forValidation, mode,
-                LocalDate.now(), instance.getSubmittedAt()));
+                LocalDate.now(), instance.getSubmittedAt(), initiatorCompanyId(instance)));
         ruleRegistry.require(schema.formType()).validate(context, collector);
         return collector.build();
     }
@@ -391,7 +395,8 @@ public class FormDataService {
         FormRuleContext ruleContext = ruleContext(schema, values, payload, Map.of(), ValidationMode.DRAFT, null);
         FormTypeRules rules = ruleRegistry.require(schema.formType());
         FormValidationReport.Collector collector = FormValidationReport.collector();
-        collector.addAll(validator.validate(schema, values, ValidationMode.DRAFT, LocalDate.now(), null));
+        collector.addAll(validator.validate(schema, values, ValidationMode.DRAFT, LocalDate.now(), null,
+                initiatorCompanyId(null)));
         rules.validate(ruleContext, collector);
         collector.build().fail();
         applyPatch(values, rules.normalize(ruleContext), schema, null);
@@ -411,6 +416,32 @@ public class FormDataService {
     }
 
     // ================================================================ 内部：读取实例 / 上下文
+
+    /**
+     * <b>「发起人所属公司」的取数口径</b>（{@code rules[orgScope] = initiator_company_subtree} 的入参）。
+     *
+     * <p>两条路径，各有真源、互不混用：
+     * <ol>
+     *   <li><b>有实例</b>（保存 / 提交闸门 / 实例干跑 / 补件）→ {@code flow_instance.initiator_company_id}：
+     *       发起时固化的**快照**列（{@code doc/data-model.md} §5.1「发起人公司快照」、DDL {@code NOT NULL}），
+     *       因此事后把人调到别的公司、或把组织节点改挂到别的公司，都**不会**改变在途单据的范围判定
+     *       —— 与 AC-09「在途实例按其发起时版本执行」同一取向；</li>
+     *   <li><b>无实例</b>（建草稿 {@code prepareDraft} / 按类型干跑 {@code validateByFormType}）→
+     *       当前登录人 {@code sys_user.company_id}（随 {@code DataScopeContext} 装载），口径与
+     *       {@code ApproverPrecheckService#buildContext} 的 {@code company_id} 同源
+     *       （它也带「{@code company_id} 为空则沿组织链上溯取所属公司」的兜底；
+     *       此处直接用装载值，是因为校验发生在 HTTP 线程内、登录人恒存在）。</li>
+     * </ol>
+     * <p>返回 {@code null} 表示**无法确定发起人公司**：{@code orgScope} 校验按 fail-closed 拒绝
+     * （见 {@code FormPayloadValidator#validateOrgScope}），不静默放行。
+     */
+    private Long initiatorCompanyId(FlowInstanceRow instance) {
+        if (instance != null) {
+            return instance.getInitiatorCompanyId();
+        }
+        DataScopeContext context = DataScopeContext.current();
+        return context == null ? null : context.getCompanyId();
+    }
 
     private FlowInstanceRow requireInstance(Long instanceId) {
         if (instanceId == null) {

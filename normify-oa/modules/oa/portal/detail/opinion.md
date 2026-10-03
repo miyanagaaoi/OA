@@ -2,7 +2,6 @@
 uid: "34936074"
 id: oa.portal.detail.opinion
 parent: oa.portal.detail
-state: planned
 name: {zh: "审批意见块", en: "Approval Opinion Block"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The approval opinion block: canvas-subtle fill, rounded.sm and 12px padding, structured as opinion text, then the signature image if any, then approver plus position and timestamp; the signature image and timestamp can never be edited or deleted, only re-signed with history kept (REQ-SIGN-004).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.408Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.376Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

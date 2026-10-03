@@ -2,7 +2,6 @@
 uid: aa9db00e
 id: oa.design.component.feedback
 parent: oa.design.component
-state: planned
 name: {zh: "反馈与浮层", en: "Feedback & Overlays"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The feedback family: modal (centred, 560 / 400 / 720px wide, with a specific confirm label), drawer (480px on the right, 640px for logs), notification-toast (360px top-right with a 3px status bar on the left, auto-dismissed after three seconds on success but persistent with retry on failure), watermark, signature-pad and signature-stamp (a signature image can never be deleted, only re-signed).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.329Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.298Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

@@ -99,24 +99,37 @@ public final class FormPayloadValidator {
     /** 元素存在性失败的规则名（{@code details.errors[].rule}）。 */
     public static final String RULE_PICKER_VALUE = "pickerValue";
 
+    /** 组织选择范围失败的规则名（{@code details.errors[].rule}，{@code doc/templates.md} §2.3）。 */
+    public static final String RULE_ORG_SCOPE = "orgScope";
+
+    /** {@code rules[orgScope].value} 的唯一已实现取值：发起人所属公司及其子树。 */
+    public static final String SCOPE_INITIATOR_COMPANY_SUBTREE = "initiator_company_subtree";
+
     private final FormDictService dictService;
     private final UniqueValueChecker uniqueChecker;
     private final PickerValueChecker pickerChecker;
+    private final OrgScopeChecker orgScopeChecker;
 
     public FormPayloadValidator(FormDictService dictService, UniqueValueChecker uniqueChecker) {
-        this(dictService, uniqueChecker, null);
+        this(dictService, uniqueChecker, null, null);
     }
 
     public FormPayloadValidator(FormDictService dictService, UniqueValueChecker uniqueChecker,
                                 PickerValueChecker pickerChecker) {
+        this(dictService, uniqueChecker, pickerChecker, null);
+    }
+
+    public FormPayloadValidator(FormDictService dictService, UniqueValueChecker uniqueChecker,
+                                PickerValueChecker pickerChecker, OrgScopeChecker orgScopeChecker) {
         this.dictService = dictService;
         this.uniqueChecker = uniqueChecker;
         this.pickerChecker = pickerChecker;
+        this.orgScopeChecker = orgScopeChecker;
     }
 
     /** 无外部依赖的构造（单测 / 字典不可用的降级场景：{@code inDict} 规则跳过并记 WARN）。 */
     public static FormPayloadValidator offline(FormDictService dictService) {
-        return new FormPayloadValidator(dictService, null, null);
+        return new FormPayloadValidator(dictService, null, null, null);
     }
 
     // ================================================================ 入口
@@ -132,11 +145,26 @@ public final class FormPayloadValidator {
      */
     public FormValidationReport validate(FormSchema schema, Map<String, Object> payload, ValidationMode mode,
                                         LocalDate today, Object submitDate) {
+        return validate(schema, payload, mode, today, submitDate, null);
+    }
+
+    /**
+     * 按 schema 校验载荷（带「发起人所属公司」，供 {@code rules[orgScope]} 使用）。
+     *
+     * <p>{@code initiatorCompanyId} 是本方法唯一的**外部业务事实**入参（其余全部来自 schema 与载荷）：
+     * 组织选择范围（{@code orgScope = initiator_company_subtree}）判的是「这个节点在不在发起人公司
+     * 子树内」，因此发起人公司必须由调用方显式给出（口径见 {@link OrgScopeChecker}）。
+     *
+     * @param initiatorCompanyId 发起人所属公司 id；{@code null} = 无法确定（校验按 **fail-closed** 拒绝，
+     *                           见 {@link #validateOrgScope}）
+     */
+    public FormValidationReport validate(FormSchema schema, Map<String, Object> payload, ValidationMode mode,
+                                        LocalDate today, Object submitDate, Long initiatorCompanyId) {
         FormValidationReport.Collector collector = FormValidationReport.collector();
         Map<String, Object> values = payload == null ? Map.of() : payload;
         rejectUnknownFields(schema, values, collector);
         for (FormFieldDef field : schema.fields()) {
-            validateField(schema, field, values, mode, today, submitDate, collector);
+            validateField(schema, field, values, mode, today, submitDate, initiatorCompanyId, collector);
         }
         validateSystemFields(values, collector);
         return collector.build();
@@ -198,7 +226,8 @@ public final class FormPayloadValidator {
 
     @SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:MethodLength"})
     private void validateField(FormSchema schema, FormFieldDef field, Map<String, Object> values, ValidationMode mode,
-                               LocalDate today, Object submitDate, FormValidationReport.Collector collector) {
+                               LocalDate today, Object submitDate, Long initiatorCompanyId,
+                               FormValidationReport.Collector collector) {
         String code = field.code();
         boolean provided = values.containsKey(code) && !ConditionEvaluator.isEmpty(values.get(code));
         Object raw = values.get(code);
@@ -287,7 +316,11 @@ public final class FormPayloadValidator {
         validatePickerLimit(field, raw, collector);
 
         // ---------- 人员 / 组织选择：去重后的元素必须在通讯录 / 组织树内 ----------
-        validatePicker(field, raw, collector);
+        // 返回值 = 通过「存在性」的元素；范围规则（orgScope）只对它们判，避免一个元素拿到两条重叠错误
+        List<String> existingElements = validatePicker(field, raw, collector);
+
+        // ---------- 组织选择范围（如 cost_bearer 的「限本公司及以下节点」） ----------
+        validateOrgScope(field, existingElements, initiatorCompanyId, collector);
 
         // ---------- 附件 ----------
         if (type != null && type.isAttachment()) {
@@ -551,23 +584,28 @@ public final class FormPayloadValidator {
      *   <li>逐个元素判存在性，**一次返回全部**不合格元素（不是只报第一个；每条都带字段码 + 序号 + 原因）；</li>
      *   <li>端口未装配（单测 / 降级）时**跳过并记 WARN**，与 {@code unique} 规则同一缺省语义。</li>
      * </ol>
+     *
+     * @return 通过存在性判定的元素（保序）；端口未装配时返回全部元素（「存在性未判定」≠「不存在」，
+     *         范围规则仍须自己判）
      */
-    private void validatePicker(FormFieldDef field, Object raw, FormValidationReport.Collector collector) {
+    private List<String> validatePicker(FormFieldDef field, Object raw, FormValidationReport.Collector collector) {
         FormFieldType type = field.type();
         if (type != FormFieldType.USER && type != FormFieldType.ORG) {
-            return;
+            return List.of();
         }
         List<String> elements = pickerElements(raw);
         if (pickerChecker == null) {
             log.warn("人员/组织选择器校验未装配，字段 {}（type={}）的元素存在性校验被跳过",
                     field.code(), type.code());
-            return;
+            return elements;
         }
         boolean user = type == FormFieldType.USER;
+        List<String> existing = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             String element = elements.get(i);
             boolean exists = user ? pickerChecker.userExists(element) : pickerChecker.orgExists(element);
             if (exists) {
+                existing.add(element);
                 continue;
             }
             collector.add(field.code(), field.label(), RULE_PICKER_VALUE, user
@@ -575,6 +613,69 @@ public final class FormPayloadValidator {
                             field.label(), i + 1, element)
                     : String.format("「%s」的第 %d 项不是有效的组织节点：%s（组织 id 不存在或已停用）",
                             field.label(), i + 1, element));
+        }
+        return existing;
+    }
+
+    /**
+     * <b>组织选择范围</b>（{@code doc/templates.md} §2.3 {@code rules[orgScope]}）。
+     *
+     * <p>已实现取值只有一个：{@code initiator_company_subtree} —— 组织取值必须落在
+     * <b>发起人所属公司及其子树</b>内（{@code doc/forms.md} §2 {@code cost_bearer} 行
+     * 「限本公司及以下节点」；默认值「发起人所属公司」）。判定委托 {@link OrgScopeChecker}
+     * （生产实现走系统口径查组织树，只回答布尔事实，不构成读取旁路）。
+     *
+     * <h2>三条口径</h2>
+     * <ol>
+     *   <li><b>一次返回全部越界项</b>：每个不合格元素各一条 {@code orgScope} 失败项（含序号与取值），
+     *       不是只报第一个；</li>
+     *   <li><b>不重复报错</b>：只判**已通过存在性**的元素（{@code existingElements}）——
+     *       不存在/停用的节点已由 {@code pickerValue} 更准确地报出（「不存在或已停用」比
+     *       「不在本公司子树内」更能定位问题）；</li>
+     *   <li><b>fail-closed</b>：{@code initiatorCompanyId} 为空（发起人无公司，例如未挂公司的
+     *       集团层账号）时判**越界**并给出可自查的文案，不静默放行（见 {@link OrgScopeChecker}）。</li>
+     * </ol>
+     *
+     * <p><b>未实现的 {@code value}（如将来的 {@code initiator_org_subtree}）记 WARN 并跳过</b>：
+     * 跳过而不是拒绝，是因为「模板写了系统没实现的取值」属配置错误，不该让发起人无法提交单据；
+     * 但也**不静默**——WARN 日志留痕，且已在交付说明「待决策」中登记。
+     */
+    private void validateOrgScope(FormFieldDef field, List<String> existingElements, Long initiatorCompanyId,
+                                  FormValidationReport.Collector collector) {
+        if (field.type() != FormFieldType.ORG || existingElements.isEmpty()) {
+            return;
+        }
+        List<JsonNode> rules = field.rules(RULE_ORG_SCOPE);
+        if (rules.isEmpty()) {
+            return;
+        }
+        for (JsonNode rule : rules) {
+            String scope = rule.path("value").asText(null);
+            if (!SCOPE_INITIATOR_COMPANY_SUBTREE.equals(scope)) {
+                log.warn("模板字段 {} 的 orgScope 取值 {} 尚未实现，该规则被跳过（不静默放行，见交付说明待决策）",
+                        field.code(), scope);
+                continue;
+            }
+            if (orgScopeChecker == null) {
+                log.warn("组织范围校验器未装配，字段 {} 的 orgScope 规则（value={}）被跳过",
+                        field.code(), scope);
+                continue;
+            }
+            for (int i = 0; i < existingElements.size(); i++) {
+                String element = existingElements.get(i);
+                if (orgScopeChecker.withinInitiatorCompanySubtree(element, initiatorCompanyId)) {
+                    continue;
+                }
+                String base = ruleMessage(rule);
+                if (base == null || base.isBlank()) {
+                    base = String.format("「%s」限本公司及以下节点", field.label());
+                }
+                collector.add(field.code(), field.label(), RULE_ORG_SCOPE, initiatorCompanyId == null
+                        ? String.format("%s（无法确定发起人所属公司，第 %d 项 %s 的范围校验不可判定，已拒绝）",
+                                base, i + 1, element)
+                        : String.format("%s（第 %d 项 %s 不在发起人所属公司及其子树内）",
+                                base, i + 1, element));
+            }
         }
     }
 

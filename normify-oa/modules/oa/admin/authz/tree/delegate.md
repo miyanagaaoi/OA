@@ -2,7 +2,6 @@
 uid: 6772dd9f
 id: oa.admin.authz.tree.delegate
 parent: oa.admin.authz.tree
-state: planned
 name: {zh: "逐级分配与再分配限制", en: "Delegation Limits"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Controls who may assign permissions to whom: branch process admins receive a company-scoped delegation range and are explicitly barred from re-delegating further down.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.276Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.248Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

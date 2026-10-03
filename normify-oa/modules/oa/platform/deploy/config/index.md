@@ -2,7 +2,6 @@
 uid: 6ff2d7d5
 id: oa.platform.deploy.config
 parent: oa.platform.deploy
-state: planned
 name: {zh: "环境与配置项", en: "Environment & Config Items"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Environment configuration plus the catalogue of runtime-adjustable items that operations can change without development.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.400Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.370Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -2,7 +2,6 @@
 uid: 00951d3a
 id: oa.workflow.definition.template.registry
 parent: oa.workflow.definition.template
-state: planned
 name: {zh: "模板元数据与表单绑定", en: "Template Metadata & Form Binding"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Resolves the document type (matter/fund/contract/seal) from flow_template.code/form_type and maintains the template name, node_count and the form_schema_json field definitions that drive form rendering and the field dictionary (see doc/forms.md).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.439Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.405Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

@@ -2,7 +2,6 @@
 uid: 5f0e2e03
 id: oa.integration.warehouse.extract
 parent: oa.integration.warehouse
-state: planned
 name: {zh: "抽取任务与调度", en: "Extraction Jobs"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Scheduled extraction jobs that publish finished documents into per-month files and emit an extracted event for downstream consumers.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.391Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.358Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

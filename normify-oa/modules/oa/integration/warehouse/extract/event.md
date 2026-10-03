@@ -2,7 +2,6 @@
 uid: 5277b5b1
 id: oa.integration.warehouse.extract.event
 parent: oa.integration.warehouse.extract
-state: planned
 name: {zh: "抽取完成事件", en: "Extraction Event"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Emits an extracted event per completed run so downstream pipelines can start loading without polling files.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.390Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.358Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

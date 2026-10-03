@@ -2,7 +2,6 @@
 uid: 244534d3
 id: oa.audit.integrity.verify
 parent: oa.audit.integrity
-state: planned
 name: {zh: "完整性校验", en: "Integrity Verification"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Verifies signature hashes and log records, producing verification jobs and results as acceptance evidence for the immutability constraint, and alerts when tampering traces are found.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.309Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.279Z"
 fingerprint: d27f073aa0b7d919258285e22376dd379c55e1e74d7e28c48440b1100569087a
 source:
   - path: "doc/data-model.md"

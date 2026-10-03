@@ -2,7 +2,6 @@
 uid: 1c5456aa
 id: oa.audit.integrity.immutable
 parent: oa.audit.integrity
-state: planned
 name: {zh: "只追加约束", en: "Append-only Guard"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Application layer forbids UPDATE/DELETE while database triggers reject modification and deletion of audit logs and signature records, forming a two-layer immutability baseline.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.308Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.278Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

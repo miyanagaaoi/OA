@@ -2,7 +2,6 @@
 uid: 407abd75
 id: oa.sign.record.immutable.trigger
 parent: oa.sign.record.immutable
-state: planned
 name: {zh: "数据库不可变触发器", en: "Append-Only DB Triggers"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       MySQL 8.0 triggers: no_update allows only the verify-result write-back (image, hash, user and sign time unchanged) while no_delete always raises SIGNAL; these triggers are the acceptance object of AC-20.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.430Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.398Z"
 fingerprint: d27f073aa0b7d919258285e22376dd379c55e1e74d7e28c48440b1100569087a
 source:
   - path: "doc/data-model.md"

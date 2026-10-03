@@ -49,6 +49,7 @@
     <result property="handoverReason" column="handover_reason"/>
     <result property="taskCreatedAt" column="task_created_at"/>
     <result property="decidedAt" column="decided_at"/>
+    <result property="instanceCreatedAt" column="instance_created_at"/>
     <result property="initiatorId" column="initiator_id"/>
     <result property="initiatorName" column="initiator_name"/>
     <result property="currentNodeSeq" column="current_node_seq"/>
@@ -88,6 +89,7 @@
     t.opinion, t.handover_reason,
     DATE_FORMAT(t.created_at, '%Y-%m-%d %H:%i:%s') AS task_created_at,
     DATE_FORMAT(t.decided_at, '%Y-%m-%d %H:%i:%s') AS decided_at,
+    DATE_FORMAT(i.created_at, '%Y-%m-%d %H:%i:%s') AS instance_created_at,
     i.initiator_id, u.name AS initiator_name, i.current_node_seq,
     i.status AS instance_status, i.sub_status,
     (SELECT JSON_UNQUOTE(JSON_EXTRACT(fd.fields_json, '$.title'))
@@ -96,7 +98,7 @@
 
   <!--
     ============================================================================
-    列表筛选片段（三个任务列表 + 抄送我的一览**同一套参数**，doc/forms.md 与 PRD 审批中心）
+    列表筛选片段（三个任务列表 + 抄送我的一览**同一套参数**）
     ============================================================================
     纪律：
       · 本片段只包含 <if> 条件，**不含** @dataScope 标记 —— 标记在调用方的 WHERE 1 = 1 之后、
@@ -107,6 +109,12 @@
         且不必为「只有关键字筛才需要的 form_data」改动既有 FROM 子句（同 DataScopeSqlBuilder
         的 financeInvolveCost 分支已是此写法）。
       · ESCAPE '!'（不是反斜杠）：见 TaskListFilter#escapeLike 的说明。
+      · **日期列按列表各自的时间轴由调用方注入**（${dateColumn}）：
+        「我已审批（done）」按 t.decided_at（**我处理该任务的时间**，与 doc/forms.md §2
+        的「办结」语义一致，也与本语句既有的 ORDER BY t.decided_at 同一时间轴），
+        其余三个列表按 i.created_at（**发起时间**，doc/forms.md 的「发起日期」）。
+        ${dateColumn} 只承载 mapper 内部常量（不来自请求参数），因此不存在 SQL 注入面；
+        这正是「同一套参数、同名不同义」必须显式化的原因（见 TaskListFilter 的类注释）。
   -->
   <sql id="TaskListFilters">
     <if test="filter.hasFormType()">
@@ -119,10 +127,10 @@
       AND i.sub_status = #{filter.subStatus}
     </if>
     <if test="filter.hasDateFrom()">
-      AND i.created_at &gt;= CONCAT(#{filter.dateFrom}, ' 00:00:00')
+      AND ${dateColumn} &gt;= CONCAT(#{filter.dateFrom}, ' 00:00:00')
     </if>
     <if test="filter.hasDateTo()">
-      AND i.created_at &lt; DATE_ADD(CONCAT(#{filter.dateTo}, ' 00:00:00'), INTERVAL 1 DAY)
+      AND ${dateColumn} &lt; DATE_ADD(CONCAT(#{filter.dateTo}, ' 00:00:00'), INTERVAL 1 DAY)
     </if>
     <if test="filter.hasKeyword()">
       AND (i.biz_no LIKE #{filter.keywordLike} ESCAPE '!'
@@ -244,7 +252,7 @@
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status = 'pending'
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="i.created_at"/></include>
     ORDER BY t.created_at DESC, t.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -258,7 +266,7 @@
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status = 'pending'
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="i.created_at"/></include>
   </select>
 
   <select id="selectDone" resultMap="TaskViewResultMap">
@@ -271,7 +279,7 @@
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status &lt;&gt; 'pending'
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="t.decided_at"/></include>
     ORDER BY t.decided_at DESC, t.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -285,7 +293,7 @@
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND t.assignee_id = #{userId}
       AND t.status &lt;&gt; 'pending'
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="t.decided_at"/></include>
   </select>
 
   <select id="selectInitiated" resultMap="TaskViewResultMap">
@@ -299,6 +307,7 @@
            NULL AS task_status, NULL AS opinion, NULL AS handover_reason,
            DATE_FORMAT(i.created_at, '%Y-%m-%d %H:%i:%s') AS task_created_at,
            DATE_FORMAT(i.finished_at, '%Y-%m-%d %H:%i:%s') AS decided_at,
+           DATE_FORMAT(i.created_at, '%Y-%m-%d %H:%i:%s') AS instance_created_at,
            i.initiator_id, u.name AS initiator_name, i.current_node_seq,
            i.status AS instance_status, i.sub_status,
            (SELECT JSON_UNQUOTE(JSON_EXTRACT(fd.fields_json, '$.title'))
@@ -308,7 +317,7 @@
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND i.initiator_id = #{userId}
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="i.created_at"/></include>
     ORDER BY i.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -320,7 +329,7 @@
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND i.initiator_id = #{userId}
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="i.created_at"/></include>
   </select>
 
   <!-- ============================== 抄送我的一览（flow_cc ⋈ flow_instance） ============================== -->
@@ -347,7 +356,7 @@
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND c.user_id = #{userId}
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="i.created_at"/></include>
     ORDER BY c.created_at DESC, c.id DESC
     LIMIT #{size} OFFSET #{offset}
   </select>
@@ -360,7 +369,7 @@
     WHERE 1 = 1
       AND /* @dataScope(table=flow_instance, alias=i) */
       AND c.user_id = #{userId}
-    <include refid="TaskListFilters"/>
+    <include refid="TaskListFilters"><property name="dateColumn" value="i.created_at"/></include>
   </select>
 
   <!-- ============================== 写 ============================== -->

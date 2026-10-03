@@ -2,7 +2,6 @@
 uid: ad336cc9
 id: oa.design.print.page.height
 parent: oa.design.print.page
-state: planned
 name: {zh: "实测高度与分页预算", en: "Measured Height Budget"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Measured heights against the 297mm limit: the group contract routing sheet 274mm, the fund approval sheet 242mm, the subsidiary internal sheet with 13 records 270mm and the seal-and-licence sheet 205mm; P1 and P3 have little headroom, so more than roughly 15 trail records overflow one page and must then break across pages with a repeating header.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.332Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.302Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

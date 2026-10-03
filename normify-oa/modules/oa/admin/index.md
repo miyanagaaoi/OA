@@ -2,7 +2,6 @@
 uid: 8295ac4a
 id: oa.admin
 parent: oa
-state: planned
 name: {zh: "管理后台", en: "Admin Console"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Org and user maintenance (Excel import/export), process and form template configuration with versioned publishing, permission and data-scope assignment, dictionary maintenance, reports, and the limits of super-admin power.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.290Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.261Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

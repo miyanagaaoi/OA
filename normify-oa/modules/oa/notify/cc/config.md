@@ -2,7 +2,6 @@
 uid: 6eb70d07
 id: oa.notify.cc.config
 parent: oa.notify.cc
-state: planned
 name: {zh: "抄送人配置", en: "CC Configuration"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       CC sources: initiator selection plus template-fixed CC configured in the designer; both are merged and de-duplicated at submission. CC recipients are read-only and get no task.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.393Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.360Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

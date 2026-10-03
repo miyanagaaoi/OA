@@ -2,7 +2,6 @@
 uid: cc7892c4
 id: oa.admin.boundary.guard.verdict
 parent: oa.admin.boundary.guard
-state: planned
 name: {zh: "已批单据结果冻结", en: "Verdict Freeze"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Freezes the verdict of approved documents while still allowing the administrator to terminate an in-flight process with a reason or reassign a task, both of which are audited.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.279Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.251Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

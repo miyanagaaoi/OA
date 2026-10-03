@@ -2,7 +2,6 @@
 uid: 18e089e0
 id: oa.workflow.definition.approver-rule
 parent: oa.workflow.definition
-state: planned
 name: {zh: "审批人解析规则声明", en: "Approver Rule Declaration"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Declares and validates the node's approver_rule and approver_param: dept_leader/department_leader/finance_leader/company_exec/gm/group_dept_leader/group_dept/group_exec/chairman/designated/initiator_pick; designated requires user_ids or role_code. Only the rule code is declared here — resolution runs at submission in the approver module (REQ-FLOW-011).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.434Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.402Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

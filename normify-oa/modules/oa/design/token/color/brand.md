@@ -2,7 +2,6 @@
 uid: 64de20c8
 id: oa.design.token.color.brand
 parent: oa.design.token.color
-state: planned
 name: {zh: "品牌与强调色令牌", en: "Brand & Accent Tokens"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Brand and accent values: primary, primary-hover, primary-active, primary-subtle, primary-border and on-primary, plus the group logo spec (transparent 180×147 artwork used at 28×28 in the drawer header, 44×44 on the sign-in page and 8mm tall in the print footer). The corporate blue is whitelisted to exactly four uses: primary button fill, text links, focus ring and the current selection.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.333Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.303Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

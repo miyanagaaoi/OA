@@ -2,7 +2,6 @@
 uid: 6203dda3
 id: oa.design.token.color
 parent: oa.design.token
-state: planned
 name: {zh: "颜色令牌", en: "Color Tokens"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Every colour token: brand and accent (the single corporate blue), the four-step surface ladder with two hairlines, four levels of ink, the sidebar inverse set, the five semantic status colours and the overlay and focus ring; each colour has an explicit responsibility boundary, and crossing it is the most common review rejection.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.333Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.303Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

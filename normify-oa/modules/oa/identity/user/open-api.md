@@ -2,7 +2,6 @@
 uid: 0f5ed48d
 id: oa.identity.user.open-api
 parent: oa.identity.user
-state: planned
 name: {zh: "人员只读查询接口", en: "User Read-only Query API"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Internal read-only user queries (name, employee number, org, employment status) reused by the portal, directory and integration surface; sensitive fields such as phone numbers are excluded (the public open prefix belongs to the integration branch).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.382Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.351Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

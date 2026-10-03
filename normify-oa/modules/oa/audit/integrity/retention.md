@@ -2,7 +2,6 @@
 uid: 23ece1ca
 id: oa.audit.integrity.retention
 parent: oa.audit.integrity
-state: planned
 name: {zh: "保留期策略", en: "Retention Policy"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Audit logs and approval trails are retained ten years or more and login logs one year; expired data may only enter the archive flow, never physical deletion in phase one, and retention changes are themselves logged.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.308Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.279Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

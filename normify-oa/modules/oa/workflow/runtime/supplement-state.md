@@ -2,7 +2,6 @@
 uid: 4545b0da
 id: oa.workflow.runtime.supplement-state
 parent: oa.workflow.runtime
-state: planned
 name: {zh: "待补件子状态与回跳", en: "Awaiting-Supplement Sub-State"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       "Awaiting supplement" is an instance sub-status rather than a rejection: on entry sub_status=supplement, the current node waits, its tasks can no longer be approved and the initiator is notified; only attachments and notes stay writable (main fields read-only), submission returns to the requesting node and the round never counts as a rejection (REQ-FLOW-023).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.452Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.420Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

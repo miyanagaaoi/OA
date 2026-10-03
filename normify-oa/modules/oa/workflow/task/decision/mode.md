@@ -2,7 +2,6 @@
 uid: 11a75654
 id: oa.workflow.task.decision.mode
 parent: oa.workflow.task.decision
-state: planned
 name: {zh: "或签/会签/依次审批", en: "Any-sign / Countersign / Sequential"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       How the three modes decide a node: any-sign passes on the first approval and closes the rest; countersign accumulates approvals and rejects the node on any rejection; sequential dispatches in configured order and requires all to approve. The mode is frozen into the node instance at submission time.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.458Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.425Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

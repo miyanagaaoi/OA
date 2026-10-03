@@ -2,7 +2,6 @@
 uid: bbd9880d
 id: oa.design.print.group-sheet.signature-block
 parent: oa.design.print.group-sheet
-state: planned
 name: {zh: "多轮签名栏", en: "Multi-Round Signature Bands"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The fund sheet's three-part signature block (group function department / group line leader / chairman), each with a blank signature line and date. Formal A4 printouts always leave the signature area blank for handwriting; only the on-screen preview shows the signed thumbnail with its timestamp. The print sheet keeps the paper form's label "group function department" even though Finance is the single owner.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.331Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.301Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

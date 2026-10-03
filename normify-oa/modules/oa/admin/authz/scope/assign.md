@@ -2,7 +2,6 @@
 uid: 690f4178
 id: oa.admin.authz.scope.assign
 parent: oa.admin.authz.scope
-state: planned
 name: {zh: "角色数据域设置", en: "Role Data Scope"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Sets the data_scope value of a role among the five allowed values and keeps the role's group/company level consistent with it.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.274Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.244Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/data-model.md"

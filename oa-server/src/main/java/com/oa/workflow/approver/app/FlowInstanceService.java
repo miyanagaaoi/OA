@@ -79,9 +79,11 @@ public class FlowInstanceService {
     private final AuditLogWriter auditLogWriter;
     private final com.oa.form.template.schema.FormSchemaService formSchemaService;
     private final com.oa.form.app.FormDataService formDataService;
+    private final com.oa.workflow.runtime.infra.FlowRuntimeMapper runtimeMapper;
     private final Long financeDeptId;
     private final String financeDeptName;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public FlowInstanceService(ApproverPrecheckService precheckService,
                                ApproverDirectory directory,
                                FlowInstanceMapper instanceMapper,
@@ -90,6 +92,7 @@ public class FlowInstanceService {
                                AuditLogWriter auditLogWriter,
                                com.oa.form.template.schema.FormSchemaService formSchemaService,
                                com.oa.form.app.FormDataService formDataService,
+                               com.oa.workflow.runtime.infra.FlowRuntimeMapper runtimeMapper,
                                com.oa.common.config.OaProperties properties) {
         this.precheckService = precheckService;
         this.directory = directory;
@@ -99,6 +102,7 @@ public class FlowInstanceService {
         this.auditLogWriter = auditLogWriter;
         this.formSchemaService = formSchemaService;
         this.formDataService = formDataService;
+        this.runtimeMapper = runtimeMapper;
         this.financeDeptId = properties.getScope().getFinanceDeptId();
         this.financeDeptName = properties.getScope().getFinanceDeptName() == null
                 ? "财务部" : properties.getScope().getFinanceDeptName();
@@ -270,10 +274,60 @@ public class FlowInstanceService {
         return ApproverSnapshotCodec.read(instance.getApproverSnapshotJson());
     }
 
-    /** 实例详情（含快照）。 */
+    /**
+     * 实例详情（含快照）+ <b>抄送「打开详情即已读」</b>。
+     *
+     * <h2>为什么已读写入挂在这里（AC-54 / TC-MSG-004）</h2>
+     * <p>真源原文：{@code doc/test-cases.md} TC-MSG-004 步骤③「{@code flow_cc.read_at}
+     * **在打开详情后**写入，已读时间可查」；{@code doc/prd-0.1.md} AC-54「抄送只读不产生待办：
+     * 抄送人可见单据但待办数为 0，**已读时间可查**」。而 {@code doc/forms.md} / PRD 没有
+     * 「显式已读按钮」这一交互，抄送列表本身也不产生待办，因此「打开详情」是唯一可观测的
+     * 已读时点 —— 本方法即 {@code GET /api/v1/flow-instances/{instanceId}}（前端详情页
+     * {@code TaskDetailView} 的首个请求）的落点。
+     *
+     * <h2>四条不可回退的纪律</h2>
+     * <ol>
+     *   <li><b>只写抄送人本人、只写这一张单</b>：{@code markCcRead} 的 WHERE 是
+     *       {@code instance_id = ? AND user_id = 当前登录人 AND read_at IS NULL}，
+     *       非抄送人命中 0 行（不影响任何行）；</li>
+     *   <li><b>幂等</b>：{@code read_at IS NULL} 守卫保证重复打开**不覆盖**首次已读时间；</li>
+     *   <li><b>不削弱数据域 / 权限</b>：入口闸门（{@code requireInitiator}）与域内判定
+     *       （{@link #requireInstance} → {@code @dataScope} 织入，域外 404）**都在本调用之前**，
+     *       域外请求根本走不到写已读这一步；</li>
+     *   <li><b>不改任何可见性</b>：{@code flow_cc} 本就不是受控表，本写入不参与任何
+     *       列表 / 详情 / 导出的可见性判定（{@code flow_cc} 的可见性依附于实例的数据域过滤）。</li>
+     * </ol>
+     * <p>写入失败不影响读：这里是「读详情的副作用」，异常向上抛会让「抄送人打不开详情」，
+     * 与 AC-54 的「可读」相反；因此只记 WARN 留痕（不静默 —— WARN 里有 instanceId/userId）。
+     */
     public InstanceView detail(Long instanceId) {
-        permissionService.requireInitiator("查看审批单");
-        return toView(requireInstance(instanceId));
+        CurrentUser actor = permissionService.requireInitiator("查看审批单");
+        FlowInstanceRow instance = requireInstance(instanceId);
+        markCcRead(instanceId, actor);
+        return toView(instance);
+    }
+
+    /**
+     * 抄送已读写入（仅抄送人本人命中；幂等；域外请求在此之前已被 404 拦下）。
+     *
+     * @return 实际被置位 {@code read_at} 的行数（0 或 1）
+     */
+    public int markCcRead(Long instanceId, CurrentUser actor) {
+        if (instanceId == null || actor == null || actor.id() == null) {
+            return 0;
+        }
+        try {
+            int updated = runtimeMapper.markCcRead(instanceId, actor.id());
+            if (updated > 0) {
+                log.info("抄送已读：instanceId={} userId={}（打开详情写入 read_at，幂等不覆盖；AC-54 / TC-MSG-004）",
+                        instanceId, actor.id());
+            }
+            return updated;
+        } catch (RuntimeException ex) {
+            log.warn("抄送已读写入失败（不影响详情读取）：instanceId={} userId={} 原因={}",
+                    instanceId, actor.id(), ex.getMessage());
+            return 0;
+        }
     }
 
     /** 实例列表（可按模板/版本/状态/发起人过滤；**数据域过滤**）。 */

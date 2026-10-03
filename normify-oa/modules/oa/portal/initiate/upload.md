@@ -2,7 +2,6 @@
 uid: 1e9849c5
 id: oa.portal.initiate.upload
 parent: oa.portal.initiate
-state: planned
 name: {zh: "附件上传块", en: "Attachment Upload Block"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A block-style upload button with capacity copy (at most 30 files, 500MB each) instead of a large dashed drop zone; uploaded files appear as list rows (icon, name, size, delete) with no image thumbnail grid; over-limit uploads state the exact cap, and supplement attachments carry their round number.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.417Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.386Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

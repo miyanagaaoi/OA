@@ -2,7 +2,6 @@
 uid: 4a4144e6
 id: oa.admin.flow.template.publish
 parent: oa.admin.flow.template
-state: planned
 name: {zh: "版本发布", en: "Versioned Publishing"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Versioned publishing: each change creates a new version, already-started instances keep executing on the version and approver snapshot captured at initiation, and disabling a template leaves in-flight instances untouched.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.290Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.261Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

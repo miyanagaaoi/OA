@@ -2,7 +2,6 @@
 uid: a0b13abf
 id: oa.design.component.data-display
 parent: oa.design.component
-state: planned
 name: {zh: "数据展示", en: "Data Display"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The data display family: table as the default list form, status-pill badges, tag labels, workflow-step nodes, pagination, tabs and the empty state; the first question for any list is whether it can be a table, with only H5 and card-style portals excepted.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.328Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.297Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

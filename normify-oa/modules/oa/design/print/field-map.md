@@ -2,7 +2,6 @@
 uid: cd4adb51
 id: oa.design.print.field-map
 parent: oa.design.print
-state: planned
 name: {zh: "打印字段标签映射", en: "Print Field Label Map"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Print labels come from printLabel on each field of the template's form_schema_json (falling back to the interface label) and printVisible (true by default, switchable off for internal notes); the first release fixes mappings such as category to matter classification, amount to requested or contract amount, the two period fields merged into one contract-term cell and counterparty to party B; the attachment list names files and marks supplement rounds.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.330Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.300Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

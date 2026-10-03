@@ -10,8 +10,8 @@ description:
   en: >
       User profiles and login accounts: name, employee number (for watermarking), primary org and company, position, employment status, salted password hash and encrypted phone; phones are never stored in clear text.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.382Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.351Z"
 fingerprint: 02c79bef5b526c09d9b17ac2bb5a55cdff4a11759e5c538d9f8df8b95cd4948f
 source:
   - path: "doc/data-model.md"

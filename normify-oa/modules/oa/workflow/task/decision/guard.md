@@ -2,7 +2,6 @@
 uid: 1241a0a4
 id: oa.workflow.task.decision.guard
 parent: oa.workflow.task.decision
-state: planned
 name: {zh: "决议前置校验", en: "Decision Pre-checks"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Pre-checks before a decision is recorded: rejections require an opinion of at least five characters (no blank rejection); a person appearing several times in one node is deduplicated into a single candidate and task; the same person approving several sequential nodes is handled node by node, not merged.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.458Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.424Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

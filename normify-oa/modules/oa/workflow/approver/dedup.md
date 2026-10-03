@@ -2,7 +2,6 @@
 uid: "33800628"
 id: oa.workflow.approver.dedup
 parent: oa.workflow.approver
-state: planned
 name: {zh: "候选人去重与合并策略", en: "Candidate Dedup & Merge Policy"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Automatically de-duplicates a person appearing multiple times inside one node (multi-post or multi-org assignments); when the same person approves several sequential nodes the default is one approval per node with no automatic merging unless the designer explicitly configures it.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.432Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.399Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -78,7 +78,8 @@ class FlowInstancePrecheckGateTest {
 
         service = new FlowInstanceService(precheckService, mock(ApproverDirectory.class), instanceMapper,
                 mock(FlowTemplateMapper.class), gate, mock(AuditLogWriter.class),
-                mock(FormSchemaService.class), mock(FormDataService.class), new OaProperties());
+                mock(FormSchemaService.class), mock(FormDataService.class),
+                mock(com.oa.workflow.runtime.infra.FlowRuntimeMapper.class), new OaProperties());
 
         DataScopeContext.set(DataScopeContext.builder()
                 .principal(CurrentUser.of(INITIATOR_ID, "dev_em01", "员工甲", "D0001", 135L, 12L,
@@ -165,7 +166,8 @@ class FlowInstancePrecheckGateTest {
         when(directory.orgByName(anyString())).thenReturn(java.util.Optional.empty());
         FlowInstanceService realService = new FlowInstanceService(precheckService, directory,
                 instanceMapper, mock(FlowTemplateMapper.class), new WorkflowPermissionService(permissions),
-                mock(AuditLogWriter.class), schemaService, formDataService, new OaProperties());
+                mock(AuditLogWriter.class), schemaService, formDataService,
+                mock(com.oa.workflow.runtime.infra.FlowRuntimeMapper.class), new OaProperties());
 
         when(instanceMapper.insertFormData(any(FormDataRow.class))).thenAnswer(invocation -> {
             FormDataRow row = invocation.getArgument(0);

@@ -2,7 +2,6 @@
 uid: 51cb6861
 id: oa.form.dict.contract-type
 parent: oa.form.dict
-state: planned
 name: {zh: "合同类型字典", en: "Contract Type Dictionary"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Contract type `contract_type`: purchase, sales, service, lease, construction, labor and other (other requires the `contract_type_other` note).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.341Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.309Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

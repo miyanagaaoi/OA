@@ -29,6 +29,9 @@ import java.util.Map;
  */
 public final class FormFieldDef {
 
+    /** 规则节点里的类型键（出参里与「参数键」区分开）。 */
+    private static final String RULE_TYPE_KEY = "type";
+
     private final String code;
     private final String label;
     private final String printLabel;
@@ -298,7 +301,77 @@ public final class FormFieldDef {
             ruleTypes.add(text(rule, "type"));
         }
         view.put("rules", ruleTypes);
+        // 规则**参数**（2026-10-05 追加）：`rules` 只给类型名，前端拿不到 `pickerLimit.max`、
+        // `filePolicy.maxCount`、`conditionalRequired.when` 这些**模板已经声明**的约束，只能按服务端
+        // 默认值兜底或让用户试错。新增 `ruleDetails` 与 `rules` **下标一一对应**（`ruleDetails[i].type == rules[i]`），
+        // 逐条**如实转写**模板声明的键（含 `message`），不注入任何默认值、不臆造模板未声明的键。
+        view.put("ruleDetails", ruleDetailsView());
         return view;
+    }
+
+    /**
+     * {@code ruleDetails[]}：与 {@link #rules()} 下标一一对应的规则明细。
+     *
+     * <h2>为什么是「新增键」而不是把 {@code rules} 改成对象数组</h2>
+     * <p>{@code rules} 现有的形状是**字符串数组**（规则类型名），既有调用方按
+     * {@code rules.includes("pickerLimit")} 的语义读取；改成对象数组等于删改既有契约。
+     * 因此保持 {@code rules} 一字不动，另加 {@code ruleDetails}。
+     *
+     * <h2>取值口径（如实转写，不补默认）</h2>
+     * <ul>
+     *   <li>每条 = {@code {"type": 规则类型}} + 模板在该规则上**声明的全部其它键**（原样，含 {@code message}）；</li>
+     *   <li>嵌套条件对象（如 {@code conditionalRequired.when}）与数组（如 {@code filePolicy.allowExt}）
+     *       递归转成普通 JSON 值，前端可直接读；</li>
+     *   <li><b>不注入服务端默认值</b>：模板没声明 {@code pickerLimit.max} 时这里就**没有** {@code max} 键
+     *       （此时生效的是服务端默认 {@code FormPayloadValidator.PICKER_MAX_DEFAULT}，属另一层口径，
+     *       若在这里补一个「看起来像模板声明」的值，会把默认值伪装成模板事实）；</li>
+     *   <li>整数按 {@code Long} 出参，定点/大数以**字符串**出参（与 {@code amountRange}「金额禁浮点、
+     *       以字符串定点数表达」的既有口径一致）。</li>
+     * </ul>
+     */
+    private List<Map<String, Object>> ruleDetailsView() {
+        List<Map<String, Object>> details = new ArrayList<>();
+        for (JsonNode rule : rules) {
+            Map<String, Object> detail = new LinkedHashMap<>();
+            detail.put("type", text(rule, "type"));
+            rule.fields().forEachRemaining(entry -> {
+                if (!RULE_TYPE_KEY.equals(entry.getKey())) {
+                    detail.put(entry.getKey(), ruleValue(entry.getValue()));
+                }
+            });
+            details.add(detail);
+        }
+        return details;
+    }
+
+    /** 规则参数的 JSON → 普通出参值（对象/数组递归；定点数以字符串表达）。 */
+    private static Object ruleValue(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        if (node.isBoolean()) {
+            return node.asBoolean();
+        }
+        if (node.isIntegralNumber()) {
+            // int 范围用 Integer（与 maxLength / templateVersion 等既有出参同为 JSON 数字）；
+            // 超出 int 的整数按 Long 出参（本工程 JacksonConfig 把 Long 序列化成字符串，
+            // 与 id 一族同口径，避免 JS 精度丢失）。
+            return node.canConvertToInt() ? (Object) node.asInt() : (Object) node.asLong();
+        }
+        if (node.isNumber()) {
+            return node.asText();
+        }
+        if (node.isArray()) {
+            List<Object> items = new ArrayList<>();
+            node.forEach(item -> items.add(ruleValue(item)));
+            return items;
+        }
+        if (node.isObject()) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            node.fields().forEachRemaining(entry -> map.put(entry.getKey(), ruleValue(entry.getValue())));
+            return map;
+        }
+        return node.asText();
     }
 
     private static Object javaValue(JsonNode node) {

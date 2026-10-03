@@ -2,7 +2,6 @@
 uid: 2d746dee
 id: oa.form.matter.fields.basic
 parent: oa.form.matter.fields
-state: planned
 name: {zh: "基础信息字段组", en: "Basic Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Matter title `title` (text ≤60, required, read-only after initiation), category `category` (select, configuration item, not re-classifiable after submission) and description `description` (textarea ≤2000, ≥10 characters); all three become read-only after submission.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.348Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.318Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

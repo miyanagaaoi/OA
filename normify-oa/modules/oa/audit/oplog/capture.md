@@ -2,7 +2,6 @@
 uid: 01690f2c
 id: oa.audit.oplog.capture
 parent: oa.audit.oplog
-state: planned
 name: {zh: "操作日志写入", en: "Operation Log Writer"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Single ingestion entry for the operation log: records actor, timestamp, source IP and user agent, target type and ID, and action code, appending only to sys_log with no update or delete.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.309Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.280Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

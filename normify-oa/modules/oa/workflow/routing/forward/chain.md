@@ -2,7 +2,6 @@
 uid: 2c404555
 id: oa.workflow.routing.forward.chain
 parent: oa.workflow.routing.forward
-state: planned
 name: {zh: "连续流转链", en: "Continuous Routing Chain"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Supports continuous routing A-B-C: each hop increments flow_routing.seq and the instance routing counters, updates the current receiving department, marks the current node instance approved and creates tasks for the leader of the new department. The chain remains visible to approvers.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.445Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.411Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

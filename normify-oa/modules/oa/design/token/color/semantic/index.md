@@ -2,7 +2,6 @@
 uid: "81408085"
 id: oa.design.token.color.semantic
 parent: oa.design.token.color
-state: planned
 name: {zh: "状态语义色", en: "Semantic Status Colors"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The five semantic status colours (success, warning, error, info, neutral), each paired with a light surface; they apply only to status badges, flow nodes, risk notices and validation messages, never to decorative categorisation, and badges are always light fill with a same-hue dark text rather than a saturated block.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.334Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.304Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

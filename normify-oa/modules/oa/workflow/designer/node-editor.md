@@ -2,7 +2,6 @@
 uid: 1e6f393f
 id: oa.workflow.designer.node-editor
 parent: oa.workflow.designer
-state: planned
 name: {zh: "节点属性面板", en: "Node Property Panel"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Designer node property panel: choose the approver rule, configure decision mode and pass threshold, mandatory signature, timeout hours and the add-sign/jump switches, forwarded uniformly to the node behavior config and rule declaration (REQ-FLOW-008).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.440Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.406Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -2,7 +2,6 @@
 uid: 0d27ae7e
 id: oa.workflow.definition.node-behavior.decision
 parent: oa.workflow.definition.node-behavior
-state: planned
 name: {zh: "决议模式与通过阈值", en: "Decision Mode & Pass Threshold"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Writes and resolves decision_mode (any-sign default / countersign / sequential) and pass_threshold (percentage such as "50%" or absolute such as "2"; absolute wins when both are set). The post-rejection destination is fixed to "back to the initiator" in phase 1, with no per-node configuration (any one rejection in a countersign/collaboration task rejects that node; per-node reject routing belongs to phase 2; see doc/prd-0.1.md §5.4).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.436Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.403Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

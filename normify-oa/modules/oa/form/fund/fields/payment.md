@@ -2,7 +2,6 @@
 uid: 426503a2
 id: oa.form.fund.fields.payment
 parent: oa.form.fund.fields
-state: planned
 name: {zh: "支付字段组", en: "Payment Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Payment method `pay_method` (select per 6.2), planned pay date `pay_date` (date not earlier than today), linked contract number `contract_ref` (text ≤40, must be an approved document number when present) and urgency `urgent` (boolean, defaults to no; yes enables the urgent marker and higher reminder frequency).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.345Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.315Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

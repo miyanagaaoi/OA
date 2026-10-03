@@ -2,7 +2,6 @@
 uid: 3bc091c4
 id: oa.workflow.routing.visibility
 parent: oa.workflow.routing
-state: planned
 name: {zh: "流转可见性", en: "Routing Visibility"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A receiving department can see the document: the flow_routing chain is itself the basis for routing visibility, so every department the document has been routed to (and the current receiving department) may read it. Other departments and cc recipients stay read-only and may not approve.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.448Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.416Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

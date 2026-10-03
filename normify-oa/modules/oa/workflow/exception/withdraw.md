@@ -2,7 +2,6 @@
 uid: 6e7f21b0
 id: oa.workflow.exception.withdraw
 parent: oa.workflow.exception
-state: planned
 name: {zh: "撤回", en: "Withdraw"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Only the initiator may withdraw. The window is a template-level setting (flow_template.withdraw_window, templates.md 1.8): the default until_finance_approved allows withdrawal until the finance node (node 2) approves, node 2 in approval included (REQ-FLOW-009); the optional until_finance_started allows it only before node 2 starts (strict AC-16). The engine reads it from the version locked at instance creation, so edits never affect in-flight documents (AC-09).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.444Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.409Z"
 fingerprint: 8d16cf2ade0b836c969a1d24ebfe8370cf368f4e374aabc5aa266a360273d630
 source:
   - path: "doc/prd-0.1.md"

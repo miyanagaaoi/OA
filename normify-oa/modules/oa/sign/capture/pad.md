@@ -2,7 +2,6 @@
 uid: 00caf7fd
 id: oa.sign.capture.pad
 parent: oa.sign.capture
-state: planned
 name: {zh: "签名面板交互", en: "Signature Pad UI"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The signature pad for mobile H5 and desktop: tapping sign-confirm opens a canvas supporting touch and mouse drawing, undo and clear; stroke points (with time and pressure) are captured and handed to the stroke renderer.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.424Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.391Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

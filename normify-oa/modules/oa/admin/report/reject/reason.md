@@ -2,7 +2,6 @@
 uid: b60f8ec7
 id: oa.admin.report.reject.reason
 parent: oa.admin.report.reject
-state: planned
 name: {zh: "驳回原因分布", en: "Rejection Reason Mix"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Aggregates rejection reasons captured in approval opinions into a distribution, so recurring rejection causes can be fixed at the source.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.298Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.270Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

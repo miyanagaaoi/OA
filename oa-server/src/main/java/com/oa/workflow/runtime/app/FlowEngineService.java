@@ -1649,12 +1649,37 @@ public class FlowEngineService {
                 SupplementDeadlinePolicy.executionTodo());
     }
 
+    /**
+     * <b>统一动作结果</b>：三层状态（实例 / 节点 / 任务）一律回显**动作后**的库中值。
+     *
+     * <h2>为什么必须重新读库（2026-10-05 修正）</h2>
+     * <p>改前本方法只把**实例**重新读了一遍（{@code fresh}），任务却直接用入参 {@code task}
+     * —— 那是 {@code requireTask} 在动作**之前**取的快照。于是 {@code POST /flow-tasks/{id}/approve}
+     * 的响应回 {@code taskStatus:"pending"}，而库里（以及「我已审批」列表、运行态视图）是
+     * {@code agreed}：**同一事实两处不一致**，客户端只能靠「再查一次」纠正，且会把「刚办完」
+     * 误判成「还没办」。节点状态同理：改前虽已是重新读库（{@code selectNodeInstanceById}），
+     * 但读的是**入参 task 的** {@code node_instance_id}，一旦任务被重新读取就必须同源。
+     *
+     * <p>四条口径：
+     * <ol>
+     *   <li><b>任务</b>：按 id 重新读（{@code selectTaskById}，走调用人数据域，与
+     *       {@code requireTask} 同一语句），回显其 {@code status}；</li>
+     *   <li><b>实例</b>：{@code requireInstance} 重新读（动作后状态 / 当前节点序号 / 子状态）；</li>
+     *   <li><b>节点</b>：按**重新读取后的任务**的 {@code node_instance_id} 读节点实例
+     *       （动作后状态：{@code active} / {@code finished} / …）；任务为 {@code null}
+     *       （如补件提交）或读不到时，退回「实例当前节点中的 active 节点」；</li>
+     *   <li><b>读不到就退回动作前快照并记 WARN</b>：不静默返回 {@code null} 字段
+     *       （那会把既有字段悄悄变成空值，客户端无从判断是「无此状态」还是「读失败」）。</li>
+     * </ol>
+     * <p><b>字段名与错误码一字未改</b>：只改「值的时点」。
+     */
     private ActionResult actionResult(FlowAction action, FlowInstanceRow instance, FlowTaskRow task,
                                       String message, GateCounterPolicy.Budget budget,
                                       SupplementDeadlineView deadline) {
         FlowInstanceRow fresh = requireInstance(instance.getId());
-        FlowNodeInstanceRow node = task == null ? null
-                : nodeInstanceMapper.selectNodeInstanceById(task.getNodeInstanceId());
+        FlowTaskRow taskAfter = reloadTask(task);
+        FlowNodeInstanceRow node = taskAfter == null ? null
+                : nodeInstanceMapper.selectNodeInstanceById(taskAfter.getNodeInstanceId());
         if (node == null && fresh.getCurrentNodeSeq() != null) {
             node = nodeInstanceMapper.selectByInstanceAndSeq(fresh.getId(), fresh.getCurrentNodeSeq())
                     .stream().filter(row -> NodeStatus.ACTIVE.code().equals(row.getStatus()))
@@ -1669,11 +1694,30 @@ public class FlowEngineService {
                 fresh.getCurrentNodeSeq(),
                 node == null ? null : node.getId(),
                 node == null ? null : node.getStatus(),
-                task == null ? null : task.getId(),
-                task == null ? null : task.getStatus(),
+                taskAfter == null ? null : taskAfter.getId(),
+                taskAfter == null ? null : taskAfter.getStatus(),
                 message,
                 toGateView(budget),
                 deadline);
+    }
+
+    /**
+     * 动作后重新读取任务行（{@link #actionResult} 的唯一任务取数口）。
+     *
+     * <p>读不到（数据域过滤 / 行被并发删除）时退回动作前快照并记 WARN：既有字段仍然有值，
+     * 但「回显的是旧值」这件事必须留痕可查（不静默掩盖）。
+     */
+    private FlowTaskRow reloadTask(FlowTaskRow before) {
+        if (before == null || before.getId() == null) {
+            return before;
+        }
+        FlowTaskRow after = taskMapper.selectTaskById(before.getId());
+        if (after == null) {
+            log.warn("动作结果回显：任务 #{} 重新读取为空（数据域过滤或行已不存在），按动作前快照回显 status={}",
+                    before.getId(), before.getStatus());
+            return before;
+        }
+        return after;
     }
 
     /**

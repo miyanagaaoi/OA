@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.oa.common.error.BizException;
 import com.oa.common.error.ErrorCode;
+import com.oa.common.json.JsonText;
 import com.oa.form.FormSchemaFixtures;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -139,6 +141,86 @@ class FormSchemaParserTest {
         assertThat(involveCost)
                 .as("doc/forms.md §10：involve_cost 不占独立字段行（printVisible=false）")
                 .containsEntry("printVisible", false);
+    }
+
+    // ================================================================ 规则参数出参（rules / ruleDetails）
+
+    @Test
+    @DisplayName("字段摘要出参的规则：既有 rules（类型名数组）不变，新增 ruleDetails 如实给出模板声明的参数")
+    void fieldViewCarriesRuleParameters() {
+        Map<String, Object> view = FormSchemaFixtures.schema("matter").field("cc_users").orElseThrow().view();
+
+        // ① 既有形状一字未改（不得删改既有字段）
+        assertThat(view.get("rules")).as("既有形状：规则类型名数组").isEqualTo(java.util.List.of("pickerLimit"));
+
+        // ② 新增：规则参数（模板里 cc_users 声明 {"type":"pickerLimit","max":20,"message":"抄送人最多选择 20 人"}）
+        List<Map<String, Object>> details = ruleDetails(view);
+        assertThat(details).hasSize(1);
+        assertThat(details.get(0))
+                .containsEntry("type", "pickerLimit")
+                .containsEntry("max", 20)
+                .containsEntry("message", "抄送人最多选择 20 人");
+        assertThat(details.get(0).get("type"))
+                .as("ruleDetails 与 rules **下标一一对应**").isEqualTo(((List<?>) view.get("rules")).get(0));
+    }
+
+    @Test
+    @DisplayName("规则参数：模板声明 5 则出参 5；**未声明就不出该键**（不把服务端默认值伪装成模板事实）")
+    void ruleDetailsMirrorOnlyWhatTheTemplateDeclares() {
+        FormFieldDef declared = FormFieldDef.from(JsonText.read("{\"code\":\"cc_users\",\"label\":\"抄送人\","
+                + "\"type\":\"user\",\"rules\":[{\"type\":\"pickerLimit\",\"max\":5,\"message\":\"最多 5 人\"}]}"));
+        assertThat(ruleDetails(declared.view()).get(0))
+                .containsEntry("max", 5).containsEntry("message", "最多 5 人");
+
+        FormFieldDef undeclared = FormFieldDef.from(JsonText.read("{\"code\":\"cc_users\",\"label\":\"抄送人\","
+                + "\"type\":\"user\",\"rules\":[{\"type\":\"pickerLimit\",\"message\":\"最多 20 人\"}]}"));
+        assertThat(ruleDetails(undeclared.view()).get(0))
+                .containsEntry("type", "pickerLimit")
+                .containsEntry("message", "最多 20 人")
+                .as("未声明的 max 不出现（此时生效的是服务端默认 20，属另一层口径）")
+                .doesNotContainKey("max");
+    }
+
+    @Test
+    @DisplayName("规则参数：嵌套条件对象 / 数组 / 定点数如实转写（when、allowExt、scale）")
+    void ruleDetailsCarryNestedParameters() {
+        FormSchema matter = FormSchemaFixtures.schema("matter");
+        // cost_bearer 的 conditionalRequired 带 when 条件对象
+        List<Map<String, Object>> costBearer = ruleDetails(matter.field("cost_bearer").orElseThrow().view());
+        Map<String, Object> conditional = costBearer.stream()
+                .filter(item -> "conditionalRequired".equals(item.get("type"))).findFirst().orElseThrow();
+        assertThat(conditional.get("when")).as("嵌套条件对象递归转成普通 Map").isInstanceOf(Map.class);
+        assertThat(objectMap(conditional.get("when")))
+                .containsEntry("field", "involve_cost").containsEntry("op", "eq").containsEntry("value", true);
+        assertThat(conditional).containsEntry("message", "涉及费用时，费用承担主体为必填");
+
+        // 附件字段的 filePolicy 带数组（allowExt / denyExt）
+        FormSchema fund = FormSchemaFixtures.schema("fund");
+        Map<String, Object> filePolicy = ruleDetails(fund.field("attachments").orElseThrow().view()).stream()
+                .filter(item -> "filePolicy".equals(item.get("type"))).findFirst().orElseThrow();
+        assertThat(filePolicy.get("allowExt")).as("数组如实转成 List").isInstanceOf(List.class);
+        assertThat(stringList(filePolicy.get("allowExt"))).contains("pdf", "xlsx").doesNotContain("exe");
+        assertThat(filePolicy).containsEntry("maxSizeMb", 50).containsEntry("maxCount", 20);
+
+        // amountRange 的 scale / max
+        Map<String, Object> amountRange = ruleDetails(fund.field("amount").orElseThrow().view()).stream()
+                .filter(item -> "amountRange".equals(item.get("type"))).findFirst().orElseThrow();
+        assertThat(amountRange).containsEntry("scale", 2).containsEntry("min", "0.01");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Map<String, Object>> ruleDetails(Map<String, Object> fieldView) {
+        return (List<Map<String, Object>>) fieldView.get("ruleDetails");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> objectMap(Object value) {
+        return (Map<String, Object>) value;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> stringList(Object value) {
+        return (List<String>) value;
     }
 
     // ================================================================ 版本同步

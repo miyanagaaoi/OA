@@ -2,7 +2,6 @@
 uid: 5a6a819b
 id: oa.notify.reminder
 parent: oa.notify
-state: planned
 name: {zh: "超时催办", en: "Timeout Reminders"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Per-node timeout detection (configurable, at least 24 hours) sending in-app and email reminders, optionally copying the approver's superior; supplement deadlines remind the initiator only - never auto-skip and never auto-escalate.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.398Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.367Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

@@ -10,8 +10,8 @@ description:
   en: >
       Returns leader candidates for an org node: the section's leaders first, escalating to the parent department when none is set; an empty candidate set blocks initiation rather than being silently skipped.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.376Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.344Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

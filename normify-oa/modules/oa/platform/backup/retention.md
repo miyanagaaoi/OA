@@ -2,7 +2,6 @@
 uid: bee0db52
 id: oa.platform.backup.retention
 parent: oa.platform.backup
-state: planned
 name: {zh: "备份保留与清理", en: "Backup Retention"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Retention and cleanup rules for backup sets: thirty days of daily fulls, older sets pruned on schedule, and audit-relevant exports kept according to the ten-year retention rule.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.400Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.369Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

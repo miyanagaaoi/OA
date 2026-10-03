@@ -10,8 +10,8 @@ description:
   en: >
       Computes the writable field set per document state and blocks out-of-scope writes: while awaiting supplement all main fields are read-only and changes must go through reject → edit → resubmit; state comes from the process instance.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.370Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.338Z"
 fingerprint: 8cb8ee719ee014a8f11e4e86597e356444ff53a872cea106c704e314271bd8af
 source:
   - path: "doc/forms.md"

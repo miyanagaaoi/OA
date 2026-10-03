@@ -2,7 +2,6 @@
 uid: c7d1e091
 id: oa.design.print
 parent: oa.design
-state: planned
 name: {zh: "打印规格", en: "Print Specification"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Print specification: paper size and type area, rules that differ from the screen UI, the structural elements shared by group-level sheets, the different structure of the subsidiary internal approval sheet, headers and footers, and the measured 297mm page height constraint.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.332Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.301Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

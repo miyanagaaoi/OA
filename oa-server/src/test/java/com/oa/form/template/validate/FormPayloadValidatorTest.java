@@ -454,6 +454,124 @@ class FormPayloadValidatorTest {
         assertThat(report.passed()).as("未装配端口时跳过元素存在性，但类型/上限仍然生效").isTrue();
     }
 
+    // ================================================================ 组织选择范围 rules[orgScope]
+
+    /**
+     * 组织范围替身：公司 12 的子树 = {12 自身, 135, 138}；公司 1（集团根）= 全域；其余公司为空。
+     *
+     * <p>与生产实现 {@code FormOrgScopeChecker} 的判定同形（「公司及以下节点」= path 前缀匹配含自身），
+     * 但**不查库**：本类的目的是穷举校验器的分支（放行 / 越界 / fail-closed / 与存在性不重复报错）。
+     */
+    private static final OrgScopeChecker SCOPE = (orgId, companyId) -> {
+        if (orgId == null || companyId == null) {
+            return false;
+        }
+        if (companyId == 1L) {
+            return true;
+        }
+        if (companyId != 12L) {
+            return false;
+        }
+        return "12".equals(orgId) || "135".equals(orgId) || "138".equals(orgId);
+    };
+
+    private FormPayloadValidator withScope() {
+        return new FormPayloadValidator(new FormDictService(new InMemoryDictMapper()),
+                (scope, value) -> true, DIRECTORY, SCOPE);
+    }
+
+    /** 事项单里带 cost_bearer 的最小载荷（involve_cost=true 时该字段才可见/可填）。 */
+    private static Map<String, Object> costBearer(Object value) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("involve_cost", true);
+        payload.put("amount", "10.00");
+        payload.put("cost_bearer", value);
+        return payload;
+    }
+
+    @Test
+    @DisplayName("orgScope：本公司根 + 本公司子树内的部门/科室 → 全部通过（doc/forms.md §2「限本公司及以下节点」）")
+    void orgScopeAllowsCompanyRootAndItsSubtree() {
+        FormPayloadValidator validator = withScope();
+        FormValidationReport report = validator.validate(matter, costBearer(List.of("12", "135", "138")),
+                ValidationMode.DRAFT, TODAY, null, 12L);
+        assertThat(report.issues()).extracting(FieldIssue::rule).doesNotContain("orgScope");
+        assertThat(report.passed()).as("本公司及以下节点必须放行：%s", report.summary()).isTrue();
+    }
+
+    @Test
+    @DisplayName("orgScope：外公司节点（另一家公司及其部门）→ 拒绝，且**一次返回全部越界项**")
+    void orgScopeRejectsForeignCompanyNodes() {
+        FormPayloadValidator validator = withScope();
+        FormValidationReport report = validator.validate(matter, costBearer(List.of("12", "13", "137")),
+                ValidationMode.DRAFT, TODAY, null, 12L);
+
+        assertThat(report.issues()).extracting(FieldIssue::rule)
+                .as("越界的 13 / 137 各一条，本公司的 12 不报").containsOnly("orgScope");
+        assertThat(report.messagesOf("cost_bearer")).hasSize(2)
+                .allMatch(message -> message.contains("限本公司及以下节点"))
+                .allMatch(message -> message.contains("不在发起人所属公司及其子树内"));
+        assertThat(report.messagesOf("cost_bearer").get(0)).contains("第 2 项").contains("13");
+        assertThat(report.messagesOf("cost_bearer").get(1)).contains("第 3 项").contains("137");
+    }
+
+    @Test
+    @DisplayName("orgScope：单值形态同样判（不是只判数组）")
+    void orgScopeAppliesToSingleValue() {
+        FormPayloadValidator validator = withScope();
+        FormValidationReport report = validator.validate(matter, costBearer("137"),
+                ValidationMode.DRAFT, TODAY, null, 12L);
+        assertThat(report.messagesOf("cost_bearer")).singleElement()
+                .asString().contains("第 1 项").contains("137").contains("不在发起人所属公司及其子树内");
+    }
+
+    @Test
+    @DisplayName("orgScope：集团口径（companyId=1）时本公司子树 = 全域 → 不误伤（真源：集团层账号 company_id 指向集团根）")
+    void orgScopeAllowsEverythingUnderGroupNode() {
+        FormPayloadValidator validator = withScope();
+        FormValidationReport report = validator.validate(matter, costBearer(List.of("12", "13", "137")),
+                ValidationMode.DRAFT, TODAY, null, 1L);
+        assertThat(report.passed()).as("集团节点的子树包含全部公司：%s", report.summary()).isTrue();
+    }
+
+    @Test
+    @DisplayName("orgScope：发起人无公司（companyId 为空）→ **fail-closed 拒绝**，文案说明范围不可判定")
+    void orgScopeIsFailClosedWithoutInitiatorCompany() {
+        FormPayloadValidator validator = withScope();
+        FormValidationReport report = validator.validate(matter, costBearer("13"),
+                ValidationMode.DRAFT, TODAY, null, null);
+        assertThat(report.messagesOf("cost_bearer")).singleElement()
+                .asString().contains("无法确定发起人所属公司").contains("已拒绝");
+        assertThat(report.issues()).extracting(FieldIssue::rule).containsExactly("orgScope");
+    }
+
+    @Test
+    @DisplayName("orgScope：不存在/停用的节点只报 pickerValue 一条（不叠加 orgScope，避免同一元素两条重叠错误）")
+    void orgScopeDoesNotDuplicateExistenceFailure() {
+        FormPayloadValidator validator = withScope();
+        // 999：DIRECTORY.known 判为不存在（>=900 视作未知）；13：存在但越界
+        FormValidationReport report = validator.validate(matter, costBearer(List.of("999", "13")),
+                ValidationMode.DRAFT, TODAY, null, 12L);
+
+        assertThat(report.issues()).extracting(FieldIssue::rule)
+                .containsExactlyInAnyOrder("pickerValue", "orgScope");
+        List<String> messages = report.messagesOf("cost_bearer");
+        assertThat(messages.stream().filter(message -> message.contains("999")))
+                .as("不存在的节点只有 pickerValue 一条").hasSize(1);
+        assertThat(messages.stream().filter(message -> message.contains("999")))
+                .singleElement().asString().contains("不是有效的组织节点");
+        assertThat(messages.stream().filter(message -> message.contains("13")))
+                .singleElement().asString().contains("不在发起人所属公司及其子树内");
+    }
+
+    @Test
+    @DisplayName("orgScope：端口未装配（offline）→ 跳过并记 WARN，不静默变成「永远拒绝」")
+    void orgScopeIsSkippedWhenPortMissing() {
+        FormValidationReport report = validator.validate(matter, costBearer("137"),
+                ValidationMode.DRAFT, TODAY, null, 12L);
+        assertThat(report.passed()).as("未装配 orgScope 端口时不判范围：%s", report.summary()).isTrue();
+    }
+
     // ================================================================ 夹具
 
     private Map<String, Object> fundPayload(Object amount) {

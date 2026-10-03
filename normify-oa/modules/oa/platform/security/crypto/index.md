@@ -2,7 +2,6 @@
 uid: 8eeb66d8
 id: oa.platform.security.crypto
 parent: oa.platform.security
-state: planned
 name: {zh: "敏感字段加密", en: "Sensitive Field Encryption"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Passwords are stored as salted hashes and phone numbers are encrypted at rest with managed keys and a rotation procedure, while list responses keep masked values.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.405Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.373Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

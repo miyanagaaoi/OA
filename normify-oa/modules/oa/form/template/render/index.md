@@ -2,7 +2,6 @@
 uid: 0ce72e0e
 id: oa.form.template.render
 parent: oa.form.template
-state: planned
 name: {zh: "字段驱动渲染", en: "Schema-Driven Rendering"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Renders forms from `flow_template.form_schema_json`: type-to-control mapping and field linkage evaluation (visibility, requiredness, value derivation). The front end hardcodes no fields; all four document types share one renderer.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.362Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.331Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

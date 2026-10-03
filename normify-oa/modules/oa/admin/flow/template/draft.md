@@ -2,7 +2,6 @@
 uid: 4897a70b
 id: oa.admin.flow.template.draft
 parent: oa.admin.flow.template
-state: planned
 name: {zh: "模板草稿编辑", en: "Template Draft Editing"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Creates and edits flow template drafts, including node list and ordering, and hands the layout to the graphical designer; unpublished drafts can be deleted outright.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.289Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.260Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

@@ -25,7 +25,8 @@ import java.util.regex.Pattern;
  *       ，另接受子状态 {@code pending_supplement}（待补件）</td>
  *       <td>{@code i.status} / {@code i.sub_status}</td></tr>
  *   <tr><td>{@code dateFrom} / {@code dateTo}</td><td>起止日期（{@code YYYY-MM-DD}，含首含尾）</td>
- *       <td>{@code i.created_at}（**发起时间**，四个端点同义）</td></tr>
+ *       <td><b>按列表各自的时间轴</b>：待我审批 / 我发起的 / 抄送我的 = {@code i.created_at}
+ *       （**发起时间**）；我已审批 = {@code t.decided_at}（**我处理该任务的时间**，2026-10-05 裁定）</td></tr>
  * </table>
  *
  * <h2>为什么做成值对象而不是散装 {@code @RequestParam}</h2>
@@ -42,9 +43,14 @@ import java.util.regex.Pattern;
  * <p>非法 {@code formType} / {@code status} / 日期一律抛 400 {@link ErrorCode#PARAM_INVALID}
  * 并给出**合法取值清单**（不静默忽略：静默忽略会让用户以为筛选生效、实际看到的是全量）。
  *
- * <p><b>日期口径</b>：{@code i.created_at}（单据发起时间）对四个端点同义 ——
- * 「我发起的」没有任务维度的日期，若三个列表各按自己的时间列筛，同名参数会指向不同事实。
- * 「已办按办结时间筛」是另一种合理口径，已列入待决策。
+ * <p><b>日期口径（2026-10-05 裁定，替换此前「四个端点同义」的临时口径）</b>：
+ * 「我已审批」按 <b>{@code flow_task.decided_at}</b>（我处理该任务的时间）筛 ——
+ * 该列表回答的是「我哪天办的那张单」，与「我发起的」按发起时间筛是**两条不同的时间轴**，
+ * 同名参数因此必须由出参如实披露（{@code PageResult.dateField}：{@code decidedAt} /
+ * {@code createdAt}），否则用户「筛了却看不出按什么筛」。待我审批 / 我发起的 / 抄送我的
+ * 仍按 {@code flow_instance.created_at}（发起时间）。日期条件由
+ * {@code FlowTaskMapper.xml} 的 {@code TaskListFilters} 片段按调用方注入的日期列拼装
+ * （列名是 mapper 内部常量，不来自请求参数）。
  */
 public record TaskListFilter(String keyword, String formType, String status, String subStatus,
                              String dateFrom, String dateTo) {

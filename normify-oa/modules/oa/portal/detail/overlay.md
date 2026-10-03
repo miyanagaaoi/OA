@@ -2,7 +2,6 @@
 uid: 1fb59aab
 id: oa.portal.detail.overlay
 parent: oa.portal.detail
-state: planned
 name: {zh: "浮层详情容器", en: "Overlay Detail Container"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The centred overlay opened by clicking a list row: main form 2fr against approval record 1fr; the scrim is a fixed 40% black and the overlay closes on scrim click or Esc; closing with unsaved content asks for a second confirmation; no permanent detail column, and closing returns to the same table position.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.409Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.376Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "doc/prd-0.1.md"

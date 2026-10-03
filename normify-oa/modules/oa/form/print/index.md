@@ -2,7 +2,6 @@
 uid: 3e4c6f5b
 id: oa.form.print
 parent: oa.form
-state: planned
 name: {zh: "A4 打印稿", en: "A4 Print Sheets"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       A4 print layout for all four document types, matching the group's existing paper forms: the group contract routing sheet and fund approval sheet at group level, the internal approval sheet at subsidiary level; no colour blocks, radius or shadows, information must survive black-and-white copying, content limited to a 297mm page height.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.354Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.323Z"
 fingerprint: 7e081a86f47a253a1b802832ba2d4024203ca8e2708d91f4b7cb494bc32d861d
 source:
   - path: "doc/forms.md"

@@ -2,7 +2,6 @@
 uid: bdbe0b73
 id: oa.form.print.style-isolation
 parent: oa.form.print
-state: planned
 name: {zh: "打印样式隔离", en: "Print Style Isolation"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Sheets share data with the screen UI but never its styles: square corners everywhere, 1pt solid table rules (outer border to .6mm), no shadows or gradients, no theme colour (all black), statuses expressed as text, fixed 9.5pt/8.5pt/16pt sizes, no .btn/.card/.pill reuse, millimetre and point units for paper and margins, and nothing lost in black-and-white copying.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.356Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.325Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

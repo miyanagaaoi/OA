@@ -10,9 +10,9 @@ description:
   en: >
       One field's schema entry: field ID, label, type (text/textarea/number/amount/select/multiselect/date/daterange/user/org/tag/boolean/file/files), required (yes/no/conditional), length, validation, post-submit mutability, default and linkage. A field code is never reused once used.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.363Z"
-fingerprint: 86d61edf99bfa401baf425f4c66ec67d767fb476544a27a13f77dcd16c3a370f
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.333Z"
+fingerprint: 57d876d9a5ac43c22cbd3224ed2253b35a5d64dabc2dba6c922439c9d5144960
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/schema/FormFieldDef.java"

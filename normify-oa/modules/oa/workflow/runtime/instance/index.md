@@ -2,7 +2,6 @@
 uid: 36508cc4
 id: oa.workflow.runtime.instance
 parent: oa.workflow.runtime
-state: planned
 name: {zh: "实例状态机", en: "Instance State Machine"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       flow_instance main state machine and transition guards: draft→approving→approved/rejected/withdrawn/terminated with sub_status carrying "awaiting supplement", validating that terminal states cannot be resubmitted and enforcing the withdraw window and counter gates (REQ-FLOW-001/009/010/014/017/024).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.450Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.418Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

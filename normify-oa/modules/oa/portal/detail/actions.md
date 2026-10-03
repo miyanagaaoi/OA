@@ -2,7 +2,6 @@
 uid: 349bedb3
 id: oa.portal.detail.actions
 parent: oa.portal.detail
-state: planned
 name: {zh: "详情操作栏", en: "Detail Action Bar"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The overlay footer action bar (60px tall, buttons right-aligned): approve, reject, route to another department, revert to previous node, return to own department, request more material, terminate, transfer and print; exactly one primary button, destructive actions need a second confirmation naming action and object, and while awaiting material the document is read-only for every other role.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.407Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.375Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

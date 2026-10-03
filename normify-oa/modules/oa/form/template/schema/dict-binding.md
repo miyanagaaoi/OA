@@ -10,9 +10,9 @@ description:
   en: >
       Binds select / multiselect / checkbox fields to data dictionaries: options come from `sys_dict_item` and new options need no release; validation and printing resolve option names through the bound dictionary.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.363Z"
-fingerprint: 4c8e59c3e05f7f284d06b633ceb39d02863f6398b39ca6b7438f144cef3e22b7
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.332Z"
+fingerprint: 2499bcaea2fb92b38d2fc771e674259d5f176c1c8e1b54d87fbfc30df7f2b1ee
 source:
   - path: "doc/forms.md"
   - path: "oa-server/src/main/java/com/oa/form/template/schema/FormSchemaParser.java"

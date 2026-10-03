@@ -2,7 +2,6 @@
 uid: 7f35be6d
 id: oa.form.seal.fields.seal
 parent: oa.form.seal.fields
-state: planned
 name: {zh: "用印字段组", en: "Seal Use Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Seal type `seal_type` (select, required, values per 6.4), copy count `seal_count` (number, integer 1–999, default 1, required unless the type is certificate borrow) and external flag `is_external` (boolean, required, default no; yes raises the purpose minimum length).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.359Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.327Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

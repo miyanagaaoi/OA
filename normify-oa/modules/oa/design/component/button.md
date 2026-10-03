@@ -2,7 +2,6 @@
 uid: 94880ef4
 id: oa.design.component.button
 parent: oa.design.component
-state: planned
 name: {zh: "按钮", en: "Buttons"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The five button families: primary (exactly one per screen, corporate-blue fill with white text, 4px radius, 32px tall and 16px horizontal padding, darkening on hover and press, disabled as a primary-border fill with ink-muted text), secondary (white with a hairline-strong border), ghost (row actions in primary text), danger (destructive, with a red-on-white variant preferred for reject) and the 44px H5 primary and secondary pair.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.327Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.297Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

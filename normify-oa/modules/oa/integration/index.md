@@ -2,7 +2,6 @@
 uid: a4b3ce6c
 id: oa.integration
 parent: oa
-state: planned
 name: {zh: "接口与集成", en: "APIs & Integration"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Unified API gateway and auth. Phase one exposes read-only org/user queries (no external writes), integrates the contract system later, and standardises archive data for warehouse extraction.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.388Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.356Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

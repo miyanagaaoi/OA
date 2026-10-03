@@ -2,7 +2,6 @@
 uid: 7082b1ee
 id: oa.design.token.color.surface.ladder
 parent: oa.design.token.color.surface
-state: planned
 name: {zh: "四级表面阶梯", en: "Surface Ladder"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The four surfaces: canvas #ffffff for pages and cards (about 90% of the area), canvas-subtle #f7f8fa for table headers, read-only blocks, opinion blocks, the upload area and row hover, surface-1 #f2f4f7 for grouping containers, disabled control fills, skeletons and avatar backgrounds, and surface-2 #e6e9ef for heavier separations and the off track of a switch; used in order, never skipped.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.335Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.305Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

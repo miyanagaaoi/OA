@@ -2,7 +2,6 @@
 uid: "85102981"
 id: oa.design.token.typography
 parent: oa.design.token
-state: planned
 name: {zh: "字体与层级令牌", en: "Typography Tokens"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Font families (Inter with PingFang SC / Microsoft YaHei / Noto Sans SC fallbacks, and JetBrains Mono with Consolas for identifiers) and eleven type levels from display 28/600 to button 14/500; 14px body is the default rather than a minimum, numerals are always tabular, hierarchy comes from weight rather than size jumps and Chinese never takes negative letter-spacing.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.337Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.306Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

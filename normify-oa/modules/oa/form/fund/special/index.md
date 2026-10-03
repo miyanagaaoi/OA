@@ -2,7 +2,6 @@
 uid: 4669aeea
 id: oa.form.fund.special
 parent: oa.form.fund
-state: planned
 name: {zh: "资金单专用字段与敏感项", en: "Fund-Specific & Sensitive Fields"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Fund-only content: the plan category and payment belong checkboxes, stored but unused in phase one (Q8/Q9, never referenced by flow conditions, data-scope filters or timeout rules), plus payee-account encryption and role masking.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.346Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.316Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

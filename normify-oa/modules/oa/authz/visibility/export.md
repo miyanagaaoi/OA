@@ -10,8 +10,8 @@ description:
   en: >
       Export is restricted to system admins and amount fields cannot be exported by non-finance roles; every export is authorised up front so the UI cannot be bypassed by calling the API directly.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.323Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.292Z"
 fingerprint: 63fa18ff9ca66c0f45990c27a387c64888ebedfc529d3ac0d11ce477c6a02a5d
 source:
   - path: "oa-server/src/main/java/com/oa/authz/visibility/ExportFieldPolicy.java"

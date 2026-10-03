@@ -2,7 +2,6 @@
 uid: aa2e0263
 id: oa.form.print.structure.signature-block
 parent: oa.form.print.structure
-state: planned
 name: {zh: "签名栏", en: "Signature Blocks"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Nodes that require a signature leave a blank signature line on the sheet (signature ____ date); the fund sheet has three sections (group function department, group executives, chairman); already-signed blocks print a signature thumbnail with a timestamp, taking seals and signatures from signature records.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.356Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.324Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

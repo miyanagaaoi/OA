@@ -2,7 +2,6 @@
 uid: 3f509f47
 id: oa.archive.policy.migration
 parent: oa.archive.policy
-state: planned
 name: {zh: "整单搬迁", en: "Archive Migration"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Three stages of archive migration: batch planning, whole-document execution and result verification, so a document moves together with its trail and signatures.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.301Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.273Z"
 fingerprint: d27f073aa0b7d919258285e22376dd379c55e1e74d7e28c48440b1100569087a
 source:
   - path: "doc/data-model.md"

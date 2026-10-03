@@ -2,7 +2,6 @@
 uid: "41250139"
 id: oa.sign.record.immutable.verify-writeback
 parent: oa.sign.record.immutable
-state: planned
 name: {zh: "验签结果回写通道", en: "Verify-Result Write-Back"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       The only permitted update path for CA verification results: it touches verify_result and verified_at only, which is exactly what the trigger allows; the path exists in phase one with no caller.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.430Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.398Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

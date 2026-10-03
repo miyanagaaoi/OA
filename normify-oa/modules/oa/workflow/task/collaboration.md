@@ -2,7 +2,6 @@
 uid: 1919d059
 id: oa.workflow.task.collaboration
 parent: oa.workflow.task
-state: planned
 name: {zh: "并行协同任务组", en: "Parallel Collaboration Task Groups"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       At the finance node the approver ticks collaborating departments; each department leader gets an independent task group with its own decision. The flow continues only after all groups finish, and any rejection returns the document to the initiator. Collaboration tasks consume no main-chain node number.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.458Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.424Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

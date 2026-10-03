@@ -2,7 +2,6 @@
 uid: 61dcd426
 id: oa.workflow.exception.cascade
 parent: oa.workflow.exception
-state: planned
 name: {zh: "驳回联动关闭", en: "Rejection Cascade & Closing"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Cascade closing after a rejection: on a countersign node any single rejection rejects the node immediately and auto-closes its remaining tasks; a rejection from any collaborating department returns the document to the initiator and closes the other collaboration tasks. Remaining tasks and node instances follow the state machine so no document is left hanging.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.441Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.407Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

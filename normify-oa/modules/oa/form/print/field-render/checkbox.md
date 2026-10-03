@@ -2,7 +2,6 @@
 uid: b57e8c4a
 id: oa.form.print.field-render.checkbox
 parent: oa.form.print.field-render
-state: planned
 name: {zh: "复选框呈现", en: "Checkbox Rendering"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Single and multi-select fields print as the text symbols `☑ / ☐` at body size rather than input[type=checkbox], keeping print and photocopy consistent; plan_category, payment_belong and the other joint-review departments line follow the paper form's look.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.352Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.322Z"
 fingerprint: 88c368e042714c6c1aa4b765a97c2bda96929b19c7be8666e8f9f305cf305896
 source:
   - path: "DESIGN.md"

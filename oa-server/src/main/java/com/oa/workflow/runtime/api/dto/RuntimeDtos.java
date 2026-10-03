@@ -242,7 +242,17 @@ public final class RuntimeDtos {
              * 而列表此前只有类型与发起人，前端拿不到标题就只剩「尽力还原」一条路。
              * 追加在**末尾**，不影响既有字段的顺序与语义。
              */
-            String title
+            String title,
+            /**
+             * 单据**发起时间**（{@code flow_instance.created_at}）。
+             *
+             * <p><b>追加字段</b>（2026-10-05，任务「我已审批按办结时间筛」）：三个列表的
+             * {@code dateFrom/dateTo} 语义不同（{@code done} = {@code flow_task.decided_at}，
+             * 其余 = 发起时间），因此出参必须把**筛选所依据的那个时间**如实给出，避免
+             * 「筛了但看不出按什么筛」。{@code taskCreatedAt} 是**任务**产生时间（待办/已办），
+             * 不能当作发起时间；本字段恒为发起时间，与 {@link PageResult#dateField()} 配套读。
+             */
+            String instanceCreatedAt
     ) {
     }
 
@@ -273,12 +283,27 @@ public final class RuntimeDtos {
     ) {
     }
 
-    /** 分页结果（{@code page} 从 1 起）。 */
+    /**
+     * 分页结果（{@code page} 从 1 起）。
+     *
+     * @param dateField {@code dateFrom/dateTo} 实际作用的那个时间字段名（**如实暴露口径**，
+     *                  2026-10-05 追加）：{@code createdAt} = 单据发起时间
+     *                  （待我审批 / 我发起的 / 抄送我的，对应出参 {@code instanceCreatedAt} /
+     *                  {@code ccCreatedAt} 一族的发起时间），{@code decidedAt} = 我处理该任务的
+     *                  时间（我已审批，对应出参 {@code decidedAt}）。两个列表的同名参数指向
+     *                  不同事实，客户端据此才能正确显示「按 X 时间筛选」。
+     */
     public record PageResult<T>(
             List<T> items,
             long total,
             int page,
-            int size
+            int size,
+            String dateField
     ) {
+        /** 日期筛选依据 = 单据**发起时间**（{@code i.created_at}）。 */
+        public static final String DATE_FIELD_CREATED_AT = "createdAt";
+
+        /** 日期筛选依据 = **我处理该任务的时间**（{@code t.decided_at}）。 */
+        public static final String DATE_FIELD_DECIDED_AT = "decidedAt";
     }
 }

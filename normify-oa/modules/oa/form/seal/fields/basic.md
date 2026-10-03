@@ -2,7 +2,6 @@
 uid: 7f08b391
 id: oa.form.seal.fields.basic
 parent: oa.form.seal.fields
-state: planned
 name: {zh: "印鉴基础字段组", en: "Seal Basic Field Group"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Seal/borrow reason `title` (text ≤60, required), category `category` (fixed to admin, defaulted and greyed out), purpose `purpose` (textarea ≤500, ≥5 characters, raised to 20 when `is_external` is yes) and attachments `attachments` (files, optional).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.358Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.326Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

@@ -2,7 +2,6 @@
 uid: 998909d8
 id: oa.form.print.variant
 parent: oa.form.print
-state: planned
 name: {zh: "打印稿版式", en: "Print Sheet Variants"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Four print layouts: the group contract circulation sheet, the group fund sheet, the subsidiary internal sheet and the seal & certificate sheet. The two group layouts mirror the paper forms, the subsidiary sheet uses vertical fields plus an approval trail, and the seal sheet derives from the group layout (REQ-FORM-001).
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.357Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.325Z"
 fingerprint: d7d0d1b9e6e41e9590b00d6806c9c43da38139e084006a3b5c0ed7a820865bdb
 source:
   - path: "DESIGN.md"

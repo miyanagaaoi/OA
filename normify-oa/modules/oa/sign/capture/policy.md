@@ -2,7 +2,6 @@
 uid: 11dae6d4
 id: oa.sign.capture.policy
 parent: oa.sign.capture
-state: planned
 name: {zh: "节点签名要求判定", en: "Node Signature Policy"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Resolves the signature requirement of a node (mandatory / optional / none). Group leaders and the chairman are mandatory by default; a mandatory node cannot be approved unsigned. Includes the designer configuration endpoint.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.424Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.392Z"
 fingerprint: 7c384f475eefe31be143493f21b22df3dd45e45087da0f4d0d7eb7e98cc2078b
 source:
   - path: "doc/prd-0.1.md"

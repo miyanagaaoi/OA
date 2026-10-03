@@ -2,7 +2,6 @@
 uid: "7267e291"
 id: oa.workflow.exception.resubmit.snapshot
 parent: oa.workflow.exception.resubmit
-state: planned
 name: {zh: "重解析审批人快照", en: "Re-resolve Approver Snapshot"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       On resubmission the approver snapshot and process version are resolved again: candidates come from the latest template version and the current organisation, overwriting the previous snapshot and frozen version rather than reusing them.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.443Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.408Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"

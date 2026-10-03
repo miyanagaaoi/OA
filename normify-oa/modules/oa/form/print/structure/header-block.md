@@ -2,7 +2,6 @@
 uid: a758de8c
 id: oa.form.print.structure.header-block
 parent: oa.form.print.structure
-state: planned
 name: {zh: "抬头与三栏表头", en: "Heading & Three-Column Header"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Document heading: centred, bold, 16pt with 2px letter spacing and an optional subtitle; the three-column header row such as reporting unit | responsible department | submission time, with centred equal-width label cells.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.355Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.323Z"
 fingerprint: 575a8794373e5c9b787da64ecd4e108e7ac3726be946e9988d72588fa3b166fb
 source:
   - path: "DESIGN.md"

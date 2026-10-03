@@ -2,7 +2,6 @@
 uid: 3d4c6f54
 id: oa.form
 parent: oa
-state: planned
 name: {zh: "表单与单据", en: "Forms & Documents"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Four approval document types (matter/fund/contract/seal) on one form-template engine: field dictionary, three-state write model, shared validation, attachment limits, amount rules, dictionary options, and A4 print layout.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.347Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.318Z"
 fingerprint: bbeb3d9d134bd5a3a4751c83c995321260d43af7e642a30dcf9069bba7d15ac9
 source:
   - path: "doc/forms.md"

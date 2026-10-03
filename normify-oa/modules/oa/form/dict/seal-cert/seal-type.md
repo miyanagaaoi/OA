@@ -2,7 +2,6 @@
 uid: 594f65d8
 id: oa.form.dict.seal-cert.seal-type
 parent: oa.form.dict.seal-cert
-state: planned
 name: {zh: "用印类型字典", en: "Seal Type Dictionary"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Seal type `seal_type`: company seal, contract seal, finance seal and legal seal (all require a copy count); certificate borrow (requires `cert_name`, no count). The contract form's intended seal type shares this dictionary.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.344Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.314Z"
 fingerprint: 9e01c603eddd74a5a97498d41625d8be347350c66c0db0ae5d7bb17c4c584112
 source:
   - path: "doc/forms.md"

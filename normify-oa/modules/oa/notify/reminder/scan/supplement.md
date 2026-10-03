@@ -2,7 +2,6 @@
 uid: 9c9cc871
 id: oa.notify.reminder.scan.supplement
 parent: oa.notify.reminder.scan
-state: planned
 name: {zh: "补件时限扫描", en: "Supplement Deadline Scan"}
 description:
   zh: >
@@ -11,8 +10,8 @@ description:
   en: >
       Scans pending supplement requests against flow_supplement.deadline (3 working days by default), marks them overdue and emits a reminder aimed only at the initiator; no auto-reject or auto-approve.
       
-revision: e6f40ca3d3fabae44e2601c81472fafe9370a8b7
-updated_at: "2026-10-03T06:52:10.399Z"
+revision: 7e0c41c54edf2d106fd4e2a995349e6c3132252f
+updated_at: "2026-10-03T07:15:53.368Z"
 fingerprint: f2112a3f56e4ca573fed099fe39c14837f7bba516b0b76dfa0b1ee47e81fcc06
 source:
   - path: "doc/prd-0.1.md"
